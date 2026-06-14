@@ -5,7 +5,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "recovery",
         name: "Recovery",
         category: "combat",
-        unlockCostGold: 10,
+        unlockCostCoins: 10,
         researchRequired: 30,
         shortDescription: "Regeneration. Restores HP every second while the battle runs.",
         flavorText: "“The art of medicine consists in amusing the patient while nature cures the disease.” — Voltaire",
@@ -25,7 +25,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "force",
         name: "Force",
         category: "combat",
-        unlockCostGold: 10,
+        unlockCostCoins: 10,
         researchRequired: 30,
         initialExpToLevel: 5,
         shortDescription: "Attack practice. +0.25 base damage per level (before Strength multiplier).",
@@ -45,7 +45,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "fortitude",
         name: "Fortitude",
         category: "combat",
-        unlockCostGold: 10,
+        unlockCostCoins: 10,
         researchRequired: 30,
         initialExpToLevel: 5,
         shortDescription: "Fortitude training. Reduces incoming slap damage.",
@@ -66,7 +66,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "wisdom",
         name: "Wisdom",
         category: "combat",
-        unlockCostGold: 20,
+        unlockCostCoins: 20,
         researchRequired: 90,
         initialExpToLevel: 3,
         initialTalentToLevel: 3,
@@ -87,48 +87,48 @@ const SKILL_DEFINITION_ROWS = [
         key: "greed",
         name: "Greed",
         category: "combat",
-        unlockCostGold: 30,
+        unlockCostCoins: 30,
         researchRequired: 150,
         initialExpToLevel: 3,
         initialTalentToLevel: 3,
-        shortDescription: "Treasure sense. Boosts gold gain on kills.",
+        shortDescription: "Treasure sense. Boosts coins gain on kills.",
         flavorText: "“He who knows that enough is enough will always have enough.” — Lao Tzu",
         guestArchetype: "Treasure Broker",
         guestRarity: 9,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: multiply gold from kills by 1.1 per Greed skill level (compounding).";
+            return "Reward: multiply coins from kills by 1.1 per Greed skill level (compounding).";
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { greedKillGoldMultiplier: Math.pow(1.1, sk.level || 0) };
+            return { greedKillCoinsMultiplier: Math.pow(1.1, sk.level || 0) };
         }
     },
     {
         key: "scavenger",
         name: "Scavenger",
         category: "combat",
-        unlockCostGold: 20,
+        unlockCostCoins: 20,
         researchRequired: 90,
         initialExpToLevel: 10,
-        shortDescription: "Looting knack. Adds extra base gold per intruder removal.",
+        shortDescription: "Looting knack. Adds extra base coins per intruder removal.",
         flavorText: "“Waste not, want not.” — English proverb",
-        guestArchetype: "Scrap Hunter",
+        guestArchetype: "Scrap Mockery",
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: +1 base gold per skill level on each intruder removal. Applies before other multipliers.";
+            return "Reward: +1 base coins per skill level on each intruder removal. Applies before other multipliers.";
         },
-        triggerText: "Trigger: gain sqrt(gold gained) exp on killing a unit.",
+        triggerText: "Trigger: gain sqrt(coins gained) exp on killing a unit.",
         getEffect: function(sk) {
-            return { scavengerKillGoldFlatPerKill: sk.level || 0 };
+            return { scavengerKillCoinsFlatPerKill: sk.level || 0 };
         }
     },
     {
         key: "endurance",
         name: "Endurance",
         category: "combat",
-        unlockCostGold: 30,
+        unlockCostCoins: 30,
         researchRequired: 150,
         initialExpToLevel: 10,
         shortDescription: "Resolve. Raises base HP as the skill levels; gains exp every 10s from current HP.",
@@ -148,7 +148,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "tenacity",
         name: "Tenacity",
         category: "combat",
-        unlockCostGold: 30,
+        unlockCostCoins: 30,
         researchRequired: 150,
         initialExpToLevel: 10,
         shortDescription: "Grit under pressure. Bonus HP while hurt; gains exp each second below half HP.",
@@ -169,7 +169,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "adaptation",
         name: "Adaptation",
         category: "combat",
-        unlockCostGold: 30,
+        unlockCostCoins: 30,
         researchRequired: 150,
         initialExpToLevel: 5,
         shortDescription: "Body and mind adjust to milestones: +1 Str and +1 Con each time this skill levels.",
@@ -190,7 +190,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "integration",
         name: "Integration",
         category: "combat",
-        unlockCostGold: 40,
+        unlockCostCoins: 40,
         researchRequired: 200,
         initialExpToLevel: 8,
         shortDescription: "Cross-training. Other skills' exp gains multiply; grows when other combat or class skills level.",
@@ -206,13 +206,13 @@ const SKILL_DEFINITION_ROWS = [
             return { integrationOtherSkillExpMult: Math.pow(1.1, sk.level || 0) };
         }
     },
-    //rogue skills
+    //scold skills
     {
         key: "alacrity",
         name: "Alacrity",
         category: "class",
-        classKey: "rogue",
-        unlockCostGold: 30,
+        classKey: "scold",
+        unlockCostCoins: 30,
         researchRequired: 300,
         initialExpToLevel: 5,
         shortDescription: "Quick hands. Reduces slap/sandal cooldowns.",
@@ -236,11 +236,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "sneak_attack",
         name: "Sneak Attack",
         category: "class",
-        classKey: "rogue",
-        unlockCostGold: 200,
+        classKey: "scold",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Rogue opener damage bonus on first hit per intruder.",
+        shortDescription: "Scold opener damage bonus on first hit per intruder.",
         flavorText: "“All warfare is based on deception.” — Sun Tzu",
         guestArchetype: "Back Alley Teacher",
         guestRarity: 7,
@@ -257,11 +257,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "exploit",
         name: "Exploit",
         category: "class",
-        classKey: "rogue",
-        unlockCostGold: 200,
+        classKey: "scold",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Rogue sustained pressure on repeated target hits.",
+        shortDescription: "Scold sustained pressure on repeated target hits.",
         flavorText: "“Opportunities multiply as they are seized.” — Sun Tzu",
         guestArchetype: "Knife Expert",
         guestRarity: 7,
@@ -275,16 +275,16 @@ const SKILL_DEFINITION_ROWS = [
         }
     },
     {
-        key: "precision_rogue",
+        key: "precision_scold",
         name: "Precision",
         category: "class",
-        classKey: "rogue",
-        unlockCostGold: 200,
+        classKey: "scold",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Rogue class skill.",
+        shortDescription: "Scold class skill.",
         flavorText: "“Aim small, miss small.” — traditional marksmanship advice",
-        guestArchetype: "Rogue Tutor",
+        guestArchetype: "Scold Tutor",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
@@ -295,13 +295,13 @@ const SKILL_DEFINITION_ROWS = [
             return { precisionPlaceholderCritPercent: sk.level || 0 };
         }
     },
-    //warrior skills
+    //condescension skills
     {
         key: "adrenaline",
         name: "Adrenaline",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 30,
+        classKey: "condescension",
+        unlockCostCoins: 30,
         researchRequired: 300,
         initialExpToLevel: 5,
         shortDescription: "Pressure fighting. Grants Strength with crowding.",
@@ -321,8 +321,8 @@ const SKILL_DEFINITION_ROWS = [
         key: "preparation",
         name: "Preparation",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 30,
+        classKey: "condescension",
+        unlockCostCoins: 30,
         researchRequired: 300,
         initialExpToLevel: 5,
         shortDescription: "Poise. Faster slap recharge when not engaged.",
@@ -339,16 +339,16 @@ const SKILL_DEFINITION_ROWS = [
         }
     },
     {
-        key: "toughness_warrior",
+        key: "toughness_condescension",
         name: "Toughness",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior class skill.",
+        shortDescription: "Condescension class skill.",
         flavorText: "“Difficulty strengthens the mind, as labor does the body.” — Seneca",
-        guestArchetype: "Warrior Mentor",
+        guestArchetype: "Condescension Mentor",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
@@ -363,11 +363,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "cleave",
         name: "Cleave",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior power strikes splash to adjacent threats.",
+        shortDescription: "Condescension power strikes splash to adjacent threats.",
         flavorText: "“As iron sharpens iron, so one person sharpens another.” — Proverbs 27:17",
         guestArchetype: "Greatblade Master",
         guestRarity: 8,
@@ -384,11 +384,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "thorns",
         name: "Thorns",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior retaliates on slap damage taken.",
+        shortDescription: "Condescension retaliates on slap damage taken.",
         flavorText: "“Whoever digs a pit will fall into it.” — Ecclesiastes 10:8",
         guestArchetype: "Spiked Defender",
         guestRarity: 6,
@@ -405,11 +405,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "execute",
         name: "Execute",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior deals more damage to wounded enemies.",
+        shortDescription: "Condescension deals more damage to wounded enemies.",
         flavorText: "“Never interrupt your intruder when he is making a mistake.” — Napoleon Bonaparte",
         guestArchetype: "Finisher Captain",
         guestRarity: 7,
@@ -426,11 +426,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "second_wind",
         name: "Second Wind",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior recovers HP when blocking.",
+        shortDescription: "Condescension recovers HP when blocking.",
         flavorText: "“Fall seven times, stand up eight.” — Japanese proverb",
         guestArchetype: "Battle Survivor",
         guestRarity: 6,
@@ -447,11 +447,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "overkill",
         name: "Overkill",
         category: "class",
-        classKey: "warrior",
-        unlockCostGold: 200,
+        classKey: "condescension",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Warrior finisher rhythm: exp from excess damage; after kills, surge the weapon bar (capped by attack floor).",
+        shortDescription: "Condescension finisher rhythm: exp from excess damage; after kills, surge the weapon bar (capped by attack floor).",
         flavorText: "“Anything worth doing is worth overdoing.” — Mick Jagger (attributed)",
         guestArchetype: "Executioner",
         guestRarity: 7,
@@ -469,11 +469,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "longshot",
         name: "Longshot",
         category: "class",
-        classKey: "hunter",
-        unlockCostGold: 200,
+        classKey: "mockery",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Hunter sandal finishing and damage scaling.",
+        shortDescription: "Mockery sandal finishing and damage scaling.",
         flavorText: "“The good archer is known not by his arrows, but by his aim.” — English proverb",
         guestArchetype: "Farshot Scout",
         guestRarity: 6,
@@ -490,11 +490,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "impact",
         name: "Impact",
         category: "class",
-        classKey: "hunter",
-        unlockCostGold: 200,
+        classKey: "mockery",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Hunter sandal knockback and upper-map precision training.",
+        shortDescription: "Mockery sandal knockback and upper-map precision training.",
         flavorText: "“To every action there is always opposed an equal reaction.” — Isaac Newton",
         guestArchetype: "Siege Archer",
         guestRarity: 8,
@@ -508,16 +508,16 @@ const SKILL_DEFINITION_ROWS = [
         }
     },
     {
-        key: "marksmanship_hunter",
+        key: "marksmanship_mockery",
         name: "Marksmanship",
         category: "class",
-        classKey: "hunter",
-        unlockCostGold: 200,
+        classKey: "mockery",
+        unlockCostCoins: 200,
         researchRequired: 2000,
         initialExpToLevel: 5,
-        shortDescription: "Hunter class skill.",
+        shortDescription: "Mockery class skill.",
         flavorText: "“Practice is the best of all instructors.” — Publilius Syrus",
-        guestArchetype: "Hunter Guide",
+        guestArchetype: "Mockery Guide",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
@@ -528,15 +528,15 @@ const SKILL_DEFINITION_ROWS = [
             return { marksmanshipPlaceholderSandalPct: sk.level || 0 };
         }
     },
-    //town skills
+    //resort skills
     {
         key: "interfere",
         name: "Interfere",
-        category: "town",
-        unlockCostGold: 30,
+        category: "resort",
+        unlockCostCoins: 30,
         researchRequired: 300,
         initialExpToLevel: 5,
-        shortDescription: "Improves manual town action speed and rewards.",
+        shortDescription: "Improves manual resort action speed and rewards.",
         flavorText: "“Plans are nothing; planning is everything.” — Dwight D. Eisenhower",
         guestArchetype: "Busy Foreman",
         guestRarity: 4,
@@ -547,7 +547,7 @@ const SKILL_DEFINITION_ROWS = [
             const rewardBonus = (sk.talentLevel || 0) * 10;
             return `Reward: manual action cooldown speed ×${cdSpeed.toFixed(2)}; +${rewardBonus}% manual action reward from talent.`;
         },
-        triggerText: "Trigger: each time you press a manual town action.",
+        triggerText: "Trigger: each time you press a manual resort action.",
         getEffect: function(sk) {
             const lv = Math.min(99, sk.level || 0);
             return {
@@ -559,13 +559,13 @@ const SKILL_DEFINITION_ROWS = [
     {
         key: "gossip",
         name: "Gossip",
-        category: "town",
-        unlockCostGold: 100,
+        category: "resort",
+        unlockCostCoins: 100,
         researchRequired: 1000,
         initialExpToLevel: 5,
         shortDescription: "Speeds guest chats and amplifies tips gained.",
-        flavorText: "“Speech is silver, silence is golden.” — English proverb",
-        guestArchetype: "Town Rumormonger",
+        flavorText: "“Speech is silver, silence is coinsen.” — English proverb",
+        guestArchetype: "Resort Rumormonger",
         guestRarity: 3,
         affectedStat: "none",
         rewardText: function(sk) {
@@ -588,7 +588,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "technique",
         name: "Technique",
         category: "foraging",
-        unlockCostGold: 60,
+        unlockCostCoins: 60,
         researchRequired: 600,
         initialExpToLevel: 5,
         shortDescription: "Improve harvest hits.",
@@ -608,7 +608,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "quick_rest",
         name: "Quick Rest",
         category: "foraging",
-        unlockCostGold: 60,
+        unlockCostCoins: 60,
         researchRequired: 600,
         initialExpToLevel: 5,
         shortDescription: "Recover stamina from successful gathering.",
@@ -628,7 +628,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "breathing",
         name: "Breathing",
         category: "foraging",
-        unlockCostGold: 60,
+        unlockCostCoins: 60,
         researchRequired: 600,
         initialExpToLevel: 5,
         shortDescription: "Increase stamina capacity over time.",
@@ -648,11 +648,11 @@ const SKILL_DEFINITION_ROWS = [
         key: "planning",
         name: "Planning",
         category: "foraging",
-        unlockCostGold: 60,
+        unlockCostCoins: 60,
         researchRequired: 600,
         initialExpToLevel: 5,
         shortDescription: "Ambush preparation for first strikes.",
-        flavorText: "“Victorious warriors win first and then go to war, while defeated warriors go to war first and then seek to win.” — Sun Tzu",
+        flavorText: "“Victorious condescensions win first and then go to war, while defeated condescensions go to war first and then seek to win.” — Sun Tzu",
         guestArchetype: "Pathfinder",
         guestRarity: 5,
         affectedStat: "none",
@@ -698,7 +698,7 @@ let skills = {
             stars: {
                 bronze: false,
                 silver: false,
-                gold: false
+                coins: false
             }
         };
         if (d.maxLevel !== undefined) {
@@ -718,7 +718,7 @@ let skills = {
 
     resetSkillForRun: function(skill) {
         const cat = skill.category || "combat";
-        if (cat === "town") {
+        if (cat === "resort") {
             return;
         }
         skill.level = 0;
@@ -735,7 +735,7 @@ let skills = {
         const sk = progressSkills;
         const out = [];
         const currentClass = data.progress.currentClassKey || "none";
-        if (category === "class" && ["warrior", "rogue", "hunter"].indexOf(currentClass) < 0) {
+        if (category === "class" && ["condescension", "scold", "mockery"].indexOf(currentClass) < 0) {
             return out;
         }
         for (let i = 0; i < skills.keysInOrder.length; i++) {
@@ -767,7 +767,7 @@ let skills = {
         return keys.length > 0;
     },
     isSkillUnlocked: function(skillKey) {
-        return !!data.progress.base.library.unlockedSkills[skillKey];
+        return !!data.progress.base.scrollArchives.unlockedSkills[skillKey];
     },
 
     getSkillRewardText: function(skillKey, skill) {
@@ -803,7 +803,7 @@ let skills = {
             case "wisdom":
                 return `Current: char exp ×${roundNearestDecimals(e.wisdomCharacterExpMultiplier || 1, 2)}`;
             case "greed":
-                return `Current: intruder removal gold ×${roundNearestDecimals(e.greedKillGoldMultiplier || 1, 2)}`;
+                return `Current: intruder removal coins ×${roundNearestDecimals(e.greedKillCoinsMultiplier || 1, 2)}`;
             case "endurance":
                 return `Current: +${e.enduranceBaseHpInnerBonus || 0} base HP inner`;
             case "tenacity": {
@@ -815,7 +815,7 @@ let skills = {
             case "integration":
                 return `Current: ×${roundNearestDecimals(e.integrationOtherSkillExpMult || 1, 4)} other skills' skill exp`;
             case "scavenger":
-                return `Current: +${e.scavengerKillGoldFlatPerKill || 0} base gold per intruder removal`;
+                return `Current: +${e.scavengerKillCoinsFlatPerKill || 0} base coins per intruder removal`;
             case "alacrity": {
                 const lv = e.alacrityEffectiveLevel || 0;
                 return `Current: −${lv * cd.alacritySlapReductionPerLevelMs} ms slap / −${lv * cd.alacritySandalReductionPerLevelMs} ms sandal`;
@@ -824,13 +824,13 @@ let skills = {
                 return `Current: first hit +${roundNearestDecimals((e.sneakFirstHitDamageBonusFraction || 0) * 100, 1)}%`;
             case "exploit":
                 return `Current: +${e.exploitFlatDamagePerConsecutiveStep || 0} dmg per repeat-hit step`;
-            case "precision_rogue":
+            case "precision_scold":
                 return `Current: +${e.precisionPlaceholderCritPercent || 0}% crit (placeholder)`;
             case "adrenaline":
                 return `Current: +${e.adrenalineStrFromSkillLevels || 0} Str from this skill`;
             case "preparation":
                 return `Current: +${roundNearestDecimals((e.preparationIdleRechargeFraction || 0) * 100, 1)}% slap recharge when idle`;
-            case "toughness_warrior":
+            case "toughness_condescension":
                 return `Current: ${roundNearestDecimals(e.toughnessArmorFlat || 0, 2)} armor flat`;
             case "cleave":
                 return `Current: splash ${roundNearestDecimals((e.cleaveSplashFraction || 0) * 100, 1)}% of strike`;
@@ -846,7 +846,7 @@ let skills = {
                 return `Current: +${e.longshotSandalFlatDamage || 0} sandal damage`;
             case "impact":
                 return `Current: knockback ${roundNearestDecimals(e.impactKnockbackTravelSeconds || 0, 2)}× intruder speed`;
-            case "marksmanship_hunter":
+            case "marksmanship_mockery":
                 return `Current: +${e.marksmanshipPlaceholderSandalPct || 0}% sandal (placeholder)`;
             case "interfere":
                 return `Current: manual CD ×${roundNearestDecimals(e.interfereManualCdSpeedMult || 1, 2)}; reward ×${roundNearestDecimals(e.interfereManualRewardMult || 1, 2)}`;
@@ -871,8 +871,8 @@ let skills = {
         const d = skills._byKey[skillKey];
         return (d && d.flavorText) ? d.flavorText : "";
     },
-    getSkillUnlockCostGold: function(skillKey) {
-        return skills._byKey[skillKey].unlockCostGold;
+    getSkillUnlockCostCoins: function(skillKey) {
+        return skills._byKey[skillKey].unlockCostCoins;
     },
     getSkillresearchRequired: function(skillKey) {
         return skills._byKey[skillKey].researchRequired;
@@ -905,7 +905,7 @@ let skills = {
         let starCount = 0;
         if (stars.bronze) starCount++;
         if (stars.silver) starCount++;
-        if (stars.gold) starCount++;
+        if (stars.coins) starCount++;
         // Additive star scaling per design: 0 stars x1, 1 star x2, 2 stars x4, 3 stars x6.
         const starMult = starCount > 0 ? (starCount * 2) : 1;
         return {

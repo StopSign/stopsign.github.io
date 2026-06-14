@@ -68,8 +68,10 @@ let driver = {
     secondPassed: function() {
         data.currentGameState.secondsPassed++;
 
-    },
-    realSecondPassed: function() {
+        if (typeof engine.updateManaPerSecond === "function") {
+            engine.updateManaPerSecond();
+        }
+
         const chapel = data.progress.base && data.progress.base.chapel;
         if (!chapel || !chapel.autoRetryEnabled) {
             return;
@@ -84,6 +86,8 @@ let driver = {
         } else {
             data.progress.autoRetryCountdownSec = 0;
         }
+    },
+    realSecondPassed: function() {
     },
     skipTime: function(time) {
 

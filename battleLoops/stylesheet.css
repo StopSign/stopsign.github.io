@@ -17,20 +17,96 @@ body {
 }
 
 #mainLayout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-height: calc(100vh - 30px);
+    justify-content: flex-start;
+}
+
+.game-columns-row {
     display: grid;
     grid-template-columns: 690px 690px;
     gap: 10px;
-    min-height: calc(100vh - 30px);
-    align-items: flex-start;
-    justify-content: center;
+    width: 1390px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.game-progress-bars {
+    width: 1390px;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.game-progress-bar {
+    width: 100%;
+}
+
+.game-progress-track {
+    position: relative;
+}
+
+.game-progress-bar-label {
+    position: absolute;
+    inset: 0;
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.game-progress-sep {
+    margin: 0 0.35em;
+}
+
+.game-progress-bar-label .game-progress-bold {
+    font-weight: bold;
+}
+
+.game-progress-bar-label .muted-text {
+    margin-top: 0;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+    color: #9ca3af;
+}
+
+.game-progress-bar-label .okami-state-display {
+    pointer-events: auto;
+}
+
+.prog-fill-okami-exp {
+    background: #734d05;
+}
+
+.prog-fill-mana {
+    background: #3c0295;
 }
 
 @media (max-width: 1419px) {
     #mainLayout {
-        display: block;
         max-width: 690px;
         margin-left: auto;
         margin-right: auto;
+    }
+
+    .game-columns-row {
+        grid-template-columns: 690px;
+        width: 690px;
+    }
+
+    .game-progress-bars {
+        width: 690px;
     }
 }
 
@@ -54,6 +130,7 @@ body {
     background: #101621;
     position: relative;
     min-height: 0;
+    height: 810px;
     width: 690px;
     max-width: 100%;
     box-sizing: border-box;
@@ -97,14 +174,18 @@ button {
     flex: 1 1 auto;
     min-height: 0;
     height: auto;
+    overflow: hidden;
+    position: relative;
 }
 
 #battleColumn {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     padding: 8px;
     gap: 8px;
+    height: 800px;
+    position: relative;
 }
 
 #battlefieldWrap {
@@ -330,6 +411,10 @@ button {
     border: 1px solid var(--border-color);
     border-radius: 2px;
     overflow: hidden;
+}
+
+.prog-track.game-progress-track {
+    height: 28px;
 }
 
 .prog-fill {
@@ -949,13 +1034,30 @@ button {
     margin-bottom: 6px;
 }
 
+#tabPane_base {
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#tabPane_base .pane-title {
+    position: relative;
+    z-index: 30;
+}
+
 .base-map-wrap {
     position: relative;
     width: 100%;
-    min-height: 220px;
+    height: 690px;
     border: 1px solid var(--border-color);
-    background: linear-gradient(to bottom, #152339, #132032);
+    background: linear-gradient(to bottom, #10233a 0%, #10233a 48%, #172817 49%, #162318 100%);
     margin-bottom: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    --path-end-x: 631px;
+    --path-end-y: 328px;
+    user-select: none;
 }
 
 .base-building-label {
@@ -975,7 +1077,14 @@ button {
 .base-building-label.base-building-selected {
     color: #f9e2af;
     text-decoration: underline;
-    font-weight: bold;
+    font-weight: inherit;
+    text-shadow: 0.45px 0 0 currentColor, -0.45px 0 0 currentColor;
+}
+
+.resort-building-map-btn.base-building-selected .resort-building-label-text,
+.resort-building-hidden-spring.base-building-selected .resort-building-label-text {
+    font-weight: inherit;
+    text-shadow: 0.45px 0 0 currentColor, -0.45px 0 0 currentColor;
 }
 
 .base-building-label.base-building-label--notify {
@@ -989,29 +1098,803 @@ button {
     color: #e67e22;
 }
 
-.base-building-chapel { top: 20px; left: 5%; }
-.base-building-inn { top: 50px; left: 24%; }
-.base-building-guild { top: 76px; left: 43%; }
-.base-building-townhall { top: 12px; left: 46%; }
-.base-building-market { top: 108px; left: 36%; }
-.base-building-garden { bottom: 62px; right: 31%; }
-.base-building-workshop { top: 84px; right: 12%; }
-.base-building-mage_tower { top: 24px; right: 12%; }
-.base-building-library { bottom: 18px; left: 46%; }
-.base-building-lumbermill { bottom: 58px; left: 24%; }
-.base-building-mine-node { top: 118px; left: 24px; }
-.base-building-smith-node { top: 118px; left: 120px; }
-.base-building-claypit-node { bottom: 18px; left: 24px; }
-.base-building-kiln-node { bottom: 18px; left: 120px; }
-.base-building-library-node { bottom: 18px; left: 46%; }
+.resort-map-cave {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    left: 50%;
+    top: -48px;
+    transform: translateX(-50%);
+    background: url("img/cave.svg") center top / contain no-repeat;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.resort-building-label {
+    z-index: 12;
+    text-shadow: 0 1px 3px #000;
+    user-select: none;
+}
+
+.resort-building-map-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    font-size: 12px;
+}
+
+.resort-building-art {
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.resort-building-label-text {
+    user-select: none;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.resort-building-display {
+    user-select: none;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 100%;
+    line-height: 1.2;
+}
+
+.resort-building-hidden-spring {
+    top: 73px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 11;
+}
+
+.resort-building-hidden-spring.map-building-locked {
+    pointer-events: none;
+    cursor: default;
+}
+
+.resort-building-hidden-spring.map-building-locked .resort-building-label-text {
+    display: none;
+}
+
+.resort-building-mine { top: 20px; left: 55px; }
+
+.resort-building-inn {
+    bottom: 200px;
+    left: 140px;
+    transform: none;
+}
+
+.resort-building-bar {
+    left: 30%;
+    bottom: 203px;
+    transform: none;
+}
+
+.resort-building-laundry {
+    left: 11%;
+    bottom: 293px;
+    transform: none;
+}
+
+.resort-building-torii {
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.resort-building-cistern {
+    left: 80%;
+    bottom: 290px;
+    transform: none;
+}
+
+.resort-building-bonfire {
+    left: 88%;
+    bottom: 12px;
+    transform: none;
+}
+
+.resort-building-garden {
+    left: 71%;
+    bottom: 59px;
+    transform: none;
+}
+
+.resort-building-atelier {
+    left: 74%;
+    bottom: 192px;
+    transform: none;
+}
+
+.resort-building-scrollArchives {
+    left: 61%;
+    bottom: 270px;
+    transform: none;
+}
+
+.resort-building-market {
+    left: 5%;
+    bottom: 9px;
+    transform: none;
+}
+
+.resort-building-mage-tower {
+    left: 45%;
+    bottom: 143px;
+    transform: none;
+}
+
+.resort-building-stone-pile {
+    left: calc(var(--path-end-x) - 9px);
+    top: calc(var(--path-end-y) + 18px);
+    transform: translate(-50%, 0);
+    bottom: auto;
+    right: auto;
+}
+
+.resort-building-bamboo {
+    left: calc(var(--path-end-x) - 9px);
+    top: calc(var(--path-end-y) + 125px);
+    transform: translate(-50%, 0);
+    bottom: auto;
+    right: auto;
+}
+
+.resort-building-fox-den {
+    bottom: 260px;
+    left: 50%;
+    top: auto;
+    transform: translateX(-50%);
+    z-index: 13;
+}
+
+.map-reveal-hidden {
+    visibility: hidden;
+}
+
+.resort-building-map-btn.map-building-layout-hidden {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.fox-den-map-slot {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transform: translate(-50%, -50%);
+    z-index: 11;
+    pointer-events: none;
+}
+
+.fox-den-build-art {
+    width: 36px;
+    height: 36px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.fox-den-carrier-token {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.fox-den-carrier-img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.spirit-slot-grid {
+    position: absolute;
+    display: grid;
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: 22px;
+    gap: 3px;
+    z-index: 14;
+}
+
+.spirit-slot-grid-earth { top: 60px; left: 205px; }
+.spirit-slot-grid-water { top: 60px; left: 385px; }
+.spirit-slot-grid-fire { top: 5px; left: 50%; transform: translateX(-50%); }
+.spirit-slot-grid-mine-earth {
+    top: 44px;
+    left: 54px;
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: 22px;
+}
+
+.spirit-slot-grid-bamboo-plant {
+    left: calc(var(--path-end-x) - 57px);
+    top: calc(var(--path-end-y) + 206px);
+    grid-template-columns: repeat(4, 22px);
+    grid-template-rows: 22px;
+}
+
+.spirit-slot-plant {
+    border: 1px solid #4a9a4a;
+}
+
+.plant-spirit-token {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #4a9a4a;
+    z-index: 14;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+    color: #fff7ed;
+    text-shadow: 0 1px 2px #000;
+}
+
+.plant-spirit-token.spirit-token-selected {
+    outline: 2px solid #f9e2af;
+    outline-offset: 1px;
+}
+
+.bamboo-stalk-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.bamboo-stalk-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+}
+
+.bamboo-cell-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    width: 100%;
+    height: 56px;
+}
+
+.bamboo-cell-rail {
+    width: 3px;
+    background: #2d4a2d;
+    flex-shrink: 0;
+}
+
+.bamboo-cell-body {
+    flex: 1;
+    position: relative;
+    background: rgba(20, 40, 20, 0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 56px;
+}
+
+.bamboo-cell-label {
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #f3f4f6;
+    text-shadow: 0 1px 2px #000, 0 0 4px #000;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.bamboo-cell-wrap:hover .bamboo-cell-label {
+    display: flex;
+}
+
+.bamboo-cell-fill {
+    width: 100%;
+    min-height: 0;
+    transition: height 0.15s linear;
+}
+
+.bamboo-harvest-row,
+.bamboo-status-row,
+.bamboo-base-wood-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.bamboo-cut-btn {
+    width: 64px;
+    font-size: 11px;
+    padding: 2px 4px;
+}
+
+.bamboo-cut-btn.bamboo-cut-active {
+    background: #3d7a3d;
+    color: #f3f4f6;
+}
+
+.bamboo-status-text,
+.bamboo-base-wood-col {
+    width: 64px;
+    text-align: center;
+    font-size: 11px;
+}
+
+.bamboo-base-wood-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.bamboo-tagline {
+    text-align: center;
+    margin-top: 6px;
+}
+
+.base-upgrade-divider {
+    height: 1px;
+    background: rgba(148, 163, 184, 0.35);
+    margin: 10px 0 8px;
+}
+
+.spirit-slot {
+    width: 22px;
+    height: 22px;
+    box-sizing: border-box;
+    background: rgba(8, 12, 18, 0.35);
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+    color: #f3f4f6;
+    cursor: pointer;
+}
+
+.spirit-slot.spirit-slot-selected {
+    outline: 2px solid #f9e2af;
+    outline-offset: 1px;
+}
+
+.spirit-slot.spirit-slot-filled {
+    color: #fff7ed;
+    text-shadow: 0 1px 2px #000;
+}
+
+.spirit-slot-earth { border: 1px solid #8a5a2b; }
+.spirit-slot-water { border: 1px solid #4da3ff; }
+.spirit-slot-fire { border: 1px solid #ff8a3d; }
+
+.earth-spirit-token {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #c08a46;
+    z-index: 14;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1;
+    color: #fff7ed;
+    text-shadow: 0 1px 2px #000;
+}
+
+.earth-spirit-token.spirit-token-selected {
+    outline: 2px solid #f9e2af;
+    outline-offset: 1px;
+}
+
+.pebble-token {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #9ca3af;
+    border: 1px solid #d1d5db;
+    z-index: 13;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.path-seg-hit {
+    cursor: pointer;
+}
+
+.path-seg-highlight {
+    stroke: transparent;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+    transition: none;
+}
+
+.path-seg-highlight.path-seg-hover {
+    stroke: #9ca3af;
+    filter: none;
+}
+
+.path-seg-highlight.path-seg-selected {
+    stroke: #f9e2af;
+    filter: drop-shadow(0 0 6px rgba(249, 226, 175, 0.55));
+}
+
+.okami-site-tail {
+    display: none;
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    left: calc(50% - 23px - 15px);
+    top: 10px;
+    bottom: auto;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 3;
+}
+
+.okami-site-tail.okami-site-tail-visible {
+    display: block;
+}
+
+.resort-building-hidden-spring.map-building-locked .okami-site-tail {
+    bottom: 50%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.okami-travel-token {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    z-index: 14;
+    pointer-events: none;
+}
+
+.okami-path-weave-token {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: 14;
+    pointer-events: none;
+    transform: translate(-100%, -50%);
+}
+
+.okami-path-weave-tail {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.okami-travel-tail {
+    width: 100%;
+    height: 100%;
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.okami-tail-mirror {
+    transform: scaleX(-1);
+}
+
+.resort-path-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.resort-path-track,
+.resort-path-hollow {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.resort-path-track {
+    stroke: rgba(205, 214, 244, 0.55);
+    stroke-width: 18;
+}
+
+.resort-path-hollow {
+    stroke: #10233a;
+    stroke-width: 14;
+}
+
+.path-seg-track,
+.path-seg-hollow {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.path-seg-track {
+    stroke-width: 18;
+}
+
+.path-seg-hollow {
+    stroke-width: 14;
+}
+
+.path-seg-track-tier-rocks {
+    stroke: #8a92a8;
+}
+
+.path-seg-hollow-tier-rocks {
+    stroke: none;
+}
+
+.path-seg-track-tier-clear {
+    stroke: #c8d0e8;
+}
+
+.path-seg-hollow-tier-clear {
+    stroke: #10233a;
+}
+
+.path-seg-track-tier-railing {
+    stroke: #d4b896;
+}
+
+.path-seg-hollow-tier-railing {
+    stroke: #4a3828;
+}
+
+.path-seg-track-tier-stairs {
+    stroke: #9ec4a0;
+}
+
+.path-seg-hollow-tier-stairs {
+    stroke: none;
+}
+
+.path-seg-track-tier-lanterns {
+    stroke: #b8dcf0;
+}
+
+.path-seg-hollow-tier-lanterns {
+    stroke: #1a3a4a;
+}
+
+.resort-map-progress {
+    position: absolute;
+    z-index: 12;
+    width: 78px;
+}
+
+.resort-map-progress-laundry {
+    bottom: 250px;
+    left: 160px;
+}
+
+.resort-map-progress-torii {
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#baseBuildingInfo {
+    z-index: 50;
+    display: none;
+}
+
+#baseBuildingInfo.base-info-on-battle {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: auto;
+    max-height: calc(100% - 16px);
+    height: auto;
+}
+
+#baseBuildingInfo.base-info-on-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto;
+    max-height: 100%;
+    height: auto;
+}
 
 .base-info-panel {
     border: 1px solid var(--border-color);
-    min-height: 120px;
-    max-height: none;
-    overflow-y: auto;
+    overflow: hidden;
     padding: 10px;
     background: #0c1220;
+    box-sizing: border-box;
+    margin-bottom: 0;
+    transition: none;
+    flex-direction: column;
+}
+
+.base-info-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.base-info-worker-dock {
+    flex: 0 0 auto;
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.base-info-worker-dock-section {
+    padding-bottom: 4px;
+}
+
+.worker-prog-fill-instant,
+.base-info-worker-dock .prog-fill,
+.base-worker-power-row .prog-fill {
+    transition: none;
+}
+
+.base-info-close-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 50;
+    border: 1px solid var(--border-color);
+    background: #1f2b3e;
+    color: #e5e7eb;
+    width: 24px;
+    height: 24px;
+    line-height: 20px;
+    padding: 0;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.base-info-close-btn:hover {
+    background: #2d4e7a;
+}
+
+.torii-next-visitor-progress {
+    margin-top: 6px;
+    margin-bottom: 8px;
+}
+
+.okami-inspiration-hint {
+    font-size: 12px;
+}
+
+.debug-speed-panel {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 200;
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--overlay-color);
+}
+
+.debug-speed-btn.debug-speed-active {
+    background-color: #2d6a4f;
+    border-color: #52b788;
+}
+
+.okami-exp-block {
+    margin: 8px 0 12px;
+}
+
+.okami-exp-label {
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.okami-exp-track {
+    height: 14px;
+}
+
+.okami-stat-row {
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.okami-state-display.okami-state-clickable {
+    cursor: pointer;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.okami-state-display.okami-state-clickable:hover {
+    color: #89b4fa;
+}
+
+.assign-okami-btn {
+    margin-top: 8px;
+}
+
+.assign-okami-btn.assign-okami-btn-active {
+    background: #2d4e7a;
+}
+
+.upgrade-btn-weaving {
+    position: relative;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.upgrade-btn-weaving::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--weave-pct, 0%);
+    background: rgba(79, 158, 255, 0.35);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.upgrade-btn-paused {
+    opacity: 0.72;
+}
+
+.tab-button.upgrade-btn-ready {
+    border-color: #4dc719;
+    background: #134f73;
+}
+
+.tab-button.upgrade-btn-ready:hover {
+    background: #134f73 !important;
+}
+
+@keyframes fox-den-queue-flash {
+    0%, 100% {
+        color: inherit;
+    }
+    15% {
+        color: #ef4444;
+    }
+}
+
+.resort-building-display.fox-den-queue-flash {
+    animation: fox-den-queue-flash 1s ease;
 }
 
 .base-info-title {
@@ -1080,7 +1963,7 @@ button {
     flex-shrink: 0;
 }
 
-.base-library-row {
+.base-scrollArchives-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1089,11 +1972,11 @@ button {
     padding:2px;
 }
 
-.base-library-row:hover {
+.base-scrollArchives-row:hover {
     background: #162238;
 }
 
-#basePanel_library .base-library-row {
+#basePanel_scrollArchives .base-scrollArchives-row {
     align-items: flex-start;
     background: #171e30;
     border-bottom: 2px solid #101621;
@@ -1101,11 +1984,11 @@ button {
     margin-bottom: 0;
 }
 
-#basePanel_library .base-library-row:hover {
+#basePanel_scrollArchives .base-scrollArchives-row:hover {
     background: #222b42;
 }
 
-#basePanel_library .base-library-row:last-child {
+#basePanel_scrollArchives .base-scrollArchives-row:last-child {
     margin-bottom: 8px;
 }
 
@@ -1139,21 +2022,6 @@ button {
     margin-top: 4px;
 }
 
-.map-manual-btn {
-    display: none;
-    border: 1px solid var(--border-color);
-    background: #1f2b3e;
-    color: var(--text-primary);
-    font-size: 10px;
-    padding: 2px 5px;
-}
-
-.base-map-btn-inn {
-    position: absolute;
-    top: 74px;
-    left: 24%;
-}
-
 .base-map-prod-rate {
     font-size: 10px;
     text-align: center;
@@ -1166,10 +2034,140 @@ button {
     margin-top: 6px;
 }
 
+.resort-info-section {
+    display: none;
+    padding-right: 26px;
+}
+
+.resort-info-section.resort-info-visible {
+    display: block;
+}
+
+.resort-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 12px;
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.guests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guest-section-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #e5e7eb;
+}
+
+.guest-log-list,
+.guest-current-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.guest-log-row,
+.guest-list-row {
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    background: #111827;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.mine-depth-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.mine-info-header {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-right: 28px;
+}
+
+.mine-status-inline {
+    font-size: 12px;
+}
+
+.mine-info-body {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.mine-info-side {
+    flex: 1;
+    min-width: 0;
+}
+
+.mine-resource-grid {
+    margin-bottom: 8px;
+}
+
+.mine-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 22px);
+    grid-template-rows: repeat(5, 22px);
+    gap: 3px;
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+    margin: 0;
+}
+
+.mine-block {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--border-color);
+    background: rgba(8, 12, 18, 0.35);
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.mine-block-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+}
+
+.mine-block-fill.dirt {
+    background: #8a5a2b;
+}
+
+.mine-block-fill.stone {
+    background: #8f8f8f;
+}
+
+.mine-block-fill.ore {
+    background: #b8860b;
+}
+
+.mine-play-progress {
+    margin-top: 8px;
+}
+
 .base-skill-short {
-    font-size: 10px;
+    font-size: 11px;
     margin-top: 1px;
     max-width: 330px;
+}
+
+.base-upgrade-text [id$="_extra"] {
+    font-size: 14px;
+    margin-top: 2px;
 }
 
 .options-row {
@@ -1227,8 +2225,8 @@ button {
 
 .skill-star-bronze { color: #cd7f32; }
 .skill-star-silver { color: #c0c0c0; }
-.skill-star-gold { color: #ffd700; }
+.skill-star-coins { color: #ffd700; }
 .skill-star-filled { text-shadow: 0 0 4px rgba(255,255,255,0.35); }
 .star-bronze { color: #cd7f32; }
 .star-silver { color: #c0c0c0; }
-.star-gold { color: #ffd700; }
+.star-coins { color: #ffd700; }

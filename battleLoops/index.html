@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="height:100%;overflow:auto;padding:10px;">
+<html lang="en" style="height:100%;overflow:auto;">
 <head>
     <meta charset="UTF-8">
     <!-- to force a reload -->
@@ -48,9 +48,11 @@
         <button id="compactPane_menus" class="tab-button" onclick="events.switchCompactPane('menus')">Menus</button>
         <button id="compactPane_battle" class="tab-button" onclick="events.switchCompactPane('battle')">Battle</button>
     </div>
+    <div id="gameColumnsRow" class="game-columns-row">
     <div id="menuColumn" class="game-column">
         <div id="menuTabs">
-            <button id="tabButton_base" class="tab-button" onclick="events.switchTab('base')">Base</button>
+            <button id="tabButton_base" class="tab-button" onclick="events.switchTab('base')">Resort</button>
+            <button id="tabButton_guests" class="tab-button" onclick="events.switchTab('guests')">Guests</button>
             <button id="tabButton_leveling" class="tab-button" onclick="events.switchTab('leveling')">Leveling</button>
             <button id="tabButton_stats" class="tab-button" onclick="events.switchTab('stats')">Stats</button>
             <button id="tabButton_skills" class="tab-button" onclick="events.switchTab('skills')">Skills</button>
@@ -60,48 +62,114 @@
         </div>
         <div id="menuContent">
             <div id="tabPane_base" class="tab-pane">
-                <div class="pane-title">Gold: <span id="baseGoldText"></span> | Workers <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span></div>
-                <div id="baseTownMap" class="base-map-wrap">
-                    <button id="baseBuilding_chapel" class="base-building-label base-building-chapel" onclick="events.selectBaseBuilding('chapel')">Chapel</button>
-                    <button id="baseBuilding_townhall" class="base-building-label base-building-townhall" onclick="events.selectBaseBuilding('townhall')">Town Hall</button>
-                    <div class="base-building-node base-building-smith-node">
-                        <button id="baseBuilding_smith" class="base-building-label" onclick="events.selectBaseBuilding('smith')">Smith</button>
-                        <div id="baseSmithProgressWrap" class="base-mini-progress"><div id="baseSmithProgressFill" class="base-mini-progress-fill"></div></div>
-                        <div id="base_smith_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
-                        <button id="mapManualBtn_smith" class="map-manual-btn" onclick="events.manualSmelt()">Smelt</button>
-                    </div>
-                    <button id="baseBuilding_inn" class="base-building-label base-building-inn" onclick="events.selectBaseBuilding('inn')">Inn</button>
-                    <button id="baseBuilding_guild" class="base-building-label base-building-guild" onclick="events.selectBaseBuilding('guild')">Guild</button>
-                    <button id="baseBuilding_market" class="base-building-label base-building-market" onclick="events.selectBaseBuilding('market')">Market</button>
-                    <button id="baseBuilding_garden" class="base-building-label base-building-garden" onclick="events.selectBaseBuilding('garden')">Garden</button>
-                    <button id="baseBuilding_workshop" class="base-building-label base-building-workshop" onclick="events.selectBaseBuilding('workshop')">Workshop</button>
-                    <button id="baseBuilding_mage_tower" class="base-building-label base-building-mage_tower" onclick="events.selectBaseBuilding('mage_tower')">Mage Tower</button>
-                    <div class="base-building-node base-building-mine-node">
-                        <button id="baseBuilding_mine" class="base-building-label" onclick="events.selectBaseBuilding('mine')">Mine</button>
-                        <div id="baseMineProgressWrap" class="base-mini-progress"><div id="baseMineProgressFill" class="base-mini-progress-fill"></div></div>
-                        <div id="base_mine_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
-                        <button id="mapManualBtn_mine" class="map-manual-btn" onclick="events.manualMine()">Mine</button>
-                    </div>
-                    <div class="base-building-node base-building-library-node">
-                        <button id="baseBuilding_library" class="base-building-label" onclick="events.selectBaseBuilding('library')">Library</button>
-                        <div id="baseLibraryProgressWrap" class="base-mini-progress"><div id="baseLibraryProgressFill" class="base-mini-progress-fill"></div></div>
-                    </div>
-                    <div class="base-building-node base-building-claypit-node">
-                        <button id="baseBuilding_claypit" class="base-building-label" onclick="events.selectBaseBuilding('claypit')">Clay Pit</button>
-                        <div id="baseClaypitProgressWrap" class="base-mini-progress"><div id="baseClaypitProgressFill" class="base-mini-progress-fill"></div></div>
-                        <div id="base_claypit_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
-                        <button id="mapManualBtn_claypit" class="map-manual-btn" onclick="events.manualLumber()">Dig</button>
-                    </div>
-                    <div class="base-building-node base-building-kiln-node">
-                        <button id="baseBuilding_kiln" class="base-building-label" onclick="events.selectBaseBuilding('kiln')">Kiln</button>
-                        <div id="baseKilnProgressWrap" class="base-mini-progress"><div id="baseKilnProgressFill" class="base-mini-progress-fill"></div></div>
-                        <div id="base_kiln_map_prod_rate" class="base-map-prod-rate muted-text" style="display:none;"></div>
-                        <button id="mapManualBtn_kiln" class="map-manual-btn" onclick="events.manualSaw()">Fire</button>
-                    </div>
-                    <button id="baseBuilding_lumbermill" class="base-building-label base-building-lumbermill" onclick="events.selectBaseBuilding('lumbermill')">Lumbermill</button>
-                    <button id="mapManualBtn_inn" class="map-manual-btn base-map-btn-inn" onclick="events.advertiseInn()">Advertise</button>
+                <div class="pane-title">Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><span id="basePaneTitleCoins"> | Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | Star Beads: <span id="baseStarBeadsText"></span></span></div>
+                <div id="baseResortMap" class="base-map-wrap">
+                    <div class="resort-map-cave" aria-hidden="true"></div>
+                    <button id="baseBuilding_foxDen" class="base-building-label resort-building-label resort-building-map-btn resort-building-fox-den" onclick="events.selectBaseBuilding('foxDen')">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/den.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Fox Den</span>
+                        <span id="foxDenMapDisplay" class="resort-building-display"></span>
+                    </button>
+                    <button id="baseBuilding_hiddenSpring" class="base-building-label resort-building-label resort-building-hidden-spring map-building-locked" onclick="events.selectBaseBuilding('hiddenSpring')"><img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false"><span class="resort-building-label-text">Hidden Spring</span></button>
+                    <div id="spiritSlots_earth" class="spirit-slot-grid spirit-slot-grid-earth"></div>
+                    <div id="spiritSlots_water" class="spirit-slot-grid spirit-slot-grid-water"></div>
+                    <div id="spiritSlots_fire" class="spirit-slot-grid spirit-slot-grid-fire"></div>
+                    <button id="baseBuilding_mine" class="base-building-label resort-building-label resort-building-map-btn resort-building-mine" onclick="events.selectBaseBuilding('mine')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/mine.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Mine</span>
+                    </button>
+                    <div id="spiritSlots_mine_earth" class="spirit-slot-grid spirit-slot-grid-mine-earth" style="display:none"></div>
+                    <button id="baseBuilding_laundry" class="base-building-label resort-building-label resort-building-map-btn resort-building-laundry" onclick="events.selectBaseBuilding('laundry')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/laundry.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Laundry Basins</span>
+                    </button>
+                    <div id="mapLaundryProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-laundry" style="display:none"><div id="mapLaundryProgressFill" class="base-mini-progress-fill"></div></div>
+                    <button id="baseBuilding_inn" class="base-building-label resort-building-label resort-building-map-btn resort-building-inn" onclick="events.selectBaseBuilding('inn')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/inn.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Tatami Inn</span>
+                        <span id="innMapDisplay" class="resort-building-display"></span>
+                    </button>
+                    <button id="baseBuilding_bonfire" class="base-building-label resort-building-label resort-building-map-btn resort-building-bonfire" onclick="events.selectBaseBuilding('bonfire')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/bonfire.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Bonfire</span>
+                    </button>
+                    <button id="baseBuilding_garden" class="base-building-label resort-building-label resort-building-map-btn resort-building-garden" onclick="events.selectBaseBuilding('garden')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/garden.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Rock Garden</span>
+                    </button>
+                    <button id="baseBuilding_atelier" class="base-building-label resort-building-label resort-building-map-btn resort-building-atelier" onclick="events.selectBaseBuilding('atelier')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/atelier.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Atelier</span>
+                    </button>
+                    <button id="baseBuilding_scrollArchives" class="base-building-label resort-building-label resort-building-map-btn resort-building-scrollArchives" onclick="events.selectBaseBuilding('scrollArchives')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/archives.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Scroll Archives</span>
+                    </button>
+                    <button id="baseBuilding_bar" class="base-building-label resort-building-label resort-building-map-btn resort-building-bar" onclick="events.selectBaseBuilding('bar')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/bar.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Bar</span>
+                    </button>
+                    <button id="baseBuilding_market" class="base-building-label resort-building-label resort-building-map-btn resort-building-market" onclick="events.selectBaseBuilding('market')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/market.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Market</span>
+                    </button>
+                    <button id="baseBuilding_mage_tower" class="base-building-label resort-building-label resort-building-map-btn resort-building-mage-tower" onclick="events.selectBaseBuilding('mage_tower')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/orb.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">The Orb</span>
+                    </button>
+                    <button id="baseBuilding_torii" class="base-building-label resort-building-label resort-building-map-btn resort-building-torii" onclick="events.selectBaseBuilding('torii')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/torii.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Zenko Torii Gate</span>
+                        <span id="toriiMapDisplay" class="resort-building-display"></span>
+                    </button>
+                    <div id="mapToriiProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-torii" style="display:none"><div id="mapToriiProgressFill" class="base-mini-progress-fill"></div></div>
+                    <button id="baseBuilding_cistern" class="base-building-label resort-building-label resort-building-map-btn resort-building-cistern" onclick="events.selectBaseBuilding('cistern')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/cistern.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Cistern</span>
+                    </button>
+                    <button id="baseBuilding_stonePile" class="base-building-label resort-building-label resort-building-map-btn resort-building-stone-pile" onclick="events.selectBaseBuilding('stonePile')">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/pile.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Stone Pile</span>
+                        <span id="stonePileMapValue" class="resort-building-display">0</span>
+                    </button>
+                    <button id="baseBuilding_bambooForest" class="base-building-label resort-building-label resort-building-map-btn resort-building-bamboo" onclick="events.selectBaseBuilding('bambooForest')">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/bamboo.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Bamboo Forest</span>
+                        <span id="bambooForestMapDisplay" class="resort-building-display">0</span>
+                    </button>
+                    <div id="spiritSlots_bambooForest_plant" class="spirit-slot-grid spirit-slot-grid-bamboo-plant" style="display:none"></div>
+                    <div id="foxDenMapSlotPool"></div>
+                    <div id="pebbleMapPool"></div>
+
+                    <svg class="resort-path-svg" viewBox="0 0 668 690" preserveAspectRatio="none" aria-hidden="true">
+                        <path class="resort-path-track" d=""></path>
+                        <path class="resort-path-hollow" d=""></path>
+                        <g id="pathSegmentTrackLayer"></g>
+                        <g id="pathSegmentHollowLayer"></g>
+                        <g id="pathSegmentHitLayer"></g>
+                        <g id="pathSegmentHighlightLayer"></g>
+                    </svg>
                 </div>
-                <div id="baseBuildingInfo" class="base-info-panel"></div>
+            </div>
+
+            <div id="tabPane_guests" class="tab-pane">
+                <div class="pane-title">Guests</div>
+                <div id="guestsList" class="guests-list"></div>
             </div>
 
             <div id="tabPane_leveling" class="tab-pane">
@@ -147,7 +215,7 @@
                 <div class="pane-title">Skills</div>
                 <div class="row-buttons">
                     <button id="skillSubTab_combat" class="tab-button" onclick="events.switchSkillsTab('combat')">Combat</button>
-                    <button id="skillSubTab_town" class="tab-button" onclick="events.switchSkillsTab('town')">Town</button>
+                    <button id="skillSubTab_resort" class="tab-button" onclick="events.switchSkillsTab('resort')">Resort</button>
                     <button id="skillSubTab_foraging" class="tab-button" onclick="events.switchSkillsTab('foraging')">Foraging</button>
                     <button id="skillSubTab_class" class="tab-button" onclick="events.switchSkillsTab('class')">Class</button>
                 </div>
@@ -188,7 +256,7 @@
             </div>
         </div>
     </div>
-    <div id="battleColumn" class="game-column">
+    <div id="battleColumn" class="game-column" style="display:none">
         <div id="battlefieldWrap">
             <button type="button" id="battleEndRunBtn" class="battle-end-run-btn tab-button" onclick="events.endRunNow()" title="End run (set HP to 0)">End run</button>
             <div id="battlefield">
@@ -247,7 +315,30 @@
                 <span class="muted-text battle-hud-hint">If off: push wave when slap ready and none in slap range.</span>
             </div>
         </div>
+        <div id="baseBuildingInfo" class="base-info-panel"></div>
     </div>
+    </div>
+    <div id="gameProgressBars" class="game-progress-bars">
+        <div id="okamiProgressBar" class="game-progress-bar">
+            <div class="prog-track game-progress-track okami-progress-track">
+                <div id="okamiExpFill" class="prog-fill prog-fill-okami-exp"></div>
+                <div class="game-progress-bar-label">
+                    <span id="okamiTailLabel" class="game-progress-bold">One Tail</span> - Level <span id="okamiLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Exp: <span id="okamiExpText" class="game-progress-bold">0 / 200</span><span class="game-progress-sep">|</span>Spirit Strands: <span id="okamiSpiritStrands" class="game-progress-bold">1</span><span class="game-progress-sep">|</span>Inspiration Bonus: <span id="okamiInspirationBonus" class="game-progress-bold">x1.2</span> <span id="okamiInspirationHint" class="muted-text">(+.02/level)</span><span class="game-progress-sep">|</span>Currently: <span id="okamiStateDisplay" class="okami-state-display game-progress-bold" onclick="events.goToOkamiAssignment()">Idling</span>
+                </div>
+            </div>
+        </div>
+        <div id="manaProgressBar" class="game-progress-bar" style="display:none">
+            <div class="prog-track game-progress-track mana-progress-track">
+                <div id="manaFill" class="prog-fill prog-fill-mana"></div>
+                <div class="game-progress-bar-label"><span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="debugSpeedPanel" class="debug-speed-panel" style="display:none">
+    <button id="debugSpeed_x3" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(3)">x3</button>
+    <button id="debugSpeed_x10" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(10)">x10</button>
 </div>
 
 </body>
@@ -266,7 +357,7 @@
 <script src="mapData.js"></script>
 <script src="skills.js"></script>
 <script src="helpers.js"></script>
-<script src="townData.js"></script>
+<script src="resortData.js"></script>
 <script src="initialize.js"></script>
 <script src="viewCreate.js"></script>
 <script src="viewUpdating.js"></script>

@@ -3,7 +3,7 @@ let mapData = {
      * @param {object} [skillShard] Optional single-type shard drop for this zone: `{ key, gain, chance, max }`
      *   (skill key must match `skills` definition keys). At most one shard type per zone.
      */
-    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, hpDamageTradeRatio, goldPerIntruder, expBasePerIntruder, skillShard) {
+    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, hpDamageTradeRatio, coinsPerIntruder, expBasePerIntruder, skillShard) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
         const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
         const z = {
@@ -14,7 +14,7 @@ let mapData = {
             distanceBetweenUnits: safeDistanceBetweenUnits,
             lengthMs: Math.max(0, safeDistanceBetweenUnits * Math.max(0, safeEnemies - 1)),
             intruderType: intruderType || "scoundrel",
-            goldPerIntruder: goldPerIntruder !== undefined ? Math.max(0, goldPerIntruder) : 1,
+            coinsPerIntruder: coinsPerIntruder !== undefined ? Math.max(0, coinsPerIntruder) : 1,
             hpDamageTradeRatio: hpDamageTradeRatio !== undefined ? Math.max(0.01, hpDamageTradeRatio) : 1,
             expBasePerIntruder: expBasePerIntruder !== undefined ? Math.max(0, expBasePerIntruder) : 1
         };
@@ -105,16 +105,16 @@ let mapData = {
         const ratio = z.difficulty || 1;
         const trade = z.hpDamageTradeRatio !== undefined ? Math.max(0.01, z.hpDamageTradeRatio) : 1;
         const tm = typeof tierMultiplier === "number"
-            ? { combat: tierMultiplier || 1, gold: 1, exp: 1 }
-            : (tierMultiplier || { combat: 1, gold: 1, exp: 1 });
+            ? { combat: tierMultiplier || 1, coins: 1, exp: 1 }
+            : (tierMultiplier || { combat: 1, coins: 1, exp: 1 });
         const combatMult = tm.combat || 1;
-        const goldMult = tm.gold || 1;
+        const coinsMult = tm.coins || 1;
         const expMult = tm.exp || 1;
         const totalDifficulty = (mapDefinition.baseDifficulty || 1) * combatMult;
         const rawHp = gameData.battle.intruderBaseHp * ratio * totalDifficulty * trade;
         const rawDamage = gameData.battle.intruderAttackDamage * ratio * totalDifficulty / trade;
-        const goldPerIntruderBase = Math.max(0, z.goldPerIntruder !== undefined ? z.goldPerIntruder : 1);
-        const perIntruderGain = Math.ceil(goldPerIntruderBase * Math.pow(totalDifficulty, 1.5) * goldMult);
+        const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
+        const perIntruderGain = Math.ceil(coinsPerIntruderBase * Math.pow(totalDifficulty, 1.5) * coinsMult);
         const expBasePerIntruder = Math.max(0, (z.expBasePerIntruder !== undefined ? z.expBasePerIntruder : 1) * expMult);
         return {
             rawHp,
@@ -150,14 +150,14 @@ let mapData = {
         }
         return rows;
     },
-    /** Combat HP/damage scaling plus separate gold and exp reward multipliers per map tier. */
+    /** Combat HP/damage scaling plus separate coins and exp reward multipliers per map tier. */
     getTierDifficultyMultiplier: function(tier) {
         if (tier <= 0) {
-            return { combat: 1, gold: 1, exp: 1 };
+            return { combat: 1, coins: 1, exp: 1 };
         }
         if (tier === 1) {
-            return { combat: 5, gold: 3, exp: 2 };
+            return { combat: 5, coins: 3, exp: 2 };
         }
-        return { combat: 25, gold: 9, exp: 4 };
+        return { combat: 25, coins: 9, exp: 4 };
     }
 };

@@ -36,7 +36,6 @@ let gameData = {
             sandalDamageSlapMultiplier: 1.5,
             baseHpInner: 20,
             conStrStatDivisor: 10,
-            smithArmorHpPerUpgrade: 5,
             foragingBaseStaminaInner: 20,
             foragingBreathingStaminaPerLevel: 2,
             foragingHarvestDamageBase: 5

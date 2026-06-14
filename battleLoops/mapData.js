@@ -38,23 +38,23 @@ mapData.getDefaultMaps = function() {
             ]
         }),
         mapData.createMap({
-            key: "map_warrior_1",
+            key: "map_condescension_1",
             name: "Shieldwall Gauntlet",
             seed: 900001,
             baseDifficulty: 1.4,
-            requiredClassKey: "warrior",
+            requiredClassKey: "condescension",
             zones: [
                 mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, 1, { key: "fortitude", gain: 1, chance: 0.006, max: 24 }),
-                mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, 1, { key: "toughness_warrior", gain: 1, chance: 0.005, max: 28 }),
+                mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, 1, { key: "toughness_condescension", gain: 1, chance: 0.005, max: 28 }),
                 mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, 1, { key: "second_wind", gain: 1, chance: 0.004, max: 30 })
             ]
         }),
         mapData.createMap({
-            key: "map_rogue_1",
+            key: "map_scold_1",
             name: "Silent Crossfire",
             seed: 900002,
             baseDifficulty: 1.45,
-            requiredClassKey: "rogue",
+            requiredClassKey: "scold",
             zones: [
                 mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22, 1),
                 mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32, 1),
@@ -62,11 +62,11 @@ mapData.getDefaultMaps = function() {
             ]
         }),
         mapData.createMap({
-            key: "map_hunter_1",
+            key: "map_mockery_1",
             name: "Colossus Trail",
             seed: 900003,
             baseDifficulty: 2.1,
-            requiredClassKey: "hunter",
+            requiredClassKey: "mockery",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26, 1),
                 mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36, 1),

@@ -13,8 +13,6 @@ let onLoad = {
             data.progress.selectedSkillDetailKey = "";
         }
         data.battle = toLoad.battle ?? initials.battle();
-        initialize.ensureProgressShape();
-        initialize.applySavedProgressEconomyFromTownData();
 
         initialize.applyPlanForCurrentLevel();
         if (data.battle.state === "running" && !data.battle.runSkillTalentStart) {

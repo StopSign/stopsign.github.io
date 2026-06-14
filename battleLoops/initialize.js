@@ -25,6 +25,7 @@ let isSteam = false; //SET FOR COMMIT
 
 // let isDebug = false; //SET FOR COMMIT
 let isDebug = true;
+let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 function debug() {
     if(!isDebug) {
@@ -36,30 +37,95 @@ function debug() {
 let initials = {
     base: function() {
         const pb = function(buildingKey) {
-            const def = townData.buildings[buildingKey] && townData.buildings[buildingKey].progressDefaults;
+            const def = resortData.buildings[buildingKey] && resortData.buildings[buildingKey].progressDefaults;
             return def ? JSON.parse(JSON.stringify(def)) : {};
         };
         return {
             chapel: pb("chapel"),
-            townhall: {
-                unlocks: Object.assign({}, townData.defaultTownhallUnlocksState),
-                townUpgrades: Object.assign({}, townData.defaultTownhallTownUpgrades)
+            foxDen: Object.assign({
+                unlocks: Object.assign({}, resortData.defaultFoxDenUnlocksState),
+                constructionQueue: [],
+                constructionSites: {},
+                constructionCarriers: [],
+                upgradeGatherJobs: {},
+                upgradeGatherQueue: [],
+                lastCarrierSpawnMs: 0,
+                assignedWorkers: 0,
+                gearSets: 1
+            }),
+            bambooForest: pb("bambooForest"),
+            mapRevealed: Object.assign({}, resortData.defaultMapRevealedState),
+            mine: {
+                resources: {
+                    dirt: 0,
+                    stone: 0
+                },
+                currentDepth: 0,
+                clearsByDepth: { 0: 0 },
+                blocks: null,
+                playTimerMs: 0
             },
-            claypit: pb("claypit"),
-            kiln: pb("kiln"),
-            mine: pb("mine"),
-            smith: pb("smith"),
-            library: pb("library"),
-            inn: pb("inn"),
-            lumbermill: pb("lumbermill"),
-            workshop: pb("workshop"),
+            scrollArchives: pb("scrollArchives"),
+            inn: Object.assign(pb("inn"), {
+                roomsAvailable: 1,
+                roomsOccupied: 0,
+                restfulnessPerSecond: 1,
+                furnitureBought: 0,
+                decorationBought: 0,
+                addRoomBought: 0,
+                guests: [],
+                guestLog: [],
+                guestIdCounter: 1
+            }),
+            atelier: pb("atelier"),
             garden: pb("garden"),
-            resources: Object.assign({}, townData.defaultBaseResources)
+            torii: {
+                assignedWorkers: 0,
+                gearSets: 1,
+                workerPower: 0,
+                visitorsWaiting: 0,
+                maxVisitors: 2,
+                queuePostsBought: 0,
+                nextVisitorTimerMs: 60000,
+                visitorIntervalMs: 60000,
+                callForAllyBought: 0,
+                plantSpiritsBought: 0,
+                karmaCheckPowerRequired: 30
+            },
+            laundry: {
+                assignedWorkers: 0,
+                gearSets: 1,
+                workerPower: 0,
+                cleanPowerRequired: 30
+            },
+            hiddenSpring: {
+                earthSpiritsBought: 0,
+                waterSpiritsBought: 0,
+                fireSpiritsBought: 0,
+                spiritCostBase: 50,
+                spiritCostMult: 10,
+                spiritMax: 3,
+                spiritIdCounter: 1,
+                spirits: []
+            },
+            stonePile: {
+                stone: 0
+            },
+            cistern: {
+                waterVolume: 0,
+                essence: 0
+            },
+            pebbles: [],
+            pebbleIdCounter: 1,
+            droplets: [],
+            dropletIdCounter: 1,
+            resources: Object.assign({}, resortData.defaultBaseResources)
         };
     },
     gameSettings: function() {
         return {
             gameSpeed: 1,
+            debugSpeedMultiplier: 0,
             bonusSpeed: 1,
             stop: false,
             stopAll: false,
@@ -111,19 +177,40 @@ let initials = {
     },
     progress: function() {
         return {
-            gold: 0,
-            selectedBaseBuilding: "chapel",
+            coins: 35,
+            starBeads: 0,
+            selectedBaseBuilding: "",
+            selectedPathSegmentIndex: null,
+            selectedResortInfoType: "",
+            selectedSpiritId: null,
+            battleUnlocked: false,
+            kitsune: {
+                total: 2
+            },
+            okami: {
+                level: 0,
+                exp: 0,
+                assignedBuildingKey: "",
+                pathJob: null,
+                pausedPathJobs: {}
+            },
+            mana: {
+                amount: 0
+            },
+            weaving: {
+                active: null,
+                paused: null
+            },
             selectedSkillsTab: "combat",
             selectedSkillDetailKey: "",
             selectedStatsTab: "combat",
-            selectedLibraryTab: "combat",
-            selectedTownHallTab: "buildings",
+            selectedScrollArchivesTab: "combat",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,
             stars: {
                 bronze: 0,
                 silver: 0,
-                gold: 0
+                coins: 0
             },
             options: {
                 hideMaxedUpgrades: true,
@@ -144,8 +231,9 @@ let initials = {
             skills: skills.getDefaultSkills(),
             sandalAttackEnabled: false,
             baseContentNotify: {
-                building: { chapel: true, townhall: true },
-                subtab: { townhall_buildings: true, townhall_town_upgrades: true }
+                building: { chapel: true, foxDen: true },
+                subtab: {},
+                upgradeSeen: {}
             },
             base: initials.base()
         };
@@ -154,7 +242,7 @@ let initials = {
         return {
             elapsedMs: 0,
             mode: "combat",
-            state: "running",
+            state: "idle",
             resetCount: 0,
             intruderIdCounter: 1,
             enemies: [],
@@ -165,11 +253,11 @@ let initials = {
             seed: 1337,
             generatedFromSeed: null,
             currentTab: "base",
-            runStartGold: 0,
+            runStartCoins: 0,
             historyLogged: false,
             enemiesKilled: 0,
-            runGoldFromKills: 0,
-            completionBonusGold: 0,
+            runCoinsFromKills: 0,
+            completionBonusCoins: 0,
             mapTier: 0,
             zoneSpawnedInCycle: [],
             activeZones: [],
@@ -183,8 +271,8 @@ let initials = {
             classPowerA: 0,
             classPowerB: 0,
             classRetreatMs: 0,
-            rogueDashActive: false,
-            rogueFlurryMs: 0,
+            scoldDashActive: false,
+            scoldFlurryMs: 0,
             lastPlayerHitIntruderId: 0,
             lastPlayerHitStreak: 0,
             forageIndexSpawned: {},
@@ -210,11 +298,10 @@ let initialize = {
         data.gameSettings = initials.gameSettings();
         data.currentGameState = initials.currentGameState();
         data.progress = initials.progress();
-        initialize.ensureProgressShape();
-        initialize.applySavedProgressEconomyFromTownData();
         data.battle = initials.battle();
         data.battle.intruderPool = initials.intruderPool();
         initialize.startFreshBattle(data.progress.mapDefinitions[0].seed, data.progress.currentMapKey);
+        data.battle.state = data.progress.battleUnlocked ? "running" : "idle";
     },
     startFreshBattle: function(seed, mapKey) {
         const preservedTab = data.battle && data.battle.currentTab ? data.battle.currentTab : "base";
@@ -224,7 +311,7 @@ let initialize = {
         data.battle.generatedFromSeed = seed;
         data.battle.currentTab = preservedTab;
         data.progress.autoRetryCountdownSec = 0;
-        data.battle.runStartGold = data.progress.gold;
+        data.battle.runStartCoins = data.progress.coins;
         data.battle.historyLogged = false;
         const selectedMapKey = mapKey || data.progress.currentMapKey;
         data.progress.currentMapKey = selectedMapKey;
@@ -240,6 +327,7 @@ let initialize = {
         data.battle.transitionMessage = "";
         data.battle.nextTierAfterCountdown = 0;
         data.battle.mode = "combat";
+        data.battle.state = data.progress && data.progress.battleUnlocked ? "running" : "idle";
         data.battle.forageIndexSpawned = {};
         data.battle.forageKindSpawnCounts = {};
         data.battle.forageActiveDrainMapKey = "";
@@ -253,7 +341,7 @@ let initialize = {
         data.gameSettings.stopAll = false;
     },
     getClassDef: function(classKey) {
-        const defs = townData.guildClassDefs;
+        const defs = resortData.bonfireClassDefs;
         return (defs && defs[classKey]) || defs.none;
     },
     getCurrentClassDef: function() {
@@ -361,13 +449,11 @@ let initialize = {
         const totalStr = data.battle.levelState.levelStr + data.battle.levelState.skillStrBonus;
         const fEff = skills.getSkillEffect("force");
         const forceFlat = fEff.slapFlatBeforeStr || 0;
-        const smithAtkBonus = data.progress.base && data.progress.base.smith ? (data.progress.base.smith.attackUpgradesBought || 0) : 0;
         const fortEff = skills.getSkillEffect("endurance");
         const fortLvl = fortEff.enduranceBaseHpInnerBonus || 0;
         const tenEff = skills.getSkillEffect("tenacity");
         const tenInner = tenEff.tenacityHpInnerBonus || 0;
-        const armorHp = data.progress.base && data.progress.base.smith ? ((data.progress.base.smith.armorUpgradesBought || 0) * gc.smithArmorHpPerUpgrade) : 0;
-        const baseInner = gc.baseHpInner + fortLvl + tenInner + armorHp;
+        const baseInner = gc.baseHpInner + fortLvl + tenInner;
         const conMult = 1 + totalCon / div;
         const tenacityHpExtra = Math.ceil((2 * tenInner) * conMult);
         let maxHp = Math.max(1, Math.ceil(baseInner * conMult) + tenacityHpExtra);
@@ -377,7 +463,7 @@ let initialize = {
         } else {
             data.battle.player.hp = Math.max(1, data.battle.player.maxHp - missingHp);
         }
-        let atk = (gc.baseSlapDamage + forceFlat + smithAtkBonus) * (1 + (totalStr / div));
+        let atk = (gc.baseSlapDamage + forceFlat) * (1 + (totalStr / div));
         atk = Math.max(1, roundNearestDecimals(atk, 1));
         data.battle.player.attackDamage = atk;
         const lsEff = skills.getSkillEffect("longshot");
@@ -387,108 +473,5 @@ let initialize = {
         const rEff = skills.getSkillEffect("recovery");
         data.battle.player.regenPerSecond = rEff.recoveryHpPerSec || 0;
         engine.syncPlayerCooldownFields();
-    },
-    ensureProgressShape: function() {
-        const base = data.progress.base;
-        const wpk = townData.workerPowerSiteKeys;
-        for (let i = 0; i < wpk.length; i++) {
-            const k = wpk[i];
-            const s = base[k];
-            if (s.workerPower === undefined) {
-                s.workerPower = Math.min(40, (s.progress || 0) * 40);
-            }
-        }
-        // Migrate Discipline → Adaptation; backfill new skill keys on old saves.
-        const lib = base && base.library;
-        if (lib) {
-            if (!lib.unlockedSkills) {
-                lib.unlockedSkills = {};
-            }
-            const u = lib.unlockedSkills;
-            if (u.discipline && !u.adaptation) {
-                u.adaptation = true;
-                delete u.discipline;
-            }
-        }
-        const sks = data.progress.skills;
-        if (sks) {
-            if (sks.discipline && !sks.adaptation) {
-                sks.adaptation = sks.discipline;
-                sks.adaptation.key = "adaptation";
-                sks.adaptation.name = "Adaptation";
-                delete sks.discipline;
-            } else if (sks.discipline) {
-                delete sks.discipline;
-            }
-            for (let i = 0; i < skills.keysInOrder.length; i++) {
-                const k = skills.keysInOrder[i];
-                if (!sks[k]) {
-                    sks[k] = skills.createFreshSkillState(k);
-                }
-            }
-            const skKeysAll = Object.keys(sks);
-            for (let j = 0; j < skKeysAll.length; j++) {
-                const ent = sks[skKeysAll[j]];
-                if (ent && ent.shards === undefined) {
-                    ent.shards = 0;
-                }
-            }
-        }
-        if (data.progress.selectedSkillDetailKey === "discipline") {
-            data.progress.selectedSkillDetailKey = "adaptation";
-        }
-        if (data.progress.selectedTravelSubTab !== "maps" && data.progress.selectedTravelSubTab !== "challenges") {
-            data.progress.selectedTravelSubTab = "maps";
-        }
-        const clsTravel = data.progress.currentClassKey || "none";
-        if (clsTravel === "none" && data.progress.selectedTravelSubTab === "challenges") {
-            data.progress.selectedTravelSubTab = "maps";
-        }
-        const defsFix = data.progress.mapDefinitions || [];
-        let curDef = null;
-        for (let fi = 0; fi < defsFix.length; fi++) {
-            if (defsFix[fi].key === data.progress.currentMapKey) {
-                curDef = defsFix[fi];
-                break;
-            }
-        }
-        if (!curDef || !mapData.isMapUnlocked(curDef, data.progress)) {
-            for (let fj = 0; fj < defsFix.length; fj++) {
-                if (mapData.isMapUnlocked(defsFix[fj], data.progress)) {
-                    data.progress.currentMapKey = defsFix[fj].key;
-                    break;
-                }
-            }
-        }
-    },
-
-    applySavedProgressEconomyFromTownData: function() {
-        const base = data.progress.base;
-        if (!base) {
-            return;
-        }
-        const gearSites = ["mine", "smith", "claypit", "kiln", "lumbermill", "library"];
-        for (let i = 0; i < gearSites.length; i++) {
-            const k = gearSites[i];
-            const s = base[k];
-            if (!s) {
-                continue;
-            }
-            delete s.cost;
-            delete s.costIncrease;
-        }
-        if (base.smith) {
-            delete base.smith.nextAttackUpgradeCostBars;
-        }
-        if (base.workshop) {
-            delete base.workshop.innRoomNextGoldCost;
-            delete base.workshop.innRoomNextLumberCost;
-        }
-        if (base.townhall) {
-            delete base.townhall.upgradeCosts;
-            if (base.townhall.townUpgrades) {
-                delete base.townhall.townUpgrades.hireLocalNextGoldCost;
-            }
-        }
     }
 }
