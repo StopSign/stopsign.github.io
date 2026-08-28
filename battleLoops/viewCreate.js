@@ -14,10 +14,35 @@ let createView = {
             });
         }
         createView.createSkillElements();
+        createView.createBattleBuffSlots();
+        createView.createWaveInfoStructure();
         createView.createBaseInfoElements();
         createView.createTravelElements();
         createView.showCurrentTab();
         createView.setAllCaches(); //happens after generation
+    },
+    waveInfoZoneSlotCount: 12,
+    waveInfoZoneShardSlotCount: 8,
+    createWaveInfoStructure: function() {
+        const root = document.getElementById("waveInfo");
+        if (!root || root.dataset.waveInfoBuilt === "1") {
+            return;
+        }
+        root.dataset.waveInfoBuilt = "1";
+        let h = "";
+        h += `<div id="waveInfoTimeRow" class="wave-info-time-row"><span id="waveInfoStar" class="wave-info-star-inline skill-star-btn skill-star-bronze" title="Bronze cycle">☆</span><span id="waveInfoTimeLabel" class="wave-info-time-label">Time 0s</span></div>`;
+        h += `<div id="waveInfoTransition" style="display:none"></div>`;
+        h += `<div id="waveInfoZoneShards">`;
+        for (let si = 0; si < createView.waveInfoZoneShardSlotCount; si++) {
+            h += `<div id="waveInfoZoneShard_${si}" class="wave-info-zone-shard" style="display:none"></div>`;
+        }
+        h += `</div>`;
+        h += `<div id="waveInfoZones">`;
+        for (let zi = 0; zi < createView.waveInfoZoneSlotCount; zi++) {
+            h += `<div id="waveInfoZone_${zi}" class="wave-info-zone-row" style="display:none"></div>`;
+        }
+        h += `</div>`;
+        root.innerHTML = h;
     },
     createTravelElements: function() {
         const mapsPane = document.getElementById("travelPane_maps");
@@ -31,9 +56,9 @@ let createView = {
             const cardHtml = `
                 <div class="travel-card" id="travel_card_${m.key}">
                     <div class="travel-card-head">
-                        <div class="travel-map-name"><span class="travel-map-stars-inline"><span id="mapStar_${m.key}_bronze" class="skill-star-btn skill-star-bronze">☆</span><span id="mapStar_${m.key}_silver" class="skill-star-btn skill-star-silver">☆</span><span id="mapStar_${m.key}_coins" class="skill-star-btn skill-star-coins">☆</span></span> ${m.name}<span class="muted-text">${classReq}</span></div>
+                        <div class="travel-map-name"><span class="travel-map-stars-inline"><span id="mapStar_${m.key}_bronze" class="skill-star-btn skill-star-bronze">☆</span><span id="mapStar_${m.key}_silver" class="skill-star-btn skill-star-silver">☆</span><span id="mapStar_${m.key}_gold" class="skill-star-btn skill-star-gold">☆</span></span> ${m.name}<span class="muted-text">${classReq}</span></div>
                         <div class="row-buttons travel-map-actions">
-                            <button id="mapButton_${m.key}" class="tab-button" onclick="events.changeMap('${m.key}')">Clear the Grounds</button>
+                            <label class="travel-map-radio"><input type="radio" name="travelMapSelect" id="travelRadio_${m.key}" onclick="events.selectTravelMap('${m.key}')"> Travel here</label>
                             ${m.requiredClassKey ? "" : `<button id="mapSmartHarvestStart_${m.key}" class="tab-button" onclick="events.startHarvestCountdownAndForage('${m.key}')" style="display:none">Start harvest</button><button id="mapHarvestButton_${m.key}" class="tab-button" onclick="events.startHarvest('${m.key}')" style="display:none">Harvest Resources</button>`}
                             <span id="mapActionCurrent_${m.key}" class="travel-map-current-label muted-text" style="display:none">Current</span>
                         </div>
@@ -46,8 +71,10 @@ let createView = {
                         <div>Kitsune Rescued: <span id="mapWorkers_${m.key}"></span></div>
                     </div>
                     <div class="muted-text">${m.description || ""}</div>
-                    <div class="base-row">Intruders Cleared: <span id="mapClearStatus_${m.key}">0%</span></div>
-                    <div class="prog-track skill-prog-mini travel-map-clear-fill"><div id="mapClearFill_${m.key}" class="prog-fill prog-fill-skill"></div></div>
+                    <div id="mapClearWrap_${m.key}" class="base-row">
+                        <div class="base-row">Intruders Cleared: <span id="mapClearStatus_${m.key}">0%</span></div>
+                        <div class="prog-track skill-prog-mini travel-map-clear-fill"><div id="mapClearFill_${m.key}" class="prog-fill prog-fill-skill"></div></div>
+                    </div>
                 </div>
             `;
             if (m.requiredClassKey) {
@@ -64,18 +91,20 @@ let createView = {
         const guestRoot = document.getElementById("guestsList");
         const earthSlots = document.getElementById("spiritSlots_earth");
         const waterSlots = document.getElementById("spiritSlots_water");
-        const fireSlots = document.getElementById("spiritSlots_fire");
+        const bonfireFireSlots = document.getElementById("spiritSlots_bonfire_fire");
+        const atelierFireSlots = document.getElementById("spiritSlots_atelier_fire");
         const pebblePool = document.getElementById("pebbleMapPool");
         const assignOkamiBtn = function(siteKey) {
             return `<button id="base_${siteKey}_assign_okami_btn" class="tab-button assign-okami-btn" onclick="events.assignOkami('${siteKey}')">Assign Okami</button>`;
         };
         const foxDenUnlockRowsHtml = function() {
             let h = "";
-            for (let ui = 0; ui < resortData.foxDenUnlockOrder.length; ui++) {
-                const k = resortData.foxDenUnlockOrder[ui];
-                const defMeta = resortData.foxDenUnlockDefs[k];
-                const desc = defMeta && defMeta.description ? defMeta.description : "";
-                const label = defMeta && defMeta.label ? defMeta.label : k;
+            const unlockOrder = resortData.getFoxDenUnlockOrder();
+            for (let ui = 0; ui < unlockOrder.length; ui++) {
+                const k = unlockOrder[ui];
+                const bdef = resortData.buildings[k];
+                const desc = bdef && bdef.description ? bdef.description : "";
+                const label = bdef && bdef.label ? bdef.label : k;
                 const rowId = resortData.idRow("foxDen", k);
                 const btnId = resortData.idBtn("foxDen", k);
                 h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${label}</div><div class="muted-text base-skill-short">${desc}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Plan to build</button></div>`;
@@ -84,6 +113,13 @@ let createView = {
         };
         const workerControls = function(siteKey) {
             const p = `'${siteKey}'`;
+            const bonfireProg = siteKey === "bonfire";
+            const progWrapClass = bonfireProg
+                ? "prog-track bonfire-worker-prog-wrap"
+                : "prog-track skill-prog-mini";
+            const progFillClass = bonfireProg
+                ? "prog-fill prog-fill-bonfire-heat worker-prog-fill-instant"
+                : "prog-fill prog-fill-skill worker-prog-fill-instant";
             return `
                 <div class="base-worker-assign-row">
                     <button id="base_${siteKey}_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'all_dec')"><<</button>
@@ -97,23 +133,27 @@ let createView = {
                 </div>
                 <div class="base-row base-worker-power-row">
                     <span id="base_${siteKey}_worker_prod_text" class="muted-text"></span>
-                    <div id="base_${siteKey}_worker_prod_wrap" class="prog-track skill-prog-mini">
-                        <div id="base_${siteKey}_worker_prog_fill" class="prog-fill prog-fill-skill worker-prog-fill-instant"></div>
+                    <div id="base_${siteKey}_worker_prod_wrap" class="${progWrapClass}">
+                        <div id="base_${siteKey}_worker_prog_fill" class="${progFillClass}"></div>
                     </div>
                 </div>
                 ${assignOkamiBtn(siteKey)}
             `;
         };
-        const resortUpgradeRowsHtml = function(scopeKey) {
+        const resortUpgradeRowsHtml = function(scopeKey, excludeKeys) {
             const cfg = resortData.buildings[scopeKey];
             if (!cfg || !cfg.upgradesOrder) {
                 return "";
             }
             const order = cfg.upgradesOrder || [];
+            const exclude = excludeKeys || [];
             let h = "";
             let first = true;
             for (let oi = 0; oi < order.length; oi++) {
                 const pk = order[oi];
+                if (exclude.indexOf(pk) >= 0) {
+                    continue;
+                }
                 const ud = cfg.upgrades[pk];
                 if (!ud) {
                     continue;
@@ -130,15 +170,61 @@ let createView = {
             }
             return h;
         };
-        const bonfireClassRowsHtml = function() {
-            let h = "";
-            for (let ci = 0; ci < resortData.bonfireClasses.length; ci++) {
-                const ck = resortData.bonfireClasses[ci];
-                const d = initialize.getClassDef(ck);
-                const rowId = resortData.idRow("bonfire", ck);
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${d.name}</div><div class="muted-text base-skill-short">+${d.perLevel.str} Str, +${d.perLevel.con} Con, +${d.perLevel.spd} Spd per level</div><div id="base_bonfire_extra_${ck}" class="muted-text"></div></div><div class="base-upgrade-actions"><button id="${resortData.bonfireBuyBtn(ck)}" class="tab-button" onclick="events.buyUpgrade('bonfire','${ck}')">Buy</button><button id="${resortData.bonfireSwitchBtn(ck)}" class="tab-button" onclick="events.queueClassSwitch('${ck}')">Switch</button></div></div>`;
+        const htmlBonfirePanel = function() {
+            let classBtns = "";
+            for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
+                const ck = bonfireClassOrder[ci];
+                const d = bonfireClassDefs[ck];
+                classBtns += `<button type="button" id="bonfire_class_btn_${ck}" class="bonfire-pick-btn" onclick="events.bonfireSelectClass('${ck}')"><img class="bonfire-pick-img" src="${d.image}" alt="" draggable="false"><span class="bonfire-pick-label">${d.shortLabel}</span></button>`;
             }
-            return h;
+            let modBtns = "";
+            for (let mi = 0; mi < bonfireModifierOrder.length; mi++) {
+                const mk = bonfireModifierOrder[mi];
+                const md = bonfireModifierDefs[mk];
+                modBtns += `<button type="button" id="bonfire_mod_btn_${mk}" class="bonfire-pick-btn" onclick="events.bonfireSelectModifier('${mk}')"><img class="bonfire-pick-img" src="${md.image}" alt="" draggable="false"><span class="bonfire-pick-label">${md.name}</span></button>`;
+            }
+            return `
+                <button type="button" id="base_bonfire_clone_btn" class="tab-button bonfire-clone-btn" onclick="events.startBonfireClone()">Create a clone for <span id="base_bonfire_mana_cost">0</span> mana</button>
+                <div id="base_bonfire_current" class="base-row"></div>
+                <div id="bonfireFireTending_row" class="base-row" style="display:none">
+                    <label><input type="checkbox" id="bonfireFireTending_chk" checked onchange="events.toggleBonfireFireTending(this.checked)"> Only bring wood while heat is below</label>
+                    <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="52" onchange="events.setBonfireFireTendingCap(this.value)">
+                    <span class="muted-text">Assigned carriers skip trips when heat is at or above this value.</span>
+                </div>
+                <div id="bonfireClassSelectRow" class="base-row">Select a class (optional):</div>
+                <div id="bonfirePickerLayout" class="bonfire-picker-layout">
+                    <div class="bonfire-picker-col">
+                        <div class="bonfire-class-row">${classBtns}</div>
+                        <div class="bonfire-modifier-grid">${modBtns}</div>
+                    </div>
+                    <div id="base_bonfire_info_panel" class="bonfire-info-panel"></div>
+                </div>
+                ${resortUpgradeRowsHtml("bonfire")}
+            `;
+        };
+        const scrollArchivesChoicesHtml = function() {
+            let choiceCols = "";
+            const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards, and only start to drop when this research is woven. Each shard increases the base exp of the skill when creating a new clone.";
+            for (let ci = 0; ci < 3; ci++) {
+                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
+            }
+            return choiceCols;
+        };
+        const htmlScrollArchivesPanel = function() {
+            return `
+                <div class="base-row">Choose Research: <span id="scrollArchivesResearchesToChoose">0</span></div>
+                <div id="scrollArchivesChoicesWrap" style="display:none">
+                    <div class="scroll-archives-choices-grid">${scrollArchivesChoicesHtml()}</div>
+                    <div id="base_scrollArchives_row_finish_research" class="base-scrollArchives-row base-upgrade-row">
+                        <div class="base-upgrade-text">
+                            <div class="base-upgrade-name">Finish Research</div>
+                            <div id="base_scrollArchives_extra_finish_research" class="muted-text"></div>
+                        </div>
+                        <button id="base_scrollArchives_finish_research_btn" class="tab-button" onclick="events.buyUpgrade('scrollArchives','finishResearch')">Finish Research</button>
+                    </div>
+                </div>
+                ${resortUpgradeRowsHtml("scrollArchives", ["finishResearch"])}
+            `;
         };
         const workerDockHtml = function() {
             const keys = resortData.workerDockSiteKeys || [];
@@ -163,27 +249,33 @@ let createView = {
                 <div id="resortInfo_spirit" class="resort-info-section">
                     <div id="spiritInfoTitle" class="base-info-title">Spirit</div>
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
-                    <div class="base-row">Spirit power: <span id="spiritInfoPower"></span></div>
-                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span></div>
+                    <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
+                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(×1.8/lvl)</span></div>
                     <div id="spiritInfoEarthExtras">
-                        <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/2</div>
+                        <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
+                        <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
                     </div>
                     <div id="spiritInfoWaterExtras" style="display:none">
                         <div class="base-row">Water volume: <span id="spiritInfoWaterVolume"></span></div>
                         <div class="base-row">Heat: <span id="spiritInfoHeat"></span></div>
                         <div class="base-row">Essence: <span id="spiritInfoEssence"></span></div>
-                        <div class="base-row">Infusion: <span id="spiritInfoInfusion"></span></div>
                     </div>
                     <div id="spiritInfoFireExtras" style="display:none">
                         <div id="spiritInfoFireNote" class="base-row muted-text"></div>
+                        <div id="spiritInfoFireLauncherExtras" style="display:none">
+                            <div class="base-row">Launcher: <span id="spiritInfoFireLauncherName"></span></div>
+                            <div class="base-row">Embers: <span id="spiritInfoFireLauncherEmbers"></span>/100</div>
+                            <div class="base-row muted-text" id="spiritInfoFireLauncherStats"></div>
+                        </div>
                     </div>
                     <div id="spiritInfoPlantExtras" style="display:none">
                         <div class="base-row">Bamboo column: <span id="spiritInfoPlantColumn"></span></div>
-                        <div class="base-row muted-text">Plant spirits gain 1 exp each time a wood segment regrows in their bamboo column.</div>
+                        <div class="base-row" id="spiritInfoPlantChipsBonus"></div>
+                        <div class="base-row muted-text">Plant spirits gain 1 exp each time a chip regrows in their assigned bamboo column. They add their spirit power to the base chips of the bamboo.</div>
                     </div>
                     <div id="spiritInfoTaskWrap">
                         <div id="spiritInfoTaskText" class="base-row base-gap-top"></div>
-                        <div class="prog-track skill-prog-mini"><div id="spiritInfoTaskFill" class="prog-fill prog-fill-skill"></div></div>
+                        <div id="spiritInfoTaskProgressWrap" class="prog-track skill-prog-mini"><div id="spiritInfoTaskFill" class="prog-fill prog-fill-skill"></div></div>
                     </div>
                 </div>
                 <div id="resortInfo_torii" class="resort-info-section">
@@ -195,13 +287,24 @@ let createView = {
                     ${resortUpgradeRowsHtml("torii")}
                 </div>
                 <div id="resortInfo_inn" class="resort-info-section">
-                    <div class="base-info-title">Tatami Inn</div>
+                    <div id="innInfoTitle" class="base-info-title">Tatami Inn</div>
+                    <div id="innManaRow" class="base-row inn-mana-row" style="display:none">
+                        <button type="button" id="innFillMana_btn" class="tab-button" onclick="events.startInnFillMana()">Fill Mana</button>
+                        <div id="innManaProgressWrap" class="prog-track game-progress-track inn-mana-prog-track">
+                            <div id="innManaFill" class="prog-fill prog-fill-mana"></div>
+                            <div class="game-progress-bar-label">Mana: <span id="innManaAmount" class="game-progress-bold">0</span>/<span id="innManaCap" class="game-progress-bold">100</span></div>
+                        </div>
+                    </div>
+                    <div id="innManaExplain_row" class="base-row muted-text" style="display:none">Gentle Lights use 1 mana/s per occupied room and grant +2 restfulness/s while mana is available. Fill Mana weaves Okami to transfer global mana into this reservoir.</div>
                     <div class="base-row">
                         <div>Rooms available: <span id="innRoomsAvailable"></span></div>
                         <div>Rooms occupied: <span id="innRoomsOccupied"></span></div>
                         <div>Guests gain +<span id="innRestfulnessPerSecond"></span>/s restfulness while occupying a room.</div>
                     </div>
-                    <div class="base-row muted-text">Zenko guests settle in for 5s, then rest for <span id="innRestDurationText">5</span>s before leaving the inn.</div>
+                    <div id="innHotWater_row" class="base-row" style="display:none">Hot Water: <span id="innHotWaterText">0/20</span></div>
+                    <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires water of at least 40C</div>
+                    <div class="base-row muted-text">Check the Guest tab for the itinerary.</div>
+                    <div id="innGuestsVisitPond_row" class="base-row" style="display:none"><label><input type="checkbox" id="innGuestsVisitPond_chk" checked onchange="events.toggleInnGuestsVisitPond(this.checked)"> Allow guests to visit the pond</label></div>
                     ${resortUpgradeRowsHtml("inn")}
                     <div class="resort-info-grid">
                     </div>
@@ -227,8 +330,8 @@ let createView = {
                 <div id="resortInfo_garden" class="resort-info-section">
                     <div class="base-info-title">Rock Garden</div>
                     <div class="base-row muted-text">Automation for an easy life, so you can go outside.</div>
-                    <div id="gardenAppraisalAuto_row" class="base-row" style="display:none"><label><input type="checkbox" id="gardenAppraisalAuto_chk" checked onchange="events.toggleGardenAutoWeaveOnGather(this.checked)"> Arrangement of Appraisal — auto-weave ready gather jobs when Okami is idle or at a building</label></div>
-                    <div id="gardenReviewAuto_row" class="base-row" style="display:none"><label><input type="checkbox" id="gardenReviewAuto_chk" checked onchange="events.toggleGardenAutoWeaveCheapestReady(this.checked)"> Arrangement of Review — periodically auto-weave the ready upgrade with the shortest weave time</label></div>
+                    <div id="gardenAppraisalAuto_row" class="base-row" style="display:none"><label><input type="checkbox" id="gardenAppraisalAuto_chk" checked onchange="events.toggleGardenAutoWeaveOnGather(this.checked)"> Arrangement of Appraisal - auto-weave ready gather jobs when Okami is idle or at a building</label></div>
+                    <div id="gardenReviewAuto_row" class="base-row" style="display:none"><label><input type="checkbox" id="gardenReviewAuto_chk" checked onchange="events.toggleGardenAutoWeaveCheapestReady(this.checked)"> Arrangement of Review - periodically auto-weave the ready upgrade with the shortest weave time</label></div>
                     ${resortUpgradeRowsHtml("garden")}
                 </div>
                 <div id="resortInfo_atelier" class="resort-info-section">
@@ -236,17 +339,32 @@ let createView = {
                     <div class="base-row muted-text">Upgrades for the different buildings.</div>
                     ${resortUpgradeRowsHtml("atelier")}
                 </div>
+                <div id="resortInfo_mage_tower" class="resort-info-section">
+                    <div class="base-info-title">The Orb</div>
+                    <div class="base-row muted-text">Gains exp each second equal to the total levels of all spirits. Each assigned Kitsune (and Okami) multiplies Orb exp gain by x1.1. Mana gain per second equals Orb level; Bonfire heat and Spin Currents multiply that rate. When Okami is assigned here, her inspiration bonus also multiplies mana generation (but not the worker exp bonus).</div>
+                    <div class="base-row">Mana generation: <span id="orbManaRateText"></span>/s</div>
+                    <div class="base-row">Exp gain: <span id="orbExpRateText"></span>/s from spirit levels</div>
+                    <div id="orbExpProgressWrap" class="prog-track orb-exp-prog-track">
+                        <div id="orbExpFill" class="prog-fill prog-fill-orb-exp"></div>
+                        <div class="game-progress-bar-label">Level <span id="orbLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span><span id="orbExpText" class="game-progress-bold">0</span> / <span id="orbExpToLevelText" class="game-progress-bold">20</span></div>
+                    </div>
+                    ${resortUpgradeRowsHtml("mage_tower")}
+                </div>
                 <div id="resortInfo_bonfire" class="resort-info-section">
                     <div class="base-info-title">Bonfire</div>
                     <div class="base-row muted-text">Stare at the fire and contemplate how to protect what's yours.</div>
-                    <div id="base_bonfire_current" class="base-row"></div>
-                    ${bonfireClassRowsHtml()}
+                    ${htmlBonfirePanel()}
+                </div>
+                <div id="resortInfo_scrollArchives" class="resort-info-section">
+                    <div class="base-info-title">Scroll Archives</div>
+                    ${htmlScrollArchivesPanel()}
                 </div>
                 <div id="resortInfo_bambooForest" class="resort-info-section">
                     <div class="base-info-title">Bamboo Forest</div>
                     <div class="base-row muted-text">Harvest bamboo for construction wood.</div>
                     <div class="base-row">Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 Chips become 1 Wood -> </span> Wood: <span id="bambooForestInfoWood"></span></div>
                     <div class="base-row">Chop Power: <span id="bambooChopPower"></span> <span class="muted-text">Gain Chop Power per assigned Kitsune</span></div>
+                    <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span> <span class="muted-text">Bamboo grows twice as fast when water is available. 1L is used for every 10 chips regrown.</span></div>
                     <div class="base-row muted-text">Select which stalk to cut. One bamboo segment takes 2 minutes to fully grow. Bamboo grows when not being harvested.</div>
                     <div id="bambooStalkGrid" class="bamboo-stalk-grid"></div>
                     <div id="bambooCutRow" class="bamboo-harvest-row"></div>
@@ -258,29 +376,58 @@ let createView = {
                 <div id="resortInfo_foxDen" class="resort-info-section">
                     <div class="base-info-title">Fox Den</div>
                     <div class="base-row muted-text">Plan buildings and send kitsune to deliver materials. Buildings are prioritized over upgrades.</div>
-                    <div class="base-row">Wood: <span id="foxDenInfoWood"></span></div>
+                    <div id="foxDenManaOrders_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenManaOrders_chk" onchange="events.toggleFoxDenManaOrders(this.checked)"> Arrangement of Mana Orders - deliver mana from the Orb when no other gather/build orders remain</label></div>
                     ${foxDenUnlockRowsHtml()}
                 </div>
                 <div id="resortInfo_cistern" class="resort-info-section">
                     <div class="base-info-title">Cistern</div>
                     <div class="base-row muted-text">Collects water from droplets.</div>
                     <div class="base-row">Stored water: <span id="cisternInfoWater"></span></div>
+                    <div class="base-row">Temperature: <span id="cisternInfoTemperature"></span></div>
+                    <div class="base-row">Capacity: <span id="cisternInfoCapacity"></span></div>
                     <div class="base-row">Essence: <span id="cisternInfoEssence"></span></div>
+                    <div id="cisternReplaceHotWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternReplaceHotWater_chk" onchange="events.toggleCisternReplaceWithHotterWater(this.checked)"> Replace with hotter water</label></div>
+                    <div class="base-row"><button id="cisternEmptyHalf_btn" class="tab-button" onclick="events.emptyHalfCistern()">Empty Half</button></div>
+                    ${resortUpgradeRowsHtml("cistern")}
+                </div>
+                <div id="resortInfo_pond" class="resort-info-section">
+                    <div class="base-info-title">Pond</div>
+                    <div class="base-row muted-text">Overflow basin for extra water.</div>
+                    <div class="base-row">Water: <span id="pondInfoWater"></span></div>
+                    <div id="pondSendWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="pondSendWater_chk" checked onchange="events.togglePondSendWaterToForest(this.checked)"> Send water to bamboo forest</label></div>
+                    ${resortUpgradeRowsHtml("pond")}
+                </div>
+                <div id="resortInfo_fireLauncher" class="resort-info-section">
+                    <div id="fireLauncherInfoTitle" class="base-info-title">Fire Launcher</div>
+                    <div class="base-row">Type: <span id="fireLauncherInfoType"></span></div>
+                    <div class="base-row">Embers: <span id="fireLauncherInfoEmbers"></span>/100</div>
+                    <div class="base-row">Range: <span id="fireLauncherInfoRange"></span>px</div>
+                    <div class="base-row">Attack interval: <span id="fireLauncherInfoInterval"></span>s</div>
+                    <div class="base-row">Ember cost: <span id="fireLauncherInfoEmberCost"></span></div>
+                    <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span></div>
+                    <div class="base-row">Assigned: <span id="fireLauncherInfoSpirit"></span></div>
                 </div>
                 <div id="resortInfo_mine" class="resort-info-section">
                     <div class="mine-info-header">
                         <div class="base-info-title">Mine</div>
                         <span id="mineStatusText" class="mine-status-inline muted-text"></span>
                     </div>
-                    <div class="mine-depth-row"><button id="mineDepthLeftBtn" class="tab-button" onclick="events.changeMineDepth(-1)">←</button><span>depth <span id="mineDepthText"></span> | <span id="mineDepthClears"></span>/10</span><button id="mineDepthRightBtn" class="tab-button" onclick="events.changeMineDepth(1)">→</button></div>
+                    <div class="mine-depth-row"><button id="mineDepthLeftBtn" class="tab-button" onclick="events.changeMineDepth(-1)">←</button><span>Depth <span id="mineDepthText"></span> | <span id="mineDepthClears"></span>/10</span><button id="mineDepthRightBtn" class="tab-button" onclick="events.changeMineDepth(1)">→</button></div>
+                    <div class="base-row muted-text">
+                    Each depth level increases rewards by x2, difficulty by x1.9.<br>
+                    Earth Spirits mine faster equal to their Spirit Power.<br>
+                    When a Mine Grid is finished, Earth Spirits play in the dirt, taking the total spirit level of dirt and splitting the exp gain among the assigned earth spirits.
+                    </div>
                     <div class="mine-info-body">
                         <div id="mineGrid" class="mine-grid"></div>
                         <div class="mine-info-side">
                             <div class="resort-info-grid mine-resource-grid">
                                 <div>Dirt: <span id="mineDirtText"></span></div>
                                 <div>Stone: <span id="mineStoneText"></span></div>
+                                <div id="mineOreRow" style="display:none">Ore: <span id="mineOreText"></span></div>
                                 <div>Assigned spirit level: <span id="mineAssignedLevelText"></span></div>
                             </div>
+                            <div id="minePrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="minePrioritizeOre_chk" onchange="events.toggleMinePrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
                             <div id="minePlayProgressWrap" class="prog-track skill-prog-mini mine-play-progress"><div id="minePlayProgressFill" class="prog-fill prog-fill-skill"></div></div>
                         </div>
                     </div>
@@ -301,6 +448,17 @@ let createView = {
                 guestRows += `<div id="guestRow_${gi}" class="guest-list-row" style="display:none">The <b id="guestRow_${gi}_type"></b> is currently <b id="guestRow_${gi}_state"></b> for the next <b id="guestRow_${gi}_time"></b>. <span id="guestRow_${gi}_rest_text"></span><b id="guestRow_${gi}_restfulness"></b> <span id="guestRow_${gi}_rest_end"></span>.</div>`;
             }
             guestRoot.innerHTML = `
+                <div id="guestItinerarySection" class="guest-itinerary-section" style="display:none">
+                    <div class="guest-section-title">Guest Itinerary</div>
+                    <div id="guestItineraryPanel" class="guest-itinerary-panel">
+                        <div id="guestItineraryLine_0" class="guest-itinerary-line"></div>
+                        <div id="guestItineraryLine_1" class="guest-itinerary-line"></div>
+                        <div id="guestItineraryLine_2" class="guest-itinerary-line"></div>
+                        <div id="guestItineraryLine_3" class="guest-itinerary-line"></div>
+                    </div>
+                    <div id="guestStarBeadsRange" class="guest-itinerary-line">Expected Star Beads: <span id="guestStarBeadsMin">0</span> – <span id="guestStarBeadsMax">0</span></div>
+                    <div id="guestStarBeadsRangeNote" class="muted-text guest-itinerary-line">Max assumes resources hold for the whole stay.</div>
+                </div>
                 <div class="guest-log-section">
                     <div class="guest-section-title">Guest Log</div>
                     <div id="guestLogList" class="guest-log-list">${guestLogRows}</div>
@@ -320,11 +478,14 @@ let createView = {
         };
         if (earthSlots) earthSlots.innerHTML = slotHtml("earth", "hiddenSpring", 3);
         if (waterSlots) waterSlots.innerHTML = slotHtml("water", "hiddenSpring", 3);
-        if (fireSlots) fireSlots.innerHTML = slotHtml("fire", "hiddenSpring", 3);
+        if (bonfireFireSlots) bonfireFireSlots.innerHTML = slotHtml("fire", "bonfire", 3);
+        if (atelierFireSlots) atelierFireSlots.innerHTML = slotHtml("fire", "atelier", 3);
         const mineEarthSlots = document.getElementById("spiritSlots_mine_earth");
         if (mineEarthSlots) mineEarthSlots.innerHTML = slotHtml("earth", "mine", 3);
         const bambooPlantSlots = document.getElementById("spiritSlots_bambooForest_plant");
-        if (bambooPlantSlots) bambooPlantSlots.innerHTML = slotHtml("plant", "bambooForest", 4);
+        const pondWaterSlots = document.getElementById("spiritSlots_pond_water");
+        if (bambooPlantSlots) bambooPlantSlots.innerHTML = slotHtml("plant", "bambooForest", resortData.bambooForestConfig.stalkCount);
+        if (pondWaterSlots) pondWaterSlots.innerHTML = slotHtml("water", "pond", 3);
         const bambooStalkGrid = document.getElementById("bambooStalkGrid");
         const bambooCutRow = document.getElementById("bambooCutRow");
         const bambooStatusRow = document.getElementById("bambooStatusRow");
@@ -363,11 +524,28 @@ let createView = {
             let h = "";
             for (let i = 0; i < 12; i++) {
                 h += `<div id="pebbleToken_${i}" class="pebble-token" style="display:none"></div>`;
+                h += `<div id="pebbleTokenAmt_${i}" class="path-token-amount-label hyperVisible" style="display:none"></div>`;
+                h += `<div id="dropletToken_${i}" class="droplet-token" style="display:none"></div>`;
+                h += `<div id="dropletTokenAmtBelow_${i}" class="path-token-amount-label hyperVisible" style="display:none"></div>`;
+                h += `<div id="dropletTokenAmtTop_${i}" class="path-token-amount-label hyperVisible" style="display:none"></div>`;
             }
             h += `<div id="okamiTravelToken" class="okami-travel-token" style="display:none"><img class="okami-travel-tail" src="img/foxTail.svg" alt="" draggable="false"></div>`;
             h += `<div id="okamiPathWeaveToken" class="okami-path-weave-token" style="display:none"><img class="okami-path-weave-tail" src="img/foxTail.svg" alt="" draggable="false"></div>`;
             for (let ci = 0; ci < 8; ci++) {
                 h += `<div id="foxDenCarrier_${ci}" class="fox-den-carrier-token" style="display:none"><img class="fox-den-carrier-img" src="img/foxWorker.svg" alt="" draggable="false"></div>`;
+            }
+            for (let bi = 0; bi < 8; bi++) {
+                h += `<div id="bonfireCarrier_${bi}" class="fox-den-carrier-token bonfire-carrier-token" style="display:none"><img class="bonfire-carrier-img fox-den-carrier-img" src="img/foxWorker.svg" alt="" draggable="false"></div>`;
+            }
+            for (let ii = 0; ii < 8; ii++) {
+                h += `<div id="innCarrier_${ii}" class="fox-den-carrier-token inn-carrier-token" style="display:none"><img class="inn-carrier-img fox-den-carrier-img" src="img/foxWorker.svg" alt="" draggable="false"></div>`;
+            }
+            for (let cci = 0; cci < 8; cci++) {
+                h += `<div id="cisternCarrier_${cci}" class="fox-den-carrier-token cistern-carrier-token" style="display:none"><img class="cistern-carrier-img fox-den-carrier-img" src="img/foxWorker.svg" alt="" draggable="false"></div>`;
+            }
+            for (let fi = 0; fi < 8; fi++) {
+                h += `<div id="fireLauncherProjectile_${fi}" class="fire-launcher-projectile" style="display:none"><img src="img/fire.svg" alt="" draggable="false"></div>`;
+                h += `<div id="fireLauncherAoe_${fi}" class="fire-launcher-aoe-pulse" style="display:none"></div>`;
             }
             pebblePool.innerHTML = h;
         }
@@ -381,205 +559,22 @@ let createView = {
             }
             mineGrid.innerHTML = h;
         }
-        return;
-        const td = resortData.buildings;
-        let skillRowsHtml = "";
-        for (let i = 0; i < skills.keysInOrder.length; i++) {
-            const k = skills.keysInOrder[i];
-            const nm = data.progress.skills[k] ? data.progress.skills[k].name : k;
-            const classKey = (skills._byKey[k] && skills._byKey[k].classKey) ? skills._byKey[k].classKey : "";
-            const className = classKey ? (classKey.charAt(0).toUpperCase() + classKey.slice(1)) : "";
-            const classNote = className ? ` - ${className}` : "";
-            skillRowsHtml += `<div id="base_scrollArchives_row_${k}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div id="base_scrollArchives_name_${k}" class="base-upgrade-name">${nm}${classNote}</div><div id="base_scrollArchives_desc_${k}" class="muted-text base-skill-short">${skills.getSkillShortDescription(k)}</div><div id="base_scrollArchives_progress_${k}" class="muted-text"></div></div><div class="base-upgrade-actions"><button id="base_scrollArchives_btn_${k}" class="tab-button" onclick="events.buyScrollArchivesSkill('${k}')">Buy for</button><button id="base_scrollArchives_pause_${k}" class="tab-button" onclick="events.toggleScrollArchivesResearchPause('${k}')">Pause</button></div></div>`;
-        }
-        let guestRowsHtml = "";
-        for (let gi = 0; gi < 10; gi++) {
-            guestRowsHtml += `<div id="base_inn_guest_wrap_${gi}" class="base-guest-wrap"><div class="base-guest-row"><div id="base_inn_guest_name_${gi}"></div><button id="base_inn_guest_chat_${gi}" class="tab-button">Chat</button></div><div class="base-mini-progress base-guest-progress"><div id="base_inn_guest_fill_${gi}" class="base-mini-progress-fill"></div></div></div>`;
-        }
-
-        const makePanelShell = function(key, titleText, innerHtml) {
-            return `<div id="basePanel_${key}" class="base-info-section"><div class="base-info-title">${titleText}</div>${innerHtml}</div>`;
-        };
-
-        const htmlStaticPanelDescription = function(buildingKey, text) {
-            if (!text) {
-                return "";
-            }
-            return `<div id="base_${buildingKey}_desc" class="base-row">${text}</div>`;
-        };
-
-        const upgradePurchaseRowHtml = function(panelScope, upgradePropKey, u) {
-            const slug = resortData.slug(u);
-            const wc = u.wrapClass ? ` ${u.wrapClass}` : "";
-            const rowId = resortData.idRow(panelScope, slug);
-            const btnId = resortData.idBtn(panelScope, slug);
-            const extraId = resortData.idExtra(panelScope, slug);
-            const name = u.name || "";
-            const desc = u.description || "";
-            return `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row${wc}"><div class="base-upgrade-text"><div class="base-upgrade-name">${name}</div><div class="muted-text base-skill-short">${desc}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${panelScope}','${upgradePropKey}')">Buy for</button></div>`;
-        };
-
-        const htmlOrderedUpgradeKeys = function(bcfg, panelScope, keys) {
-            let h = "";
-            for (let oi = 0; oi < keys.length; oi++) {
-                const pk = keys[oi];
-                const ud = bcfg.upgrades[pk];
-                if (ud) {
-                    h += upgradePurchaseRowHtml(panelScope, pk, ud);
-                }
-            }
-            return h;
-        };
-
-        const htmlWorkerBlock = function(buildingKey, w, extraAfterWorkers) {
-            const rowId = `base_${buildingKey}_row`;
-            const p = `'${buildingKey}'`;
-            const gk = w.gearKey || "gear";
-            const gearUp = resortData.buildings[buildingKey] && resortData.buildings[buildingKey].upgrades && resortData.buildings[buildingKey].upgrades[gk];
-            const gslug = gearUp && gearUp.key ? gearUp.key : "gear";
-            const gearExtraId = resortData.idExtra(buildingKey, gslug);
-            const gearBtnId = resortData.idBtn(buildingKey, gslug);
-            const workerPowerRow = (resortData.workerPowerSiteKeys || []).indexOf(buildingKey) >= 0
-                ? `<div class="base-row base-worker-power-row"><span id="base_${buildingKey}_worker_prod_text" class="muted-text"></span><div id="base_${buildingKey}_worker_prod_wrap" class="prog-track skill-prog-mini"><div id="base_${buildingKey}_worker_prog_fill" class="prog-fill prog-fill-skill"></div></div></div>`
-                : "";
-            return `
-                <div id="${rowId}" class="base-row"></div>
-                <div class="base-scrollArchives-row base-upgrade-row">
-                    <div class="base-upgrade-text">
-                        <div class="base-upgrade-name">${w.gearName}</div>
-                        <div class="muted-text base-skill-short">${w.gearDescription}</div>
-                        <div id="${gearExtraId}" class="muted-text"></div>
-                    </div>
-                    <button id="${gearBtnId}" class="tab-button" onclick="events.buyUpgrade('${buildingKey}','${gk}')">Buy for</button>
-                </div>
-                <div class="base-worker-assign-row"><button id="base_${buildingKey}_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'all_dec')"><<</button><button id="base_${buildingKey}_unassign_ten_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'ten_dec')">--</button><button id="base_${buildingKey}_unassign_one_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'one_dec')">-</button><span class="base-worker-cap-label">Assign Kitsune</span><button id="base_${buildingKey}_assign_one_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'one_inc')">+</button><button id="base_${buildingKey}_assign_ten_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'ten_inc')">++</button><button id="base_${buildingKey}_assign_all_btn" class="tab-button" onclick="events.adjustWorkers(${p}, 'all_inc')">>></button><span id="base_${buildingKey}_workers_label" class="base-worker-cap-label muted-text"></span></div>
-                <button id="base_${buildingKey}_assign_okami_btn" class="tab-button assign-okami-btn" onclick="events.assignOkami('${buildingKey}')">Assign Okami</button>
-                ${workerPowerRow}
-                ${extraAfterWorkers || ""}
-            `;
-        };
-
-        const htmlFoxDenUnlockRows = function() {
-            let h = "";
-            for (let ui = 0; ui < resortData.foxDenUnlockOrder.length; ui++) {
-                const k = resortData.foxDenUnlockOrder[ui];
-                const defMeta = resortData.foxDenUnlockDefs[k];
-                const desc = defMeta && defMeta.description ? defMeta.description : "";
-                const label = defMeta && defMeta.label ? defMeta.label : k;
-                const rowId = resortData.idRow("foxDen", k);
-                const btnId = resortData.idBtn("foxDen", k);
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${label}</div><div class="muted-text base-skill-short">${desc}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Buy for</button></div>`;
-            }
-            return h;
-        };
-
-        const htmlBonfireClassRows = function() {
-            let h = "";
-            for (let ci = 0; ci < resortData.bonfireClasses.length; ci++) {
-                const ck = resortData.bonfireClasses[ci];
-                const d = initialize.getClassDef(ck);
-                const rowId = resortData.idRow("bonfire", ck);
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${d.name}</div><div class="muted-text base-skill-short">+${d.perLevel.str} Str, +${d.perLevel.con} Con, +${d.perLevel.spd} Spd per level</div><div id="base_bonfire_extra_${ck}" class="muted-text"></div></div><div class="base-upgrade-actions"><button id="${resortData.bonfireBuyBtn(ck)}" class="tab-button" onclick="events.buyUpgrade('bonfire','${ck}')">Buy</button><button id="${resortData.bonfireSwitchBtn(ck)}" class="tab-button" onclick="events.queueClassSwitch('${ck}')">Switch</button></div></div>`;
-            }
-            return h;
-        };
-
-        const htmlGardenManualRows = function() {
-            const gcfg = resortData.buildings.garden;
-            return htmlOrderedUpgradeKeys(gcfg, "garden", gcfg.upgradesOrder);
-        };
-
-        const htmlScrollArchivesDeskOnly = function(libCfg) {
-            return upgradePurchaseRowHtml("scrollArchives", "researchDesk", libCfg.upgrades.researchDesk);
-        };
-
-        const buildBuildingPanel = function(buildingKey) {
-            const titleText = resortData.getScopeDisplayName(buildingKey);
-            const cfg = td[buildingKey];
-            if (buildingKey === "market" || buildingKey === "mage_tower") {
-                return makePanelShell(buildingKey, titleText, `<div class="base-row muted-text">${cfg.mutedPlaceholder}</div>`);
-            }
-            if (!cfg) {
-                return "";
-            }
-            if (buildingKey === "chapel") {
-                const ccfg = td.chapel;
-                return makePanelShell(buildingKey, titleText,
-                    htmlStaticPanelDescription(buildingKey, ccfg.description) + htmlOrderedUpgradeKeys(ccfg, buildingKey, ccfg.upgradesOrder));
-            }
-            if (buildingKey === "foxDen") {
-                const tcfg = td.foxDen;
-                return makePanelShell(buildingKey, titleText,
-                    htmlStaticPanelDescription(buildingKey, tcfg.description)
-                    + htmlFoxDenUnlockRows());
-            }
-            if (cfg.workers) {
-                return makePanelShell(buildingKey, titleText, htmlWorkerBlock(buildingKey, cfg.workers, ""));
-            }
-            if (buildingKey === "inn") {
-                const icfg = td.inn;
-                const adv = icfg.advertiseAction;
-                return makePanelShell(buildingKey, titleText,
-                    htmlOrderedUpgradeKeys(icfg, buildingKey, icfg.upgradesOrder)
-                    + `<div id="${icfg.statusRowIds.openActive}" class="base-row"></div><div id="${icfg.statusRowIds.nextGuest}" class="base-row"></div>`
-                    + `<button id="${adv.btnId}" class="tab-button base-manual-btn" onclick="${adv.onclick}">${adv.label}<div id="${adv.cdWrapId}" class="base-mini-progress base-manual-cd"><div id="${adv.cdFillId}" class="base-mini-progress-fill"></div></div></button>`
-                    + `<div id="${adv.cdTextId}" class="muted-text"></div><div id="${icfg.emptyGuestsId}" class="muted-text">${icfg.emptyGuestsText}</div>${guestRowsHtml}`);
-            }
-            if (buildingKey === "bonfire") {
-                return makePanelShell(buildingKey, titleText, `<div id="${cfg.currentStatusRowId}" class="base-row"></div>${htmlBonfireClassRows()}`);
-            }
-            if (buildingKey === "scrollArchives") {
-                const libCfg = td.scrollArchives;
-                return makePanelShell(buildingKey, titleText,
-                    htmlScrollArchivesDeskOnly(libCfg)
-                    + `<div class="base-worker-assign-row"><button id="base_scrollArchives_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'all_dec')"><<</button><button id="base_scrollArchives_unassign_ten_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'ten_dec')">--</button><button id="base_scrollArchives_unassign_one_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'one_dec')">-</button><span class="base-worker-cap-label">Assign Kitsune</span><button id="base_scrollArchives_assign_one_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'one_inc')">+</button><button id="base_scrollArchives_assign_ten_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'ten_inc')">++</button><button id="base_scrollArchives_assign_all_btn" class="tab-button" onclick="events.adjustWorkers('scrollArchives', 'all_inc')">>></button><span id="base_scrollArchives_workers_label" class="base-worker-cap-label muted-text"></span></div>`
-                    + `<div id="base_scrollArchives_queue_note" class="base-row muted-text">${libCfg.queueNote}</div>`
-                    + `<div class="row-buttons"><button id="scrollArchivesTab_combat" class="tab-button" onclick="events.switchScrollArchivesTab('combat')">Combat</button><button id="scrollArchivesTab_resort" class="tab-button" onclick="events.switchScrollArchivesTab('resort')">Resort</button><button id="scrollArchivesTab_foraging" class="tab-button" onclick="events.switchScrollArchivesTab('foraging')">Foraging</button><button id="scrollArchivesTab_class" class="tab-button" onclick="events.switchScrollArchivesTab('class')">Class</button></div>`
-                    + `<div id="${libCfg.emptySkillsId}" class="muted-text">${libCfg.emptySkillsText}</div>${skillRowsHtml}`);
-            }
-            if (buildingKey === "atelier") {
-                return makePanelShell(buildingKey, titleText, htmlOrderedUpgradeKeys(td.atelier, buildingKey, td.atelier.upgradesOrder));
-            }
-            if (buildingKey === "garden") {
-                const gcfg = td.garden;
-                return makePanelShell(buildingKey, titleText,
-                    `<div class="base-row muted-text">${gcfg.introMuted}</div>${htmlGardenManualRows()}<div id="${gcfg.emptyPlaceholderId}" class="muted-text">${gcfg.emptyPlaceholderText}</div>`);
-            }
-            return "";
-        };
-
-        let panelsHtml = "";
-        const panelOrder = resortData.baseBuildingOrder.slice();
-        for (let pi = 0; pi < panelOrder.length; pi++) {
-            panelsHtml += buildBuildingPanel(panelOrder[pi]);
-        }
-
-        root.innerHTML = `
-            <div id="base_resource_strip" class="base-resource-strip">
-                <span>Stone <span id="base_res_stone"></span></span>
-            </div>
-            ${panelsHtml}
-        `;
-        for (let i = 0; i < 10; i++) {
-            const btn = root.querySelector(`#base_inn_guest_chat_${i}`);
-            if (btn) {
-                btn.addEventListener("click", function() {
-                    const gid = parseInt(this.dataset.guestId || "0", 10);
-                    if (gid > 0) {
-                        events.chatInnGuest(gid);
-                    }
-                });
-            }
-        }
     },
     fixUiAfterLoad: function() {
-        events.showSelectedBaseBuildingPanels(data.progress.selectedBaseBuilding || "");
+        events.refreshBaseBuildingPanels();
+        if (typeof events.syncNumberTypeRadiosFromSettings === "function") {
+            events.syncNumberTypeRadiosFromSettings();
+        }
+        if (typeof engine.cacheMapBuildingPositions === "function") {
+            engine.cacheMapBuildingPositions();
+        }
+        view.updateVal("saveToFileRow", isDebug ? "" : "none", "style.display");
     },
     /** One-time on load: 40% skill rows + 60% Skill Info panel. Visibility via view.updateSkillsListVisibility. */
     createSkillElements: function() {
         const skillsList = document.getElementById("skillsList");
-        const innUnlockedFromFoxDen = !!(data.progress.base && data.progress.base.foxDen && data.progress.base.foxDen.unlocks && data.progress.base.foxDen.unlocks.inn);
-        const tipsRowHiddenStyle = innUnlockedFromFoxDen ? "" : " style=\"display:none\"";
+        const tipsUnlocked = engine.isSkillTipsUnlocked();
+        const tipsHiddenStyle = tipsUnlocked ? "" : " style=\"display:none\"";
         let col = `<div id="skillsListColumn" class="skills-list-column"><div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>`;
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const key = skills.keysInOrder[i];
@@ -594,7 +589,7 @@ let createView = {
                         <div id="skill_${key}_stars_controls" class="skill-stars-controls skill-stars-row-compact skill-row-stars-right" onclick="event.stopPropagation()">
                             <button id="skill_${key}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleSkillStar('${key}', 'bronze')">☆</button>
                             <button id="skill_${key}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleSkillStar('${key}', 'silver')">☆</button>
-                            <button id="skill_${key}_star_coins" class="skill-star-btn skill-panel-star-btn skill-star-coins" onclick="events.toggleSkillStar('${key}', 'coins')">☆</button>
+                            <button id="skill_${key}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleSkillStar('${key}', 'gold')">☆</button>
                         </div>
                     </div>
                     <div class="skill-row-bars">
@@ -611,16 +606,16 @@ let createView = {
                 <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current muted-text"></div></div>
                 <div class="skill-reward" id="skillInfo_reward"></div>
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
-                <div class="skill-trigger" id="skillInfo_tips_rarity"></div>
+                <div class="skill-trigger" id="skillInfo_tips_rarity"${tipsHiddenStyle}></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_exp_on_trigger"></div>
                 <div class="prog-label-row skill-exp-row">Skill exp: <span id="skillInfo_exp_text"></span> <span class="skill-exp-mults" id="skillInfo_exp_mults"></span></div>
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="skillInfo_exp_fill" class="prog-fill prog-fill-skill"></div></div>
                 <div class="prog-label-row">Talent: <span id="skillInfo_talent_text"></span></div>
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="skillInfo_talent_fill" class="prog-fill prog-fill-talent"></div></div>
                 <div id="skillInfo_star_effect_row" class="prog-label-row">Star effect: <span id="skillInfo_star_effect"></span></div>
-                <div id="skillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsRowHiddenStyle}>Tips: <span id="skillInfo_tips_text"></span> <span class="skill-exp-mults" id="skillInfo_tips_mults"></span></div>
+                <div id="skillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsHiddenStyle}>Tips: <span id="skillInfo_tips_text"></span> <span class="skill-exp-mults" id="skillInfo_tips_mults"></span></div>
                 <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
-                <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Integration mult: <span id="skillInfo_integration_mult"></span></div>
+                <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Echo Chamber mult: <span id="skillInfo_integration_mult"></span></div>
                 <div id="skillInfo_flavor" class="skill-info-flavor"></div>
             </aside>
         `;
@@ -641,8 +636,43 @@ let createView = {
                 `skill_wrap_${key}`,
                 `skill_${key}_name`, `skill_${key}_lvl_talent`,
                 `skill_${key}_exp_fill`, `skill_${key}_talent_fill`,
-                `skill_${key}_stars_controls`, `skill_${key}_star_bronze`, `skill_${key}_star_silver`, `skill_${key}_star_coins`
+                `skill_${key}_stars_controls`, `skill_${key}_star_bronze`, `skill_${key}_star_silver`, `skill_${key}_star_gold`
             );
+        }
+    },
+    createBattleBuffSlots: function() {
+        const row = document.getElementById("playerBuffRow");
+        if (!row || row.dataset.buffSlotsBuilt === "1") {
+            return;
+        }
+        row.dataset.buffSlotsBuilt = "1";
+        for (let i = 0; i < BATTLE_BUFF_KEYS.length; i++) {
+            const key = BATTLE_BUFF_KEYS[i];
+            const def = battleBuffDefs[key];
+            const slotEl = document.createElement("div");
+            slotEl.id = `playerBuffSlot_${key}`;
+            slotEl.className = "player-buff-slot showthat";
+            slotEl.style.display = "none";
+            const imgEl = document.createElement("img");
+            imgEl.className = "player-buff-icon";
+            imgEl.src = def.img;
+            imgEl.alt = def.label;
+            imgEl.draggable = false;
+            const trEl = document.createElement("div");
+            trEl.id = `playerBuffSlot_${key}_tr`;
+            trEl.className = "hypervisible player-buff-num-tr";
+            trEl.style.display = "none";
+            const brEl = document.createElement("div");
+            brEl.id = `playerBuffSlot_${key}_br`;
+            brEl.className = "hypervisible player-buff-num-br";
+            const tipEl = document.createElement("div");
+            tipEl.id = `playerBuffSlot_${key}_tip`;
+            tipEl.className = "showthis player-buff-tooltip";
+            slotEl.appendChild(imgEl);
+            slotEl.appendChild(trEl);
+            slotEl.appendChild(brEl);
+            slotEl.appendChild(tipEl);
+            row.appendChild(slotEl);
         }
     },
     setStaticDimensions: function() {
@@ -683,17 +713,17 @@ let createView = {
 
         createView.queueCache(
             "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate",
-            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "rangeMarkers", "attackLines", "playerStack", "playerToken", "playerTokenHpLayer", "playerStatHpLine", "playerStatDmgLine", "playerMovePulse",
+            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
-            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathSummary", "deathTalentDetails", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_options",
-            "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiStateDisplay", "okamiInspirationBonus",
+            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_options",
+            "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
-            "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_torii", "resortInfo_inn", "resortInfo_bar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_bonfire", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_mine",
+            "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_bar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine",
             "gardenAppraisalAuto_row", "gardenAppraisalAuto_chk", "gardenReviewAuto_row", "gardenReviewAuto_chk",
-            "foxDenMapDisplay", "innRestDurationText",
-            "bambooForestInfoChips", "bambooForestInfoWood", "foxDenInfoWood", "bambooForestMapDisplay",
+            "foxDenMapDisplay",
+            "bambooForestInfoChips", "bambooForestInfoWood", "bambooForestMapDisplay",
             "base_bambooForest_assign_one_btn", "base_bambooForest_assign_ten_btn", "base_bambooForest_assign_all_btn", "base_bambooForest_unassign_one_btn", "base_bambooForest_unassign_ten_btn", "base_bambooForest_unassign_all_btn", "base_bambooForest_workers_label", "base_bambooForest_worker_prod_text", "base_bambooForest_worker_prod_wrap", "base_bambooForest_worker_prog_fill", "base_bambooForest_assign_okami_btn",
             "base_foxDen_assign_one_btn", "base_foxDen_assign_ten_btn", "base_foxDen_assign_all_btn", "base_foxDen_unassign_one_btn", "base_foxDen_unassign_ten_btn", "base_foxDen_unassign_all_btn", "base_foxDen_workers_label", "base_foxDen_assign_okami_btn",
             "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken",
@@ -702,49 +732,60 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoLevel", "spiritInfoPower", "spiritInfoExp", "spiritInfoExpReq",
-            "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
-            "spiritInfoPebbles", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoInfusion", "spiritInfoFireNote", "spiritInfoPlantColumn",
-            "spiritInfoTaskText", "spiritInfoTaskFill",
-            "cisternInfoWater", "cisternInfoEssence",
+            "spiritInfoTitle", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
+            "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
+            "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoFireNote",
+            "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherStats", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
+            "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
+            "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence",
+            "cisternReplaceHotWater_row", "cisternEmptyHalf_btn",
+            "pondInfoWater", "pondSendWater_row",
+            "bambooForestWater_row", "bambooForestWaterText",
             "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10",
-            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond",
-            "stonePileInfoValue", "stonePileMapValue", "toriiMapDisplay", "innMapDisplay",
-            "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill",
-            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineAssignedLevelText", "minePlayProgressWrap", "minePlayProgressFill",
+            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterText", "innOnsenTempReq_row", "innMapLabelText", "innGuestsVisitPond_row",
+            "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap", "innManaExplain_row",
+            "foxDenManaOrders_row", "foxDenManaOrders_chk",
+            "mapInnManaProgressWrap", "mapInnManaProgressFill",
+            "guestStarBeadsRange", "guestStarBeadsMin", "guestStarBeadsMax", "guestStarBeadsRangeNote",
+            "kitsuneAssignTooltip", "kitsuneAssignTooltipList",
+            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay",
+            "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill",
+            "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbExpRateText",
+            "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
+            "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoRange", "fireLauncherInfoInterval",
+            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoSpirit",
+            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAssignedLevelText", "minePlayProgressWrap", "minePlayProgressFill",
             "base_torii_assign_one_btn", "base_torii_assign_ten_btn", "base_torii_assign_all_btn", "base_torii_unassign_one_btn", "base_torii_unassign_ten_btn", "base_torii_unassign_all_btn", "base_torii_workers_label", "base_torii_worker_prod_text", "base_torii_worker_prod_wrap", "base_torii_worker_prog_fill",
             "base_laundry_assign_one_btn", "base_laundry_assign_ten_btn", "base_laundry_assign_all_btn", "base_laundry_unassign_one_btn", "base_laundry_unassign_ten_btn", "base_laundry_unassign_all_btn", "base_laundry_workers_label", "base_laundry_worker_prod_text", "base_laundry_worker_prod_wrap", "base_laundry_worker_prog_fill",
             "base_resource_strip", "base_res_stone",
-            "base_chapel_retry_row", "base_chapel_retry_btn", "base_chapel_retry_extra",
-            "base_chapel_growth_row", "base_chapel_growth_btn", "base_chapel_growth_extra",
-            "base_chapel_planned_row", "base_chapel_planned_btn", "base_chapel_planned_extra",
-            "basePanel_chapel", "basePanel_foxDen", "basePanel_mine", "basePanel_inn", "basePanel_bonfire", "basePanel_market", "basePanel_mage_tower", "basePanel_scrollArchives", "basePanel_atelier", "basePanel_garden",
+            "basePanel_foxDen", "basePanel_mine", "basePanel_inn", "basePanel_bonfire", "basePanel_market", "basePanel_mage_tower", "basePanel_scrollArchives", "basePanel_atelier", "basePanel_garden",
             "base_foxDen_desc",
             "base_foxDen_hire_row", "base_foxDen_hire_btn", "base_foxDen_hire_extra",
-            "base_chapel_desc", "base_mine_row", "base_mine_gear_btn", "base_mine_gear_extra", "base_mine_assign_one_btn", "base_mine_assign_ten_btn", "base_mine_assign_all_btn", "base_mine_unassign_one_btn", "base_mine_unassign_ten_btn", "base_mine_unassign_all_btn", "base_mine_workers_label", "base_mine_manual_btn", "base_mine_cd_wrap", "base_mine_cd_fill", "base_mine_cd_text",
+            "base_mine_row", "base_mine_gear_btn", "base_mine_gear_extra", "base_mine_assign_one_btn", "base_mine_assign_ten_btn", "base_mine_assign_all_btn", "base_mine_unassign_one_btn", "base_mine_unassign_ten_btn", "base_mine_unassign_all_btn", "base_mine_workers_label", "base_mine_manual_btn", "base_mine_cd_wrap", "base_mine_cd_fill", "base_mine_cd_text",
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
-            "base_bonfire_current",
-            "base_bonfire_extra_condescension", "base_bonfire_extra_scold", "base_bonfire_extra_mockery",
-            "base_bonfire_condescension_row", "base_bonfire_scold_row", "base_bonfire_mockery_row",
-            "base_bonfire_condescension_buy_btn", "base_bonfire_condescension_switch_btn", "base_bonfire_scold_buy_btn", "base_bonfire_scold_switch_btn", "base_bonfire_mockery_buy_btn", "base_bonfire_mockery_switch_btn",
-            "base_scrollArchives_empty", "base_scrollArchives_workers_label", "base_scrollArchives_desk_row", "base_scrollArchives_desk_btn", "base_scrollArchives_desk_extra",
-            "base_scrollArchives_assign_one_btn", "base_scrollArchives_assign_ten_btn", "base_scrollArchives_assign_all_btn", "base_scrollArchives_unassign_one_btn", "base_scrollArchives_unassign_ten_btn", "base_scrollArchives_unassign_all_btn",
+            "base_bonfire_clone_btn", "base_bonfire_current", "base_bonfire_mana_cost", "base_bonfire_info_panel",
+            "bonfireClassSelectRow", "bonfirePickerLayout", "bonfireFireTending_row", "bonfireFireTending_cap",
+            "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
+            "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",
+            "base_bonfire_planned_row", "base_bonfire_planned_btn", "base_bonfire_planned_extra",
+            "base_bonfire_assign_one_btn", "base_bonfire_assign_ten_btn", "base_bonfire_assign_all_btn", "base_bonfire_unassign_one_btn", "base_bonfire_unassign_ten_btn", "base_bonfire_unassign_all_btn", "base_bonfire_workers_label", "base_bonfire_worker_prod_text", "base_bonfire_worker_prod_wrap", "base_bonfire_worker_prog_fill", "base_bonfire_assign_okami_btn",
+            "scrollArchivesResearchesToChoose", "scrollArchivesChoicesWrap",
+            "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
             "base_garden_smartHarvest_row", "base_garden_smartHarvest_btn", "base_garden_smartHarvest_extra", "base_garden_empty",
-            "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_inn", "baseBuilding_bar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_mine",
-            "baseBuilding_chapel", "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_mine", "baseBuilding_scrollArchives",
+            "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_inn", "baseBuilding_bar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
+            "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "baseMineProgressWrap", "baseMineProgressFill", "base_mine_map_prod_rate", "base_mine_worker_prod_text", "base_mine_worker_prod_wrap", "base_mine_worker_prog_fill",
-            "baseScrollArchivesProgressWrap", "baseScrollArchivesProgressFill",
-            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "statsHpText", "statsHpTip", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
-            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "skillSubTab_combat", "skillSubTab_resort", "skillSubTab_foraging", "skillSubTab_class", "scrollArchivesTab_combat", "scrollArchivesTab_resort", "scrollArchivesTab_foraging", "scrollArchivesTab_class",
+            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
+            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_combat", "skillSubTab_foraging", "skillSubTab_class",
             "combatStarsInventory", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
         const maps = data.progress.mapDefinitions;
         for (let mi = 0; mi < maps.length; mi++) {
             const m = maps[mi];
             const mk = m.key;
-            createView.queueCache(`travel_card_${mk}`, `mapButton_${mk}`, `mapActionCurrent_${mk}`, `mapShardSummary_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_coins`, `mapWorkers_${mk}`, `mapClearStatus_${mk}`, `mapClearFill_${mk}`);
+            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapShardSummary_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`, `mapClearWrap_${mk}`, `mapClearStatus_${mk}`, `mapClearFill_${mk}`);
             /* Class-only maps omit harvest / smart-harvest controls in HTML - do not queue those ids. */
             if (!m.requiredClassKey) {
                 createView.queueCache(`mapSmartHarvestStart_${mk}`, `mapHarvestButton_${mk}`);
@@ -757,18 +798,37 @@ let createView = {
         for (let gli = 0; gli < 5; gli++) {
             createView.queueCache(`guestLogRow_${gli}`, `guestLogRow_${gli}_text`);
         }
+        createView.queueCache(
+            "guestItinerarySection", "guestItineraryPanel",
+            "guestItineraryLine_0", "guestItineraryLine_1", "guestItineraryLine_2", "guestItineraryLine_3"
+        );
         for (let si = 0; si < 3; si++) {
-            createView.queueCache(`spiritSlot_hiddenSpring_earth_${si}`, `spiritSlot_hiddenSpring_water_${si}`, `spiritSlot_hiddenSpring_fire_${si}`);
+            createView.queueCache(`spiritSlot_hiddenSpring_earth_${si}`, `spiritSlot_hiddenSpring_water_${si}`);
         }
         for (let si = 0; si < 3; si++) {
-            createView.queueCache(`spiritSlot_mine_earth_${si}`);
+            createView.queueCache(`spiritSlot_mine_earth_${si}`, `spiritSlot_bonfire_fire_${si}`, `spiritSlot_atelier_fire_${si}`);
         }
-        createView.queueCache("spiritSlots_bambooForest_plant");
-        for (let bpi = 0; bpi < 4; bpi++) {
+        const launcherDefs = resortData.fireLauncherPlatformDefs || [];
+        for (let li = 0; li < launcherDefs.length; li++) {
+            const lk = launcherDefs[li].key;
+            createView.queueCache(
+                `fireLauncher_${lk}_wrap`, `fireLauncher_${lk}_range`, `fireLauncher_${lk}_emberFill`,
+                `spiritSlot_fireLauncher_${lk}_0`
+            );
+        }
+        for (let fi = 0; fi < 8; fi++) {
+            createView.queueCache(`fireLauncherProjectile_${fi}`, `fireLauncherAoe_${fi}`);
+        }
+        createView.queueCache("spiritSlots_earth", "spiritSlots_water", "spiritSlots_bambooForest_plant", "spiritSlots_pond_water", "spiritSlots_bonfire_fire", "spiritSlots_atelier_fire");
+        const pondSlotMax = engine.getPondWaterSpiritSlotMax();
+        for (let bpi = 0; bpi < resortData.bambooForestConfig.stalkCount; bpi++) {
             createView.queueCache(`spiritSlot_bambooForest_plant_${bpi}`);
         }
+        for (let pwi = 0; pwi < pondSlotMax; pwi++) {
+            createView.queueCache(`spiritSlot_pond_water_${pwi}`);
+        }
         for (let pi = 0; pi < 12; pi++) {
-            createView.queueCache(`pebbleToken_${pi}`);
+            createView.queueCache(`pebbleToken_${pi}`, `pebbleTokenAmt_${pi}`, `dropletToken_${pi}`, `dropletTokenAmtBelow_${pi}`, `dropletTokenAmtTop_${pi}`);
         }
         const bfcfg = resortData.bambooForestConfig;
         const bStalks = bfcfg.stalkCount || 4;
@@ -780,18 +840,27 @@ let createView = {
                 createView.queueCache(`bambooCell_${bsi}_${bri}`, `bambooCellFill_${bsi}_${bri}`, `bambooCellLabel_${bsi}_${bri}`);
             }
         }
+        for (let bci = 0; bci < bonfireClassOrder.length; bci++) {
+            createView.queueCache(`bonfire_class_btn_${bonfireClassOrder[bci]}`);
+        }
+        for (let bmi = 0; bmi < bonfireModifierOrder.length; bmi++) {
+            createView.queueCache(`bonfire_mod_btn_${bonfireModifierOrder[bmi]}`);
+        }
         if (typeof engine.getResortPathSegmentSpecs === "function") {
             const pathSpecs = engine.getResortPathSegmentSpecs();
             for (let psi = 0; psi < pathSpecs.length; psi++) {
                 createView.queueCache(`baseBuilding_path_${psi}`);
             }
         }
-        for (let fui = 0; fui < resortData.foxDenUnlockOrder.length; fui++) {
-            const fk = resortData.foxDenUnlockOrder[fui];
+        for (let fui = 0; fui < resortData.getFoxDenUnlockOrder().length; fui++) {
+            const fk = resortData.getFoxDenUnlockOrder()[fui];
             createView.queueCache(`foxDenSlot_${fk}`, `foxDenSlotPct_${fk}`);
         }
         for (let ci = 0; ci < 8; ci++) {
             createView.queueCache(`foxDenCarrier_${ci}`);
+            createView.queueCache(`bonfireCarrier_${ci}`);
+            createView.queueCache(`innCarrier_${ci}`);
+            createView.queueCache(`cisternCarrier_${ci}`);
         }
         for (let wdi = 0; wdi < (resortData.workerDockSiteKeys || []).length; wdi++) {
             const wsk = resortData.workerDockSiteKeys[wdi];
@@ -828,16 +897,27 @@ let createView = {
         for (let bi = 0; bi < 25; bi++) {
             createView.queueCache(`mineBlock_${bi}`, `mineBlockFill_${bi}`);
         }
-        for (let si = 0; si < skills.keysInOrder.length; si++) {
-            const sk = skills.keysInOrder[si];
-            createView.queueCache(`base_scrollArchives_row_${sk}`, `base_scrollArchives_name_${sk}`, `base_scrollArchives_desc_${sk}`, `base_scrollArchives_progress_${sk}`, `base_scrollArchives_btn_${sk}`, `base_scrollArchives_pause_${sk}`);
+        for (let wzi = 0; wzi < createView.waveInfoZoneSlotCount; wzi++) {
+            createView.queueCache(`waveInfoZone_${wzi}`);
         }
-        for (let tui = 0; tui < resortData.foxDenUnlockOrder.length; tui++) {
-            const kx = resortData.foxDenUnlockOrder[tui];
+        for (let wsi = 0; wsi < createView.waveInfoZoneShardSlotCount; wsi++) {
+            createView.queueCache(`waveInfoZoneShard_${wsi}`);
+        }
+        for (let ci = 0; ci < 3; ci++) {
+            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
+        }
+        createView.queueCache("base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn");
+        for (let tui = 0; tui < resortData.getFoxDenUnlockOrder().length; tui++) {
+            const kx = resortData.getFoxDenUnlockOrder()[tui];
             createView.queueCache(`base_foxDen_extra_${kx}`, resortData.idRow("foxDen", kx), resortData.idBtn("foxDen", kx));
+        }
+        for (let bi = 0; bi < BATTLE_BUFF_KEYS.length; bi++) {
+            const bk = BATTLE_BUFF_KEYS[bi];
+            createView.queueCache(`playerBuffSlot_${bk}`, `playerBuffSlot_${bk}_tr`, `playerBuffSlot_${bk}_br`, `playerBuffSlot_${bk}_tip`);
         }
         createView.clearCacheQueue();
         createView.cacheBuildingNotifyLabels();
+        createView.ensureTabNotifyBadges();
         createView.updateLayoutMeasurements();
         createView.buildStaticRangeMarkers();
         if (typeof engine.syncResortPathDom === "function") {
@@ -885,7 +965,7 @@ let createView = {
             const compactBreakpointPx = 1420;
             const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
             const compactOn = !forceWide && window.innerWidth < compactBreakpointPx;
-            const battleVisible = !compactOn && data.progress && data.progress.battleUnlocked && window.getComputedStyle(battleCol).display !== "none";
+            const battleVisible = !compactOn && !!(data.progress && (data.progress.showBattle || data.progress.selectedBaseBuilding)) && window.getComputedStyle(battleCol).display !== "none";
             if (battleVisible) {
                 menuCol.style.maxHeight = `${battleCol.offsetHeight}px`;
             } else {
@@ -898,7 +978,7 @@ let createView = {
         if (!pool) {
             return;
         }
-        const order = resortData.foxDenUnlockOrder || [];
+        const order = resortData.getFoxDenUnlockOrder();
         let h = "";
         for (let i = 0; i < order.length; i++) {
             const k = order[i];
@@ -982,6 +1062,44 @@ let createView = {
             const cacheKey = "baseBuildingNotifyLabel_" + k;
             viewData.cached[cacheKey] = labelEl;
             delete viewData.prevValues[cacheKey];
+            const baseLabel = resortData.getScopeDisplayName(k);
+            labelEl.textContent = baseLabel;
+            let badge = bel.querySelector(".resort-building-notify-badge");
+            if (!badge) {
+                badge = document.createElement("span");
+                badge.className = "resort-building-notify-badge";
+                badge.textContent = "!";
+                badge.style.display = "none";
+                bel.appendChild(badge);
+            }
+            viewData.cached["baseBuildingNotifyBadge_" + k] = badge;
+            delete viewData.prevValues["baseBuildingNotifyBadge_" + k];
+        }
+    },
+    ensureTabNotifyBadges: function() {
+        const tabLabels = {
+            base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
+            skills: "Skills", travel: "Travel", history: "History", options: "Options"
+        };
+        for (const tabKey in tabLabels) {
+            const btnId = "tabButton_" + tabKey;
+            const btn = document.getElementById(btnId);
+            if (!btn) {
+                continue;
+            }
+            if (!btn.dataset.tabLabel) {
+                btn.dataset.tabLabel = tabLabels[tabKey];
+            }
+            let badge = btn.querySelector(".tab-notify-badge");
+            if (!badge) {
+                badge = document.createElement("span");
+                badge.className = "tab-notify-badge";
+                badge.textContent = "!";
+                badge.style.display = "none";
+                btn.appendChild(badge);
+            }
+            viewData.cached["tabNotifyBadge_" + tabKey] = badge;
+            delete viewData.prevValues["tabNotifyBadge_" + tabKey];
         }
     },
     queueCache: function() {

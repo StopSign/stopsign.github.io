@@ -1,9 +1,24 @@
 let mapData = {
     /**
-     * @param {object} [skillShard] Optional single-type shard drop for this zone: `{ key, gain, chance, max }`
+     * Normalize a shard drop def: `{ key, gain, chance, cap }`.
+     * Soft cap: each time it is reached, drop chance ÷5 and the next segment size ×2.
+     */
+    normalizeSkillShardDef: function(skillShard) {
+        if (!skillShard || !skillShard.key) {
+            return null;
+        }
+        return {
+            key: skillShard.key,
+            gain: Math.max(1, Math.floor(skillShard.gain !== undefined ? skillShard.gain : 1)),
+            chance: Math.max(0, Math.min(1, skillShard.chance !== undefined ? skillShard.chance : 0)),
+            cap: Math.max(1, Math.floor(skillShard.cap !== undefined ? skillShard.cap : 1))
+        };
+    },
+    /**
+     * @param {object} [skillShard] Optional single-type shard drop for this zone: `{ key, gain, chance, cap }`
      *   (skill key must match `skills` definition keys). At most one shard type per zone.
      */
-    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, hpDamageTradeRatio, coinsPerIntruder, expBasePerIntruder, skillShard) {
+    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder, expBasePerIntruder, skillShard) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
         const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
         const z = {
@@ -15,16 +30,12 @@ let mapData = {
             lengthMs: Math.max(0, safeDistanceBetweenUnits * Math.max(0, safeEnemies - 1)),
             intruderType: intruderType || "scoundrel",
             coinsPerIntruder: coinsPerIntruder !== undefined ? Math.max(0, coinsPerIntruder) : 1,
-            hpDamageTradeRatio: hpDamageTradeRatio !== undefined ? Math.max(0.01, hpDamageTradeRatio) : 1,
+            audDamageTradeRatio: audDamageTradeRatio !== undefined ? Math.max(0.01, audDamageTradeRatio) : 1,
             expBasePerIntruder: expBasePerIntruder !== undefined ? Math.max(0, expBasePerIntruder) : 1
         };
-        if (skillShard && skillShard.key) {
-            z.skillShard = {
-                key: skillShard.key,
-                gain: Math.max(1, Math.floor(skillShard.gain !== undefined ? skillShard.gain : 1)),
-                chance: Math.max(0, Math.min(1, skillShard.chance !== undefined ? skillShard.chance : 0)),
-                max: Math.max(1, Math.floor(skillShard.max !== undefined ? skillShard.max : 1))
-            };
+        const normalized = mapData.normalizeSkillShardDef(skillShard);
+        if (normalized) {
+            z.skillShard = normalized;
         }
         return z;
     },
@@ -41,6 +52,14 @@ let mapData = {
             const fz = forageZones[i];
             fz.name = fz.name || `Forage ${i + 1}`;
         }
+        const zoneShards = [];
+        const rawZoneShards = config.zoneShards || [];
+        for (let si = 0; si < rawZoneShards.length; si++) {
+            const n = mapData.normalizeSkillShardDef(rawZoneShards[si]);
+            if (n) {
+                zoneShards.push(n);
+            }
+        }
         return {
             key: config.key,
             name: config.name,
@@ -48,19 +67,22 @@ let mapData = {
             seed: config.seed,
             baseDifficulty: config.baseDifficulty || 1,
             requiredClassKey: config.requiredClassKey || "",
+            unlocksAfterMapKey: config.unlocksAfterMapKey || "",
             zones: zones,
             forageZones: forageZones,
-            totalDurationMs: totalDurationMs
+            zoneShards: zoneShards,
+            totalDurationMs: totalDurationMs,
+            version: config.version
         };
     },
-    createForageZone: function(totalEnemies, unitType, distanceBetweenUnits, index, baseHp, rewardAmount, rewardResource, expBasePerIntruder) {
+    createForageZone: function(totalEnemies, unitType, distanceBetweenUnits, index, baseAud, rewardAmount, rewardResource, expBasePerIntruder) {
         return {
             name: "",
             totalEnemies: Math.max(1, totalEnemies || 1),
             unitType: unitType || "tree",
             distanceBetweenUnits: Math.max(0, distanceBetweenUnits || 0),
             index: Math.max(0, index || 0),
-            baseHp: Math.max(1, baseHp || 10),
+            baseAud: Math.max(1, baseAud || 10),
             rewardAmount: Math.max(0, rewardAmount || 1),
             rewardResource: rewardResource || "logs",
             expBasePerIntruder: Math.max(0, expBasePerIntruder || 1)
@@ -103,7 +125,7 @@ let mapData = {
     computeZoneCombatAndRewards: function(mapDefinition, zoneIndex, tierMultiplier) {
         const z = mapDefinition.zones[zoneIndex];
         const ratio = z.difficulty || 1;
-        const trade = z.hpDamageTradeRatio !== undefined ? Math.max(0.01, z.hpDamageTradeRatio) : 1;
+        const trade = z.audDamageTradeRatio !== undefined ? Math.max(0.01, z.audDamageTradeRatio) : 1;
         const tm = typeof tierMultiplier === "number"
             ? { combat: tierMultiplier || 1, coins: 1, exp: 1 }
             : (tierMultiplier || { combat: 1, coins: 1, exp: 1 });
@@ -111,13 +133,13 @@ let mapData = {
         const coinsMult = tm.coins || 1;
         const expMult = tm.exp || 1;
         const totalDifficulty = (mapDefinition.baseDifficulty || 1) * combatMult;
-        const rawHp = gameData.battle.intruderBaseHp * ratio * totalDifficulty * trade;
+        const rawAud = gameData.battle.intruderBaseAud * ratio * totalDifficulty * trade;
         const rawDamage = gameData.battle.intruderAttackDamage * ratio * totalDifficulty / trade;
         const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
         const perIntruderGain = Math.ceil(coinsPerIntruderBase * Math.pow(totalDifficulty, 1.5) * coinsMult);
         const expBasePerIntruder = Math.max(0, (z.expBasePerIntruder !== undefined ? z.expBasePerIntruder : 1) * expMult);
         return {
-            rawHp,
+            rawAud,
             rawDamage,
             perIntruderGain,
             expBasePerIntruder,
@@ -141,7 +163,7 @@ let mapData = {
                 zoneIndex: zoneIndex,
                 zoneName: z.name,
                 spawnTimeMs: z.startTimeMs + (i * intervalMs),
-                rawHp: cr.rawHp,
+                rawAud: cr.rawAud,
                 rawDamage: cr.rawDamage,
                 gain: cr.perIntruderGain,
                 expBase: cr.expBasePerIntruder,
@@ -150,7 +172,7 @@ let mapData = {
         }
         return rows;
     },
-    /** Combat HP/damage scaling plus separate coins and exp reward multipliers per map tier. */
+    /** Combat Aud/damage scaling plus separate coins and exp reward multipliers per map tier. */
     getTierDifficultyMultiplier: function(tier) {
         if (tier <= 0) {
             return { combat: 1, coins: 1, exp: 1 };

@@ -39,26 +39,22 @@ function loop() {
         const totalTicksToRun = Math.floor(exactTicks);
         tickResidue = exactTicks - totalTicksToRun;
 
-        if (!data.gameSettings.stop) {
-            for (let i = 0; i < totalTicksToRun; i++) {
-                didSomething = true;
-                engine.gameTick();
-                if (data.gameSettings.ticksForSeconds >= data.gameSettings.ticksPerSecond) {
-                    data.gameSettings.ticksForSeconds = 0;
-                    driver.secondPassed();
-                }
+        for (let i = 0; i < totalTicksToRun; i++) {
+            didSomething = true;
+            engine.gameTick();
+            if (data.gameSettings.ticksForSeconds >= data.gameSettings.ticksPerSecond) {
+                data.gameSettings.ticksForSeconds = 0;
+                driver.secondPassed();
             }
-            if (data.gameSettings.bonusSpeed > 1) {
-                const processedElapsed = ticksProcessed * tickInterval;
-                const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
-                data.currentGameState.bonusTime -= bonusTimeConsumed;
-                if (data.currentGameState.bonusTime <= 0) {
-                    data.currentGameState.bonusTime = 0;
-                    data.gameSettings.bonusSpeed = 1;
-                }
+        }
+        if (data.gameSettings.bonusSpeed > 1) {
+            const processedElapsed = ticksProcessed * tickInterval;
+            const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
+            data.currentGameState.bonusTime -= bonusTimeConsumed;
+            if (data.currentGameState.bonusTime <= 0) {
+                data.currentGameState.bonusTime = 0;
+                data.gameSettings.bonusSpeed = 1;
             }
-        } else {
-            data.currentGameState.bonusTime += tickInterval * ticksProcessed;
         }
     }
     const remainingForRender = now - lastTickTime;

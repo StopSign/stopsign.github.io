@@ -12,17 +12,11 @@ let events = {
         }
     },
     tryAgain: function() {
-        if (data.progress.pendingClassKey) {
-            data.progress.currentClassKey = data.progress.pendingClassKey;
-            data.progress.pendingClassKey = "";
-            if (data.progress.currentClassKey === "scold") {
-                data.progress.sandalAttackEnabled = false;
+        if (data.battle && data.battle.cloneRunSettings) {
+            if (!bonfire.retryWithStoredSettings()) {
+                return;
             }
-            const mapDef = initialize.getCurrentMapDefinition();
-            const reqClass = mapDef && mapDef.requiredClassKey ? mapDef.requiredClassKey : "";
-            if (reqClass && reqClass !== data.progress.currentClassKey) {
-                data.progress.currentMapKey = "map_1";
-            }
+            return;
         }
         initialize.resetBattleFromSeed();
     },
@@ -30,7 +24,7 @@ let events = {
         if (!data.battle || data.battle.state !== "running") {
             return;
         }
-        data.battle.player.hp = 0;
+        data.battle.player.aud = 0;
         engine.checkLossCondition();
     },
     skillsTabUnlocked: function() {
@@ -41,9 +35,41 @@ let events = {
         const rh = data.progress.base && data.progress.base.foxDen;
         return !!(rh && rh.unlocks && rh.unlocks.inn);
     },
-    /** Foraging skills / ScrollArchives foraging tab unlock with Scroll Archives */
+    /** Foraging skills / Scroll Archives foraging tab unlock with Scroll Archives */
     foragingSkillsUnlocked: function() {
         return events.skillsTabUnlocked();
+    },
+    /** Map harvest / intruder-clear forage - unlock condition TBD */
+    harvestForageUnlocked: function() {
+        return false;
+    },
+    markTabNotify: function(tabKey) {
+        data.progress.baseContentNotify.tab[tabKey] = true;
+    },
+    markTabSeen: function(tabKey) {
+        const notify = data.progress.baseContentNotify;
+        delete notify.tab[tabKey];
+        notify.tabSeen[tabKey] = true;
+    },
+    setNumberType: function(numberType) {
+        const valid = ["numberSuffix", "scientific", "engineering"];
+        if (valid.indexOf(numberType) < 0) {
+            return;
+        }
+        data.gameSettings.numberType = numberType;
+        if (typeof view !== "undefined" && view.invalidateFormattedNumberCache) {
+            view.invalidateFormattedNumberCache();
+        }
+    },
+    syncNumberTypeRadiosFromSettings: function() {
+        const t = (data.gameSettings && data.gameSettings.numberType) || "numberSuffix";
+        const ids = { numberSuffix: "numberTypeSuffix", scientific: "numberTypeScientific", engineering: "numberTypeEngineering" };
+        for (const k in ids) {
+            const el = document.getElementById(ids[k]);
+            if (el) {
+                el.checked = k === t;
+            }
+        }
     },
     mainMenuTabOrder: function() {
         if (!(data.progress && data.progress.battleUnlocked)) {
@@ -57,8 +83,8 @@ let events = {
         if (events.guestsTabUnlocked()) {
             tabs.splice(2, 0, "guests");
         }
-        const chapel = data.progress.base && data.progress.base.chapel;
-        if (chapel && chapel.growthBlessingUnlocked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (bf && bf.growthBlessingUnlocked) {
             tabs.splice(1, 0, "leveling");
         }
         if (!events.skillsTabUnlocked()) {
@@ -70,40 +96,22 @@ let events = {
     switchTab: function(tabKey) {
         const validTabs = events.mainMenuTabOrder();
         data.battle.currentTab = validTabs.indexOf(tabKey) >= 0 ? tabKey : "base";
+        events.markTabSeen(tabKey);
         createView.showCurrentTab();
+        view.updateCompactLayout();
         createView.updateLayoutMeasurements();
     },
     markNewBaseContent: function(buildingKey, optionalFoxDenSubtab) {
-        if (!data.progress.baseContentNotify) {
-            data.progress.baseContentNotify = { building: {}, subtab: {}, upgradeSeen: {} };
-        }
-        if (!data.progress.baseContentNotify.building) {
-            data.progress.baseContentNotify.building = {};
-        }
-        if (!data.progress.baseContentNotify.subtab) {
-            data.progress.baseContentNotify.subtab = {};
-        }
-        if (!data.progress.baseContentNotify.upgradeSeen) {
-            data.progress.baseContentNotify.upgradeSeen = {};
-        }
+        const notify = data.progress.baseContentNotify;
         if (buildingKey) {
-            data.progress.baseContentNotify.building[buildingKey] = true;
+            notify.building[buildingKey] = true;
         }
         if (optionalFoxDenSubtab) {
-            data.progress.baseContentNotify.subtab["foxDen_" + optionalFoxDenSubtab] = true;
+            notify.subtab["foxDen_" + optionalFoxDenSubtab] = true;
         }
-    },
-    ensureBaseContentNotify: function() {
-        if (!data.progress.baseContentNotify) {
-            data.progress.baseContentNotify = { building: {}, subtab: {}, upgradeSeen: {} };
-        }
-        if (!data.progress.baseContentNotify.upgradeSeen) {
-            data.progress.baseContentNotify.upgradeSeen = {};
-        }
-        return data.progress.baseContentNotify;
     },
     markScopeUpgradesSeen: function(scopeKey) {
-        const notify = events.ensureBaseContentNotify();
+        const notify = data.progress.baseContentNotify;
         const seen = notify.upgradeSeen;
         const bcfg = resortData.buildings[scopeKey];
         if (bcfg && bcfg.upgrades) {
@@ -123,7 +131,7 @@ let events = {
         if (scopeKey === "foxDen") {
             const rh = data.progress.base && data.progress.base.foxDen;
             const unlocks = rh && rh.unlocks ? rh.unlocks : {};
-            const unlockOrder = resortData.foxDenUnlockOrder || [];
+            const unlockOrder = resortData.getFoxDenUnlockOrder();
             for (let ui = 0; ui < unlockOrder.length; ui++) {
                 const uk = unlockOrder[ui];
                 if (!unlocks[uk]) {
@@ -133,25 +141,25 @@ let events = {
         }
     },
     syncBaseContentNotifications: function() {
-        const notify = events.ensureBaseContentNotify();
+        const notify = data.progress.baseContentNotify;
         const seen = notify.upgradeSeen;
         const rh = data.progress.base && data.progress.base.foxDen;
         const unlocks = rh && rh.unlocks ? rh.unlocks : {};
-        const unlockOrder = resortData.foxDenUnlockOrder || [];
+        const unlockOrder = resortData.getFoxDenUnlockOrder();
         for (let ui = 0; ui < unlockOrder.length; ui++) {
             const uk = unlockOrder[ui];
             if (!unlocks[uk]) {
                 const seenKey = "foxDenUnlock:" + uk;
                 if (!seen[seenKey]) {
                     events.markNewBaseContent("foxDen");
-                    const hasMapButton = !!resortData.baseBuildingDisplayNames[uk];
+                    const hasMapButton = resortData.baseBuildingOrder.indexOf(uk) >= 0;
                     if (hasMapButton) {
                         events.markNewBaseContent(uk === "scrollArchives" ? "scrollArchives" : uk);
                     }
                 }
             }
         }
-        const upgradeScopes = ["torii", "hiddenSpring", "inn", "path", "chapel", "garden", "atelier", "bonfire", "scrollArchives"];
+        const upgradeScopes = ["torii", "hiddenSpring", "inn", "path", "garden", "atelier", "bonfire"];
         for (let si = 0; si < upgradeScopes.length; si++) {
             const scopeKey = upgradeScopes[si];
             const bcfg = resortData.buildings[scopeKey];
@@ -182,6 +190,12 @@ let events = {
             view.updateBasePanel();
         }
     },
+    toggleVentingSurplus: function(enabled) {
+        const garden = data.progress.base && data.progress.base.garden;
+        if (garden) {
+            garden.ventingSurplusEnabled = !!enabled;
+        }
+    },
     /** Sync hide-maxed checkbox from save (call after DOM caches exist; not per-frame). */
     syncHideMaxedToggleFromSave: function() {
         const el = viewData.cached.hideMaxedUpgradesToggle || document.getElementById("hideMaxedUpgradesToggle");
@@ -198,7 +212,7 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     switchSkillsTab: function(tabKey) {
-        const valid = ["combat", "resort", "foraging", "class"];
+        const valid = ["combat", "foraging", "class"];
         let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
         if (t === "foraging" && !events.foragingSkillsUnlocked()) {
             t = "combat";
@@ -233,19 +247,38 @@ let events = {
         view.applySkillDetailSelectionHighlight();
         view.updateSkillInfoPanel();
     },
-    switchScrollArchivesTab: function(tabKey) {
-        const valid = ["combat", "resort", "foraging", "class"];
-        let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
-        if (t === "foraging" && !events.foragingSkillsUnlocked()) {
-            t = "combat";
+    selectScrollResearchChoice: function(choiceIndex) {
+        const lib = data.progress.base.scrollArchives;
+        const choices = lib.researchChoices || [];
+        const skillKey = choices[choiceIndex];
+        if (!skillKey) {
+            return;
         }
-        data.progress.selectedScrollArchivesTab = t;
+        lib.selectedResearchChoice = skillKey;
+        const selected = data.progress.selectedResortInfoType || data.progress.selectedBaseBuilding || "";
+        if (selected === "scrollArchives") {
+            const base = data.progress.base;
+            const t = view._basePanelPurchasingTools(base, null, false);
+            view.updateBasePanelScrollArchives(base, t);
+        }
     },
     switchCompactPane: function(paneKey) {
         const valid = ["menus", "battle"];
         data.progress.compactViewPane = valid.indexOf(paneKey) >= 0 ? paneKey : "menus";
         view.updateCompactLayout();
         createView.updateLayoutMeasurements();
+    },
+    clickEventHitsElement: function(e, el) {
+        if (!el) {
+            return false;
+        }
+        const path = typeof e.composedPath === "function" ? e.composedPath() : [];
+        for (let i = 0; i < path.length; i++) {
+            if (path[i] === el) {
+                return true;
+            }
+        }
+        return !!(e.target && el.contains(e.target));
     },
     bindBaseBuildingInfoDismiss: function() {
         if (document._baseBuildingInfoDismissBound) {
@@ -260,10 +293,17 @@ let events = {
             if (!panel || panel.style.display === "none") {
                 return;
             }
-            if (panel.contains(e.target)) {
+            if (events.clickEventHitsElement(e, panel)) {
                 return;
             }
-            if (e.target.closest(".base-building-label, .resort-building-map-btn, .resort-building-label, .path-seg-hit, .spirit-slot, .spirit-slot-btn, .mine-block-btn")) {
+            const battlefieldWrap = viewData.cached.battlefieldWrap || document.getElementById("battlefieldWrap");
+            const battleHud = viewData.cached.battleHud || document.getElementById("battleHud");
+            if (events.clickEventHitsElement(e, battlefieldWrap) || events.clickEventHitsElement(e, battleHud)) {
+                events.closeBaseBuildingInfo();
+                return;
+            }
+            const gameColumnsRow = viewData.cached.gameColumnsRow || document.getElementById("gameColumnsRow");
+            if (events.clickEventHitsElement(e, gameColumnsRow)) {
                 return;
             }
             events.closeBaseBuildingInfo();
@@ -364,52 +404,87 @@ let events = {
             if (!engine.isPathSegmentAccessible(idx)) {
                 return;
             }
-            if (data.progress.selectedBaseBuilding === "path" && data.progress.selectedPathSegmentIndex === idx && !data.progress.selectedSpiritId) {
-                data.progress.selectedBaseBuilding = "";
-                data.progress.selectedPathSegmentIndex = null;
-                data.progress.selectedResortInfoType = "";
-                events.showSelectedBaseBuildingPanels("");
+            if (events.isBaseBuildingSelected("path", idx)) {
+                events.clearBaseBuildingSelection();
+                return;
+            }
+            events.openBaseBuilding("path", idx);
+            return;
+        }
+        if (!events.canOpenBaseBuilding(buildingKey)) {
+            return;
+        }
+        if (events.isBaseBuildingSelected(buildingKey)) {
+            events.clearBaseBuildingSelection();
+            return;
+        }
+        events.openBaseBuilding(buildingKey);
+    },
+    isBaseBuildingSelected: function(buildingKey, pathSegmentIndex) {
+        if (buildingKey === "path") {
+            return data.progress.selectedBaseBuilding === "path"
+                && data.progress.selectedPathSegmentIndex === pathSegmentIndex
+                && !data.progress.selectedSpiritId;
+        }
+        return data.progress.selectedBaseBuilding === buildingKey && !data.progress.selectedSpiritId;
+    },
+    canOpenBaseBuilding: function(buildingKey) {
+        if (!buildingKey || buildingKey === "spirit") {
+            return !!buildingKey;
+        }
+        if (buildingKey === "path") {
+            return true;
+        }
+        if (engine.isFoxDenConstructionActive(buildingKey)) {
+            return false;
+        }
+        if (buildingKey === "hiddenSpring" && !engine.isMapElementRevealed("hiddenSpring")) {
+            return false;
+        }
+        if (buildingKey === "mine" && !engine.isMapElementRevealed("mine")) {
+            return false;
+        }
+        return resortData.baseBuildingOrder.indexOf(buildingKey) >= 0;
+    },
+    clearBaseBuildingSelection: function() {
+        data.progress.selectedBaseBuilding = "";
+        data.progress.selectedPathSegmentIndex = null;
+        data.progress.selectedResortInfoType = "";
+        data.progress.selectedSpiritId = null;
+        data.progress.selectedFireLauncherKey = null;
+        events.refreshBaseBuildingPanels();
+    },
+    openBaseBuilding: function(buildingKey, pathSegmentIndex) {
+        if (buildingKey === "path") {
+            const idx = pathSegmentIndex;
+            if (idx === undefined || idx === null || isNaN(idx)) {
+                return;
+            }
+            if (!engine.isPathSegmentAccessible(idx)) {
                 return;
             }
             data.progress.selectedSpiritId = null;
+            data.progress.selectedFireLauncherKey = null;
             data.progress.selectedBaseBuilding = "path";
             data.progress.selectedPathSegmentIndex = idx;
             data.progress.selectedResortInfoType = "path";
-            if (data.progress.baseContentNotify && data.progress.baseContentNotify.building) {
-                delete data.progress.baseContentNotify.building.path;
-            }
+            delete data.progress.baseContentNotify.building.path;
             events.markScopeUpgradesSeen("path");
-            events.showSelectedBaseBuildingPanels("path");
-            return;
-        }
-        if (buildingKey && engine.isFoxDenConstructionActive(buildingKey)) {
-            return;
-        }
-        if (buildingKey === "hiddenSpring" && !engine.isMapElementRevealed("hiddenSpring")) {
-            return;
-        }
-        if (buildingKey === "mine" && !engine.isMapElementRevealed("mine")) {
-            return;
-        }
-        if (resortData.baseBuildingOrder.indexOf(buildingKey) < 0) {
-            return;
-        }
-        if (data.progress.selectedBaseBuilding === buildingKey && !data.progress.selectedSpiritId) {
-            data.progress.selectedBaseBuilding = "";
+        } else {
+            if (!events.canOpenBaseBuilding(buildingKey)) {
+                return;
+            }
+            data.progress.selectedSpiritId = null;
+            data.progress.selectedFireLauncherKey = null;
             data.progress.selectedPathSegmentIndex = null;
-            data.progress.selectedResortInfoType = "";
-            events.showSelectedBaseBuildingPanels("");
-            return;
-        }
-        data.progress.selectedSpiritId = null;
-        data.progress.selectedPathSegmentIndex = null;
-        data.progress.selectedBaseBuilding = buildingKey;
-        data.progress.selectedResortInfoType = buildingKey;
-        if (data.progress.baseContentNotify && data.progress.baseContentNotify.building) {
+            data.progress.selectedBaseBuilding = buildingKey;
+            data.progress.selectedResortInfoType = buildingKey;
             delete data.progress.baseContentNotify.building[buildingKey];
+            if (buildingKey !== "spirit") {
+                events.markScopeUpgradesSeen(buildingKey);
+            }
         }
-        events.markScopeUpgradesSeen(buildingKey);
-        events.showSelectedBaseBuildingPanels(buildingKey);
+        events.refreshBaseBuildingPanels();
     },
     applyBaseBuildingInfoOverlay: function(buildingKey) {
         const infoPanel = viewData.cached.baseBuildingInfo || document.getElementById("baseBuildingInfo");
@@ -418,8 +493,9 @@ let events = {
         }
         view.updateBaseBuildingInfoLayout();
     },
-    showSelectedBaseBuildingPanels: function(buildingKey) {
-        const resortInfoExtras = ["spirit", "path"];
+    refreshBaseBuildingPanels: function() {
+        const buildingKey = data.progress.selectedResortInfoType || data.progress.selectedBaseBuilding || "";
+        const resortInfoExtras = ["spirit", "path", "fireLauncher"];
         events.applyBaseBuildingInfoOverlay(buildingKey);
         for (let ri = 0; ri < resortData.baseBuildingOrder.length; ri++) {
             const rk = resortData.baseBuildingOrder[ri];
@@ -442,6 +518,10 @@ let events = {
         if (buildingKey === "spirit") {
             view.updateResortMapTokens();
         }
+        if (buildingKey === "fireLauncher") {
+            view.updateFireLauncherInfo();
+            view.updateResortMapTokens();
+        }
         if (buildingKey && (buildingKey === "spirit" || buildingKey === "path" || viewData.cached[`resortInfo_${buildingKey}`])) {
             return;
         }
@@ -454,6 +534,14 @@ let events = {
         if (typeof view.updateBasePanel === "function") {
             view.updateBasePanel();
         }
+    },
+    /** @deprecated Use refreshBaseBuildingPanels, openBaseBuilding, or clearBaseBuildingSelection */
+    showSelectedBaseBuildingPanels: function(buildingKey) {
+        if (!buildingKey) {
+            events.clearBaseBuildingSelection();
+            return;
+        }
+        events.openBaseBuilding(buildingKey, buildingKey === "path" ? data.progress.selectedPathSegmentIndex : null);
     },
     toggleDebugGameSpeed: function(multiplier) {
         if (typeof isDebug === "undefined" || !isDebug) {
@@ -550,11 +638,25 @@ let events = {
         if (!purchaseUi) {
             return;
         }
-        if (purchaseUi.mode === "weaving" || purchaseUi.mode === "soldOut") {
+        if (purchaseUi.mode === "soldOut") {
+            return;
+        }
+        if (purchaseUi.mode === "weaving") {
+            engine.pauseActiveWeaving(scopeKey, upgradeKey);
             return;
         }
         if (purchaseUi.mode === "weavePaused") {
             engine.resumeWeaving(scopeKey, upgradeKey);
+            return;
+        }
+        if (purchaseUi.mode === "directWeaveReady") {
+            if (purchaseUi.disabled) {
+                return;
+            }
+            if (up.canBuy && !up.canBuy()) {
+                return;
+            }
+            engine.startWeaving(scopeKey, upgradeKey, up);
             return;
         }
         if (purchaseUi.mode === "idle") {
@@ -566,6 +668,10 @@ let events = {
                 return;
             }
             engine.enqueueUpgradeGather(scopeKey, upgradeKey);
+            return;
+        }
+        if (purchaseUi.mode === "gathering") {
+            engine.toggleUpgradeGatherPause(scopeKey, upgradeKey);
             return;
         }
         if (purchaseUi.mode === "paused") {
@@ -585,7 +691,7 @@ let events = {
         if (keys.indexOf(buildingKey) < 0) {
             return;
         }
-        if (engine.isOkamiWeaving()) {
+        if (buildingKey === "cistern" && !engine.isInnOnsenConverted()) {
             return;
         }
         const okami = engine.getOkami();
@@ -593,6 +699,15 @@ let events = {
             okami.assignedBuildingKey = "";
             if (buildingKey === "foxDen") {
                 engine.syncFoxDenCarriersToWorkforce();
+            }
+            if (buildingKey === "bonfire") {
+                engine.syncBonfireCarriersToWorkforce();
+            }
+            if (buildingKey === "cistern") {
+                engine.syncCisternCarriersToWorkforce();
+            }
+            if (buildingKey === "inn") {
+                engine.syncInnCarriersToWorkforce();
             }
             if (buildingKey === "bambooForest") {
                 engine.clearBambooCutIfNoWorkers();
@@ -603,6 +718,21 @@ let events = {
         if (prevAssign === "foxDen" && buildingKey !== "foxDen") {
             okami.assignedBuildingKey = "";
             engine.syncFoxDenCarriersToWorkforce();
+        }
+        if (prevAssign === "bonfire" && buildingKey !== "bonfire") {
+            okami.assignedBuildingKey = "";
+            engine.syncBonfireCarriersToWorkforce();
+        }
+        if (prevAssign === "cistern" && buildingKey !== "cistern") {
+            okami.assignedBuildingKey = "";
+            engine.syncCisternCarriersToWorkforce();
+        }
+        if (prevAssign === "inn" && buildingKey !== "inn") {
+            okami.assignedBuildingKey = "";
+            engine.syncInnCarriersToWorkforce();
+        }
+        if (engine.isOkamiWeaving()) {
+            engine.pauseAnyActiveWeaving();
         }
         if (okami.pathJob && !okami.pathJob.paused) {
             engine.pauseOkamiPathJob();
@@ -615,10 +745,19 @@ let events = {
         if (buildingKey === "foxDen") {
             engine.syncFoxDenCarriersToWorkforce();
         }
+        if (buildingKey === "bonfire") {
+            engine.syncBonfireCarriersToWorkforce();
+        }
+        if (buildingKey === "cistern") {
+            engine.syncCisternCarriersToWorkforce();
+        }
+        if (buildingKey === "inn") {
+            engine.syncInnCarriersToWorkforce();
+        }
     },
     goToOkamiAssignment: function() {
         const okami = engine.getOkami();
-        if (!okami.assignedBuildingKey || (data.progress.weaving && data.progress.weaving.active)) {
+        if (!okami.assignedBuildingKey) {
             return;
         }
         const pathIdx = engine.parsePathAssignmentKey(okami.assignedBuildingKey);
@@ -639,11 +778,7 @@ let events = {
         events.buyUpgrade("hiddenSpring", "assembleEarthSpirit");
     },
     closeBaseBuildingInfo: function() {
-        data.progress.selectedBaseBuilding = "";
-        data.progress.selectedPathSegmentIndex = null;
-        data.progress.selectedSpiritId = null;
-        data.progress.selectedResortInfoType = "";
-        events.showSelectedBaseBuildingPanels("");
+        events.clearBaseBuildingSelection();
     },
     clickSpiritSlot: function(kind, location, slotIndex) {
         if (kind !== "earth" && kind !== "water" && kind !== "fire" && kind !== "plant") {
@@ -652,7 +787,13 @@ let events = {
         if (kind === "plant" && location !== "bambooForest") {
             return;
         }
-        if (kind !== "earth" && kind !== "plant" && location !== "hiddenSpring") {
+        if (kind === "water" && location !== "hiddenSpring" && location !== "pond") {
+            return;
+        }
+        if (kind === "fire" && location !== "bonfire" && location !== "atelier" && location.indexOf("fireLauncher_") !== 0) {
+            return;
+        }
+        if (kind === "earth" && location !== "hiddenSpring" && location !== "mine") {
             return;
         }
         const selected = engine.getSpiritById(data.progress.selectedSpiritId);
@@ -660,16 +801,30 @@ let events = {
         const canMoveKind = selected && selected.kind === kind && (
             (kind === "plant" && location === "bambooForest") ||
             (kind === "earth" && (location === "hiddenSpring" || location === "mine")) ||
-            ((kind === "water" || kind === "fire") && location === "hiddenSpring")
+            (kind === "water" && (location === "hiddenSpring" || location === "pond")) ||
+            (kind === "fire" && (location === "bonfire" || location === "atelier" || location.indexOf("fireLauncher_") === 0))
         );
+        const defaultLoc = kind === "plant" ? "bambooForest" : (kind === "fire" ? "bonfire" : "hiddenSpring");
         const isSameSlot = selected
-            && (selected.location || (kind === "plant" ? "bambooForest" : "hiddenSpring")) === location
+            && (selected.location || defaultLoc) === location
             && (selected.slot || 0) === slotIndex;
-        if (canMoveKind && !isSameSlot) {
+        if (occupant && (!selected || occupant.id !== selected.id)) {
+            data.progress.selectedSpiritId = occupant.id;
+            data.progress.selectedBaseBuilding = "spirit";
+            data.progress.selectedResortInfoType = "spirit";
+            data.progress.selectedFireLauncherKey = engine.getFireLauncherKeyForSpirit(occupant);
+            events.refreshBaseBuildingPanels();
+            view.updateSpiritInfo();
+            view.updateResortMapTokens();
+            return;
+        }
+        if (canMoveKind && !isSameSlot && !occupant) {
             engine.moveSelectedSpiritTo(location, slotIndex);
             data.progress.selectedBaseBuilding = "spirit";
             data.progress.selectedResortInfoType = "spirit";
-            events.showSelectedBaseBuildingPanels("spirit");
+            data.progress.selectedFireLauncherKey = location.indexOf("fireLauncher_") === 0
+                ? engine.parseFireLauncherLocation(location) : null;
+            events.refreshBaseBuildingPanels();
             view.updateSpiritInfo();
             view.updateResortMapTokens();
             return;
@@ -678,13 +833,85 @@ let events = {
             data.progress.selectedSpiritId = occupant.id;
             data.progress.selectedBaseBuilding = "spirit";
             data.progress.selectedResortInfoType = "spirit";
-            events.showSelectedBaseBuildingPanels("spirit");
+            data.progress.selectedFireLauncherKey = engine.getFireLauncherKeyForSpirit(occupant);
+            events.refreshBaseBuildingPanels();
             view.updateSpiritInfo();
             view.updateResortMapTokens();
         }
     },
+    clickFireLauncher: function(platformKey) {
+        if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
+            return;
+        }
+        data.progress.selectedFireLauncherKey = platformKey;
+        data.progress.selectedSpiritId = null;
+        data.progress.selectedBaseBuilding = "fireLauncher";
+        data.progress.selectedResortInfoType = "fireLauncher";
+        events.refreshBaseBuildingPanels();
+        view.updateFireLauncherInfo();
+        view.updateResortMapTokens();
+    },
+    clickFireLauncherSlot: function(platformKey) {
+        if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
+            return;
+        }
+        const location = engine.getFireLauncherLocationKey(platformKey);
+        const occupant = engine.getSpiritAtLocation(location, 0, "fire");
+        const selected = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (occupant && (!selected || occupant.id !== selected.id)) {
+            data.progress.selectedSpiritId = occupant.id;
+            data.progress.selectedFireLauncherKey = platformKey;
+            data.progress.selectedBaseBuilding = "spirit";
+            data.progress.selectedResortInfoType = "spirit";
+            events.refreshBaseBuildingPanels();
+            view.updateSpiritInfo();
+            view.updateResortMapTokens();
+            return;
+        }
+        if (selected && selected.kind === "fire") {
+            const oldLoc = selected.location || "bonfire";
+            const isSame = oldLoc === location && (selected.slot || 0) === 0;
+            if (!isSame) {
+                engine.moveSelectedSpiritTo(location, 0);
+                data.progress.selectedFireLauncherKey = platformKey;
+                data.progress.selectedBaseBuilding = "spirit";
+                data.progress.selectedResortInfoType = "spirit";
+                events.refreshBaseBuildingPanels();
+                view.updateSpiritInfo();
+                view.updateResortMapTokens();
+                return;
+            }
+        }
+        if (occupant) {
+            data.progress.selectedSpiritId = occupant.id;
+            data.progress.selectedFireLauncherKey = platformKey;
+            data.progress.selectedBaseBuilding = "spirit";
+            data.progress.selectedResortInfoType = "spirit";
+            events.refreshBaseBuildingPanels();
+            view.updateSpiritInfo();
+            view.updateResortMapTokens();
+        } else {
+            events.clickFireLauncher(platformKey);
+        }
+    },
     toggleBambooCut: function(stalkIndex) {
         engine.toggleBambooCut(stalkIndex);
+    },
+    toggleBonfireFireTending: function(checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (bf) {
+            bf.fireTendingEnabled = !!checked;
+        }
+    },
+    setBonfireFireTendingCap: function(value) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        const n = parseInt(value, 10);
+        if (!isNaN(n) && n >= 0) {
+            bf.fireTendingHeatCap = n;
+        }
     },
     toggleGardenAutoWeaveOnGather: function(checked) {
         const g = data.progress.base && data.progress.base.garden;
@@ -698,14 +925,88 @@ let events = {
             g.autoWeaveCheapestReady = !!checked;
         }
     },
-    toggleBambooAutoRotate: function(checked) {
-        const bf = engine.ensureBambooForestState();
-        if (bf) {
-            bf.autoRotateHarvest = !!checked;
+    toggleFoxDenManaOrders: function(checked) {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh) {
+            rh.manaOrdersEnabled = !!checked;
         }
+    },
+    startInnFillMana: function() {
+        const weaveUi = engine.getUpgradeWeaveUi("inn", "fillMana");
+        if (weaveUi) {
+            if (weaveUi.mode === "paused") {
+                engine.resumeWeaving("inn", "fillMana");
+            } else {
+                engine.pauseActiveWeaving("inn", "fillMana");
+            }
+            return;
+        }
+        engine.startInnFillMana();
+    },
+    refreshKitsuneAssignmentTooltip: function() {
+        const list = document.getElementById("kitsuneAssignTooltipList");
+        if (!list) {
+            return;
+        }
+        const keys = resortData.workerAssignmentSiteKeys || [];
+        let html = "";
+        for (let i = 0; i < keys.length; i++) {
+            const sk = keys[i];
+            const slot = data.progress.base && data.progress.base[sk];
+            const n = slot && slot.assignedWorkers ? slot.assignedWorkers : 0;
+            if (n <= 0) {
+                continue;
+            }
+            html += `<div class="kitsune-assign-tip-row">${resortData.getScopeDisplayName(sk)}: ${n}</div>`;
+        }
+        if (!html) {
+            html = `<div class="kitsune-assign-tip-row muted-text">None assigned</div>`;
+        }
+        list.innerHTML = html;
+    },
+    toggleBambooAutoRotate: function(checked) {
+        const bf = data.progress.base.bambooForest;
+        bf.autoRotateHarvest = !!checked;
+    },
+    toggleInnGuestsVisitPond: function(checked) {
+        const inn = data.progress.base && data.progress.base.inn;
+        if (inn) {
+            inn.guestsVisitPond = !!checked;
+        }
+    },
+    togglePondSendWaterToForest: function(checked) {
+        const pond = data.progress.base && data.progress.base.pond;
+        if (pond) {
+            pond.sendWaterToBambooForest = !!checked;
+        }
+    },
+    toggleCisternReplaceWithHotterWater: function(checked) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (cistern) {
+            cistern.replaceWithHotterWater = !!checked;
+        }
+    },
+    emptyHalfCistern: function() {
+        engine.emptyHalfCistern();
     },
     changeMineDepth: function(delta) {
         engine.changeMineDepth(delta);
+    },
+    toggleMinePrioritizeOre: function(checked) {
+        if (!engine.isArrangementOfPriorityUnlocked()) {
+            return;
+        }
+        data.progress.base.mine.prioritizeOre = !!checked;
+    },
+    toggleSpiritPrioritizeOre: function(checked) {
+        if (!engine.isArrangementOfPriorityUnlocked()) {
+            return;
+        }
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (!spirit || spirit.kind !== "earth") {
+            return;
+        }
+        spirit.prioritizeOre = !!checked;
     },
     spendCoinsIfPossible: function(cost) {
         if (data.progress.coins < cost) {
@@ -727,55 +1028,36 @@ let events = {
             }
         }
     },
-    buyScrollArchivesSkill: function(skillKey) {
-        if (skills.keysInOrder.indexOf(skillKey) < 0) {
-            return;
+    startBonfireClone: function() {
+        if (bonfire.startCloneCombat(data.progress.selectedTravelMapKey || data.progress.currentMapKey)) {
+            events.closeBaseBuildingInfo();
         }
-        const dSk = skills._byKey[skillKey];
-        const cls = data.progress.currentClassKey || "none";
-        if (dSk && dSk.classKey && (cls === "none" || cls !== dSk.classKey)) {
-            return;
-        }
-        const lib = data.progress.base.scrollArchives;
-        const rs = lib.skillResearch[skillKey];
-        if ((rs && rs.purchased) || lib.unlockedSkills[skillKey]) {
-            return;
-        }
-        const cost = skills.getSkillUnlockCostCoins(skillKey);
-        if (!events.spendCoinsIfPossible(cost)) {
-            return;
-        }
-        lib.skillResearch[skillKey] = {
-            purchased: true,
-            researched: false,
-            paused: false,
-            progress: 0,
-            required: skills.getSkillresearchRequired(skillKey)
-        };
     },
-    toggleScrollArchivesResearchPause: function(skillKey) {
-        const lib = data.progress.base && data.progress.base.scrollArchives;
-        if (!lib || !lib.skillResearch || !lib.skillResearch[skillKey]) {
-            return;
+    startTravelWithBonfireSettings: function() {
+        bonfire.startCloneCombat(data.progress.selectedTravelMapKey);
+    },
+    goToBonfire: function() {
+        events.switchTab("base");
+        events.openBaseBuilding("bonfire");
+        view.updateBasePanelBonfire();
+    },
+    selectTravelMap: function(mapKey) {
+        data.progress.selectedTravelMapKey = mapKey;
+    },
+    bonfireSelectClass: function(classKey) {
+        bonfire.selectClass(classKey);
+        view.updateBasePanelBonfire();
+    },
+    bonfireSelectModifier: function(modKey) {
+        bonfire.selectModifier(modKey);
+        view.updateBasePanelBonfire();
+    },
+    bonfireApplySelection: function(e) {
+        if (e && e.stopPropagation) {
+            e.stopPropagation();
         }
-        const rs = lib.skillResearch[skillKey];
-        if (rs.researched) {
-            return;
-        }
-        rs.paused = !rs.paused;
-    },
-    queueClassSwitch: function(classKey) {
-        if (!data.progress.unlockedClasses[classKey]) return;
-        if (data.progress.currentClassKey === classKey) return;
-        if ((data.progress.classSwitchCooldownMs || 0) > 0) return;
-        data.progress.pendingClassKey = classKey;
-        data.progress.classSwitchCooldownMs = 300000;
-    },
-    assignWorker: function(kind) {
-        if (!engine.tryAssignWorker(kind)) return;
-    },
-    unassignWorker: function(kind) {
-        if (!engine.tryUnassignWorker(kind)) return;
+        bonfire.applyCurrentSelection();
+        view.updateBasePanelBonfire();
     },
     adjustWorkers: function(kind, mode) {
         if (!mode) return;
@@ -808,8 +1090,8 @@ let events = {
         }
     },
     assignAttribute: function(attributeKey) {
-        const chapel = data.progress.base && data.progress.base.chapel;
-        if (!chapel || !chapel.plannedGrowthBlessingUnlocked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || !bf.plannedGrowthBlessingUnlocked) {
             return;
         }
         const worked = engine.applyAttributePoint(attributeKey, true);
@@ -818,8 +1100,8 @@ let events = {
         }
     },
     clearAttributePlan: function() {
-        const chapel = data.progress.base && data.progress.base.chapel;
-        if (!chapel || !chapel.plannedGrowthBlessingUnlocked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || !bf.plannedGrowthBlessingUnlocked) {
             return;
         }
         data.progress.attributePlan = [];
@@ -827,31 +1109,7 @@ let events = {
         initialize.calcPlayerStats(false);
     },
     changeMap: function(mapKey) {
-        if (mapKey === data.progress.currentMapKey) {
-            return;
-        }
-        const defs = data.progress.mapDefinitions || [];
-        let target = null;
-        for (let i = 0; i < defs.length; i++) {
-            if (defs[i].key === mapKey) {
-                target = defs[i];
-                break;
-            }
-        }
-        if (!target) {
-            return;
-        }
-        if (!mapData.isMapUnlocked(target, data.progress)) {
-            return;
-        }
-        const reqClass = target.requiredClassKey || "";
-        if (reqClass && reqClass !== (data.progress.currentClassKey || "none")) {
-            return;
-        }
-        data.progress.currentMapKey = mapKey;
-        const travelSeed = Math.floor(Math.random() * 0x7fffffff) + 1;
-        initialize.resetSkillRunProgress();
-        initialize.startFreshBattle(travelSeed, mapKey);
+        data.progress.selectedTravelMapKey = mapKey;
     },
     switchTravelSubTab: function(which) {
         data.progress.selectedTravelSubTab = which === "challenges" ? "challenges" : "maps";
@@ -864,6 +1122,9 @@ let events = {
         }
     },
     startHarvest: function(mapKey) {
+        if (!events.harvestForageUnlocked()) {
+            return;
+        }
         const defs = data.progress.mapDefinitions || [];
         let target = null;
         for (let i = 0; i < defs.length; i++) {
@@ -888,6 +1149,9 @@ let events = {
     },
     /** Smart Forage: from 100% cleared (no countdown yet), start the 120s window and begin foraging. */
     startHarvestCountdownAndForage: function(mapKey) {
+        if (!events.harvestForageUnlocked()) {
+            return;
+        }
         const g = data.progress.base && data.progress.base.garden;
         if (!g || !g.smartHarvestUnlocked) {
             return;
@@ -923,7 +1187,7 @@ let events = {
         }
     },
     toggleSkillStar: function(skillKey, starType) {
-        const valid = { bronze: true, silver: true, coins: true };
+        const valid = { bronze: true, silver: true, gold: true };
         if (!valid[starType]) {
             return;
         }
@@ -933,12 +1197,12 @@ let events = {
             return;
         }
         if (!sk.stars) {
-            sk.stars = { bronze: false, silver: false, coins: false };
+            sk.stars = { bronze: false, silver: false, gold: false };
         }
         const currentlyAssigned = !!sk.stars[starType];
         if (currentlyAssigned) {
             sk.stars[starType] = false;
-            data.progress.stars[starType] = (data.progress.stars[starType] || 0) + 1;
+            data.progress.stars[starType]++;
             if (typeof view !== "undefined") {
                 view.updateSkillRowCompact(skillKey);
                 if (data.progress.selectedSkillDetailKey === skillKey) {
@@ -947,7 +1211,7 @@ let events = {
             }
             return;
         }
-        if ((data.progress.stars[starType] || 0) <= 0) {
+        if (data.progress.stars[starType] <= 0) {
             return;
         }
         data.progress.stars[starType]--;

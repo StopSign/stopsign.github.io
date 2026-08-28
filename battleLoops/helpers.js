@@ -191,6 +191,21 @@ function intToStringRound(value) {
     return Math.floor(value);
 }
 
+function intToStringManaCap(value) {
+    let isNeg = value < 0;
+    value *= isNeg ? -1 : 1;
+    if (value >= 100000) {
+        if(data.gameSettings.numberType === "numberSuffix") {
+            return (isNeg ? "-" : "") + nFormatter(value, 3);
+        } else if(data.gameSettings.numberType === "scientific") {
+            return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
+        } else if(data.gameSettings.numberType === "engineering") {
+            return formatEngineering(value * (isNeg ? -1 : 1));
+        }
+    }
+    return Math.floor(value);
+}
+
 function numToOrdinal(n) {
     const j = n % 10;
     const k = n % 100;

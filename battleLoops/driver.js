@@ -1,9 +1,9 @@
 //Contains the timing functions for UI and the game
 
 let driver = {
-    startGame: function() {
+    startGame: async function() {
         // load calls recalcInterval, which will start the callbacks
-        saving.load();
+        await saving.load();
         driver.setScreenSize();
         setTimeout(driver.initTimingSystem, 200);
     },
@@ -72,15 +72,21 @@ let driver = {
             engine.updateManaPerSecond();
         }
 
-        const chapel = data.progress.base && data.progress.base.chapel;
-        if (!chapel || !chapel.autoRetryEnabled) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || !bf.autoRetryEnabled) {
             return;
         }
         if (data.battle && data.battle.state === "dead") {
             if (data.progress.autoRetryCountdownSec > 0) {
                 data.progress.autoRetryCountdownSec--;
                 if (data.progress.autoRetryCountdownSec <= 0) {
-                    events.tryAgain();
+                    if (data.battle && data.battle.cloneRunSettings) {
+                        if (bonfire.canAffordRetryWithStoredSettings()) {
+                            bonfire.retryWithStoredSettings();
+                        }
+                    } else if (bonfire.canAffordClone()) {
+                        bonfire.startCloneCombat(data.progress.currentMapKey);
+                    }
                 }
             }
         } else {
@@ -104,17 +110,14 @@ let driver = {
         data.currentGameState.instantTime -= ticksToUse;
 
         setTimeout(() => {
-            let origPause = data.gameSettings.stop;
-            data.gameSettings.stop = false;
             data.gameSettings.ticksPerSecond = 1;
 
             for (let i = 0; i < time * 60; i++) {
-                engine.gameTick();
+                engine.gameTick({ ignoreBattlePause: true });
                 driver.secondPassed();
             }
 
             data.gameSettings.ticksPerSecond = 20;
-            data.gameSettings.stop = origPause;
             saving.save();
 
             setTimeout(() => {

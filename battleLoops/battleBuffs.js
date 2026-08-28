@@ -1,0 +1,335 @@
+/**
+ * Battlefield buff definitions, state, queue, display, and tick logic.
+ */
+
+var BATTLE_BUFF_KEYS = ["fury", "desensitized", "outrage", "malice", "fakeTears", "clout"];
+
+var battleBuffDefs = {
+    fury: {
+        key: "fury",
+        label: "Fury",
+        img: "img/fury.svg",
+        kind: "stackUntilAttack",
+        description: "Your next strike deals +1% damage per stack. All stacks are consumed when you attack."
+    },
+    desensitized: {
+        key: "desensitized",
+        label: "Desensitized",
+        img: "img/desensitized.svg",
+        kind: "stackTimed",
+        description: "Incoming damage is multiplied by 1 / (1 + 0.03 × stacks). Each stack expires on its own timer."
+    },
+    outrage: {
+        key: "outrage",
+        label: "Outrage",
+        img: "img/outrage.svg",
+        kind: "duration",
+        effectPercent: 15,
+        description: "Your attack timer recharges 15% faster while active. Additional time extends the buff."
+    },
+    malice: {
+        key: "malice",
+        label: "Malice",
+        img: "img/malice.svg",
+        kind: "duration",
+        effectPercent: 20,
+        description: "You deal 20% more damage while active. Additional time extends the buff."
+    },
+    fakeTears: {
+        key: "fakeTears",
+        label: "Fake Tears",
+        img: "img/fakeTears.svg",
+        kind: "duration",
+        effectPercent: 20,
+        description: "You take 20% less damage while active. Additional time extends the buff."
+    },
+    clout: {
+        key: "clout",
+        label: "Clout",
+        img: "img/clout.svg",
+        kind: "stackUntilDamage",
+        description: "Each stack blocks 1 incoming damage. Stacks consumed equal damage prevented."
+    }
+};
+
+var battleBuffs = {
+    initState: function() {
+        return {
+            queue: [],
+            byKey: {}
+        };
+    },
+    getState: function() {
+        if (!data.battle.buffs) {
+            data.battle.buffs = battleBuffs.initState();
+        }
+        return data.battle.buffs;
+    },
+    ensureInQueue: function(state, key) {
+        if (state.queue.indexOf(key) >= 0) {
+            return;
+        }
+        state.queue.push(key);
+    },
+    isBuffActive: function(key, entry) {
+        if (!entry) {
+            return false;
+        }
+        const def = battleBuffDefs[key];
+        if (!def) {
+            return false;
+        }
+        if (def.kind === "stackUntilAttack" || def.kind === "stackUntilDamage") {
+            return (entry.stacks || 0) > 0;
+        }
+        if (def.kind === "stackTimed") {
+            return entry.stacks && entry.stacks.length > 0;
+        }
+        if (def.kind === "duration") {
+            return (entry.remainingMs || 0) > 0;
+        }
+        return false;
+    },
+    pruneQueue: function(state) {
+        const next = [];
+        for (let i = 0; i < state.queue.length; i++) {
+            const key = state.queue[i];
+            if (battleBuffs.isBuffActive(key, state.byKey[key])) {
+                next.push(key);
+            } else {
+                delete state.byKey[key];
+            }
+        }
+        state.queue = next;
+    },
+    formatBuffRemainingLabel: function(remainingMs) {
+        return intToString(Math.max(0, remainingMs/1000), 1) + "s";
+    },
+    getDesensitizedReductionPercent: function(stackCount) {
+        if (!stackCount || stackCount <= 0) {
+            return 0;
+        }
+        return (1 - (1 / (1 + 0.03 * stackCount))) * 100;
+    },
+    getDesensitizedStackStats: function(stacks) {
+        if (!stacks || stacks.length === 0) {
+            return { longestMs: 0, averageMs: 0 };
+        }
+        let sum = 0;
+        let longest = 0;
+        for (let i = 0; i < stacks.length; i++) {
+            const ms = Math.max(0, stacks[i].remainingMs || 0);
+            sum += ms;
+            if (ms > longest) {
+                longest = ms;
+            }
+        }
+        return {
+            longestMs: longest,
+            averageMs: sum / stacks.length
+        };
+    },
+    buildDisplayEntry: function(key, entry) {
+        const def = battleBuffDefs[key];
+        if (!def || !entry) {
+            return null;
+        }
+        let topRight = "";
+        let bottomRight = "";
+        let tooltipExtra = "";
+
+        if (key === "fury") {
+            const stacks = entry.stacks || 0;
+            bottomRight = intToString(stacks, 1);
+            topRight = intToString(stacks, 1);
+            tooltipExtra = `Stacks: ${stacks}<br>Next hit: +${stacks}% damage`;
+        } else if (key === "desensitized") {
+            const stacks = entry.stacks || [];
+            const count = stacks.length;
+            const reduction = battleBuffs.getDesensitizedReductionPercent(count);
+            const stats = battleBuffs.getDesensitizedStackStats(stacks);
+            bottomRight = intToString(count, 1);
+            topRight = `${round2(reduction)}%`;
+            tooltipExtra = `Stacks: ${count}<br>Combined reduction: ${round2(reduction)}%<br>Longest stack: ${battleBuffs.formatBuffRemainingLabel(stats.longestMs)}<br>Average time left: ${battleBuffs.formatBuffRemainingLabel(stats.averageMs)}`;
+        } else if (key === "outrage" || key === "malice" || key === "fakeTears") {
+            const pct = def.effectPercent || 0;
+            bottomRight = battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0);
+            topRight = `${pct}%`;
+            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}`;
+        } else if (key === "clout") {
+            const stacks = entry.stacks || 0;
+            bottomRight = intToString(stacks, 2);
+            const neg = entry.lastNegation || 0;
+            topRight = neg > 0 ? `-${intToString(neg, 2)}` : "";
+            tooltipExtra = `Stacks: ${intToString(stacks, 2)}<br>Last negation: ${neg > 0 ? `-${intToString(neg, 2)}` : "-"}<br>1 damage blocked per stack consumed`;
+        }
+
+        const tooltipHtml = `<strong>${def.label}</strong><br>${def.description}<br><br>${tooltipExtra}`;
+        return {
+            key: key,
+            label: def.label,
+            img: def.img,
+            topRight: topRight,
+            bottomRight: bottomRight,
+            tooltipHtml: tooltipHtml
+        };
+    },
+    getDisplayList: function(state) {
+        const out = [];
+        for (let i = 0; i < state.queue.length; i++) {
+            const key = state.queue[i];
+            const entry = state.byKey[key];
+            if (!battleBuffs.isBuffActive(key, entry)) {
+                continue;
+            }
+            const display = battleBuffs.buildDisplayEntry(key, entry);
+            if (display) {
+                out.push(display);
+            }
+        }
+        return out;
+    },
+    tick: function(tickMs) {
+        const state = battleBuffs.getState();
+        const keys = Object.keys(state.byKey);
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            const entry = state.byKey[key];
+            const def = battleBuffDefs[key];
+            if (!entry || !def) {
+                continue;
+            }
+            if (def.kind === "stackTimed" && entry.stacks) {
+                const nextStacks = [];
+                for (let j = 0; j < entry.stacks.length; j++) {
+                    const stack = entry.stacks[j];
+                    const remain = Math.max(0, (stack.remainingMs || 0) - tickMs);
+                    if (remain > 0) {
+                        nextStacks.push({ remainingMs: remain });
+                    }
+                }
+                entry.stacks = nextStacks;
+            } else if (def.kind === "duration") {
+                entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
+            }
+        }
+        battleBuffs.pruneQueue(state);
+    },
+    addFuryStacks: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.fury) {
+            state.byKey.fury = { stacks: 0 };
+        }
+        state.byKey.fury.stacks = (state.byKey.fury.stacks || 0) + amount;
+        battleBuffs.ensureInQueue(state, "fury");
+    },
+    addDesensitizedStack: function(durationMs) {
+        if (!durationMs || durationMs <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.desensitized) {
+            state.byKey.desensitized = { stacks: [] };
+        }
+        if (!state.byKey.desensitized.stacks) {
+            state.byKey.desensitized.stacks = [];
+        }
+        state.byKey.desensitized.stacks.push({ remainingMs: durationMs });
+        battleBuffs.ensureInQueue(state, "desensitized");
+    },
+    addDurationMs: function(key, ms) {
+        if (!ms || ms <= 0 || !battleBuffDefs[key]) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey[key]) {
+            state.byKey[key] = { remainingMs: 0 };
+        }
+        state.byKey[key].remainingMs = (state.byKey[key].remainingMs || 0) + ms;
+        battleBuffs.ensureInQueue(state, key);
+    },
+    addCloutStacks: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.clout) {
+            state.byKey.clout = { stacks: 0, lastNegation: 0 };
+        }
+        state.byKey.clout.stacks = (state.byKey.clout.stacks || 0) + amount;
+        battleBuffs.ensureInQueue(state, "clout");
+    },
+    consumeFuryOnAttack: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.fury;
+        const stacks = entry ? (entry.stacks || 0) : 0;
+        const mult = 1 + (stacks * 0.01);
+        if (entry) {
+            entry.stacks = 0;
+        }
+        battleBuffs.pruneQueue(state);
+        return mult;
+    },
+    getFuryDamageMultiplier: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.fury;
+        const stacks = entry ? (entry.stacks || 0) : 0;
+        return 1 + (stacks * 0.01);
+    },
+    getDesensitizedIncomingMultiplier: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.desensitized;
+        const count = entry && entry.stacks ? entry.stacks.length : 0;
+        if (count <= 0) {
+            return 1;
+        }
+        return 1 / (1 + 0.03 * count);
+    },
+    getOutrageRechargeMultiplier: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.outrage;
+        if (entry && (entry.remainingMs || 0) > 0) {
+            return 1.15;
+        }
+        return 1;
+    },
+    getMaliceDamageMultiplier: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.malice;
+        if (entry && (entry.remainingMs || 0) > 0) {
+            return 1.2;
+        }
+        return 1;
+    },
+    getFakeTearsDamageMultiplier: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.fakeTears;
+        if (entry && (entry.remainingMs || 0) > 0) {
+            return 0.8;
+        }
+        return 1;
+    },
+    applyCloutToIncomingDamage: function(damageAfterOtherMitigation) {
+        const dmg = Math.max(0, damageAfterOtherMitigation || 0);
+        if (dmg <= 0) {
+            return 0;
+        }
+        const state = battleBuffs.getState();
+        const entry = state.byKey.clout;
+        const stacks = entry ? (entry.stacks || 0) : 0;
+        if (stacks <= 0) {
+            if (entry) {
+                entry.lastNegation = 0;
+            }
+            return dmg;
+        }
+        const negated = Math.min(stacks, dmg);
+        entry.stacks = stacks - negated;
+        entry.lastNegation = negated;
+        battleBuffs.pruneQueue(state);
+        return dmg - negated;
+    }
+};

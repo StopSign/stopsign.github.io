@@ -5,6 +5,11 @@
     --bg-secondary: #2e303d;
 }
 
+.hyperVisible {
+    text-shadow:1px 1px 2px black;
+    color: var(--text-primary);
+}
+
 html {
     min-width: 690px;
 }
@@ -85,11 +90,56 @@ body {
     pointer-events: auto;
 }
 
+.prog-fill-orb-exp {
+    background: #ac8755;
+}
+
+.base-mini-progress-fill.prog-fill-orb-exp {
+    background: #ac8755;
+}
+
+.prog-track.orb-exp-prog-track {
+    position: relative;
+    height: 28px;
+    margin: 8px 0 12px;
+    border: 1px solid var(--border-color);
+    background: #1a2233;
+    overflow: hidden;
+}
+
+.orb-exp-prog-track .prog-fill {
+    height: 100%;
+}
+
+.orb-exp-prog-track .game-progress-bar-label {
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    font-size: 12px;
+    z-index: 1;
+}
+
+.resort-map-progress-orb {
+    bottom: 135px;
+    left: 48%;
+    transform: translateX(-50%);
+}
+
+.resort-map-progress-orb .prog-fill-orb-exp {
+    height: 100%;
+}
+
 .prog-fill-okami-exp {
     background: #734d05;
 }
 
 .prog-fill-mana {
+    background: #3c0295;
+}
+
+.base-mini-progress-fill.prog-fill-mana {
     background: #3c0295;
 }
 
@@ -267,6 +317,80 @@ button {
     width: min(200px, 90%);
 }
 
+#playerBuffRow {
+    position: absolute;
+    left: 8px;
+    bottom: 33px;
+    display: grid;
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(2, 48px);
+    gap: 4px;
+    z-index: 21;
+    pointer-events: auto;
+}
+
+.player-buff-slot {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    border: 2px solid #2ad15f;
+    background: #0f3a1d;
+    cursor: default;
+}
+
+.player-buff-slot .player-buff-icon {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 70%;
+    height: 70%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.player-buff-num-tr,
+.player-buff-num-br {
+    position: absolute;
+    font-size: 11px;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.player-buff-num-tr {
+    top: 2px;
+    right: 3px;
+}
+
+.player-buff-num-br {
+    bottom: 2px;
+    right: 3px;
+}
+
+.hypervisible {
+    color: #fff7a8;
+    font-weight: 700;
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000,
+        0 0 3px rgba(0, 0, 0, 0.95);
+}
+
+.player-buff-slot .showthis {
+    min-width: 180px;
+    max-width: 240px;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
 #playerAvatarWrap {
     --player-token-size: 58px;
     --player-token-radius: 29px;
@@ -291,7 +415,7 @@ button {
     background: transparent;
 }
 
-#playerTokenHpLayer {
+#playerTokenAudLayer {
     position: absolute;
     inset: 0;
     z-index: 1;
@@ -300,7 +424,7 @@ button {
     pointer-events: none;
 }
 
-/* Sibling of #playerToken so HP text is not clipped by the token's overflow; sits above the circle. */
+/* Sibling of #playerToken so Aud text is not clipped by the token's overflow; sits above the circle. */
 #playerTokenOverlay {
     position: absolute;
     left: 0;
@@ -439,6 +563,16 @@ button {
     background: #a6e3a1;
 }
 
+.prog-fill-bonfire-heat {
+    background: linear-gradient(to right, #f97316, #ef4444);
+}
+
+.bonfire-worker-prog-wrap {
+    height: 10px;
+    min-height: 10px;
+    margin-top: 6px;
+}
+
 .prog-fill-talent {
     background: #fab387;
 }
@@ -473,7 +607,7 @@ button {
 .intruder-shape-layer {
     position: absolute;
     inset: 0;
-    border: 1px solid #4b1515;
+    border: 1px solid #7f2323;
     box-sizing: border-box;
     overflow: hidden;
     z-index: 1;
@@ -484,20 +618,26 @@ button {
     clip-path: polygon(50% 0%, 100% 38%, 81% 100%, 19% 100%, 0% 38%);
 }
 
-.intruder-hp-layer {
+.intruder-sprite-img {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.intruder-aud-layer {
+    position: absolute;
+    inset: 4px;
     pointer-events: none;
 }
 
 .intruder-overlay {
     position: absolute;
     inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1px;
+    box-sizing: border-box;
     font-size: 12px;
     line-height: 1.1;
     text-shadow: 0 0 2px #000, 0 0 4px #000;
@@ -505,6 +645,34 @@ button {
     color: #f5f5f5;
     white-space: nowrap;
     z-index: 3;
+}
+
+.intruder-stat-aud {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.intruder-overlay > .intruder-stat-dmg,
+.intruder-stat-bottom .intruder-stat-dmg {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
+
+.intruder-stat-bottom {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.intruder-stat-bottom .intruder-stat-atk-wrap {
+    position: absolute;
+    bottom: calc(0.55em + 3px);
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 #waveInfo {
@@ -968,8 +1136,12 @@ button {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 4px 10px;
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: 8px;
+}
+
+.travel-card .muted-text {
+    font-size: 12px;
 }
 
 .travel-map-stars {
@@ -1130,6 +1302,37 @@ button {
     font-size: 12px;
 }
 
+.resort-building-notify-badge {
+    position: absolute;
+    top: -2px;
+    right: -4px;
+    color: #e67e22;
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.tab-button {
+    position: relative;
+}
+
+.tab-notify-badge {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    color: #e67e22;
+    font-weight: bold;
+    font-size: 11px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.leveling-play-stats {
+    margin-top: 10px;
+    font-size: 13px;
+}
+
 .resort-building-art {
     width: 40px;
     height: 40px;
@@ -1178,7 +1381,7 @@ button {
 }
 
 .resort-building-bar {
-    left: 30%;
+    left: 37%;
     bottom: 203px;
     transform: none;
 }
@@ -1201,10 +1404,117 @@ button {
     transform: none;
 }
 
+.resort-building-pond {
+    left: 66%;
+    bottom: 280px;
+    transform: none;
+}
+
 .resort-building-bonfire {
     left: 88%;
-    bottom: 12px;
+    bottom: 34px;
     transform: none;
+}
+
+.bonfire-clone-btn--unaffordable {
+    border: 2px solid #c62828 !important;
+}
+
+.travel-launch-row {
+    margin-bottom: 10px;
+    gap: 8px;
+}
+
+.travel-map-radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.bonfire-picker-layout {
+    display: flex;
+    gap: 12px;
+    margin: 8px 0 12px;
+    align-items: flex-start;
+}
+
+.bonfire-picker-col {
+    flex: 1;
+    min-width: 0;
+}
+
+.bonfire-class-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.bonfire-modifier-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+}
+
+.bonfire-pick-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 6px;
+    border: 2px solid #3a4f6a;
+    background: #1a2433;
+    color: #e8eef5;
+    border-radius: 6px;
+    cursor: pointer;
+    aspect-ratio: 1;
+    min-height: 72px;
+}
+
+.bonfire-pick-btn:hover {
+    border-color: #5a7aa8;
+}
+
+.bonfire-pick-btn--selected {
+    border-color: #7eb6ff;
+}
+
+.bonfire-pick-btn--applied {
+    background: #2a4a6e;
+}
+
+.bonfire-pick-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.bonfire-pick-label {
+    margin-top: 4px;
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.bonfire-fire-tending-cap {
+    width: 4em;
+    margin-left: 6px;
+}
+
+.bonfire-info-panel {
+    flex: 0 0 42%;
+    min-height: 120px;
+    padding: 8px;
+    border: 1px solid #3a4f6a;
+    border-radius: 6px;
+    background: #121a26;
+}
+
+.bonfire-info-name {
+    font-weight: bold;
+    margin-bottom: 6px;
 }
 
 .resort-building-garden {
@@ -1214,14 +1524,14 @@ button {
 }
 
 .resort-building-atelier {
-    left: 74%;
-    bottom: 192px;
+    left: 75%;
+    bottom: 182px;
     transform: none;
 }
 
 .resort-building-scrollArchives {
-    left: 61%;
-    bottom: 270px;
+    left: 58%;
+    bottom: 139px;
     transform: none;
 }
 
@@ -1247,7 +1557,7 @@ button {
 
 .resort-building-bamboo {
     left: calc(var(--path-end-x) - 9px);
-    top: calc(var(--path-end-y) + 125px);
+    top: calc(var(--path-end-y) + 109px);
     transform: translate(-50%, 0);
     bottom: auto;
     right: auto;
@@ -1255,7 +1565,7 @@ button {
 
 .resort-building-fox-den {
     bottom: 260px;
-    left: 50%;
+    left: 52%;
     top: auto;
     transform: translateX(-50%);
     z-index: 13;
@@ -1314,21 +1624,141 @@ button {
     z-index: 14;
 }
 
-.spirit-slot-grid-earth { top: 60px; left: 205px; }
-.spirit-slot-grid-water { top: 60px; left: 385px; }
-.spirit-slot-grid-fire { top: 5px; left: 50%; transform: translateX(-50%); }
+.spirit-slot-grid-earth { top: 70px; left: 195px; }
+.spirit-slot-grid-water { top: 70px; left: 398px; }
 .spirit-slot-grid-mine-earth {
-    top: 44px;
-    left: 54px;
+    top: 81px;
+    left: 41px;
     grid-template-columns: repeat(3, 22px);
     grid-template-rows: 22px;
 }
 
 .spirit-slot-grid-bamboo-plant {
-    left: calc(var(--path-end-x) - 57px);
-    top: calc(var(--path-end-y) + 206px);
+    left: calc(var(--path-end-x) - 59px);
+    top: calc(var(--path-end-y) + 184px);
     grid-template-columns: repeat(4, 22px);
     grid-template-rows: 22px;
+}
+
+.spirit-slot-grid-pond-water {
+    left: 71%;
+    bottom: 254px;
+    transform: translateX(-50%);
+    grid-template-columns: repeat(4, 22px);
+    grid-template-rows: 22px;
+}
+
+.spirit-slot-grid-atelier-fire {
+    left: 79%;
+    bottom: 157px;
+    transform: translateX(-50%);
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: 22px;
+}
+
+.spirit-slot-grid-bonfire-fire {
+    left: 91%;
+    bottom: 7px;
+    transform: translateX(-50%);
+    grid-template-columns: repeat(3, 22px);
+    grid-template-rows: 22px;
+}
+
+.fire-launcher-wrap {
+    position: absolute;
+    z-index: 15;
+    width: 28px;
+    cursor: pointer;
+}
+
+.fire-launcher-pathMid {
+    left: 42%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+}
+
+.fire-launcher-bendTop {
+    left: 68%;
+    top: 22%;
+    transform: translate(-50%, -50%);
+}
+
+.fire-launcher-pathLower {
+    left: 72%;
+    top: 68%;
+    transform: translate(-50%, -50%);
+}
+
+.fire-launcher-slot {
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 0 0 3px #1a3a6b;
+}
+
+.fire-launcher-range {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 120, 60, 0.65);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    box-sizing: border-box;
+}
+
+.fire-launcher-wrap:hover .fire-launcher-range,
+.fire-launcher-wrap.fire-launcher-range-visible .fire-launcher-range {
+    display: block;
+}
+
+.fire-launcher-ember-track {
+    position: relative;
+    width: 22px;
+    height: 4px;
+    margin-top: 3px;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 2px;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.fire-launcher-ember-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6633, #ffaa44);
+    border-radius: 2px;
+}
+
+.fire-launcher-projectile {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    z-index: 16;
+    pointer-events: none;
+}
+
+.fire-launcher-projectile img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.fire-launcher-aoe-pulse {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 60, 30, 0.35);
+    border: 1px solid rgba(255, 100, 50, 0.6);
+    pointer-events: none;
+    z-index: 13;
+    transform: translate(-50%, -50%);
+    animation: fireLauncherAoeFade 0.5s ease-out forwards;
+}
+
+@keyframes fireLauncherAoeFade {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
 
 .spirit-slot-plant {
@@ -1361,7 +1791,7 @@ button {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 12px;
+    gap: 30px;
     margin: 8px 0;
 }
 
@@ -1529,6 +1959,29 @@ button {
     pointer-events: none;
 }
 
+.droplet-token {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4a9fd4;
+    border: 1px solid #7ec8e8;
+    z-index: 13;
+    box-sizing: border-box;
+    pointer-events: none;
+}
+
+.path-token-amount-label {
+    position: absolute;
+    z-index: 14;
+    pointer-events: none;
+    font-size: 10px;
+    line-height: 1;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
 .path-seg-hit {
     cursor: pointer;
 }
@@ -1680,15 +2133,15 @@ button {
 }
 
 .path-seg-track-tier-stairs {
-    stroke: #9ec4a0;
+    stroke: #b8c478;
 }
 
 .path-seg-hollow-tier-stairs {
-    stroke: none;
+    stroke: #3a4f28;
 }
 
 .path-seg-track-tier-lanterns {
-    stroke: #b8dcf0;
+    stroke: #b8860b;
 }
 
 .path-seg-hollow-tier-lanterns {
@@ -1702,14 +2155,58 @@ button {
 }
 
 .resort-map-progress-laundry {
-    bottom: 250px;
-    left: 160px;
+    bottom: 282px;
+    left: 79px;
 }
 
 .resort-map-progress-torii {
-    bottom: 14px;
+    bottom: 17px;
     left: 50%;
     transform: translateX(-50%);
+}
+
+.resort-map-progress-inn-mana {
+    bottom: 190px;
+    left: 132px;
+}
+
+.inn-mana-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.inn-mana-row .inn-mana-prog-track {
+    flex: 1;
+    min-width: 160px;
+    position: relative;
+}
+
+.inn-mana-prog-track .game-progress-bar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    font-size: 12px;
+    z-index: 1;
+}
+
+.kitsune-assign-tooltip {
+    min-width: 140px;
+    white-space: nowrap;
+}
+
+.kitsune-assign-tip-row {
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.pane-title .showthat {
+    position: relative;
+    display: inline-block;
 }
 
 #baseBuildingInfo {
@@ -1735,13 +2232,14 @@ button {
     bottom: auto;
     max-height: 100%;
     height: auto;
+    z-index: 50;
 }
 
 .base-info-panel {
     border: 1px solid var(--border-color);
     overflow: hidden;
     padding: 10px;
-    background: #0c1220;
+    background: #2a1810;
     box-sizing: border-box;
     margin-bottom: 0;
     transition: none;
@@ -1988,6 +2486,63 @@ button {
     background: #222b42;
 }
 
+.scroll-archives-choices-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 8px 0 12px;
+}
+
+.scroll-archives-choice-col {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+.scroll-archives-choice-shard {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    z-index: 2;
+    cursor: help;
+}
+
+.scroll-archives-choice-shard-img {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.scroll-archives-choice-shard .showthis {
+    right: 0;
+    left: auto;
+    min-width: 180px;
+    max-width: 240px;
+    white-space: normal;
+}
+
+.scroll-archives-choice-type {
+    font-weight: bold;
+    font-size: 10px;
+    margin-bottom: 4px;
+    padding-right: 22px;
+}
+
+.scroll-archives-choice-desc {
+    margin-bottom: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+}
+
+.scroll-archives-choice-select {
+    display: block;
+    font-size: 12px;
+}
+
 #basePanel_scrollArchives .base-scrollArchives-row:last-child {
     margin-bottom: 8px;
 }
@@ -2071,6 +2626,22 @@ button {
     gap: 6px;
 }
 
+.guest-itinerary-panel {
+    padding: 10px 12px;
+    background: #2c261c;
+    border: 1px solid #4a3f32;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.guest-itinerary-line {
+    font-size: 12px;
+    line-height: 1.45;
+    color: #e8dcc8;
+}
+
 .guest-log-row,
 .guest-list-row {
     padding: 6px;
@@ -2152,7 +2723,7 @@ button {
 }
 
 .mine-block-fill.ore {
-    background: #b8860b;
+    background: #1a3a6b;
 }
 
 .mine-play-progress {
@@ -2225,8 +2796,8 @@ button {
 
 .skill-star-bronze { color: #cd7f32; }
 .skill-star-silver { color: #c0c0c0; }
-.skill-star-coins { color: #ffd700; }
+.skill-star-gold { color: #ffd700; }
 .skill-star-filled { text-shadow: 0 0 4px rgba(255,255,255,0.35); }
 .star-bronze { color: #cd7f32; }
 .star-silver { color: #c0c0c0; }
-.star-coins { color: #ffd700; }
+.star-gold { color: #ffd700; }

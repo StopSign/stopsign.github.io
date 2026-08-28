@@ -2,15 +2,21 @@
 mapData.getDefaultMaps = function() {
     return [
         mapData.createMap({
+            version:0,
             key: "map_1",
-            name: "Northern Forest",
-            description: "Relatively peaceful forest trails. Very easy.",
+            name: "Gossip Spreads",
+            description: "The news of travelers finding peace in the mountains is starting to be gossiped about, and the Okami must make the the early but unprepared opportunists run away in shame.",
             seed: 5557,
             baseDifficulty: 1,
             zones: [
-                mapData.createZone(6, "scoundrel", 0, 300, 1, 1.6, 3, 1, { key: "endurance", gain: 1, chance: 0.012, max: 14 }),
-                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 6, 1.5, { key: "recovery", gain: 1, chance: 0.01, max: 12 }),
-                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12, 2, { key: "force", gain: 1, chance: 0.008, max: 14 }),
+                mapData.createZone(6, "scoundrel", 0, 300, 1, 1.6, 6, 1),
+                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 9, 1.5),
+                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12, 2),
+            ],
+            zoneShards: [
+                { key: "nickelAndDime", gain: 1, chance: 0.04, cap: 10 },
+                { key: "selfAffirmations", gain: 1, chance: 0.04, cap: 10 },
+                { key: "force", gain: 1, chance: 0.04, cap: 10 }
             ],
             forageZones: [
                 mapData.createForageZone(1, "tree", 200, 0, 10, 1, "logs", 1),
@@ -18,61 +24,112 @@ mapData.getDefaultMaps = function() {
             ]
         }),
         mapData.createMap({
+            version:0,
             key: "map_2",
-            name: "Eastern Forest",
-            description: "More dangerous than the north, but still manageable. Easy.",
+            name: "Protecting Modesty",
+            description: "Word has spread that there is a beautiful woman protecting an unknown village, and the Okami must slap some sense into the curious scoundrels.",
             seed: 424242,
             baseDifficulty: 1.6,
+            unlocksAfterMapKey: "map_1",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1, { key: "endurance", gain: 1, chance: 0.01, max: 10 }),
-                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2, { key: "wisdom", gain: 1, chance: 0.009, max: 12 }),
+                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1),
+                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2),
+                mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
+                mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
+                mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
+            ],
+            zoneShards: [
+                { key: "mainCharacter", gain: 1, chance: 0.02, cap: 10 },
+                { key: "shameless", gain: 1, chance: 0.02, cap: 10 },
+                { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 }
+            ],
+            forageZones: [
+                mapData.createForageZone(10, "bush", 165, 0, 5, 1, "lumber", 1),
+                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+            ]
+        }),
+        mapData.createMap({
+            version:0,
+            key: "map_3",
+            name: "Leering Intruders",
+            description: "Rumors of a hotspring have brought both scoundrels and lechers, looking to peep in and ruin the peace. The Okami will have them run away in embarrasment.",
+            seed: 6001,
+            baseDifficulty: 1.6,
+            unlocksAfterMapKey: "map_2",
+            zones: [
+                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1),
+                mapData.createZone(2, "lecher", 500, 780, 1.0, 1, 22, 1),
+                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2),
+                mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
+                mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
+                mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
+            ],
+            zoneShards: [
+                { key: "extortion", gain: 1, chance: 0.01, cap: 10 },
+                { key: "hindsight", gain: 1, chance: 0.01, cap: 10 },
+                { key: "insultFatigue", gain: 1, chance: 0.01, cap: 10 }
+            ],
+            forageZones: [
+                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+            ]
+        }),
+        mapData.createMap({
+            version:0,
+            key: "map_4",
+            name: "Romance Novelists",
+            description: "Some intruders are determined in their pursuit of seeing the secrets of the hotspring. The Okami must fill their hearts with shame.",
+            seed: 7777,
+            baseDifficulty: 1.6,
+            unlocksAfterMapKey: "map_3",
+            zones: [
+                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1,
+                    { key: "shameless", gain: 1, chance: 0.01, cap: 10 }),
+                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1, { key: "shameless", gain: 1, chance: 0.01, cap: 10 }),
+                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2, { key: "hindsight", gain: 1, chance: 0.009, cap: 12 }),
                 mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
                 mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
                 mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
             ],
             forageZones: [
-                mapData.createForageZone(10, "bush", 165, 0, 5, 1, "lumber", 1),
                 mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
-                mapData.createForageZone(8, "bush", 170, 1, 6, 1, "lumber", 1.1),
-                mapData.createForageZone(5, "ore_vein", 190, 1, 11, 1, "ironOre", 1.4)
             ]
         }),
-        mapData.createMap({
-            key: "map_condescension_1",
-            name: "Shieldwall Gauntlet",
-            seed: 900001,
-            baseDifficulty: 1.4,
-            requiredClassKey: "condescension",
-            zones: [
-                mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, 1, { key: "fortitude", gain: 1, chance: 0.006, max: 24 }),
-                mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, 1, { key: "toughness_condescension", gain: 1, chance: 0.005, max: 28 }),
-                mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, 1, { key: "second_wind", gain: 1, chance: 0.004, max: 30 })
-            ]
-        }),
-        mapData.createMap({
-            key: "map_scold_1",
-            name: "Silent Crossfire",
-            seed: 900002,
-            baseDifficulty: 1.45,
-            requiredClassKey: "scold",
-            zones: [
-                mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22, 1),
-                mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32, 1),
-                mapData.createZone(28, "lecher", 21000, 910, 1.2, 1, 44, 1)
-            ]
-        }),
-        mapData.createMap({
-            key: "map_mockery_1",
-            name: "Colossus Trail",
-            seed: 900003,
-            baseDifficulty: 2.1,
-            requiredClassKey: "mockery",
-            zones: [
-                mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26, 1),
-                mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36, 1),
-                mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1, 52, 1)
-            ]
-        })
+        // mapData.createMap({
+        //     key: "map_condescend_1",
+        //     name: "Shieldwall Gauntlet",
+        //     seed: 900001,
+        //     baseDifficulty: 1.4,
+        //     requiredClassKey: "condescend",
+        //     zones: [
+        //         mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, 1, { key: "aboveItAll", gain: 1, chance: 0.006, cap: 24 }),
+        //         mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, 1, { key: "toughness_condescend", gain: 1, chance: 0.005, cap: 28 }),
+        //         mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, 1, { key: "second_wind", gain: 1, chance: 0.004, cap: 30 })
+        //     ]
+        // }),
+        // mapData.createMap({
+        //     key: "map_scold_1",
+        //     name: "Silent Crossfire",
+        //     seed: 900002,
+        //     baseDifficulty: 1.45,
+        //     requiredClassKey: "scold",
+        //     zones: [
+        //         mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22, 1),
+        //         mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32, 1),
+        //         mapData.createZone(28, "lecher", 21000, 910, 1.2, 1, 44, 1)
+        //     ]
+        // }),
+        // mapData.createMap({
+        //     key: "map_mock_1",
+        //     name: "Colossus Trail",
+        //     seed: 900003,
+        //     baseDifficulty: 2.1,
+        //     requiredClassKey: "mock",
+        //     zones: [
+        //         mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26, 1),
+        //         mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36, 1),
+        //         mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1, 52, 1)
+        //     ]
+        // })
     ];
 };
 
@@ -88,89 +145,111 @@ mapData.isChallengeMap = function(mapDef) {
 };
 
 /**
- * Standard maps: first is always unlocked; each later map requires the previous map’s bronze star.
- * Challenge maps (same `requiredClassKey`): first is unlocked when you are that class; later maps need the previous challenge’s bronze star.
+ * Map is playable when class requirements pass and any `unlocksAfterMapKey` prerequisite has a bronze star.
+ * Maps with no `unlocksAfterMapKey` are available immediately (subject to class gate for challenges).
  */
 mapData.isMapUnlocked = function(mapDef, progress) {
     if (!mapDef || !progress) {
         return false;
     }
-    const maps = progress.mapDefinitions || [];
     const req = mapDef.requiredClassKey || "";
     const cls = progress.currentClassKey || "none";
-    if (req) {
-        if (req !== cls) {
-            return false;
-        }
-        const challenges = [];
-        for (let i = 0; i < maps.length; i++) {
-            if (maps[i].requiredClassKey === req) {
-                challenges.push(maps[i]);
-            }
-        }
-        const idx = challenges.findIndex(function(m) {
-            return m.key === mapDef.key;
-        });
-        if (idx < 0) {
-            return false;
-        }
-        if (idx === 0) {
-            return true;
-        }
-        const prev = challenges[idx - 1];
-        const prevStars = (progress.mapStars && progress.mapStars[prev.key]) || {};
-        return !!prevStars.bronze;
-    }
-    const standard = [];
-    for (let j = 0; j < maps.length; j++) {
-        if (!maps[j].requiredClassKey) {
-            standard.push(maps[j]);
-        }
-    }
-    const sidx = standard.findIndex(function(m) {
-        return m.key === mapDef.key;
-    });
-    if (sidx < 0) {
+    if (req && req !== cls) {
         return false;
     }
-    if (sidx === 0) {
+    const afterKey = mapDef.unlocksAfterMapKey || "";
+    if (!afterKey) {
         return true;
     }
-    const prevS = standard[sidx - 1];
-    const prevStarsS = (progress.mapStars && progress.mapStars[prevS.key]) || {};
-    return !!prevStarsS.bronze;
+    const prevStars = (progress.mapStars && progress.mapStars[afterKey]) || {};
+    return !!prevStars.bronze;
 };
 
-/** Sum `max` per skill key across zones that define `skillShard`. */
-mapData.getMapShardMaxBySkillKey = function(mapDef) {
-    const out = {};
-    if (!mapDef || !mapDef.zones) {
-        return out;
+/** Base soft-cap value for a zone skillShard. */
+mapData.getSkillShardCap = function(sh) {
+    if (!sh) {
+        return 1;
     }
-    for (let i = 0; i < mapDef.zones.length; i++) {
-        const sh = mapDef.zones[i].skillShard;
-        if (sh && sh.key) {
-            out[sh.key] = (out[sh.key] || 0) + (sh.max || 0);
-        }
-    }
-    return out;
+    return Math.max(1, Math.floor(sh.cap !== undefined ? sh.cap : 1));
 };
 
-/** "SkillName: current/max" for travel card; `current` is stored `skill.shards`. */
-mapData.getMapShardSummaryText = function(mapDef, progressSkills) {
-    const maxBy = mapData.getMapShardMaxBySkillKey(mapDef);
-    const keys = Object.keys(maxBy);
-    if (!keys.length) {
+/**
+ * Soft-cap tier for `found` shards with base cap C.
+ * Thresholds at C, 3C, 7C, ... = C*(2^(k+1)-1); chance is base/5^k in tier k.
+ */
+mapData.getShardSoftCapTier = function(found, baseCap) {
+    const C = Math.max(1, baseCap || 1);
+    const f = Math.max(0, found || 0);
+    let k = 0;
+    while (C * (Math.pow(2, k + 1) - 1) <= f) {
+        k++;
+    }
+    return k;
+};
+
+mapData.getShardSoftCapNextThreshold = function(found, baseCap) {
+    const C = Math.max(1, baseCap || 1);
+    const k = mapData.getShardSoftCapTier(found, C);
+    return C * (Math.pow(2, k + 1) - 1);
+};
+
+mapData.getShardSoftCapChance = function(baseChance, found, baseCap) {
+    const k = mapData.getShardSoftCapTier(found, baseCap);
+    return (baseChance || 0) / Math.pow(5, k);
+};
+
+/** Shard loot tier multiplier from map star cycle (bronze/silver/gold). */
+mapData.getShardLootTierMultiplier = function(mapTier) {
+    const tier = mapTier || 0;
+    return tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
+};
+
+/** Display line for wave info / travel map shard rows. */
+mapData.formatShardInfoLine = function(sh, tierMult, lootMult) {
+    if (!sh || !sh.key) {
+        return "";
+    }
+    if (!skills.isSkillResearchComplete(sh.key)) {
+        return "??? Shards";
+    }
+    const def = skills._byKey[sh.key];
+    const nm = def && def.name ? def.name : sh.key;
+    const sk = data.progress.skills[sh.key];
+    const found = sk && sk.shards !== undefined ? sk.shards : 0;
+    const baseCap = mapData.getSkillShardCap(sh);
+    const next = mapData.getShardSoftCapNextThreshold(found, baseCap);
+    const softChance = mapData.getShardSoftCapChance(sh.chance || 0, found, baseCap);
+    const p = Math.min(0.999, softChance * (tierMult || 1) * (lootMult || 1));
+    const chancePct = round1(p * 100);
+    return `${nm} Shards ${found}/${next}, ${chancePct}%`;
+};
+
+/** Per-zone shard summary for travel cards; includes soft-cap progress and effective loot chance. */
+mapData.getMapShardSummaryText = function(mapDef, progressSkills, lootChanceMult) {
+    if (!mapDef || !lootChanceMult) {
         return "";
     }
     const parts = [];
-    for (let i = 0; i < keys.length; i++) {
-        const k = keys[i];
-        const def = skills._byKey[k];
-        const nm = def && def.name ? def.name : k;
-        const sk = progressSkills && progressSkills[k];
-        const cur = sk && sk.shards !== undefined ? sk.shards : 0;
-        parts.push(`${nm}: ${cur}/${maxBy[k]}`);
+    const tierMult = 1;
+    const zoneShards = mapDef.zoneShards || [];
+    for (let si = 0; si < zoneShards.length; si++) {
+        const sh = zoneShards[si];
+        if (!sh || !sh.key) {
+            continue;
+        }
+        parts.push(mapData.formatShardInfoLine(sh, tierMult, lootChanceMult));
+    }
+    if (mapDef.zones) {
+        for (let i = 0; i < mapDef.zones.length; i++) {
+            const sh = mapDef.zones[i].skillShard;
+            if (!sh || !sh.key) {
+                continue;
+            }
+            const line = mapData.formatShardInfoLine(sh, tierMult, lootChanceMult);
+            if (line) {
+                parts.push(line + " wave " + (i + 1));
+            }
+        }
     }
     return parts.join(" · ");
 };

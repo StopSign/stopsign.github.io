@@ -6,12 +6,27 @@ let saving = {
         window.localStorage[saveName] = "";
         location.reload();
     },
-    load: function() {
+    load: async function() {
         initialize.initializeData();
 
         let toLoad = {};
 
-        if (localStorage[saveName]) {
+        if (!isLoadingEnabled) {
+            console.log('Save ignored.');
+        } else if (loadStaticSaveFile) {
+            try {
+                const resp = await fetch("saveFile.txt", { cache: "no-store" });
+                if (resp.ok) {
+                    const text = await resp.text();
+                    if (text.trim()) {
+                        toLoad = JSON.parse(text);
+                        console.log("Loaded saveFile.txt");
+                    }
+                }
+            } catch (e) {
+                console.log("saveFile.txt not found or invalid.", e);
+            }
+        } else if (localStorage[saveName]) {
             try {
                 toLoad = JSON.parse(localStorage[saveName]);
             } catch (e) {
@@ -19,14 +34,7 @@ let saving = {
             }
         }
 
-        if(!isLoadingEnabled) {
-            console.log('Save ignored.');
-            toLoad = {};
-        }
-
-
-
-        if(localStorage[saveName] && Object.keys(toLoad).length > 0) {
+        if (Object.keys(toLoad).length > 0) {
             onLoad.handleLoad(data, toLoad);
         }
 
@@ -36,6 +44,20 @@ let saving = {
         data.lastVisit = Date.now();
         let sdata = structuredClone(data);
         window.localStorage[saveName] = JSON.stringify(sdata);
+    },
+    /** Debug: download current game data as plaintext saveFile.txt (place in battleLoops/ for loadStaticSaveFile). */
+    saveToFile: function() {
+        saving.save();
+        const text = window.localStorage[saveName] || JSON.stringify(structuredClone(data));
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "saveFile.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     },
     exportSave: function() {
         saving.save();

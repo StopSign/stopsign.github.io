@@ -5,7 +5,8 @@ let gameData = {
         laneHorizontalInsetPx: 14,
         intruderTravelSpeedPxPerSecond: 50,
         idlePushBonusPxPerSecond: 25,
-        intruderBaseHp: 10,
+        intruderStackGapPx: 10,
+        intruderBaseAud: 10,
         intruderAttackDamage: 2,
         intruderAttackCooldownMs: 1300,
         spawnWindowMs: 360000,
@@ -34,7 +35,7 @@ let gameData = {
         combat: {
             baseSlapDamage: 5,
             sandalDamageSlapMultiplier: 1.5,
-            baseHpInner: 20,
+            baseAudInner: 20,
             conStrStatDivisor: 10,
             foragingBaseStaminaInner: 20,
             foragingBreathingStaminaPerLevel: 2,
