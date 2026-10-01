@@ -957,7 +957,7 @@ let engine = {
         if (target.hasAttackedPlayer) {
             engine.addSkillExp("grudge", 1);
         }
-        engine.addSkillExp("shockValue", Math.sqrt(Math.max(0, slapDamage)));
+        engine.addSkillExp("shockValue", engine.getShockValueTriggerExp(slapDamage));
         data.battle.lastPlayerHitIntruderId = target.id;
         data.battle.lastPlayerHitStreak = streak;
         target.timesHitByPlayer = priorHits + 1;
@@ -1108,12 +1108,11 @@ let engine = {
                         intruder.aud -= thorns;
                     }
                 }
-                incoming = engine.applyBattleBuffsToIncomingDamage(incoming);
+                const shownIncoming = engine.applyIncomingDamageBeforeClout(incoming);
+                incoming = engine.applyCloutToIncomingDamage(shownIncoming);
                 const damageApplied = incoming > 0;
                 const aboveHalfAudBeforeHit = engine.isPlayerAboveHalfAud();
-                if (damageApplied) {
-                    engine.spawnPlayerHurtFloat(intruder, incoming);
-                }
+                engine.spawnPlayerHurtFloat(intruder, shownIncoming);
                 data.battle.player.aud -= incoming;
                 intruder.hasAttackedPlayer = true;
                 if (damageApplied) {
@@ -1547,7 +1546,12 @@ let engine = {
             target.shards = (target.shards || 0) + gain;
         }
         data.battle.runShardsGained = (data.battle.runShardsGained || 0) + gain;
-        return { gain: gain, name: skills._byKey[sh.key].name, key: sh.key };
+        const skillName = skills._byKey[sh.key].name;
+        if (!data.battle.runShardBySkill) {
+            data.battle.runShardBySkill = {};
+        }
+        data.battle.runShardBySkill[skillName] = (data.battle.runShardBySkill[skillName] || 0) + gain;
+        return { gain: gain, name: skillName, key: sh.key };
     },
     trySkillShardDropOnKill: function(intruder) {
         if ((data.battle.mode || "combat") !== "combat" || !intruder) {
@@ -1893,11 +1897,10 @@ let engine = {
         }
         return out;
     },
-    applyBattleBuffsToIncomingDamage: function(incoming) {
+    applyIncomingDamageBeforeClout: function(incoming) {
         let out = Math.max(0, incoming || 0);
         out *= engine.getDesensitizedIncomingMultiplier();
         out *= engine.getFakeTearsDamageMultiplier();
-        out = engine.applyCloutToIncomingDamage(out);
         return Math.max(0, out);
     },
     slapAttackReady: function() {
@@ -2052,8 +2055,8 @@ let engine = {
         }
         const eff = skills.getSkillEffect("insultFatigue");
         const flat = stacks * (eff.insultFatigueFlatPerStack || 0);
-        intruder.insultFatigueStacks = 0;
-        return Math.max(0, incoming - flat);
+        const reduction = Math.min(flat, Math.max(0, incoming) * 0.5);
+        return Math.max(0, incoming - reduction);
     },
     grantPlayerCurrentAudGain: function(amount) {
         if (!amount || amount <= 0) {
@@ -2172,6 +2175,7 @@ let engine = {
         const stars = data.progress.mapStars[mapKey];
         const tier = data.battle.mapTier || 0;
         if (tier === 0) {
+            data.battle.runStarCleared = "bronze";
             if (!stars.bronze) {
                 stars.bronze = true;
                 data.progress.stars.bronze++;
@@ -2187,11 +2191,13 @@ let engine = {
             return;
         }
         if (tier === 1) {
+            data.battle.runStarCleared = "silver";
             if (!stars.silver) {
                 stars.silver = true;
                 data.progress.stars.silver++;
                 engine.grantWorkersForMapStar(mapKey, 2);
                 addStarClearProgress(15);
+                engine.syncScrollArchivesResearchCost();
             }
             data.battle.transitionMessage = "Silver star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 2;
@@ -2200,11 +2206,13 @@ let engine = {
             engine.idleSlapHand();
             return;
         }
+        data.battle.runStarCleared = "gold";
         if (!stars.gold) {
             stars.gold = true;
             data.progress.stars.gold++;
             engine.grantWorkersForMapStar(mapKey, 3);
             addStarClearProgress(25);
+            engine.syncScrollArchivesResearchCost();
         }
         data.battle.transitionMessage = "Gold star received! Map complete.";
         data.battle.nextTierAfterCountdown = 0;
@@ -2527,14 +2535,24 @@ let engine = {
         return data.battle.playerFloatFx;
     },
     formatPlayerFloatText: function(amount, gain) {
-        if (!(amount > 0) || typeof view === "undefined" || typeof view.formatSlapDamageText !== "function") {
+        if (typeof view === "undefined" || typeof view.formatSlapDamageText !== "function") {
+            return "";
+        }
+        if (gain) {
+            if (!(amount > 0)) {
+                return "";
+            }
+            const gainBody = view.formatSlapDamageText(amount);
+            if (!gainBody || gainBody === "0.0" || gainBody === "-0.0") {
+                return "";
+            }
+            return "+" + gainBody;
+        }
+        if (!(amount >= 0)) {
             return "";
         }
         const body = view.formatSlapDamageText(amount);
-        if (!body || body === "0.0" || body === "-0.0") {
-            return "";
-        }
-        return gain ? ("+" + body) : body;
+        return body || "";
     },
     getPlayerAvatarFloatAnchor: function() {
         const layer = document.getElementById("slapFxLayer");
@@ -2600,15 +2618,14 @@ let engine = {
         if (!data.battle || data.battle.state !== "running" || !intruder) {
             return;
         }
-        const text = engine.formatPlayerFloatText(amount, false);
-        const anchor = engine.getPlayerAvatarFloatAnchor();
-        if (!text || !anchor) {
+        const text = engine.formatPlayerFloatText(Math.max(0, amount || 0), false);
+        if (!text) {
             return;
         }
         const lm = engine.getBattleLaneMetrics();
-        const enemyX = lm.inset + ((intruder.lane || 0) + 0.5) * lm.laneWidth;
-        const x = (enemyX + anchor.centerX) / 2;
-        engine.spawnPlayerFloatSlot(x, anchor.top, text, "hurt");
+        const x = lm.inset + ((intruder.lane || 0) + 0.5) * lm.laneWidth;
+        const y = (intruder.yPx || 0) + (intruder.sizePx || 0);
+        engine.spawnPlayerFloatSlot(x, y, text, "hurt");
     },
     updatePlayerFloats: function(tickMs) {
         const fx = engine.ensurePlayerFloatFx();
@@ -2951,7 +2968,7 @@ let engine = {
         if (rt.hasAttackedPlayer) {
             engine.addSkillExp("grudge", 1);
         }
-        engine.addSkillExp("shockValue", Math.sqrt(Math.max(0, sandalDamage)));
+        engine.addSkillExp("shockValue", engine.getShockValueTriggerExp(sandalDamage));
         data.battle.lastPlayerHitIntruderId = rt.id;
         data.battle.lastPlayerHitStreak = streak;
         rt.timesHitByPlayer = priorHits + 1;
@@ -2986,7 +3003,7 @@ let engine = {
                 const audBeforeT2 = t2.aud;
                 t2.aud -= sandalDamage;
                 engine.enqueueSandalLineFx(t2);
-                engine.addSkillExp("shockValue", Math.sqrt(Math.max(0, sandalDamage)));
+                engine.addSkillExp("shockValue", engine.getShockValueTriggerExp(sandalDamage));
                 if (t2.hasAttackedPlayer) {
                     engine.addSkillExp("grudge", 1);
                 }
@@ -3101,6 +3118,10 @@ let engine = {
             return e;
         }
         return null;
+    },
+    getShockValueTriggerExp: function(egoDamage) {
+        const dmg = Math.max(0, egoDamage || 0);
+        return Math.max(Math.log10(dmg), 1);
     },
     addSkillExp: function(skillKey, amount) {
         if (!amount || amount <= 0) {
@@ -3219,6 +3240,19 @@ let engine = {
             }
         }
         const mapKey = (data.battle.cloneRunSettings && data.battle.cloneRunSettings.mapKey) || data.progress.currentMapKey || "";
+        const cloneDensity = data.battle.cloneDensity !== undefined && data.battle.cloneDensity !== null
+            ? data.battle.cloneDensity
+            : ((data.battle.cloneRunSettings && data.battle.cloneRunSettings.cloneDensity) || 0);
+        const shardMap = data.battle.runShardBySkill || {};
+        const shardNames = Object.keys(shardMap);
+        const shardRows = [];
+        for (let si = 0; si < shardNames.length; si++) {
+            const shardName = shardNames[si];
+            const shardGain = shardMap[shardName] || 0;
+            if (shardGain > 0) {
+                shardRows.push(`${shardName} +${shardGain}`);
+            }
+        }
         data.progress.runHistory.unshift({
             mapKey: mapKey,
             survivedSeconds: runSeconds,
@@ -3228,7 +3262,10 @@ let engine = {
             kills: runKills,
             talentRows: talentRows,
             shardsGained: data.battle.runShardsGained || 0,
-            okamiExpGained: engine.getPendingOkamiExpWithSoul()
+            shardRows: shardRows,
+            okamiExpGained: engine.getPendingOkamiExpWithSoul(),
+            cloneDensity: cloneDensity,
+            starCleared: data.battle.runStarCleared || null
         });
         if (data.progress.runHistory.length > 30) {
             data.progress.runHistory = data.progress.runHistory.slice(0, 30);
@@ -3360,7 +3397,7 @@ let engine = {
         return !!torii && (torii.water || 0) >= cap;
     },
     getToriiVisitorWaterCost: function() {
-        return 20;
+        return 50;
     },
     /** Cistern workers haul to the onsen, or to the Torii once the drinking bowl is placed. */
     cisternWorkersRevealed: function() {
@@ -3407,9 +3444,35 @@ let engine = {
         }
         return sinks;
     },
+    isWaterOrdersUnlocked: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        return !!(garden && garden.arrangementOfWaterOrdersUnlocked);
+    },
+    isBuildingAllowingWaterCarriers: function(buildingKey) {
+        if (!engine.isWaterOrdersUnlocked()) {
+            return true;
+        }
+        const b = data.progress.base && data.progress.base[buildingKey];
+        if (!b || b.allowCarriersBringWater === undefined) {
+            return true;
+        }
+        return !!b.allowCarriersBringWater;
+    },
+    getCisternInboundWater: function(targetKey) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const carriers = (cistern && cistern.waterCarriers) || [];
+        let sum = 0;
+        for (let i = 0; i < carriers.length; i++) {
+            const dest = carriers[i].targetKey || "inn";
+            if (dest === targetKey) {
+                sum += carriers[i].amount || 0;
+            }
+        }
+        return sum;
+    },
     /**
-     * Valid water delivery targets: needing water, cistern temp above tempMin, volume > 0.
-     * Sorted by lowest current water first.
+     * Valid water delivery targets: temperature first, then lowest stored-plus-inbound liters.
+     * A target is included only when it can accept a full carrier load.
      */
     getWaterDeliveryTargets: function() {
         const cistern = data.progress.base && data.progress.base.cistern;
@@ -3418,16 +3481,25 @@ let engine = {
         }
         const temp = cistern.temperature || 0;
         const sinks = engine.getWaterDeliverySinksNeedingWater();
+        const fullLoad = Math.min(resortData.getCisternWaterCarryAmount(), cistern.waterVolume || 0);
         const targets = [];
         for (let i = 0; i < sinks.length; i++) {
-            const min = sinks[i].tempMin;
-            const hotEnough = sinks[i].tempMinInclusive ? temp >= min : temp > min;
-            if (hotEnough) {
-                targets.push(sinks[i]);
+            const sink = sinks[i];
+            const min = sink.tempMin;
+            const hotEnough = sink.tempMinInclusive ? temp >= min : temp > min;
+            if (!hotEnough || !engine.isBuildingAllowingWaterCarriers(sink.key)) {
+                continue;
             }
+            const scheduled = (sink.current || 0) + engine.getCisternInboundWater(sink.key);
+            const room = (sink.capacity || 0) - scheduled;
+            if (room < fullLoad) {
+                continue;
+            }
+            sink.scheduled = scheduled;
+            targets.push(sink);
         }
         targets.sort(function(a, b) {
-            return (a.current || 0) - (b.current || 0);
+            return (a.scheduled || 0) - (b.scheduled || 0);
         });
         return targets;
     },
@@ -3435,11 +3507,26 @@ let engine = {
         if (!engine.cisternWorkersRevealed() || !engine.cisternHasAssignedCarriers()) {
             return false;
         }
-        const needing = engine.getWaterDeliverySinksNeedingWater();
-        if (!needing.length) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (!cistern) {
             return false;
         }
-        return engine.getWaterDeliveryTargets().length === 0;
+        const temp = cistern.temperature || 0;
+        const sinks = engine.getWaterDeliverySinksNeedingWater();
+        let allowedNeeding = false;
+        let anyHotEnough = false;
+        for (let i = 0; i < sinks.length; i++) {
+            if (!engine.isBuildingAllowingWaterCarriers(sinks[i].key)) {
+                continue;
+            }
+            allowedNeeding = true;
+            const min = sinks[i].tempMin;
+            const hotEnough = sinks[i].tempMinInclusive ? temp >= min : temp > min;
+            if (hotEnough) {
+                anyHotEnough = true;
+            }
+        }
+        return allowedNeeding && !anyHotEnough;
     },
     innHasAssignedCarriers: function() {
         if (!engine.isInnOnsenConverted()) {
@@ -3618,7 +3705,7 @@ let engine = {
         return (globalMana && globalMana.amount) || 0;
     },
     getSendManaCloneCost: function() {
-        return 200;
+        return 2000;
     },
     getFillManaDeficit: function(buildingKey) {
         const st = engine.getBuildingManaState(buildingKey);
@@ -3900,26 +3987,7 @@ let engine = {
             interval = 30000;
         }
         interval *= adMult;
-        if (torii._visitorWaterBoost) {
-            interval *= 0.75;
-        }
         return interval;
-    },
-    /** Spend 20L and latch the shorter countdown for the visitor cycle about to be armed. */
-    armToriiVisitorCountdown: function() {
-        const torii = data.progress.base && data.progress.base.torii;
-        if (!torii) {
-            return;
-        }
-        torii._visitorWaterBoost = false;
-        if (!engine.isToriiDrinkingBowlUnlocked()) {
-            return;
-        }
-        const cost = engine.getToriiVisitorWaterCost();
-        if ((torii.water || 0) >= cost) {
-            torii.water = round1((torii.water || 0) - cost);
-            torii._visitorWaterBoost = true;
-        }
     },
     updateToriiVisitors: function(tickMs) {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -3961,8 +4029,14 @@ let engine = {
         const maxVisitors = torii.maxVisitors || 2;
         let armed = false;
         while ((torii.nextVisitorTimerMs || 0) <= 0 && (torii.visitorsWaiting || 0) < maxVisitors) {
-            torii.visitorsWaiting = (torii.visitorsWaiting || 0) + 1;
-            engine.armToriiVisitorCountdown();
+            const spots = maxVisitors - (torii.visitorsWaiting || 0);
+            const cost = engine.getToriiVisitorWaterCost();
+            let arriving = 1;
+            if (engine.isToriiDrinkingBowlUnlocked() && spots >= 2 && (torii.water || 0) >= cost) {
+                arriving = 2;
+                torii.water = round1((torii.water || 0) - cost);
+            }
+            torii.visitorsWaiting = (torii.visitorsWaiting || 0) + arriving;
             const intervalMs = engine.getToriiVisitorIntervalMs();
             torii.nextVisitorTimerMs += intervalMs;
             torii._appliedVisitorIntervalMs = intervalMs;
@@ -4911,6 +4985,13 @@ let engine = {
         }
         engine.addHeatToDroplet(droplet.id, heat);
     },
+    grantFireLauncherStrikeExp: function(platformKey, heat) {
+        const amount = (heat || 0) / 5;
+        if (amount <= 0) {
+            return;
+        }
+        engine.grantSpiritExp(engine.getFireLauncherAssignedSpirit(platformKey), amount);
+    },
     spawnFireLauncherProjectile: function(platformKey, targetDroplet, heatPerStrike, durationMs) {
         const fl = data.progress.base.fireLaunchers;
         const from = engine.getFireLauncherPlatformMapPos(platformKey);
@@ -4957,7 +5038,9 @@ let engine = {
                 const droplets = (data.progress.base && data.progress.base.droplets) || [];
                 for (let di = 0; di < droplets.length; di++) {
                     if (droplets[di].id === p.dropletId) {
-                        engine.applyFireLauncherHeat(droplets[di], p.heatPerStrike || 0);
+                        const strikeHeat = p.heatPerStrike || 0;
+                        engine.applyFireLauncherHeat(droplets[di], strikeHeat);
+                        engine.grantFireLauncherStrikeExp(p.platformKey, strikeHeat);
                         break;
                     }
                 }
@@ -5009,7 +5092,9 @@ let engine = {
                 state.embers -= def.emberCost || 0;
                 state.attackTimerMs = 0;
                 for (let ri = 0; ri < inRange.length; ri++) {
-                    engine.applyFireLauncherHeat(inRange[ri], def.heatPerStrike || 0);
+                    const strikeHeat = def.heatPerStrike || 0;
+                    engine.applyFireLauncherHeat(inRange[ri], strikeHeat);
+                    engine.grantFireLauncherStrikeExp(pk, strikeHeat);
                 }
                 engine.spawnFireLauncherAoePulse(pk, def.rangePx || 0);
             } else {
@@ -9663,7 +9748,8 @@ let engine = {
             return false;
         }
         const target = targets[0];
-        const rem = target.capacity - (target.current || 0);
+        const scheduled = target.scheduled !== undefined ? target.scheduled : (target.current || 0);
+        const rem = target.capacity - scheduled;
         const carryCap = resortData.getCisternWaterCarryAmount();
         const amount = Math.min(carryCap, cistern.waterVolume || 0, rem);
         if (amount <= 0) {
@@ -10317,6 +10403,21 @@ let engine = {
         }
         return total;
     },
+    getPlayPitBought: function() {
+        const mine = data.progress.base && data.progress.base.mine;
+        return (mine && mine.playPitBought) || 0;
+    },
+    /** Same growth as Infuse Soil: +20%, then each purchase adds 5% more than the last. */
+    getPlayPitDirtMultiplier: function() {
+        const n = engine.getPlayPitBought();
+        if (n <= 0) {
+            return 1;
+        }
+        return 1 + 0.2 * n + 0.025 * n * (n - 1);
+    },
+    getMinePlayDirtPerCycle: function() {
+        return engine.getMineSpiritLevelTotal() * engine.getPlayPitDirtMultiplier();
+    },
     getMineFirstActiveBlock: function() {
         const mine = data.progress.base.mine;
         for (let i = 0; i < mine.blocks.length; i++) {
@@ -10383,7 +10484,7 @@ let engine = {
         while (mine.playTimerMs >= 5000 && (mine.resources.dirt || 0) > 0) {
             mine.playTimerMs -= 5000;
             const spirits = engine.getMineSpiritList();
-            const remove = Math.min(mine.resources.dirt || 0, engine.getMineSpiritLevelTotal());
+            const remove = Math.min(mine.resources.dirt || 0, engine.getMinePlayDirtPerCycle());
             mine.resources.dirt -= remove;
             if (spirits.length > 0 && remove > 0) {
                 const xpEach = remove / spirits.length;
@@ -11402,12 +11503,22 @@ let engine = {
     getNextSkillResearchTargetKey: function() {
         return "";
     },
-    countAchievedBronzeStars: function() {
+    countAchievedStars: function() {
         const mapStars = data.progress.mapStars || {};
         const keys = Object.keys(mapStars);
         let n = 0;
         for (let i = 0; i < keys.length; i++) {
-            if (mapStars[keys[i]] && mapStars[keys[i]].bronze) {
+            const stars = mapStars[keys[i]];
+            if (!stars) {
+                continue;
+            }
+            if (stars.bronze) {
+                n++;
+            }
+            if (stars.silver) {
+                n++;
+            }
+            if (stars.gold) {
                 n++;
             }
         }
@@ -11430,7 +11541,7 @@ let engine = {
         const archives = lib || data.progress.base.scrollArchives;
         engine.ensureResearchCoinCosts(archives);
         const completed = engine.getScrollArchivesCompletedResearchCount(archives);
-        const index = Math.max(0, completed - engine.countAchievedBronzeStars());
+        const index = Math.max(0, completed - engine.countAchievedStars());
         return archives.researchCoinCosts[index];
     },
     syncScrollArchivesResearchCost: function(lib) {
@@ -11443,7 +11554,7 @@ let engine = {
     getScrollArchivesFinishWeaveSeconds: function() {
         const lib = data.progress.base.scrollArchives;
         const unlocked = onLoad.countUnlockedSkills(lib.unlockedSkills);
-        const n = Math.max(0, unlocked - engine.countAchievedBronzeStars());
+        const n = Math.max(0, unlocked - engine.countAchievedStars());
         return 20 + 10 * n;
     },
     isScrollArchivesSkillViable: function(skillKey) {

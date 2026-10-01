@@ -939,7 +939,6 @@ button {
 }
 
 /* Match battlefield column height (gameData.battle.battlefieldHeightPx + 2). */
-#tabPane_skills,
 #tabPane_travel {
     max-height: 720px;
     overflow-y: auto;
@@ -1076,6 +1075,8 @@ button {
     flex-direction: column;
     gap: 3px;
     min-width: 0;
+    overflow-y:auto;
+    max-height: 615px;
 }
 
 .skills-list-empty {
@@ -1343,9 +1344,9 @@ button {
 
 .history-row {
     display: grid;
-    grid-template-columns: minmax(11em, 1.6fr) 5.5em 3.6em 3.6em minmax(4.2em, 1fr) 5.5em;
+    grid-template-columns: minmax(11em, 1.6fr) 7.2em 3.6em 3.6em minmax(4.2em, 1fr) 5.5em 4.2em;
     column-gap: 10px;
-    margin-bottom: 2px;
+    margin-bottom: 0;
     font-size: 13px;
     font-variant-numeric: tabular-nums;
 }
@@ -1361,14 +1362,23 @@ button {
     margin-bottom: 8px;
 }
 
+.history-entry {
+    margin-bottom: 4px;
+}
+
 .history-talent {
-    margin: 0 0 1px 0;
+    margin: 0;
     font-size: 11px;
 }
 
 .history-shards {
-    margin: 0 0 8px 0;
+    margin: 0;
     font-size: 11px;
+}
+
+.history-duration-star {
+    font-size: 14px;
+    line-height: 1;
 }
 
 .skill-buff-tip {
@@ -1666,6 +1676,43 @@ button {
     transform: none;
 }
 
+.inn-map-art-row {
+    display: block;
+    width: 40px;
+    height: 40px;
+}
+
+.inn-map-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.inn-map-onsen-art {
+    display: none;
+}
+
+.resort-building-inn.is-onsen {
+    display: flex;
+    width: 80px;
+    left: 120px;
+}
+
+.resort-building-inn.is-onsen .inn-map-art-row {
+    display: grid;
+    grid-template-columns: 40px 40px;
+    grid-template-rows: 40px;
+    width: 80px;
+    height: 40px;
+}
+
+.resort-building-inn.is-onsen .inn-map-onsen-art {
+    display: block;
+}
+
 .inn-bead-float {
     --inn-bead-x: 0px;
     position: absolute;
@@ -1894,7 +1941,7 @@ button {
 }
 
 .resort-building-stone-pile {
-    left: calc(var(--path-end-x) - 9px);
+    left: calc(var(--path-end-x) - 13px);
     top: calc(var(--path-end-y) + 18px);
     transform: translate(-50%, 0);
     bottom: auto;
@@ -2273,6 +2320,12 @@ button {
     position: relative;
 }
 
+.spirit-slot-level {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+}
+
 .spirit-slot.spirit-slot-selected {
     outline: 2px solid #f9e2af;
     outline-offset: 1px;
@@ -2591,7 +2644,7 @@ button {
 }
 
 .resort-map-progress-stone-pile-mana {
-    left: calc(var(--path-end-x) - 9px);
+    left: calc(var(--path-end-x) - 13px);
     top: calc(var(--path-end-y) + 92px);
     transform: translate(-50%, 0);
     bottom: auto;

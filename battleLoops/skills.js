@@ -374,21 +374,21 @@ const SKILL_DEFINITION_ROWS = [
         key: "insultFatigue",
         name: "Insult Fatigue",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         shortDescription: "Enemies deal less flat damage after hitting you; stacks per hit.",
         flavorText: "“Your insults are losing steam. Try harder.”",
         guestArchetype: "Cutting Remark",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: after an enemy damages you, their next attack deals ${round2((sk.level || 0) * 0.1)} flat less damage per stack (stacks per damaging hit, per enemy).`;
+            return `Reward: after an enemy damages you, later attacks deal ${round2((sk.level || 0) * 0.1)} flat less damage per stack (stacks per damaging hit, per enemy). The reduction is capped at half of that attack's damage.`;
         },
         triggerText: "Trigger: each time an intruder attacks you for the second time or later.",
         getEffect: function(sk) {
             return { insultFatigueFlatPerStack: (sk.level || 0) * 0.1 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: −${roundNearestDecimals(e.insultFatigueFlatPerStack || 0, 2)} flat dmg per stack on next hit`;
+            return `Current: −${roundNearestDecimals(e.insultFatigueFlatPerStack || 0, 2)} flat dmg per stack, capped at 50% of the attack`;
         }
     },
     {
@@ -509,7 +509,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "shockValue",
         name: "Shock Value",
         category: "combat",
-        initialExpToLevel: 15,
+        initialExpToLevel: 25,
         shortDescription: "+1 Brutality per skill level.",
         flavorText: "“Go big or go home. Preferably both, loudly.”",
         guestArchetype: "Grandstander",
@@ -518,7 +518,7 @@ const SKILL_DEFINITION_ROWS = [
         rewardText: function() {
             return "Reward: +1 Brutality per Shock Value skill level.";
         },
-        triggerText: "Trigger: sqrt(ego damage dealt) on each slap or sandal hit.",
+        triggerText: "Trigger: max(log10(ego damage dealt), 1) on each slap or sandal hit.",
         getEffect: function(sk) {
             return { shockValueBonusStr: sk.level || 0 };
         },
@@ -1268,11 +1268,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +${sk.level || 0} Clout whenever max Audacity increases, including from Confidence.`;
+            return `Reward: +${(sk.level || 0) * 3} Clout whenever max Audacity increases, including from Confidence.`;
         },
         triggerText: "Trigger: sqrt(max Audacity gained) when max Audacity increases, including from Confidence.",
         getEffect: function(sk) {
-            return { borrowedGloryCloutPerLevel: sk.level || 0 };
+            return { borrowedGloryCloutPerLevel: (sk.level || 0) * 3 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${e.borrowedGloryCloutPerLevel || 0} Clout per max Aud increase`;

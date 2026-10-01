@@ -1100,6 +1100,12 @@ let events = {
             b.allowCarriersBringMana = !!checked;
         }
     },
+    toggleBuildingAllowCarriersWater: function(buildingKey, checked) {
+        const b = data.progress.base && data.progress.base[buildingKey];
+        if (b) {
+            b.allowCarriersBringWater = !!checked;
+        }
+    },
     toggleStonePileAllowUnduplicated: function(checked) {
         const pile = data.progress.base && data.progress.base.stonePile;
         if (pile) {

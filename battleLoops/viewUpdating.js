@@ -894,7 +894,7 @@ let view = {
         const defs = (data.progress && data.progress.mapDefinitions) || [];
         for (let i = 0; i < defs.length; i++) {
             if (defs[i].key === mapKey) {
-                return defs[i].name || mapKey || "";
+                return `[${i + 1}] ${defs[i].name || mapKey || ""}`;
             }
         }
         return mapKey || "";
@@ -985,7 +985,12 @@ let view = {
             view.updateVal("bonfireCoalText", intToStringRound(engine.getMarketGoodAmount("coal")));
         }
         const hs = data.progress.base && data.progress.base.hiddenSpring;
-        const showHeatFormula = !!bf.tendTheFlameUnlocked && ((hs && hs.fireSpiritsBought) || 0) >= 1;
+        const sparkBought = ((hs && hs.fireSpiritsBought) || 0) >= 1;
+        view.updateVal("bonfireFireSpiritPower_row", sparkBought ? "" : "none", "style.display");
+        if (sparkBought) {
+            view.updateVal("bonfireFireSpiritPower", engine.getBonfireAssignedFireSpiritPowerTotal());
+        }
+        const showHeatFormula = !!bf.tendTheFlameUnlocked && sparkBought;
         view.updateVal("bonfireFireSpiritHeat_row", showHeatFormula ? "" : "none", "style.display");
         if (showHeatFormula) {
             view.updateVal("bonfireFireSpiritHeat_row", "Fire spirits: √(excess heat / 10) / 10 exp/s (excess = heat − assigned fire spirit power)");
@@ -1734,6 +1739,21 @@ let view = {
             }
         }
     },
+    syncAllowCarriersWaterCheckbox: function(buildingKey, waterVisible) {
+        const show = !!waterVisible && engine.isWaterOrdersUnlocked();
+        view.updateVal(`${buildingKey}AllowCarriersWater_row`, show ? "" : "none", "style.display");
+        if (!show) {
+            return;
+        }
+        const b = data.progress.base && data.progress.base[buildingKey];
+        if (b && b.allowCarriersBringWater === undefined) {
+            b.allowCarriersBringWater = true;
+        }
+        const chk = viewData.cached[`${buildingKey}AllowCarriersWater_chk`] || document.getElementById(`${buildingKey}AllowCarriersWater_chk`);
+        if (chk && b && chk.checked !== !!b.allowCarriersBringWater) {
+            chk.checked = !!b.allowCarriersBringWater;
+        }
+    },
     updateCollectStoneButton: function() {
         const btnId = "hiddenSpringCollectStone_btn";
         const btnNode = viewData.cached[btnId];
@@ -1970,6 +1990,113 @@ let view = {
             }
         }
     },
+    bindFoxDenQueueTip: function() {
+        const btn = viewData.cached.baseBuilding_foxDen || document.getElementById("baseBuilding_foxDen");
+        if (!btn || btn._foxDenTipBound) {
+            return;
+        }
+        btn._foxDenTipBound = true;
+        btn.addEventListener("mouseenter", function(e) {
+            view.showFoxDenQueueTip();
+            view.positionFoxDenQueueTip(e);
+        });
+        btn.addEventListener("mousemove", function(e) {
+            view.positionFoxDenQueueTip(e);
+        });
+        btn.addEventListener("mouseleave", function() {
+            const tip = viewData.cached.foxDenQueueTip || document.getElementById("foxDenQueueTip");
+            if (tip) {
+                tip.style.display = "none";
+            }
+        });
+    },
+    getFoxDenQueueTipHtml: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (!rh) {
+            return "";
+        }
+        const lines = [];
+        const cq = rh.constructionQueue || [];
+        for (let i = 0; i < cq.length; i++) {
+            const key = cq[i];
+            const site = rh.constructionSites && rh.constructionSites[key];
+            if (!site || site.status !== "building") {
+                continue;
+            }
+            const def = resortData.foxDenUnlockGetDef(key);
+            let name = "Building " + ((def && def.label) || key);
+            if (site.paused) {
+                name += " (paused)";
+            }
+            lines.push(name);
+        }
+        const uq = rh.upgradeGatherQueue || [];
+        for (let ui = 0; ui < uq.length; ui++) {
+            const jobKey = uq[ui];
+            const job = rh.upgradeGatherJobs && rh.upgradeGatherJobs[jobKey];
+            if (!job || job.status !== "gathering") {
+                continue;
+            }
+            const parsed = engine.parseUpgradeGatherJobKey(jobKey);
+            const up = parsed ? engine.getUpgradeDef(parsed.scopeKey, parsed.upgradeKey) : null;
+            const upgradeName = (up && (up.name || up.label)) || jobKey;
+            const buildingName = parsed ? resortData.getScopeDisplayName(parsed.scopeKey) : "";
+            let name = buildingName ? `${upgradeName} in ${buildingName}` : upgradeName;
+            if (job.paused) {
+                name += " (paused)";
+            }
+            lines.push(name);
+        }
+        if (!lines.length) {
+            return "";
+        }
+        const numbered = [];
+        for (let n = 0; n < lines.length; n++) {
+            numbered.push(`${n + 1}. ${lines[n]}`);
+        }
+        return "Fox Den Queue<br>" + numbered.join("<br>");
+    },
+    showFoxDenQueueTip: function() {
+        const tip = viewData.cached.foxDenQueueTip || document.getElementById("foxDenQueueTip");
+        if (!tip) {
+            return;
+        }
+        const html = view.getFoxDenQueueTipHtml();
+        if (!html) {
+            tip.style.display = "none";
+            return;
+        }
+        if (tip._foxDenTipHtml !== html) {
+            tip._foxDenTipHtml = html;
+            tip.innerHTML = html;
+        }
+        tip.style.display = "block";
+    },
+    positionFoxDenQueueTip: function(e) {
+        const map = viewData.cached.baseResortMap || document.getElementById("baseResortMap");
+        const tip = viewData.cached.foxDenQueueTip || document.getElementById("foxDenQueueTip");
+        if (!map || !tip || tip.style.display === "none" || !e) {
+            return;
+        }
+        const rect = map.getBoundingClientRect();
+        let left = e.clientX - rect.left + 12;
+        const top = e.clientY - rect.top + 12;
+        const maxLeft = Math.max(4, rect.width - tip.offsetWidth - 4);
+        if (left < 4) {
+            left = 4;
+        } else if (left > maxLeft) {
+            left = maxLeft;
+        }
+        tip.style.left = `${left}px`;
+        tip.style.top = `${Math.max(4, top)}px`;
+    },
+    refreshFoxDenQueueTip: function() {
+        const tip = viewData.cached.foxDenQueueTip || document.getElementById("foxDenQueueTip");
+        if (!tip || tip.style.display === "none") {
+            return;
+        }
+        view.showFoxDenQueueTip();
+    },
     bindDirtRoadTipEvents: function(hit) {
         if (!hit || hit._dirtRoadTipBound) {
             return;
@@ -1983,14 +2110,34 @@ let view = {
                 return;
             }
             const rect = map.getBoundingClientRect();
-            tip.style.display = "block";
-            tip.style.left = `${e.clientX - rect.left + 12}px`;
-            tip.style.top = `${e.clientY - rect.top + 12}px`;
             const html = hotspot._dirtRoadTipHtml || "";
             if (tip._dirtRoadTipHtml !== html) {
                 tip._dirtRoadTipHtml = html;
                 tip.innerHTML = html;
             }
+            tip.style.display = "block";
+            const mapX = e.clientX - rect.left;
+            const mapY = e.clientY - rect.top;
+            let pondX = 439;
+            const pond = viewData.cached.baseBuilding_pond || document.getElementById("baseBuilding_pond");
+            if (pond) {
+                const pondRect = pond.getBoundingClientRect();
+                if (pondRect.width > 0) {
+                    pondX = pondRect.left - rect.left;
+                }
+            }
+            let left = mapX + 12;
+            if (mapX > pondX) {
+                left = mapX - tip.offsetWidth - 12;
+            }
+            const maxLeft = Math.max(4, rect.width - tip.offsetWidth - 4);
+            if (left < 4) {
+                left = 4;
+            } else if (left > maxLeft) {
+                left = maxLeft;
+            }
+            tip.style.left = `${left}px`;
+            tip.style.top = `${mapY + 12}px`;
         });
         hit.addEventListener("mouseleave", function() {
             const tip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
@@ -2126,7 +2273,11 @@ let view = {
             return;
         }
         view.updateVal("noodleBarNoodlesText", intToStringRound((market && market.driedNoodles) || 0));
-        view.updateVal("noodleBarWaterText", `${round1(bar.hotWater || 0)}/${engine.getNoodleBarHotWaterCapacity()}`);
+        const noodleCap = engine.getNoodleBarHotWaterCapacity();
+        const noodleWater = bar.hotWater || 0;
+        view.updateVal("noodleBarHotWaterText", `Hot Water: ${round1(noodleWater)}/${noodleCap}`);
+        view.updateVal("noodleBarHotWaterFill", noodleCap > 0 ? `${Math.max(0, Math.min(100, (noodleWater / noodleCap) * 100))}%` : "0%", "style.width");
+        view.syncAllowCarriersWaterCheckbox("noodleBar", engine.isNoodleBarBuilt());
         let cisternTemp = "Cistern not built";
         if (engine.isCisternBuiltFromFoxDen()) {
             const cistern = data.progress.base.cistern || {};
@@ -2256,7 +2407,21 @@ let view = {
         if (el) {
             el.classList.toggle("spirit-slot-selected", isSelected);
         }
-        view.updateVal(slotId, spirit ? String(spirit.level || 1) : "", "textContent");
+        const range = el && el.querySelector(".fire-launcher-range");
+        if (range) {
+            let labelEl = el.querySelector(".spirit-slot-level");
+            if (!labelEl) {
+                labelEl = document.createElement("span");
+                labelEl.className = "spirit-slot-level";
+                el.insertBefore(labelEl, el.firstChild);
+            }
+            const label = spirit ? String(spirit.level || 1) : "";
+            if (labelEl.textContent !== label) {
+                labelEl.textContent = label;
+            }
+        } else {
+            view.updateVal(slotId, spirit ? String(spirit.level || 1) : "", "textContent");
+        }
         view.updateVal(slotId, spirit ? engine.getSpiritColor(spirit) : emptyBg, "style.backgroundColor");
         view.updateVal(slotId, !!spirit, "classList.toggle", "spirit-slot-filled");
     },
@@ -2344,8 +2509,8 @@ let view = {
                 let fill = "#4a9fd4";
                 if (droplet.hitFlashAt) {
                     const elapsed = Date.now() - droplet.hitFlashAt;
-                    if (elapsed < 500) {
-                        const t = elapsed / 500;
+                    if (elapsed < 2000) {
+                        const t = elapsed < 500 ? 0 : (elapsed - 500) / 1500;
                         const r = Math.round(224 + (74 - 224) * t);
                         const g = Math.round(64 + (159 - 64) * t);
                         const b = Math.round(64 + (212 - 64) * t);
@@ -2460,8 +2625,9 @@ let view = {
         view.updateVal("fireLauncherInfoInterval", intervalStr);
         view.updateVal("fireLauncherInfoEmberCost", def.emberCost);
         view.updateVal("fireLauncherInfoHeat", def.attackType === "aoe"
-            ? `${def.heatPerStrike} (all in range)`
-            : String(def.heatPerStrike));
+            ? `${def.heatPerStrike}C (all in range)`
+            : `${def.heatPerStrike}C`);
+        view.updateVal("fireLauncherInfoExp", round2((def.heatPerStrike || 0) / 5));
         view.updateVal("fireLauncherInfoSpirit", spirit
             ? `${engine.getSpiritDisplayName(spirit)} (Lv ${spirit.level || 1})`
             : "Unassigned");
@@ -2771,7 +2937,7 @@ let view = {
                     const intervalStr = intervalSec >= 1 ? intervalSec.toFixed(1) : intervalSec.toFixed(2);
                     const attackLabel = def.attackType === "aoe" ? "burst" : "projectile";
                     view.updateVal("spiritInfoFireLauncherStats",
-                        `Range ${def.rangePx}px · ${intervalStr}s ${attackLabel} · ${def.emberCost} embers · ${def.heatPerStrike} heat`);
+                        `Range ${def.rangePx}px · ${intervalStr}s ${attackLabel} · ${def.emberCost} embers · ${def.heatPerStrike}C heat`);
                 } else {
                     view.updateVal("spiritInfoFireLauncherStats", "");
                 }
@@ -2853,9 +3019,11 @@ let view = {
         view.updateVal("minePlayProgressFill", `${Math.max(0, Math.min(100, ((mine.playTimerMs || 0) / 5000) * 100))}%`, "style.width");
         if (cleared) {
             const playSpirits = engine.getMineSpiritList();
-            const dirtSpent = Math.min(mine.resources.dirt || 0, engine.getMineSpiritLevelTotal());
+            const dirtSpent = Math.min(mine.resources.dirt || 0, engine.getMinePlayDirtPerCycle());
             const xpEach = playSpirits.length > 0 ? dirtSpent / playSpirits.length : 0;
-            view.updateVal("minePlayProgressDetail", `${round2(dirtSpent)} dirt every 5s, ${round2(xpEach)} exp per earth spirit`);
+            const playBonusPct = Math.round((engine.getPlayPitDirtMultiplier() - 1) * 100);
+            const playBonusText = playBonusPct > 0 ? ` (+${playBonusPct}%)` : "";
+            view.updateVal("minePlayProgressDetail", `${round2(dirtSpent)} dirt every 5s${playBonusText}, ${round2(xpEach)} exp per earth spirit`);
         }
         if (!viewData.mineBlockRenderCache) {
             viewData.mineBlockRenderCache = [];
@@ -2934,6 +3102,8 @@ let view = {
         const foxQueueCount = engine.getFoxDenQueuedJobCount();
         const foxQueueMax = engine.getFoxDenQueueMax();
         view.updateVal("foxDenMapDisplay", `${foxQueueCount}/${foxQueueMax}`);
+        view.bindFoxDenQueueTip();
+        view.refreshFoxDenQueueTip();
 
         view.syncMapBuildingSelection(selected);
         view.updateMapRevealVisibility();
@@ -2978,9 +3148,10 @@ let view = {
             const toriiWaterCap = engine.getToriiWaterCapacity();
             view.updateVal("toriiWater_row", bowl ? "" : "none", "style.display");
             view.updateVal("toriiWaterReq_row", bowl ? "" : "none", "style.display");
+            view.syncAllowCarriersWaterCheckbox("torii", bowl);
             if (bowl) {
                 const toriiWater = torii.water || 0;
-                view.updateVal("toriiWaterText", `Water: ${round1(toriiWater)}/${toriiWaterCap}`);
+                view.updateVal("toriiWaterText", `Hot Water: ${round1(toriiWater)}/${toriiWaterCap}`);
                 view.updateVal("toriiWaterFill", toriiWaterCap > 0 ? `${Math.max(0, Math.min(100, (toriiWater / toriiWaterCap) * 100))}%` : "0%", "style.width");
             }
             this.updateResortWorkerControls("torii", toriiRate > 0);
@@ -3015,7 +3186,9 @@ let view = {
             view.updateBuildingManaRow("inn");
             const onsen = engine.isInnOnsenConverted();
             view.updateVal("innHotWater_row", onsen ? "" : "none", "style.display");
+            view.syncAllowCarriersWaterCheckbox("inn", onsen);
             view.updateVal("innOnsenTempReq_row", onsen ? "" : "none", "style.display");
+            view.updateVal("innOnsenSoak_row", onsen ? "" : "none", "style.display");
             view.updateVal("innOnsenPondExplain_row", onsen && engine.isPondBuiltFromFoxDen() ? "" : "none", "style.display");
             if (onsen) {
                 const hot = inn.hotWater || 0;
@@ -3230,6 +3403,7 @@ let view = {
         view.updateVal("toriiMapDisplay", `${torii.visitorsWaiting || 0}/${torii.maxVisitors || 2}`);
         view.updateVal("innMapDisplay", `${inn.roomsOccupied || 0}/${innCap}`);
         view.updateVal("innMapLabelText", engine.getInnDisplayName());
+        view.updateVal("baseBuilding_inn", engine.isInnOnsenConverted(), "classList.toggle", "is-onsen");
         const cistern = base.cistern || {};
         const cisternBuilt = engine.isCisternBuiltFromFoxDen();
         view.updateVal("cisternMapValue", cisternBuilt
@@ -3578,7 +3752,7 @@ let view = {
     updateHistoryList: function() {
         const el = viewData.cached.historyList;
         const runs = data.progress.runHistory || [];
-        let html = `<div class="history-row history-header"><span>Map</span><span>Duration</span><span>Level</span><span>Kills</span><span>${resortData.resourceIconHtml("coins")} Coins</span><span>Okami Exp</span></div>`;
+        let html = `<div class="history-row history-header"><span>Map</span><span>Duration</span><span>Level</span><span>Kills</span><span>${resortData.resourceIconHtml("coins")} Coins</span><span>Okami Exp</span><span>Density</span></div>`;
         if (!runs.length) {
             html += `<div class="muted-text">No runs yet.</div>`;
         }
@@ -3588,8 +3762,12 @@ let view = {
             const kills = run.kills !== undefined ? run.kills : 0;
             const mapName = run.mapKey ? view.getMapDisplayName(run.mapKey) : "—";
             const okamiExp = run.okamiExpGained !== undefined ? run.okamiExpGained : 0;
-            const shardsText = run.shardsGained !== undefined ? intToStringRound(run.shardsGained) : "—";
-            html += `<div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${round2(okamiExp)}</span></div>`;
+            const density = run.cloneDensity !== undefined && run.cloneDensity !== null ? run.cloneDensity : "—";
+            let starHtml = "";
+            if (run.starCleared === "bronze" || run.starCleared === "silver" || run.starCleared === "gold") {
+                starHtml = ` <span class="history-duration-star skill-star-${run.starCleared} skill-star-filled">★</span>`;
+            }
+            html += `<div class="history-entry"><div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s${starHtml}</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${round2(okamiExp)}</span><span>${density}</span></div>`;
             const talents = run.talentRows || [];
             if (talents.length > 0) {
                 const talentText = talents.map(function(row) {
@@ -3601,7 +3779,13 @@ let view = {
                 }).join(" | ");
                 html += `<div class="history-talent muted-text">Talent Levels: ${talentText}</div>`;
             }
-            html += `<div class="history-shards muted-text">Shards gained: ${shardsText}</div>`;
+            const shardRows = run.shardRows || [];
+            if (shardRows.length > 0) {
+                html += `<div class="history-shards muted-text">Shards Gained: ${shardRows.join(" | ")}</div>`;
+            } else if ((run.shardsGained || 0) > 0) {
+                html += `<div class="history-shards muted-text">Shards Gained: ${intToStringRound(run.shardsGained)}</div>`;
+            }
+            html += `</div>`;
         }
         if (viewData.prevValues.historyHtml !== html) {
             el.innerHTML = html;

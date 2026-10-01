@@ -68,6 +68,7 @@
                     <svg id="dirtRoadLayer" class="dirt-road-svg" aria-hidden="true"></svg>
                     <div id="dirtRoadHoverLayer" class="dirt-road-hover-layer"></div>
                     <div id="dirtRoadMouseTip" class="dirt-road-mouse-tip" style="display:none"></div>
+                    <div id="foxDenQueueTip" class="dirt-road-mouse-tip" style="display:none"></div>
                     <button id="baseBuilding_foxDen" class="base-building-label resort-building-label resort-building-map-btn resort-building-fox-den" onclick="events.selectBaseBuilding('foxDen')">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/den.svg" alt="" draggable="false">
@@ -95,7 +96,10 @@
                     <div id="mapLaundryProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-laundry" style="display:none"><div id="mapLaundryProgressFill" class="base-mini-progress-fill"></div></div>
                     <button id="baseBuilding_inn" class="base-building-label resort-building-label resort-building-map-btn resort-building-inn" onclick="events.selectBaseBuilding('inn')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
-                        <img class="resort-building-art" src="img/inn.svg" alt="" draggable="false">
+                        <span class="resort-building-art inn-map-art-row">
+                            <img class="inn-map-icon" src="img/inn.svg" alt="" draggable="false">
+                            <img class="inn-map-icon inn-map-onsen-art" src="img/onsen.svg" alt="" draggable="false">
+                        </span>
                         <span id="innMapLabelText" class="resort-building-label-text">Tatami Inn</span>
                         <span id="innMapDisplay" class="resort-building-display"></span>
                     </button>

@@ -35,7 +35,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1, 8),
                 mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25, 10),
                 mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1, 12),
-                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 18),
+                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 14),
                 mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 16),
             ],
             zoneShards: [
@@ -58,10 +58,10 @@ mapData.getDefaultMaps = function() {
             unlocksAfterMapKey: "map_2",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 14),
-                mapData.createZone(3, "lecher", 500, 780, 0.8, 1.25, 20),
-                mapData.createZone(4, "scoundrel", 22000, 250, 1.4, 1, 20),
-                mapData.createZone(3, "lecher", 38000, 500, 1.6, 1.25, 26),
-                mapData.createZone(5, "scoundrel", 41000, 300, 2, 1, 26),
+                mapData.createZone(4, "lecher", 500, 550, 1, 1.25, 16),
+                mapData.createZone(4, "scoundrel", 21000, 250, 1.5, 1.25, 20),
+                mapData.createZone(5, "lecher", 38000, 400, 1.6, 0.75, 24),
+                mapData.createZone(7, "scoundrel", 40000, 270, 2, 1, 22),
             ],
             zoneShards: [
                 { key: "aboveItAll", gain: 1, chance: 0.01, cap: 10 },

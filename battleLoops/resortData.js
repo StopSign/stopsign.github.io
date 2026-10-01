@@ -225,6 +225,9 @@ var resortData = {
             return (base.bambooForest && base.bambooForest.wood) || 0;
         }
         if (key === "stone") {
+            if (typeof engine !== "undefined" && engine.isStoneCarryUnduplicatedAllowed && !engine.isStoneCarryUnduplicatedAllowed() && engine.getConstructionResourceAvailable) {
+                return engine.getConstructionResourceAvailable("stone");
+            }
             return typeof engine !== "undefined" && engine.getTotalStone ? engine.getTotalStone() : 0;
         }
         if (key === "ore") {
@@ -700,7 +703,7 @@ var resortData = {
                 addRailing: {
                     key: "add_railing",
                     name: "Add Railing",
-                    description: "Install a railing so the Okami moves 50% faster along this path section.",
+                    description: "Install a railing so the Okami moves 50% faster along this path section. The Okami moves 50% slower coming, to carry the resources.",
                     getCost: function() {
                         return { wood: 2 };
                     },
@@ -764,7 +767,7 @@ var resortData = {
                 addStairs: {
                     key: "add_stairs",
                     name: "Add Stairs",
-                    description: "Build stairs so the Okami moves another 50% faster along this path section (stacks additively with railing).",
+                    description: "Build stairs so the Okami moves another 50% faster along this path section (stacks additively with railing). The Okami moves 50% slower coming, to carry the resources.",
                     getCost: function() {
                         return { wood: 5 };
                     },
@@ -1071,7 +1074,7 @@ var resortData = {
                 drinkingBowl: {
                     key: "drinking_bowl",
                     name: "Drinking Bowl",
-                    description: "Place a drinking bowl at the gate with 200L of water storage. A visitor countdown that starts with at least 20L spends 20L and is 25% shorter. Carried water must be at least 26C. Reveals Cistern workers.",
+                    description: "Place a drinking bowl at the gate with 200L of water storage. When a visitor countdown finishes with at least 50L and two open spots, two visitors arrive and 50L is spent. Carried water must be at least 26C. Reveals Cistern workers.",
                     cost: { stone: 100, wood: 200 },
                     weavingTime: 120,
                     canBuy: function() {
@@ -1707,7 +1710,7 @@ var resortData = {
                     description: "Water spirits carry more water per droplet (×2 per upgrade).",
                     getCost: function() {
                         const bought = data.progress.base.hiddenSpring.carryingCapacityBought || 0;
-                        return { starBeads: 20000 * Math.pow(5, bought) };
+                        return { starBeads: 50000 * Math.pow(5, bought) };
                     },
                     weavingTime: 300,
                     weavingTimeIncreaseAdd: 3,
@@ -1770,8 +1773,8 @@ var resortData = {
                     key: "fireSpirit",
                     name: "Spark Fire Spirit",
                     description: "Summon a fire spirit for the Hidden Spring.",
-                    weavingTime: 60,
-                    weavingTimeIncrease: 60,
+                    weavingTime: 90,
+                    weavingTimeIncrease: 3,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.hiddenSpring.fireSpiritsBought || 0;
                     },
@@ -1849,7 +1852,7 @@ var resortData = {
 
         mine: {
             label: "Mine",
-            upgradesOrder: ["pebblePay"],
+            upgradesOrder: ["pebblePay", "formPlayPit"],
             upgrades: {
                 pebblePay: {
                     key: "pebble_pay",
@@ -1881,6 +1884,41 @@ var resortData = {
                         return engine.getPebblePayBought() >= 5;
                     },
                     soldOutButtonLabel: "Max pay"
+                },
+                formPlayPit: {
+                    key: "form_play_pit",
+                    name: "Form Play Pit",
+                    description: "Shape a play pit in the mine. Earth spirits consume more dirt each play cycle. The first purchase adds +20%. Each further purchase adds 5% more than the last.",
+                    getCost: function() {
+                        const n = engine.getPlayPitBought();
+                        const mult = Math.pow(1.5, n);
+                        return {
+                            mana: Math.round(10000 * mult),
+                            starBeads: Math.round(2000 * mult)
+                        };
+                    },
+                    weavingTime: 120,
+                    weavingTimeIncreaseAdd: 60,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getPlayPitBought();
+                    },
+                    canBuy: function() {
+                        return engine.isManaUnlocked();
+                    },
+                    onBuy: function() {
+                        data.progress.base.mine.playPitBought = engine.getPlayPitBought() + 1;
+                    },
+                    extraInfo: function() {
+                        const n = engine.getPlayPitBought();
+                        const nextAdd = 20 + n * 5;
+                        const pct = Math.round((engine.getPlayPitDirtMultiplier() - 1) * 100);
+                        return `Dirt per play: +${pct}% (x${round2(engine.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
+                    },
+                    rowVisible: function() {
+                        const n = engine.getPlayPitBought();
+                        return engine.isManaUnlocked()
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
+                    }
                 }
             }
         },
@@ -1978,7 +2016,7 @@ var resortData = {
                     description: "Add another tatami room for Zenko guests.",
                     getCost: function() {
                         const bought = (data.progress.base.inn.addRoomBought || 0);
-                        return { wood: 200 * Math.pow(3, bought) };
+                        return { wood: 500 * Math.pow(3, bought) };
                     },
                     weavingTime: 60,
                     weavingTimeIncreaseAdd: 60,
@@ -2714,6 +2752,7 @@ var resortData = {
                 arrangementOfHeatTargetingUnlocked: false,
                 arrangementOfPriorityUnlocked: false,
                 arrangementOfDiggingUnlocked: false,
+                arrangementOfWaterOrdersUnlocked: false,
                 arrangementOfManaOrdersUnlocked: false,
                 arrangementOfDoubledStoneUnlocked: false,
                 arrangementOfLiftedBurdensUnlocked: false,
@@ -2723,8 +2762,8 @@ var resortData = {
                 smartHarvestUnlocked: false
             },
             introMuted: "Automation for an easy life, so you can go outside.",
-            upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfAppraisal",
-                "arrangementOfDigging", "arrangementOfReview", "arrangementOfShopping", "arrangementOfHotWater", "arrangementOfViscosity",
+            upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfAppraisal", "arrangementOfReview",
+                "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
                 "arrangementOfTargetPriority", "arrangementOfHeatTargeting", "arrangementOfManaOrders", "arrangementOfDoubledStone",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfTraderResponsibility", "arrangementOfLiftedBurdens", "smartHarvest"],
             upgrades: {
@@ -2834,12 +2873,48 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Arranged"
                 },
+                arrangementOfWaterOrders: {
+                    key: "arrangement_of_water_orders",
+                    name: "Arrangement of Water Orders",
+                    description: "Reveal a checkbox on buildings that store hot water. Uncheck it to stop carriers from bringing water there.",
+                    cost: { stone: 300 },
+                    weavingTime: 240,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        const rh = data.progress.base.foxDen;
+                        const toriiBuilt = !!(rh && rh.unlocks && rh.unlocks.torii);
+                        return toriiBuilt && engine.isInnOnsenConverted()
+                            && !(g && g.arrangementOfWaterOrdersUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfWaterOrdersUnlocked = true;
+                        const keys = ["inn", "torii", "noodleBar"];
+                        for (let i = 0; i < keys.length; i++) {
+                            const b = data.progress.base[keys[i]];
+                            if (b) {
+                                b.allowCarriersBringWater = true;
+                            }
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        const rh = data.progress.base.foxDen;
+                        const toriiBuilt = !!(rh && rh.unlocks && rh.unlocks.torii);
+                        return toriiBuilt && engine.isInnOnsenConverted()
+                            && !(g && g.arrangementOfWaterOrdersUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfWaterOrdersUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
                 arrangementOfDigging: {
                     key: "arrangement_of_digging",
                     name: "Arrangement of Digging",
                     description: "Reveal a per-earth-spirit checkbox. When checked, earth spirits at Hidden Spring automatically return to the Mine when there is no more stone or ore to send as pebbles.",
                     cost: { stone: 400 },
-                    weavingTime: 200,
+                    weavingTime: 300,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         const hs = data.progress.base.hiddenSpring;
@@ -2980,9 +3055,9 @@ var resortData = {
                 arrangementOfHotWater: {
                     key: "arrangement_of_hot_water",
                     name: "Arrangement of Hot Water",
-                    description: "Unlocks a Cistern option to replace cooler stored water when hotter droplets arrive.",
+                    description: "Unlocks a Cistern option to replace cooler stored water when hotter droplets arrive, when at max capacity.",
                     cost: { stone: 600 },
-                    weavingTime: 300,
+                    weavingTime: 400,
                     canBuy: function() {
                         const a = data.progress.base.atelier;
                         const g = data.progress.base.garden;
@@ -3008,8 +3083,8 @@ var resortData = {
                     key: "arrangement_of_viscosity",
                     name: "Arrangement of Viscosity",
                     description: "Unlocks a Cistern checkbox to let water spirits use path speed bonuses (Add Lanterns).",
-                    cost: { stone: 150 },
-                    weavingTime: 180,
+                    cost: { stone: 300 },
+                    weavingTime: 240,
                     canBuy: function() {
                         const a = data.progress.base.atelier;
                         const g = data.progress.base.garden;
@@ -3040,7 +3115,7 @@ var resortData = {
                     name: "Arrangement of Target Priority",
                     description: "Adds targeting options to Long-Range and Ember Launchers: Default, Closest, and Furthest Along.",
                     cost: { stone: 1000 },
-                    weavingTime: 300,
+                    weavingTime: 600,
                     canBuy: function() {
                         const a = data.progress.base.atelier;
                         const g = data.progress.base.garden;
@@ -3378,7 +3453,7 @@ var resortData = {
             label: "Market",
             description: "Kitsune haul goods here for Credit, which buys trade goods.",
             mapSlot: { left: "5%", bottom: 9 },
-            constructionCost: { wood: 2000, coins: 4000 },
+            constructionCost: { wood: 2000, coins: 20000 },
             progressDefaults: {
                 level: 0,
                 exp: 0,

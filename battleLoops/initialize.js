@@ -268,7 +268,8 @@ let initials = {
                 prioritizeOre: false,
                 readyConsumedByDepth: {},
                 readyNotifySeenByDepth: {},
-                pebblePayBought: 0
+                pebblePayBought: 0,
+                playPitBought: 0
             },
             scrollArchives: pb("scrollArchives"),
             inn: Object.assign(pb("inn"), {
@@ -541,6 +542,8 @@ let initials = {
             completionBonusCoins: 0,
             pendingOkamiExp: 0,
             runShardsGained: 0,
+            runShardBySkill: {},
+            runStarCleared: null,
             bonfireModifiers: {},
             cloneDensity: 0,
             mapTier: 0,
@@ -1059,6 +1062,14 @@ let initialize = {
                 garden[k] = def[k];
             }
         }
+        const waterOn = !!garden.arrangementOfWaterOrdersUnlocked;
+        const waterKeys = ["inn", "torii", "noodleBar"];
+        for (let wi = 0; wi < waterKeys.length; wi++) {
+            const building = base[waterKeys[wi]];
+            if (building && building.allowCarriersBringWater === undefined && waterOn) {
+                building.allowCarriersBringWater = true;
+            }
+        }
     },
     initializeBonfire: function() {
         const base = data.progress.base;
@@ -1188,6 +1199,10 @@ let initialize = {
         if (market && (market.driedNoodles === undefined || market.driedNoodles === null)) {
             market.driedNoodles = 0;
         }
+        const garden = base.garden;
+        if (base.noodleBar && base.noodleBar.allowCarriersBringWater === undefined && garden && garden.arrangementOfWaterOrdersUnlocked) {
+            base.noodleBar.allowCarriersBringWater = true;
+        }
     },
     initializePond: function() {
         const base = data.progress.base;
@@ -1261,6 +1276,9 @@ let initialize = {
         }
         if (mine.pebblePayBought === undefined || mine.pebblePayBought === null) {
             mine.pebblePayBought = 0;
+        }
+        if (mine.playPitBought === undefined || mine.playPitBought === null) {
+            mine.playPitBought = 0;
         }
     },
     initializePathSegments: function() {

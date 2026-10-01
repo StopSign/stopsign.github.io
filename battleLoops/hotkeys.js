@@ -16,6 +16,7 @@ document.addEventListener("keydown", function(e) {
 
     if (code === 'Space') {
         data.gameSettings.stop = !data.gameSettings.stop;
+        saving.save();
     }
 
 

@@ -59,7 +59,7 @@ let createView = {
             const cardHtml = `
                 <div class="travel-card" id="travel_card_${m.key}">
                     <div class="travel-card-head">
-                        <div class="travel-map-name"><span class="travel-map-stars-inline"><span id="mapStar_${m.key}_bronze" class="skill-star-btn skill-star-bronze">☆</span><span id="mapStar_${m.key}_silver" class="skill-star-btn skill-star-silver">☆</span><span id="mapStar_${m.key}_gold" class="skill-star-btn skill-star-gold">☆</span></span> ${m.name}<span class="muted-text">${classReq}</span></div>
+                        <div class="travel-map-name"><span class="travel-map-stars-inline"><span id="mapStar_${m.key}_bronze" class="skill-star-btn skill-star-bronze">☆</span><span id="mapStar_${m.key}_silver" class="skill-star-btn skill-star-silver">☆</span><span id="mapStar_${m.key}_gold" class="skill-star-btn skill-star-gold">☆</span></span> [${i + 1}] ${m.name}<span class="muted-text">${classReq}</span></div>
                         <div class="row-buttons travel-map-actions">
                             <label class="travel-map-radio"><input type="radio" name="travelMapSelect" id="travelRadio_${m.key}" onclick="events.selectTravelMap('${m.key}')"> Travel here</label>
                             ${m.requiredClassKey ? "" : `<button id="mapSmartHarvestStart_${m.key}" class="tab-button" onclick="events.startHarvestCountdownAndForage('${m.key}')" style="display:none">Start harvest</button><button id="mapHarvestButton_${m.key}" class="tab-button" onclick="events.startHarvest('${m.key}')" style="display:none">Harvest Resources</button>`}
@@ -182,8 +182,8 @@ let createView = {
                             <div class="game-progress-bar-label">Mana: <span id="${buildingKey}ManaAmount" class="game-progress-bold">0</span>/<span id="${buildingKey}ManaCap" class="game-progress-bold">1000</span></div>
                         </div>
                     </div>
-                    ${explainText ? `<div id="${buildingKey}ManaExplain_row" class="base-row muted-text" style="display:none">${explainText}</div>` : ""}
-                    <div id="${buildingKey}AllowCarriersMana_row" class="base-row" style="display:none"><label><input type="checkbox" id="${buildingKey}AllowCarriersMana_chk" onchange="events.toggleBuildingAllowCarriersMana('${buildingKey}', this.checked)"> Allow carriers to bring mana</label></div>`;
+                    <div id="${buildingKey}AllowCarriersMana_row" class="base-row" style="display:none"><label><input type="checkbox" id="${buildingKey}AllowCarriersMana_chk" onchange="events.toggleBuildingAllowCarriersMana('${buildingKey}', this.checked)"> Allow carriers to bring mana</label></div>
+                    ${explainText ? `<div id="${buildingKey}ManaExplain_row" class="base-row muted-text" style="display:none">${explainText}</div>` : ""}`;
         };
         const htmlBonfirePanel = function() {
             return `
@@ -200,7 +200,7 @@ let createView = {
                         <button type="button" id="bonfireDenseClones_inc_ten" class="tab-button" onclick="events.adjustCloneDensity('ten_inc')">++</button>
                         <button type="button" id="bonfireDenseClones_inc_all" class="tab-button" onclick="events.adjustCloneDensity('all_inc')">>></button>
                     </div>
-                    <div class="muted-text">Each density adds 500 base mana cost and +10% base Aud and ego damage. Max is the lesser of what mana capacity can afford and half the Orb level.</div>
+                    <div class="muted-text">Each density adds 500 base mana cost and +10% base Aud and ego damage. Max is half the Orb level, if affordable.</div>
                 </div>
                 <div id="bonfireAutoRetry_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireAutoRetry_chk" onchange="events.toggleBonfireAutoRetry(this.checked)"> Retry after the clone disperses</label>
@@ -213,6 +213,7 @@ let createView = {
                     <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="55" onchange="events.setBonfireFireTendingCap(this.value)">
                     <span class="muted-text">Assigned carriers skip trips when heat is at or above this value.</span>
                 </div>
+                <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power: <span id="bonfireFireSpiritPower">0</span></div>
                 <div id="bonfireFireSpiritHeat_row" class="base-row muted-text" style="display:none"></div>
                 <div id="bonfireWoodCarry_row" class="base-row" style="display:none">Wood carry: <span id="bonfireWoodCarry"></span> per trip</div>
                 <div id="bonfireCoal_row" class="base-row" style="display:none">Coal: <span id="bonfireCoalText">0</span> <span class="muted-text">Carriers bring coal from the Market before wood. Each coal gives 5x the heat of wood.</span></div>
@@ -368,7 +369,7 @@ let createView = {
                     <div id="hiddenSpringCollectStone_row" class="base-row">
                         <button type="button" id="hiddenSpringCollectStone_btn" class="tab-button" onclick="events.startCollectStone()">Collect 4 Stone</button>
                     </div>
-                    ${buildingManaRowHtml("hiddenSpring", "Send Mana Clone costs 200 mana plus the amount that will be deposited (up to Hidden Spring's remaining capacity). If capacity is 1000 and you have 800 global mana, it spends 800 and deposits 600; with 1100 global mana it spends 1100 and deposits 900. This takes concentration. Starting another Okami action pauses the trip; click Send Mana Clone again to resume from the same point with the same mana.")}
+                    ${buildingManaRowHtml("hiddenSpring", "Send Mana Clone costs 2000 mana plus the amount that will be deposited (up to Hidden Spring's remaining capacity). This takes concentration from the Okami.")}
                     ${resortUpgradeRowsHtml("hiddenSpring")}
                 </div>
                 <div id="resortInfo_spirit" class="resort-info-section">
@@ -418,14 +419,15 @@ let createView = {
                     <div class="base-row">Visitors at the gate: <span id="toriiVisitorsWaiting"></span>/<span id="toriiVisitorsMax"></span></div>
                     <div class="base-row">Next visitor: <span id="toriiNextVisitor"></span></div>
                     <div id="toriiNextVisitorProgressWrap" class="base-mini-progress torii-next-visitor-progress" style="display:none"><div id="toriiNextVisitorProgressFill" class="base-mini-progress-fill"></div></div>
+                    ${buildingManaRowHtml("torii", "Enticing Lights use 10 mana/s to make visitors arrive every 30 seconds instead of 60 while the gate is not full. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
                     <div id="toriiWater_row" class="base-row" style="display:none">
                         <div class="prog-track game-progress-track water-prog-track">
                             <div id="toriiWaterFill" class="prog-fill prog-fill-water"></div>
-                            <div id="toriiWaterText" class="game-progress-bar-label">Water: 0/200</div>
+                            <div id="toriiWaterText" class="game-progress-bar-label">Hot Water: 0/200</div>
                         </div>
                     </div>
-                    <div id="toriiWaterReq_row" class="base-row muted-text" style="display:none">Requires 26C</div>
-                    ${buildingManaRowHtml("torii", "Enticing Lights use 10 mana/s to make visitors arrive every 30 seconds instead of 60 while the gate is not full. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
+                    <div id="toriiAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="toriiAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('torii', this.checked)"> Allow carriers to bring water</label></div>
+                    <div id="toriiWaterReq_row" class="base-row muted-text" style="display:none">Requires 50L of water of at least 26C. When a visitor arrives and the gate can hold two, two visitors arrive and 50L is spent.</div>
                     ${resortUpgradeRowsHtml("torii")}
                 </div>
                 <div id="resortInfo_inn" class="resort-info-section">
@@ -442,10 +444,12 @@ let createView = {
                             <div id="innHotWaterText" class="game-progress-bar-label">Hot Water: 0/200</div>
                         </div>
                     </div>
+                    <div id="innAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="innAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('inn', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span> <span class="muted-text">A hot bath uses one soap and doubles the Star Bead bonus from that soak (10% becomes 20%).</span></div>
                     <div id="innTowels_row" class="base-row" style="display:none">Towels: <span id="innTowelsText">0</span> <span class="muted-text">A hot bath uses one towel and grants +100 restfulness.</span></div>
                     <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires 20L of water of at least 40C</div>
-                    <div id="innOnsenPondExplain_row" class="base-row muted-text" style="display:none">Pond visit lasts a number of seconds equal to the total level of water spirits assigned to the Pond; guests keep gaining restfulness at the inn rate during that time. Soaking in the onsen lasts 5s and adds +0.5 restfulness/s.</div>
+                    <div id="innOnsenSoak_row" class="base-row muted-text" style="display:none">Soaking lasts 5s and adds +0.5 restfulness/s, and spends 20L.</div>
+                    <div id="innOnsenPondExplain_row" class="base-row muted-text" style="display:none">Pond visit lasts a number of seconds equal to the total level of water spirits assigned to the Pond; guests keep gaining restfulness at the inn rate during that time.</div>
                     <div class="base-row muted-text">Check the Guest tab for the itinerary.</div>
                     <div id="innGuestsVisitPond_row" class="base-row" style="display:none"><label><input type="checkbox" id="innGuestsVisitPond_chk" checked onchange="events.toggleInnGuestsVisitPond(this.checked)"> Allow guests to visit the pond</label></div>
                     ${resortUpgradeRowsHtml("inn")}
@@ -456,7 +460,14 @@ let createView = {
                     <div class="base-info-title">Noodle Bar</div>
                     <div class="base-row muted-text">Guests stop here to eat before they rest. Their talk fills the tip bar.</div>
                     <div class="base-row">Dried Noodles: <span id="noodleBarNoodlesText">0</span></div>
-                    <div class="base-row">Hot Water: <span id="noodleBarWaterText">0/500</span> <span class="muted-text">Water is only hauled from the Cistern while it is above 65C.</span> <span id="noodleBarCisternTempText"></span></div>
+                    <div id="noodleBarHotWater_row" class="base-row">
+                        <div class="prog-track game-progress-track water-prog-track">
+                            <div id="noodleBarHotWaterFill" class="prog-fill prog-fill-water"></div>
+                            <div id="noodleBarHotWaterText" class="game-progress-bar-label">Hot Water: 0/500</div>
+                        </div>
+                    </div>
+                    <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
+                    <div id="noodleBarWaterReq_row" class="base-row muted-text">Water is only hauled from the Cistern while it is above 65C. <span id="noodleBarCisternTempText"></span></div>
                     <div id="noodleTipProgressWrap" class="prog-track orb-exp-prog-track">
                         <div id="noodleTipProgressFill" class="prog-fill prog-fill-noodle-tip"></div>
                         <div class="game-progress-bar-label">Tip Progress: <span id="noodleTipProgressText">0</span>/100%</div>
@@ -591,6 +602,7 @@ let createView = {
                     <div class="base-row">Attack interval: <span id="fireLauncherInfoInterval"></span>s</div>
                     <div class="base-row">Ember cost: <span id="fireLauncherInfoEmberCost"></span></div>
                     <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span></div>
+                    <div class="base-row">Exp per droplet: <span id="fireLauncherInfoExp"></span></div>
                     <div class="base-row">Assigned: <span id="fireLauncherInfoSpirit"></span></div>
                     <div id="fireLauncherTargetPriority_row" class="base-row fire-launcher-target-radios" style="display:none">
                         Target:
@@ -649,7 +661,7 @@ let createView = {
             }
             let guestRows = "";
             for (let gi = 0; gi < 10; gi++) {
-                guestRows += `<div id="guestRow_${gi}" class="guest-list-row" style="display:none">The <b id="guestRow_${gi}_type"></b> is currently <b id="guestRow_${gi}_state"></b> for the next <b id="guestRow_${gi}_time"></b>. <span id="guestRow_${gi}_rest_text"></span><b id="guestRow_${gi}_restfulness"></b> <span id="guestRow_${gi}_rest_end"></span>.</div>`;
+                guestRows += `<div id="guestRow_${gi}" class="guest-list-row" style="display:none">The <b id="guestRow_${gi}_type"></b> is doing <b id="guestRow_${gi}_state"></b> for the next <b id="guestRow_${gi}_time"></b>. <span id="guestRow_${gi}_rest_text"></span><b id="guestRow_${gi}_restfulness"></b> <span id="guestRow_${gi}_rest_end"></span>.</div>`;
             }
             guestRoot.innerHTML = `
                 <div id="guestItinerarySection" class="guest-itinerary-section" style="display:none">
@@ -1005,7 +1017,7 @@ let createView = {
             "bambooForestInfoChips", "bambooForestInfoWood", "bambooForestMapDisplay",
             "base_bambooForest_assign_one_btn", "base_bambooForest_assign_ten_btn", "base_bambooForest_assign_all_btn", "base_bambooForest_unassign_one_btn", "base_bambooForest_unassign_ten_btn", "base_bambooForest_unassign_all_btn", "base_bambooForest_workers_label", "base_bambooForest_worker_prod_text", "base_bambooForest_worker_prod_wrap", "base_bambooForest_worker_prog_fill", "base_bambooForest_assign_okami_btn",
             "base_foxDen_assign_one_btn", "base_foxDen_assign_ten_btn", "base_foxDen_assign_all_btn", "base_foxDen_unassign_one_btn", "base_foxDen_unassign_ten_btn", "base_foxDen_unassign_all_btn", "base_foxDen_workers_label", "base_foxDen_assign_okami_btn",
-            "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "baseResortMap",
+            "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "foxDenQueueTip", "baseResortMap",
             "pathSegmentStateText", "base_path_remove_rocks_row", "base_path_remove_rocks_btn", "base_path_remove_rocks_extra", "base_path_add_railing_row", "base_path_add_railing_btn", "base_path_add_railing_extra", "base_torii_call_for_ally_row", "base_torii_call_for_ally_btn", "base_torii_call_for_ally_extra", "okamiTravelToken", "okamiPathWeaveToken",
             "baseBuildingInfoClose",
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
@@ -1021,9 +1033,9 @@ let createView = {
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
-            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiWaterReq_row", "okamiInspirationHint",
+            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "toriiWaterReq_row", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10",
-            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenTempReq_row", "innOnsenPondExplain_row", "innMapLabelText", "innGuestsVisitPond_row",
+            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenTempReq_row", "innOnsenSoak_row", "innOnsenPondExplain_row", "innMapLabelText", "innGuestsVisitPond_row",
             "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap", "innManaExplain_row",
             "innAllowCarriersMana_row", "innAllowCarriersMana_chk",
             "toriiManaRow", "toriiFillMana_btn", "toriiManaProgressWrap", "toriiManaFill", "toriiManaAmount", "toriiManaCap", "toriiManaExplain_row",
@@ -1053,7 +1065,7 @@ let createView = {
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineDivinityRateText",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
             "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoRange", "fireLauncherInfoInterval",
-            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoSpirit",
+            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoExp", "fireLauncherInfoSpirit",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",
             "fireLauncherTarget_coldest", "fireLauncherTarget_hottest", "fireLauncherTarget_coldest_label", "fireLauncherTarget_hottest_label",
             "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",
@@ -1072,7 +1084,7 @@ let createView = {
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
             "bonfireAutoRetry_row", "bonfireAutoRetry_chk",
             "bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk",
-            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritHeat_row", "bonfireWoodCarry_row", "bonfireWoodCarry", "bonfireCoal_row", "bonfireCoalText",
+            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireFireSpiritHeat_row", "bonfireWoodCarry_row", "bonfireWoodCarry", "bonfireCoal_row", "bonfireCoalText",
             "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
             "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
@@ -1115,7 +1127,7 @@ let createView = {
             );
         }
         createView.queueCache(
-            "noodleBarNoodlesText", "noodleBarWaterText", "noodleBarCisternTempText",
+            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk", "noodleBarWaterReq_row", "noodleBarCisternTempText",
             "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipLast_row",
             "noodleTipLocked_row", "noodleTipControls", "noodleTopicBtn", "noodleTipSelectHint"
         );
