@@ -4,7 +4,9 @@
 
 var bonfireConfig = {
     baseCloneManaCost: 1000,
-    classManaMult: 2,
+    classDivinityCost: 5000,
+    densityManaPerLevel: 500,
+    densityStatBonusPerLevel: 0.1,
     modifierManaMult: 1.2,
     heatDecayPerTick: 0.0005,
     heatPerWood: 10,
@@ -69,8 +71,8 @@ var bonfireClassOrder = ["condescend", "mock", "scold", "shun"];
 var bonfireModifierOrder = ["spotlight"];
 
 var bonfire = {
-    grantCombatStartManaCapacityBonus: function() {
-        const inc = data.progress.manaCapacityBonusPerCombatStart || 1;
+    grantRunEndManaCapacityBonus: function() {
+        const inc = engine.getManaCapacityBonusPerCloneDispersal();
         data.progress.mana.capacityBonus = (data.progress.mana.capacityBonus || 0) + inc;
     },
 
@@ -145,12 +147,9 @@ var bonfire = {
         }
     },
 
-    getCloneManaCostFromSnapshot: function(classKey, modifiers) {
-        let cost = bonfireConfig.baseCloneManaCost;
-        if (classKey && classKey !== "none") {
-            const cd = bonfire.getClassDef(classKey);
-            cost *= (cd && cd.manaCostMult) || bonfireConfig.classManaMult;
-        }
+    getCloneManaCostFromSnapshot: function(classKey, modifiers, density) {
+        const dens = Math.max(0, density || 0);
+        let cost = bonfireConfig.baseCloneManaCost + dens * (bonfireConfig.densityManaPerLevel || 500);
         const mods = modifiers || {};
         for (let i = 0; i < bonfireModifierOrder.length; i++) {
             const mk = bonfireModifierOrder[i];
@@ -162,17 +161,148 @@ var bonfire = {
         return Math.round(cost);
     },
 
+    getCloneDensity: function() {
+        const bf = data.progress.base.bonfire;
+        if (!bf.denseClonesUnlocked) {
+            return 0;
+        }
+        return bonfire.clampCloneDensity(bf.cloneDensity || 0);
+    },
+
+    getMaxCloneDensity: function() {
+        if (!engine.isManaUnlocked()) {
+            return 0;
+        }
+        const orb = data.progress.base && data.progress.base.mage_tower;
+        const orbLevelCap = Math.floor(((orb && orb.level) || 0) / 2);
+        const cap = engine.getManaCapacity();
+        const bf = data.progress.base.bonfire;
+        const mods = bf.appliedModifiers || {};
+        const classKey = bf.appliedClassKey || "none";
+        let n = 0;
+        while (n < orbLevelCap && bonfire.getCloneManaCostFromSnapshot(classKey, mods, n + 1) < cap) {
+            n++;
+        }
+        return n;
+    },
+
+    clampCloneDensity: function(n) {
+        const v = Math.max(0, Math.floor(n || 0));
+        return Math.min(v, bonfire.getMaxCloneDensity());
+    },
+
+    getCloneDensityStatMult: function(density) {
+        const d = Math.max(0, density || 0);
+        return 1 + d * (bonfireConfig.densityStatBonusPerLevel || 0.1);
+    },
+
+    getCloneDivinityCost: function() {
+        return bonfireConfig.classDivinityCost || 5000;
+    },
+
+    formatCloneCostText: function(manaCost, divinityCost) {
+        let text = `${intToStringRound(manaCost)} mana`;
+        if ((divinityCost || 0) > 0) {
+            text += `, ${intToStringRound(divinityCost)} divinity`;
+        }
+        return text;
+    },
+
+    getEffectiveClonePlan: function() {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        const appliedClass = (bf && bf.appliedClassKey) || "none";
+        const appliedMods = bonfire.getAppliedModifiersSnapshot();
+        const useClass = appliedClass && appliedClass !== "none";
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const allowBypass = !!(shrine && shrine.allowClasslessWithoutDivinity);
+        const divinityAmt = (data.progress.divinity && data.progress.divinity.amount) || 0;
+        const classDivinityCost = useClass ? bonfire.getCloneDivinityCost() : 0;
+        let classKey = appliedClass;
+        let modifiers = appliedMods;
+        let divinityCost = 0;
+        let blocked = false;
+        if (useClass) {
+            if (divinityAmt >= classDivinityCost) {
+                divinityCost = classDivinityCost;
+            } else if (allowBypass) {
+                classKey = "none";
+                modifiers = {};
+                divinityCost = 0;
+            } else {
+                divinityCost = classDivinityCost;
+                blocked = true;
+            }
+        }
+        const density = bonfire.getCloneDensity();
+        return {
+            classKey: classKey,
+            modifiers: modifiers,
+            manaCost: bonfire.getCloneManaCostFromSnapshot(classKey, modifiers, density),
+            divinityCost: divinityCost,
+            blocked: blocked,
+            cloneDensity: density
+        };
+    },
+
+    cloneLiveSettingsDifferFromStored: function() {
+        const stored = data.battle && data.battle.cloneRunSettings;
+        if (!stored) {
+            return false;
+        }
+        const plan = bonfire.getEffectiveClonePlan();
+        if ((plan.cloneDensity || 0) !== (stored.cloneDensity || 0)) {
+            return true;
+        }
+        const liveMap = data.progress.selectedTravelMapKey || data.progress.currentMapKey;
+        if ((liveMap || "") !== (stored.mapKey || data.progress.currentMapKey || "")) {
+            return true;
+        }
+        if ((plan.classKey || "none") !== (stored.classKey || "none")) {
+            return true;
+        }
+        const liveMods = plan.modifiers || {};
+        const storedMods = stored.modifiers || {};
+        const seen = {};
+        const liveKeys = Object.keys(liveMods);
+        for (let i = 0; i < liveKeys.length; i++) {
+            seen[liveKeys[i]] = true;
+            if (!!liveMods[liveKeys[i]] !== !!storedMods[liveKeys[i]]) {
+                return true;
+            }
+        }
+        const storedKeys = Object.keys(storedMods);
+        for (let i = 0; i < storedKeys.length; i++) {
+            if (!seen[storedKeys[i]] && storedMods[storedKeys[i]]) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     getCloneManaCost: function() {
         const bf = data.progress.base.bonfire;
-        return bonfire.getCloneManaCostFromSnapshot(bf.appliedClassKey, bf.appliedModifiers);
+        return bonfire.getCloneManaCostFromSnapshot(bf.appliedClassKey, bf.appliedModifiers, bonfire.getCloneDensity());
     },
 
     canAffordClone: function() {
         if (!engine.isManaUnlocked()) {
             return false;
         }
+        const plan = bonfire.getEffectiveClonePlan();
+        if (plan.blocked) {
+            return false;
+        }
         const mana = data.progress.mana;
-        return (mana.amount || 0) >= bonfire.getCloneManaCost();
+        if ((mana.amount || 0) < plan.manaCost) {
+            return false;
+        }
+        if ((plan.divinityCost || 0) > 0) {
+            const divinity = data.progress.divinity;
+            if (((divinity && divinity.amount) || 0) < plan.divinityCost) {
+                return false;
+            }
+        }
+        return true;
     },
 
     canAffordRetryWithStoredSettings: function() {
@@ -181,10 +311,89 @@ var bonfire = {
         }
         const settings = data.battle && data.battle.cloneRunSettings;
         const cost = settings
-            ? (settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.classKey, settings.modifiers))
+            ? (settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.classKey, settings.modifiers, settings.cloneDensity))
             : bonfire.getCloneManaCost();
         const mana = data.progress.mana;
-        return (mana.amount || 0) >= cost;
+        if ((mana.amount || 0) < cost) {
+            return false;
+        }
+        const divinityCost = settings ? (settings.divinityCost || 0) : 0;
+        if (divinityCost > 0) {
+            const divinity = data.progress.divinity;
+            if (((divinity && divinity.amount) || 0) < divinityCost) {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    isApplyLiveSettingsToNextClone: function() {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        return !!(bf && bf.applyLiveSettingsToNextClone);
+    },
+
+    shouldUseLiveCloneSettings: function() {
+        if (bonfire.isApplyLiveSettingsToNextClone()) {
+            return true;
+        }
+        return !(data.battle && data.battle.cloneRunSettings);
+    },
+
+    getCreateClonePlan: function() {
+        if (bonfire.shouldUseLiveCloneSettings()) {
+            return bonfire.getEffectiveClonePlan();
+        }
+        const settings = data.battle.cloneRunSettings;
+        return {
+            classKey: settings.classKey || "none",
+            modifiers: settings.modifiers || {},
+            manaCost: settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.classKey, settings.modifiers, settings.cloneDensity),
+            divinityCost: settings.divinityCost || 0,
+            blocked: false,
+            cloneDensity: settings.cloneDensity || 0
+        };
+    },
+
+    canAffordCreateClone: function() {
+        if (bonfire.shouldUseLiveCloneSettings()) {
+            return bonfire.canAffordClone();
+        }
+        return bonfire.canAffordRetryWithStoredSettings();
+    },
+
+    startNextClone: function(mapKey) {
+        if (bonfire.shouldUseLiveCloneSettings()) {
+            return bonfire.startCloneCombat(mapKey);
+        }
+        return bonfire.retryWithStoredSettings();
+    },
+
+    isStartWithFullManaEnabled: function() {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        return !!(bf && bf.startWithFullManaUnlocked && bf.startWithFullManaEnabled);
+    },
+
+    isManaFull: function() {
+        if (!engine.isManaUnlocked()) {
+            return false;
+        }
+        const mana = data.progress.mana;
+        const cap = engine.getManaCapacity();
+        return !!(mana && cap > 0 && (mana.amount || 0) >= cap);
+    },
+
+    tryPostBattleCloneSpawn: function() {
+        if (!data.battle || data.battle.state === "running") {
+            return false;
+        }
+        const canAfford = bonfire.canAffordCreateClone();
+        if (bonfire.isAutoRetryEnabled() && canAfford) {
+            return bonfire.startNextClone();
+        }
+        if (bonfire.isStartWithFullManaEnabled() && bonfire.isManaFull() && canAfford) {
+            return bonfire.startNextClone();
+        }
+        return false;
     },
 
     getAppliedModifiersSnapshot: function() {
@@ -204,7 +413,7 @@ var bonfire = {
 
     isAutoRetryEnabled: function() {
         const bf = data.progress.base.bonfire;
-        return !!bf.autoRetryEnabled;
+        return !!(bf.autoRetryUnlocked && bf.autoRetryEnabled);
     },
 
     getNextHeatThreshold: function(heat) {
@@ -288,17 +497,30 @@ var bonfire = {
         if (!target || !mapData.isMapUnlocked(target, data.progress)) {
             return false;
         }
-        const bf = data.progress.base.bonfire;
-        const appliedClass = bf.appliedClassKey || "none";
+        const plan = bonfire.getEffectiveClonePlan();
+        if (plan.blocked) {
+            return false;
+        }
+        const appliedClass = plan.classKey || "none";
         const reqClass = target.requiredClassKey || "";
         if (reqClass && reqClass !== appliedClass) {
             return false;
         }
-        const modifierSnapshot = bonfire.getAppliedModifiersSnapshot();
-        const cost = bonfire.getCloneManaCostFromSnapshot(appliedClass, modifierSnapshot);
+        const modifierSnapshot = Object.assign({}, plan.modifiers || {});
+        const cost = plan.manaCost;
+        const divinityCost = plan.divinityCost || 0;
         const mana = data.progress.mana;
+        if ((mana.amount || 0) < cost) {
+            return false;
+        }
+        if (divinityCost > 0) {
+            const divinity = data.progress.divinity;
+            if (!divinity || (divinity.amount || 0) < divinityCost) {
+                return false;
+            }
+            divinity.amount = Math.max(0, (divinity.amount || 0) - divinityCost);
+        }
         mana.amount = Math.max(0, (mana.amount || 0) - cost);
-        bonfire.grantCombatStartManaCapacityBonus();
 
         data.progress.currentClassKey = appliedClass;
         if (appliedClass === "scold") {
@@ -311,14 +533,21 @@ var bonfire = {
         initialize.resetSkillRunProgress();
         initialize.startFreshBattle(travelSeed, targetKey);
         data.battle.bonfireModifiers = modifierSnapshot;
+        data.battle.cloneDensity = plan.cloneDensity || 0;
+        initialize.calcPlayerStats(true);
         data.battle.cloneRunSettings = {
             classKey: appliedClass,
             modifiers: Object.assign({}, modifierSnapshot),
             mapKey: targetKey,
-            manaCost: cost
+            manaCost: cost,
+            divinityCost: divinityCost,
+            cloneDensity: plan.cloneDensity || 0
         };
         data.battle.pendingOkamiExp = 0;
         data.progress.autoRetryCountdownSec = 0;
+        if (typeof view !== "undefined" && view.refreshBattleUiNow) {
+            view.refreshBattleUiNow();
+        }
         return true;
     },
 
@@ -330,13 +559,21 @@ var bonfire = {
         if (!engine.isManaUnlocked()) {
             return false;
         }
-        const cost = settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.classKey, settings.modifiers);
+        const cost = settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.classKey, settings.modifiers, settings.cloneDensity);
+        const divinityCost = settings.divinityCost || 0;
+        const density = settings.cloneDensity || 0;
         const mana = data.progress.mana;
         if ((mana.amount || 0) < cost) {
             return false;
         }
+        if (divinityCost > 0) {
+            const divinity = data.progress.divinity;
+            if (((divinity && divinity.amount) || 0) < divinityCost) {
+                return false;
+            }
+            divinity.amount = Math.max(0, (divinity.amount || 0) - divinityCost);
+        }
         mana.amount = Math.max(0, (mana.amount || 0) - cost);
-        bonfire.grantCombatStartManaCapacityBonus();
         const classKey = settings.classKey || "none";
         data.progress.currentClassKey = classKey;
         if (classKey === "scold") {
@@ -348,16 +585,23 @@ var bonfire = {
         initialize.resetSkillRunProgress();
         initialize.startFreshBattle(currentSeed, settings.mapKey || data.progress.currentMapKey);
         data.battle.bonfireModifiers = modifierSnapshot;
+        data.battle.cloneDensity = density;
+        initialize.calcPlayerStats(true);
         data.battle.cloneRunSettings = {
             classKey: classKey,
             modifiers: modifierSnapshot,
             mapKey: settings.mapKey || data.progress.currentMapKey,
-            manaCost: cost
+            manaCost: cost,
+            divinityCost: divinityCost,
+            cloneDensity: density
         };
         data.battle.resetCount = nextResetCount;
         data.progress.autoRetryCountdownSec = 0;
         data.progress.showBattle = true;
         data.gameSettings.stopAll = false;
+        if (typeof view !== "undefined" && view.refreshBattleUiNow) {
+            view.refreshBattleUiNow();
+        }
         return true;
     }
 };

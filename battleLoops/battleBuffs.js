@@ -24,16 +24,15 @@ var battleBuffDefs = {
         label: "Outrage",
         img: "img/outrage.svg",
         kind: "duration",
-        effectPercent: 15,
-        description: "Your attack timer recharges 15% faster while active. Additional time extends the buff."
+        effectPercent: 50,
+        description: "Your attack timer recharges 50% faster while active. Additional time extends the buff."
     },
     malice: {
         key: "malice",
         label: "Malice",
         img: "img/malice.svg",
-        kind: "duration",
-        effectPercent: 20,
-        description: "You deal 20% more damage while active. Additional time extends the buff."
+        kind: "counter",
+        description: "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks."
     },
     fakeTears: {
         key: "fakeTears",
@@ -79,8 +78,8 @@ var battleBuffs = {
         if (!def) {
             return false;
         }
-        if (def.kind === "stackUntilAttack" || def.kind === "stackUntilDamage") {
-            return (entry.stacks || 0) > 0;
+        if (def.kind === "stackUntilAttack" || def.kind === "stackUntilDamage" || def.kind === "counter") {
+            return (entry.stacks || entry.counter || 0) > 0;
         }
         if (def.kind === "stackTimed") {
             return entry.stacks && entry.stacks.length > 0;
@@ -151,7 +150,14 @@ var battleBuffs = {
             bottomRight = intToString(count, 1);
             topRight = `${round2(reduction)}%`;
             tooltipExtra = `Stacks: ${count}<br>Combined reduction: ${round2(reduction)}%<br>Longest stack: ${battleBuffs.formatBuffRemainingLabel(stats.longestMs)}<br>Average time left: ${battleBuffs.formatBuffRemainingLabel(stats.averageMs)}`;
-        } else if (key === "outrage" || key === "malice" || key === "fakeTears") {
+        } else if (key === "malice") {
+            const counter = entry.counter || 0;
+            const bonus = battleBuffs.getMaliceAttackBonus(counter);
+            const strikePct = Math.round((bonus.mult - 1) * 100);
+            bottomRight = intToString(counter, 1);
+            topRight = `+${strikePct}%`;
+            tooltipExtra = `Counter: ${round2(counter)}<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
+        } else if (key === "outrage" || key === "fakeTears") {
             const pct = def.effectPercent || 0;
             bottomRight = battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0);
             topRight = `${pct}%`;
@@ -164,7 +170,10 @@ var battleBuffs = {
             tooltipExtra = `Stacks: ${intToString(stacks, 2)}<br>Last negation: ${neg > 0 ? `-${intToString(neg, 2)}` : "-"}<br>1 damage blocked per stack consumed`;
         }
 
-        const tooltipHtml = `<strong>${def.label}</strong><br>${def.description}<br><br>${tooltipExtra}`;
+        const desc = (typeof skills !== "undefined" && skills.buffDescriptions && skills.buffDescriptions[def.label])
+            ? skills.buffDescriptions[def.label]
+            : (def.description || "");
+        const tooltipHtml = `<strong>${def.label}</strong><br>${desc}<br><br>${tooltipExtra}`;
         return {
             key: key,
             label: def.label,
@@ -292,17 +301,48 @@ var battleBuffs = {
         const state = battleBuffs.getState();
         const entry = state.byKey.outrage;
         if (entry && (entry.remainingMs || 0) > 0) {
-            return 1.15;
+            const pct = (battleBuffDefs.outrage && battleBuffDefs.outrage.effectPercent) || 0;
+            return 1 + pct / 100;
         }
         return 1;
+    },
+    addMalice: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.malice) {
+            state.byKey.malice = { counter: 0 };
+        }
+        state.byKey.malice.counter = (state.byKey.malice.counter || 0) + amount;
+        battleBuffs.ensureInQueue(state, "malice");
+    },
+    getMaliceAttackBonus: function(counter) {
+        const n = counter || 0;
+        if (n < 1) {
+            return { mult: 1, consume: 0, pct: 0 };
+        }
+        const steps = Math.floor(n / 20);
+        const pct = 10 + (steps * 10);
+        const consume = 1 + steps;
+        return { mult: 1 + (pct / 100), consume: consume, pct: pct };
     },
     getMaliceDamageMultiplier: function() {
         const state = battleBuffs.getState();
         const entry = state.byKey.malice;
-        if (entry && (entry.remainingMs || 0) > 0) {
-            return 1.2;
+        const counter = entry ? (entry.counter || 0) : 0;
+        return battleBuffs.getMaliceAttackBonus(counter).mult;
+    },
+    consumeMaliceOnAttack: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.malice;
+        const counter = entry ? (entry.counter || 0) : 0;
+        const bonus = battleBuffs.getMaliceAttackBonus(counter);
+        if (entry && bonus.consume > 0) {
+            entry.counter = Math.max(0, counter - bonus.consume);
         }
-        return 1;
+        battleBuffs.pruneQueue(state);
+        return bonus.mult;
     },
     getFakeTearsDamageMultiplier: function() {
         const state = battleBuffs.getState();

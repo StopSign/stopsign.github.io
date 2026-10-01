@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Skill Data Helper</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="skillHelper.css">
+</head>
+<body class="sh-body">
+    <div class="sh-page">
+        <header class="sh-header">
+            <div class="sh-header-row">
+                <h1>Skill Data Helper</h1>
+                <a class="tab-button sh-back" href="index.html">Back to game</a>
+            </div>
+            <p class="muted-text sh-lede">Effects and exp at levels 0 / 50 / 100 from <code>skills.js</code>. Set priority numbers, sort, then copy <code>SKILL_PRIORITY</code> back to the top of that file. Edits here do not write the file.</p>
+        </header>
+
+        <section class="sh-toolbar">
+            <button type="button" class="tab-button" id="shSortBtn">Sort by priority</button>
+            <button type="button" class="tab-button" id="shCopyBtn">Copy SKILL_PRIORITY</button>
+            <span id="shCopyStatus" class="muted-text"></span>
+        </section>
+
+        <div id="shSkillList" class="sh-skill-list"></div>
+
+        <section class="sh-card">
+            <div class="sh-section-head">
+                <h2>Export</h2>
+            </div>
+            <p class="muted-text">Paste this over the <code>SKILL_PRIORITY</code> block at the top of <code>skills.js</code>.</p>
+            <textarea id="shExport" class="sh-export" spellcheck="false" readonly></textarea>
+        </section>
+    </div>
+
+    <script>
+        (function loadHelperScripts() {
+            const v = Date.now();
+            const files = ["helpers.js", "gameData.js", "skills.js", "skillHelper.js"];
+            let i = 0;
+            function next() {
+                if (i >= files.length) {
+                    skillHelper.init();
+                    return;
+                }
+                const s = document.createElement("script");
+                s.src = files[i++] + "?t=" + v;
+                s.onload = next;
+                s.onerror = function() {
+                    console.error("Failed to load " + s.src);
+                };
+                document.body.appendChild(s);
+            }
+            next();
+        })();
+    </script>
+</body>
+</html>

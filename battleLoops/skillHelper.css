@@ -1,0 +1,141 @@
+.sh-body {
+    padding: 8px 12px 32px;
+    overflow: auto;
+}
+
+.sh-page {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.sh-header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.sh-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.sh-lede {
+    margin: 8px 0 0;
+    max-width: 980px;
+    line-height: 1.4;
+}
+
+.sh-back {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.sh-toolbar,
+.sh-section-head,
+.sh-card-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.sh-toolbar {
+    margin: 16px 0 12px;
+}
+
+.sh-section-head {
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.sh-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.sh-card h2 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.sh-card-head {
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.sh-card-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.sh-card-meta {
+    font-size: 12px;
+    color: #a6adc8;
+}
+
+.sh-priority-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.sh-priority-field input {
+    width: 72px;
+    background: #1f2b3e;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 4px 6px;
+}
+
+.sh-blurb {
+    font-size: 13px;
+    margin: 4px 0;
+    line-height: 1.35;
+}
+
+.sh-table-wrap {
+    overflow-x: auto;
+    margin-top: 8px;
+}
+
+.sh-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+
+.sh-table th,
+.sh-table td {
+    border-bottom: 1px solid var(--border-color);
+    padding: 4px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.sh-table th {
+    color: #a6adc8;
+    font-weight: bold;
+}
+
+.sh-table .sh-num {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.sh-export {
+    width: 100%;
+    min-height: 280px;
+    box-sizing: border-box;
+    background: #11151f;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    resize: vertical;
+}

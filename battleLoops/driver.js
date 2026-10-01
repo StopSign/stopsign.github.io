@@ -71,22 +71,19 @@ let driver = {
         if (typeof engine.updateManaPerSecond === "function") {
             engine.updateManaPerSecond();
         }
+        if (typeof engine.updateDivinityPerSecond === "function") {
+            engine.updateDivinityPerSecond();
+        }
 
         const bf = data.progress.base && data.progress.base.bonfire;
-        if (!bf || !bf.autoRetryEnabled) {
+        if (!bf || (!bonfire.isAutoRetryEnabled() && !bonfire.isStartWithFullManaEnabled())) {
             return;
         }
-        if (data.battle && data.battle.state === "dead") {
+        if (data.battle && (data.battle.state === "dead" || data.battle.state === "completed")) {
             if (data.progress.autoRetryCountdownSec > 0) {
                 data.progress.autoRetryCountdownSec--;
                 if (data.progress.autoRetryCountdownSec <= 0) {
-                    if (data.battle && data.battle.cloneRunSettings) {
-                        if (bonfire.canAffordRetryWithStoredSettings()) {
-                            bonfire.retryWithStoredSettings();
-                        }
-                    } else if (bonfire.canAffordClone()) {
-                        bonfire.startCloneCombat(data.progress.currentMapKey);
-                    }
+                    bonfire.tryPostBattleCloneSpawn();
                 }
             }
         } else {

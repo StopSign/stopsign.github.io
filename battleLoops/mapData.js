@@ -9,14 +9,14 @@ mapData.getDefaultMaps = function() {
             seed: 5557,
             baseDifficulty: 1,
             zones: [
-                mapData.createZone(6, "scoundrel", 0, 300, 1, 1.6, 6, 1),
-                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 9, 1.5),
-                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12, 2),
+                mapData.createZone(6, "scoundrel", 0, 325, 1, 1.6, 6),
+                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 9),
+                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12),
             ],
             zoneShards: [
+                { key: "force", gain: 1, chance: 0.04, cap: 10 },
                 { key: "nickelAndDime", gain: 1, chance: 0.04, cap: 10 },
-                { key: "selfAffirmations", gain: 1, chance: 0.04, cap: 10 },
-                { key: "force", gain: 1, chance: 0.04, cap: 10 }
+                { key: "selfAffirmations", gain: 1, chance: 0.04, cap: 10 }
             ],
             forageZones: [
                 mapData.createForageZone(1, "tree", 200, 0, 10, 1, "logs", 1),
@@ -24,32 +24,32 @@ mapData.getDefaultMaps = function() {
             ]
         }),
         mapData.createMap({
-            version:0,
+            version: 0,
             key: "map_2",
             name: "Protecting Modesty",
-            description: "Word has spread that there is a beautiful woman protecting an unknown village, and the Okami must slap some sense into the curious scoundrels.",
+            description: "Word has spread that there is a beautiful woman protecting an unknown village, and the Okami must slap some sense into the groups of curious scoundrels.",
             seed: 424242,
-            baseDifficulty: 1.6,
+            baseDifficulty: 1.3,
             unlocksAfterMapKey: "map_1",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1),
-                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2),
-                mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
-                mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
-                mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
+                mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1, 8),
+                mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25, 10),
+                mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1, 12),
+                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 18),
+                mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 16),
             ],
             zoneShards: [
-                { key: "mainCharacter", gain: 1, chance: 0.02, cap: 10 },
-                { key: "shameless", gain: 1, chance: 0.02, cap: 10 },
-                { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 }
+                { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 },
+                { key: "insultFatigue", gain: 1, chance: 0.02, cap: 10 },
+                { key: "mainCharacter", gain: 1, chance: 0.02, cap: 10 }
             ],
             forageZones: [
                 mapData.createForageZone(10, "bush", 165, 0, 5, 1, "lumber", 1),
-                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3)
             ]
         }),
         mapData.createMap({
-            version:0,
+            version: 0,
             key: "map_3",
             name: "Leering Intruders",
             description: "Rumors of a hotspring have brought both scoundrels and lechers, looking to peep in and ruin the peace. The Okami will have them run away in embarrasment.",
@@ -57,43 +57,125 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 1.6,
             unlocksAfterMapKey: "map_2",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1),
-                mapData.createZone(2, "lecher", 500, 780, 1.0, 1, 22, 1),
-                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2),
-                mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
-                mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
-                mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
+                mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 14),
+                mapData.createZone(3, "lecher", 500, 780, 0.8, 1.25, 20),
+                mapData.createZone(4, "scoundrel", 22000, 250, 1.4, 1, 20),
+                mapData.createZone(3, "lecher", 38000, 500, 1.6, 1.25, 26),
+                mapData.createZone(5, "scoundrel", 41000, 300, 2, 1, 26),
             ],
             zoneShards: [
-                { key: "extortion", gain: 1, chance: 0.01, cap: 10 },
+                { key: "aboveItAll", gain: 1, chance: 0.01, cap: 10 },
                 { key: "hindsight", gain: 1, chance: 0.01, cap: 10 },
-                { key: "insultFatigue", gain: 1, chance: 0.01, cap: 10 }
+                { key: "shameless", gain: 1, chance: 0.01, cap: 10 }
             ],
             forageZones: [
-                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3)
             ]
         }),
         mapData.createMap({
-            version:0,
+            version: 0,
             key: "map_4",
             name: "Romance Novelists",
             description: "Some intruders are determined in their pursuit of seeing the secrets of the hotspring. The Okami must fill their hearts with shame.",
             seed: 7777,
-            baseDifficulty: 1.6,
+            baseDifficulty: 2,
             unlocksAfterMapKey: "map_3",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1,
-                    { key: "shameless", gain: 1, chance: 0.01, cap: 10 }),
-                mapData.createZone(3, "scoundrel", 0, 200, 1, 1.5, 3, 1, { key: "shameless", gain: 1, chance: 0.01, cap: 10 }),
-                mapData.createZone(4, "scoundrel", 16000, 150, 1.2, 1, 4, 1.2, { key: "hindsight", gain: 1, chance: 0.009, cap: 12 }),
-                mapData.createZone(5, "scoundrel", 30000, 200, 1.5, 0.75, 8, 1.5),
-                mapData.createZone(2, "scoundrel", 36000, 500, 1.8, 1.25, 10, 1.8),
-                mapData.createZone(3, "scoundrel", 50000, 200, 2, 1, 20, 2)
+                mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 20),
+                mapData.createZone(3, "lecher", 2000, 400, 1.2, 0.75, 25),
+                mapData.createZone(5, "scoundrel", 22000, 250, 1.5, 1, 30),
+                mapData.createZone(2, "lecher", 26000, 500, 1.7, 0.75, 35),
+                mapData.createZone(4, "scoundrel", 41000, 200, 2, 1.25, 40),
             ],
-            forageZones: [
-                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3),
+            zoneShards: [
+                { key: "grudge", gain: 1, chance: 0.005, cap: 10 },
+                { key: "shockValue", gain: 1, chance: 0.005, cap: 10 },
+                { key: "windFallSwagger", gain: 1, chance: 0.005, cap: 10 }
             ]
         }),
+        mapData.createMap({
+            version: 0,
+            key: "map_5",
+            name: "Courtesan Chasers",
+            description: "A few big shot adventurers have heard of the hotspring. They want to see if any beauties are for hire. Slap them away.",
+            seed: 9371,
+            baseDifficulty: 3,
+            unlocksAfterMapKey: "map_4",
+            zones: [
+                mapData.createZone(3, "scoundrel", 0, 300, 1.4, 1.2, 50),
+                mapData.createZone(2, "scoundrel", 18000, 400, 1.8, 1.2, 70),
+                mapData.createZone(2, "scoundrel", 30000, 300, 2.2, 1.2, 90),
+                mapData.createZone(2, "scoundrel", 45000, 300, 2.6, 1.2, 110),
+            ],
+            zoneShards: [
+                { key: "extortion", gain: 1, chance: 0.0025, cap: 10 },
+                { key: "bitterRivalry", gain: 1, chance: 0.0025, cap: 10 },
+                { key: "seethe", gain: 1, chance: 0.0025, cap: 10 }
+            ]
+        }),
+        mapData.createMap({
+            version: 0,
+            key: "map_6",
+            name: "Muse-Seekers",
+            description: "Artists seeking muses have heard rumors of beauties in the mist. They will have shame after the Okami has finished with them.",
+            seed: 9944,
+            baseDifficulty: 2.5,
+            unlocksAfterMapKey: "map_5",
+            zones: [
+                mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 20),
+                mapData.createZone(6, "scoundrel", 12000, 100, 1.3, 1, 24),
+                mapData.createZone(7, "scoundrel", 24000, 100, 1.6, 0.75, 28),
+                mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 32),
+                mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 36),
+            ],
+            zoneShards: [
+                { key: "adaptation", gain: 1, chance: 0.00125, cap: 10 },
+                { key: "savageLessons", gain: 1, chance: 0.00125, cap: 10 },
+                { key: "validation", gain: 1, chance: 0.00125, cap: 10 }
+            ]
+        }),
+        mapData.createMap({
+            version: 0,
+            key: "map_7",
+            name: "The Gawk Squad",
+            description: "A gang known for how they catcall everyone walking by has found a new target. The Okami will stand in their way.",
+            seed: 15003,
+            baseDifficulty: 3,
+            unlocksAfterMapKey: "map_6",
+            zones: [
+                mapData.createZone(4, "lecher", 0, 300, 1, 1, 45),
+                mapData.createZone(3, "scoundrel", 500, 780, 1.2, 1.25, 40),
+                mapData.createZone(4, "lecher", 22000, 250, 1.5, 1, 55),
+                mapData.createZone(3, "scoundrel", 38000, 500, 1.8, 1.25, 50),
+                mapData.createZone(5, "lecher", 41000, 300, 2, 1, 65),
+            ],
+            zoneShards: [
+                { key: "echoChamber", gain: 1, chance: 0.000625, cap: 10 },
+                { key: "narcissism", gain: 1, chance: 0.000625, cap: 10 },
+                { key: "numbingCrowds", gain: 1, chance: 0.000625, cap: 10 }
+            ]
+        }),
+        mapData.createMap({
+            version: 0,
+            key: "map_8",
+            name: "Sketch Artists",
+            description: "They don't want to touch, only look; their gazes still make the guests uncomfortable. The Okami will show them the error of their ways.",
+            seed: 21888,
+            baseDifficulty: 3.2,
+            unlocksAfterMapKey: "map_7",
+            zones: [
+                mapData.createZone(4, "lecher", 0, 100, 1, 1, 40),
+                mapData.createZone(5, "lecher", 12000, 100, 1.3, 1, 45),
+                mapData.createZone(6, "lecher", 24000, 100, 1.6, 0.75, 50),
+                mapData.createZone(3, "lecher", 40000, 75, 1.9, 1.25, 55),
+                mapData.createZone(6, "lecher", 50000, 100, 2.2, 1, 60),
+            ],
+            zoneShards: [
+                { key: "applyTearDrops", gain: 1, chance: 0.02, cap: 10 },
+                { key: "crowdWork", gain: 1, chance: 0.02, cap: 10 },
+                { key: "walkingItOff", gain: 1, chance: 0.02, cap: 10 }
+            ]
+        })
         // mapData.createMap({
         //     key: "map_condescend_1",
         //     name: "Shieldwall Gauntlet",
@@ -101,9 +183,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 1.4,
         //     requiredClassKey: "condescend",
         //     zones: [
-        //         mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, 1, { key: "aboveItAll", gain: 1, chance: 0.006, cap: 24 }),
-        //         mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, 1, { key: "toughness_condescend", gain: 1, chance: 0.005, cap: 28 }),
-        //         mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, 1, { key: "second_wind", gain: 1, chance: 0.004, cap: 30 })
+        //         mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, { key: "aboveItAll", gain: 1, chance: 0.006, cap: 24 }),
+        //         mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, { key: "toughness_condescend", gain: 1, chance: 0.005, cap: 28 }),
+        //         mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, { key: "second_wind", gain: 1, chance: 0.004, cap: 30 })
         //     ]
         // }),
         // mapData.createMap({
@@ -113,9 +195,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 1.45,
         //     requiredClassKey: "scold",
         //     zones: [
-        //         mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22, 1),
-        //         mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32, 1),
-        //         mapData.createZone(28, "lecher", 21000, 910, 1.2, 1, 44, 1)
+        //         mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22),
+        //         mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32),
+        //         mapData.createZone(28, "lecher", 21000, 910, 1.2, 1, 44)
         //     ]
         // }),
         // mapData.createMap({
@@ -125,9 +207,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 2.1,
         //     requiredClassKey: "mock",
         //     zones: [
-        //         mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26, 1),
-        //         mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36, 1),
-        //         mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1, 52, 1)
+        //         mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26),
+        //         mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36),
+        //         mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1, 52)
         //     ]
         // })
     ];

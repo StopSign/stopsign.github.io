@@ -18,7 +18,7 @@ let mapData = {
      * @param {object} [skillShard] Optional single-type shard drop for this zone: `{ key, gain, chance, cap }`
      *   (skill key must match `skills` definition keys). At most one shard type per zone.
      */
-    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder, expBasePerIntruder, skillShard) {
+    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder, skillShard) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
         const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
         const z = {
@@ -30,8 +30,7 @@ let mapData = {
             lengthMs: Math.max(0, safeDistanceBetweenUnits * Math.max(0, safeEnemies - 1)),
             intruderType: intruderType || "scoundrel",
             coinsPerIntruder: coinsPerIntruder !== undefined ? Math.max(0, coinsPerIntruder) : 1,
-            audDamageTradeRatio: audDamageTradeRatio !== undefined ? Math.max(0.01, audDamageTradeRatio) : 1,
-            expBasePerIntruder: expBasePerIntruder !== undefined ? Math.max(0, expBasePerIntruder) : 1
+            audDamageTradeRatio: audDamageTradeRatio !== undefined ? Math.max(0.01, audDamageTradeRatio) : 1
         };
         const normalized = mapData.normalizeSkillShardDef(skillShard);
         if (normalized) {
@@ -136,8 +135,8 @@ let mapData = {
         const rawAud = gameData.battle.intruderBaseAud * ratio * totalDifficulty * trade;
         const rawDamage = gameData.battle.intruderAttackDamage * ratio * totalDifficulty / trade;
         const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
-        const perIntruderGain = Math.ceil(coinsPerIntruderBase * Math.pow(totalDifficulty, 1.5) * coinsMult);
-        const expBasePerIntruder = Math.max(0, (z.expBasePerIntruder !== undefined ? z.expBasePerIntruder : 1) * expMult);
+        const perIntruderGain = Math.ceil(coinsPerIntruderBase * coinsMult);
+        const expBasePerIntruder = Math.max(0, (mapDefinition.baseDifficulty || 1) * ratio * expMult);
         return {
             rawAud,
             rawDamage,
@@ -178,8 +177,8 @@ let mapData = {
             return { combat: 1, coins: 1, exp: 1 };
         }
         if (tier === 1) {
-            return { combat: 5, coins: 3, exp: 2 };
+            return { combat: 4, coins: 2, exp: 2 };
         }
-        return { combat: 25, coins: 9, exp: 4 };
+        return { combat: 16, coins: 4, exp: 4 };
     }
 };

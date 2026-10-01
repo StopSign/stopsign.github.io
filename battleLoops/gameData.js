@@ -15,13 +15,13 @@ let gameData = {
         playerSlapLineYPx: null,
         playerSlapOffsetFromBottomPx: 142,
 
-        /** Copied into `data.battle.player` for new runs (mutable during play). */
+        /**
+         * Copied into `data.battle.player` for new runs (mutable during play).
+         * Damage and cooldown seeds are derived from `combat` and `cooldowns` in
+         * `initialize.player()`, then recomputed by `initialize.calcPlayerStats()`.
+         */
         playerStarting: {
-            attackDamage: 5,
-            sandalAttackDamage: 7.5,
-            attackCooldownMs: 2000,
             attackTimerMs: 0,
-            sandalAttackCooldownMs: 4000,
             sandalAttackTimerMs: 0
         },
 

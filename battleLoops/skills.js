@@ -1,5 +1,82 @@
-// All skill definitions, runtime state shape, exp/talent formulas, and UI copy in one place.
+const SKILL_PRIORITY = {
+    force: 1,
+    nickelAndDime: 1,
+    selfAffirmations: 1,
+    corneredEgo: 2,
+    insultFatigue: 2,
+    mainCharacter: 2,
+    aboveItAll: 3,
+    hindsight: 3,
+    shameless: 3,
+    grudge: 4,
+    shockValue: 4,
+    windfallSwagger: 4,
+    bitterRivalry: 5,
+    extortion: 5,
+    seethe: 5,
+    adaptation: 6,
+    savageLessons: 6,
+    validation: 6,
+    echoChamber: 7,
+    narcissism: 7,
+    numbingCrowds: 7,
+    applyTearDrops: 20,
+    bloodRush: 20,
+    brokenRecord: 20,
+    imposterSyndrome: 20,
+    levelHeaded: 20,
+    recognition: 20,
+    retailTherapy: 20,
+    sadism: 20,
+    temper: 20,
+    borrowedGlory: 900,
+    closingArgument: 900,
+    crowdWork: 900,
+    experienceHog: 900,
+    heckled: 900,
+    highHorse: 900,
+    hotTake: 900,
+    marathonEgo: 900,
+    paddingResume: 900,
+    peerPressure: 900,
+    publicApology: 900,
+    repeatOffender: 900,
+    righteousRant: 900,
+    secondWind: 900,
+    simmer: 900,
+    slowBurn: 900,
+    sobStory: 900,
+    socialArmor: 900,
+    stageSob: 900,
+    stiffUpperLip: 900,
+    stoic: 900,
+    studyGroup: 900,
+    thickSkin: 900,
+    thinIce: 900,
+    underdog: 900,
+    walkingItOff: 900,
+    adrenaline: 999,
+    alacrity: 999,
+    breathing: 999,
+    cleave: 999,
+    execute: 999,
+    exploit: 999,
+    impact: 999,
+    longshot: 999,
+    marksmanship: 999,
+    overkill: 999,
+    planning: 999,
+    precision: 999,
+    preparation: 999,
+    quick_rest: 999,
+    second_wind: 999,
+    sneak_attack: 999,
+    technique: 999,
+    thorns: 999,
+    toughness_condescend: 999
+};
 
+// All skill definitions, runtime state shape, exp/talent formulas, and UI copy in one place.
 const SKILL_DEFINITION_ROWS = [
     {
         version:0,
@@ -39,10 +116,10 @@ const SKILL_DEFINITION_ROWS = [
         },
         triggerText: "Trigger: each slap or sandal attack hit.",
         getEffect: function(sk) {
-            return { slapFlatBeforeStr: (sk.level || 0) * 0.5};
+            return { slapFlatBeforeStr: (sk.level || 0) * 0.25};
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${roundNearestDecimals(e.slapFlatBeforeStr || 0, 2)} slap (before Bru)`;
+            return `Current: +${roundNearestDecimals(e.slapFlatBeforeStr || 0, 2)} slap (base)`;
         }
     },
     {
@@ -50,7 +127,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "aboveItAll",
         name: "Above It All",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         shortDescription: "Reduces incoming ego damage by a %.",
         flavorText: "“No one can make you feel inferior without your consent.” - Eleanor Roosevelt",
         guestArchetype: "Shield Bearer",
@@ -81,11 +158,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: multiply character leveling exp by 1.1 per Hindsight skill level (compounding).";
+            return "Reward: +5% character leveling exp per Hindsight skill level (additive).";
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { wisdomCharacterExpMultiplier: Math.pow(1.1, sk.level || 0) };
+            return { wisdomCharacterExpMultiplier: 1 + 0.05 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: char exp ×${roundNearestDecimals(e.wisdomCharacterExpMultiplier || 1, 2)}`;
@@ -104,11 +181,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 9,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: multiply coins from kills by 1.1 per Extortion skill level (compounding).";
+            return "Reward: +10% coins from kills per Extortion skill level (additive).";
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { greedKillCoinsMultiplier: Math.pow(1.1, sk.level || 0) };
+            return { greedKillCoinsMultiplier: 1 + 0.10 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: intruder removal coins ×${roundNearestDecimals(e.greedKillCoinsMultiplier || 1, 2)}`;
@@ -188,21 +265,42 @@ const SKILL_DEFINITION_ROWS = [
         name: "Adaptation",
         category: "combat",
         initialExpToLevel: 5,
-        shortDescription: "Body and mind adjust to milestones: +1 Bru and +1 Con each time this skill levels.",
+        shortDescription: "Body and mind adjust to milestones: +1 Con each time this skill levels.",
         flavorText: "“We are what we repeatedly do. Excellence, then, is not an act, but a habit.” - Aristotle",
         guestArchetype: "Drill Instructor",
         guestRarity: 4,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: +1 Brutality and +1 Confidence each time Adaptation gains a skill level (not each character level).";
+            return "Reward: +1 Confidence each time Adaptation gains a skill level (not each character level).";
         },
         triggerText: "Trigger: each time your character level increases.",
         getEffect: function(sk) {
-            const lv = sk.level || 0;
-            return { adaptationBonusStr: lv, adaptationBonusCon: lv };
+            return { adaptationBonusCon: sk.level || 0 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${e.adaptationBonusStr || 0} Bru, +${e.adaptationBonusCon || 0} Con from Adaptation level-ups`;
+            return `Current: +${e.adaptationBonusCon || 0} Con from Adaptation level-ups`;
+        }
+    },
+    {
+        version:0,
+        key: "savageLessons",
+        name: "Savage Lessons",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Learn through the fight: +1 Bru each time this skill levels.",
+        flavorText: "“Every bruise is a footnote. Every victory is the lecture.”",
+        guestArchetype: "Brutal Tutor",
+        guestRarity: 4,
+        affectedStat: "none",
+        rewardText: function() {
+            return "Reward: +1 Brutality each time Savage Lessons gains a skill level (not each character level).";
+        },
+        triggerText: "Trigger: each time your character level increases.",
+        getEffect: function(sk) {
+            return { savageLessonsBonusStr: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.savageLessonsBonusStr || 0} Bru from Savage Lessons level-ups`;
         }
     },
     {
@@ -217,11 +315,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function() {
-            return "Reward: multiply skill exp gains for every other skill by 1.1 per Echo Chamber skill level (compounding).";
+            return "Reward: +3% additive skill exp for every other skill per Echo Chamber skill level.";
         },
         triggerText: "Trigger: each time a Combat skill other than this one gains a skill level.",
         getEffect: function(sk) {
-            return { integrationOtherSkillExpMult: Math.pow(1.1, sk.level || 0) };
+            return { integrationOtherSkillExpMult: 1 + 0.03 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: ×${roundNearestDecimals(e.integrationOtherSkillExpMult || 1, 4)} other skills' skill exp`;
@@ -232,7 +330,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "mainCharacter",
         name: "Main Character",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         shortDescription: "+0.1 ego damage per level per visible enemy on the battlefield.",
         flavorText: "“I'm not the hero they deserve. I'm the one with the most screen time.”",
         guestArchetype: "Spotlight Thief",
@@ -241,9 +339,9 @@ const SKILL_DEFINITION_ROWS = [
         rewardText: function(sk) {
             return `Reward: +${round2((sk.level || 0) * 0.1)} base ego damage per visible intruder on the battlefield (before Brutality multiplier).`;
         },
-        triggerText: "Trigger: 1 skill exp per second while 4 or more intruders intersect the battlefield.",
+        triggerText: "Trigger: 1 skill exp per second while 4 or more intruders are visible.",
         getEffect: function(sk) {
-            return { mainCharacterFlatPerEnemy: (sk.level || 0) * 0.2 };
+            return { mainCharacterFlatPerEnemy: (sk.level || 0) * 0.1 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals(e.mainCharacterFlatPerEnemy || 0, 2)} ego dmg per visible enemy`;
@@ -283,11 +381,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: after an enemy damages you, their next attack deals ${round2((sk.level || 0) * 0.25)} flat less damage per stack (stacks per damaging hit, per enemy).`;
+            return `Reward: after an enemy damages you, their next attack deals ${round2((sk.level || 0) * 0.1)} flat less damage per stack (stacks per damaging hit, per enemy).`;
         },
         triggerText: "Trigger: each time an intruder attacks you for the second time or later.",
         getEffect: function(sk) {
-            return { insultFatigueFlatPerStack: (sk.level || 0) * 0.25 };
+            return { insultFatigueFlatPerStack: (sk.level || 0) * 0.1 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: −${roundNearestDecimals(e.insultFatigueFlatPerStack || 0, 2)} flat dmg per stack on next hit`;
@@ -305,11 +403,11 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: each enemy attack adds a Desensitized stack lasting ${round2((sk.level || 0) * 0.5)}s.`;
+            return `Reward: each enemy attack adds a Desensitized stack lasting ${round2(2 + (sk.level || 0) * 0.5)}s.`;
         },
         triggerText: "Trigger: each time an intruder attacks you (no damage required).",
         getEffect: function(sk) {
-            return { brokenRecordDesensitizedMsPerLevel: (sk.level || 0) * 500 };
+            return { brokenRecordDesensitizedMsPerLevel: 2000 + (sk.level || 0) * 500 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +1 Desensitized stack (${intToString(e.brokenRecordDesensitizedMsPerLevel || 0, 2)} ms) per enemy attack`;
@@ -321,22 +419,23 @@ const SKILL_DEFINITION_ROWS = [
         name: "Validation",
         category: "combat",
         initialExpToLevel: 5,
-        shortDescription: "+1 Confidence per kill, up to skill level.",
+        shortDescription: "+1 current and max Audacity per kill, up to skill level × 4.",
         flavorText: "“See? I told you I was right to be here.”",
         guestArchetype: "Applause Seeker",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +1 Confidence per intruder removal, up to ${sk.level || 0} Confidence from this skill.`;
+            return `Reward: +1 current and max Audacity per intruder removal, up to ${(sk.level || 0) * 4} from this skill.`;
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { validationConCap: sk.level || 0 };
+            return { validationAudCap: (sk.level || 0) * 4 };
         },
         effectUiSummary: function(sk, e) {
-            const cap = e.validationConCap || 0;
+            const cap = e.validationAudCap || 0;
             const kills = (data.battle && data.battle.enemiesKilled) || 0;
-            return `Current: +${Math.min(kills, cap)} Con from kills (cap ${cap})`;
+            const n = Math.min(kills, cap);
+            return `Current: +${n} current and max Aud from kills (cap ${cap})`;
         }
     },
     {
@@ -367,20 +466,20 @@ const SKILL_DEFINITION_ROWS = [
         name: "Narcissism",
         category: "combat",
         initialExpToLevel: 5,
-        shortDescription: "Gain more current Audacity when Aud rises (not max Aud recalc).",
-        flavorText: "“Every compliment is deserved. Every heal is a tribute.”",
+        shortDescription: "Extra current Audacity when max Audacity increases, including from Confidence.",
+        flavorText: "“The bigger I am, the more of me there is to love.”",
         guestArchetype: "Mirror Gazer",
         guestRarity: 8,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +${(sk.level || 0) * 10}% more current Audacity when you gain Aud (not from max Aud changes).`;
+            return `Reward: +${(sk.level || 0) * 10}% extra current Audacity when max Audacity increases, including from Confidence. Does not apply to regeneration or other healing.`;
         },
-        triggerText: "Trigger: sqrt(Audacity gained) when current Aud increases.",
+        triggerText: "Trigger: sqrt(current Audacity gained) when max Audacity increases, including from Confidence.",
         getEffect: function(sk) {
             return { narcissismAudGainMultPerLevel: (sk.level || 0) * 0.10 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${roundNearestDecimals((e.narcissismAudGainMultPerLevel || 0) * 100, 1)}% bonus on Aud gains`;
+            return `Current: +${roundNearestDecimals((e.narcissismAudGainMultPerLevel || 0) * 100, 1)}% extra current Aud when max Aud increases (including from Con)`;
         }
     },
     {
@@ -388,7 +487,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "windfallSwagger",
         name: "Windfall Swagger",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 15,
         shortDescription: "+1 Confidence per skill level.",
         flavorText: "“Money talks, and apparently it speaks fluent confidence.”",
         guestArchetype: "Coin Flipper",
@@ -410,7 +509,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "shockValue",
         name: "Shock Value",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 15,
         shortDescription: "+1 Brutality per skill level.",
         flavorText: "“Go big or go home. Preferably both, loudly.”",
         guestArchetype: "Grandstander",
@@ -433,22 +532,20 @@ const SKILL_DEFINITION_ROWS = [
         name: "Bitter Rivalry",
         category: "combat",
         initialExpToLevel: 5,
-        shortDescription: "+1 Brutality each time your character level increases.",
+        shortDescription: "Deal more damage to enemies the longer they stay in slap range.",
         flavorText: "“Every level they gain, I gain the urge to one-up them.”",
         guestArchetype: "Rival Clone",
         guestRarity: 4,
         affectedStat: "none",
-        rewardText: function() {
-            return "Reward: +1 Brutality each time your character level increases during a run.";
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.5)}% damage to an enemy for each second they have been in slap range.`;
         },
-        triggerText: "Trigger: each time your character level increases.",
+        triggerText: "Trigger: 1 skill exp per second an enemy spends in slap range.",
         getEffect: function(sk) {
-            return { bitterRivalryBonusStr: sk.level || 0 };
+            return { bitterRivalryDamagePercentPerSecond: (sk.level || 0) * 0.5 };
         },
         effectUiSummary: function(sk, e) {
-            const ls = data.battle && data.battle.levelState;
-            const bitterStr = ls ? Math.max(0, (ls.bitterRivalryStrBonus || 0)) : 0;
-            return `Current: +${bitterStr} Bru from character level-ups this run`;
+            return `Current: +${round2(e.bitterRivalryDamagePercentPerSecond || 0)}% damage per second an enemy is in slap range`;
         }
     },
     {
@@ -463,14 +560,14 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +1 Fury stack per Seethe skill level each second while no intruders are in slap range.`;
+            return `Reward: +1 Fury stack per Seethe skill level every 0.5s while no intruders are in slap range.`;
         },
-        triggerText: "Trigger: passive each second while no intruders are in slap range.",
+        triggerText: "Trigger: passive every 0.5s while no intruders are in slap range.",
         getEffect: function(sk) {
             return { seetheFuryPerLevel: sk.level || 0 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${e.seetheFuryPerLevel || 0} Fury/s with no enemies in melee`;
+            return `Current: +${e.seetheFuryPerLevel || 0} Fury every 0.5s with no enemies in melee`;
         }
     },
     {
@@ -478,18 +575,18 @@ const SKILL_DEFINITION_ROWS = [
         key: "retailTherapy",
         name: "Retail Therapy",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 15,
         shortDescription: "Desensitized stacks when gaining coins.",
         flavorText: "“Nothing soothes the ego like a little retail therapy.”",
         guestArchetype: "Impulse Buyer",
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +1 Desensitized stack lasting ${round2((sk.level || 0) * 0.5)}s when you gain coins.`;
+            return `Reward: +1 Desensitized stack lasting ${round2(2 + (sk.level || 0) * 0.5)}s when you gain coins.`;
         },
         triggerText: "Trigger: sqrt(coins gained) on each coin gain from intruder removal.",
         getEffect: function(sk) {
-            return { retailTherapyDesensitizedMsPerLevel: (sk.level || 0) * 500 };
+            return { retailTherapyDesensitizedMsPerLevel: 2000 + (sk.level || 0) * 500 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +1 Desensitized (${intToString(e.retailTherapyDesensitizedMsPerLevel || 0, 2)} ms) per coin gain`;
@@ -500,21 +597,21 @@ const SKILL_DEFINITION_ROWS = [
         key: "levelHeaded",
         name: "Level Headed",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         shortDescription: "Desensitized stacks when your character levels up.",
         flavorText: "“Growth is just another word for getting used to it.”",
         guestArchetype: "Steady Climber",
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +5 Desensitized stacks lasting ${round2((sk.level || 0) * 2)}s each when your character level increases.`;
+            return `Reward: 5 Desensitized stacks lasting ${round2(2 + (sk.level || 0) * 0.5)}s each when your character level increases.`;
         },
         triggerText: "Trigger: sqrt(character exp threshold for that level) each time your character level increases.",
         getEffect: function(sk) {
-            return { levelHeadedDesensitizedMsPerLevel: (sk.level || 0) * 2000 };
+            return { levelHeadedDesensitizedMsPerLevel: 2000 + (sk.level || 0) * 500 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +5 Desensitized (${intToString(e.levelHeadedDesensitizedMsPerLevel || 0, 2)} ms each) per character level-up`;
+            return `Current: 5 Desensitized stacks lasting ${round2((e.levelHeadedDesensitizedMsPerLevel || 0) / 1000)}s each per character level-up`;
         }
     },
     {
@@ -529,14 +626,14 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 7,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: Gain +${round2((sk.level || 0) * 0.5)}s of Malice when defeating an intruder while above 50% Aud.`;
+            return `Reward: Gain +${round2((sk.level || 0) * 0.5)} Malice when defeating an intruder while above 50% Aud.`;
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { bloodRushMaliceMsPerLevel: (sk.level || 0) * 500 };
+            return { bloodRushMalicePerLevel: (sk.level || 0) * 0.5 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${intToString(e.bloodRushMaliceMsPerLevel || 0, 2)} ms Malice per kill above half Aud`;
+            return `Current: +${round2(e.bloodRushMalicePerLevel || 0)} Malice per kill above half Aud`;
         }
     },
     {
@@ -551,14 +648,14 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 6,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +${round2((sk.level || 0) * 0.5)}s Malice when taking damage while above 50% Aud.`;
+            return `Reward: +${round2((sk.level || 0) * 0.5)} Malice when taking damage while above 50% Aud.`;
         },
         triggerText: "Trigger: each damaging intruder attack while above 50% Aud.",
         getEffect: function(sk) {
-            return { temperMaliceMsPerLevel: (sk.level || 0) * 500 };
+            return { temperMalicePerLevel: (sk.level || 0) * 0.5 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${intToString(e.temperMaliceMsPerLevel || 0, 2)} ms Malice per hit above half Aud`;
+            return `Current: +${round2(e.temperMalicePerLevel || 0)} Malice per hit above half Aud`;
         }
     },
     {
@@ -566,21 +663,21 @@ const SKILL_DEFINITION_ROWS = [
         key: "sadism",
         name: "Sadism",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         shortDescription: "Malice when killing enemies; exp from overkill.",
         flavorText: "“Excess is the point.”",
         guestArchetype: "Overkill Artist",
         guestRarity: 8,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +${round2(sk.level || 0)}s Malice when defeating an intruder.`;
+            return `Reward: +${round2(sk.level || 0)} Malice when defeating an intruder.`;
         },
         triggerText: "Trigger: sqrt(overkill damage) on each intruder removal.",
         getEffect: function(sk) {
-            return { sadismMaliceMsPerLevel: (sk.level || 0) * 1000 };
+            return { sadismMalicePerLevel: (sk.level || 0) * 1 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${intToString(e.sadismMaliceMsPerLevel || 0, 2)} ms Malice per kill`;
+            return `Current: +${round2(e.sadismMalicePerLevel || 0)} Malice per kill`;
         }
     },
     {
@@ -607,8 +704,8 @@ const SKILL_DEFINITION_ROWS = [
     },
     {
         version:0,
-        key: "fakeTearDrops",
-        name: "Fake Tear Drops",
+        key: "applyTearDrops",
+        name: "Apply Tear Drops",
         category: "combat",
         initialExpToLevel: 5,
         shortDescription: "Fake Tears while advancing on the battlefield.",
@@ -617,14 +714,14 @@ const SKILL_DEFINITION_ROWS = [
         guestRarity: 5,
         affectedStat: "none",
         rewardText: function(sk) {
-            return `Reward: +${round2((sk.level || 0) * 0.5)}s Fake Tears each second while moving forward.`;
+            return `Reward: +${round2(1 + (sk.level || 0) * 0.1)}s Fake Tears every 0.5s while moving forward.`;
         },
-        triggerText: "Trigger: 1 skill exp per second while moving forward on the battlefield.",
+        triggerText: "Trigger: 1 skill exp per 0.5s while moving forward on the battlefield.",
         getEffect: function(sk) {
-            return { fakeTearDropsMsPerLevel: (sk.level || 0) * 500 };
+            return { applyTearDropsMs: 1000 + (sk.level || 0) * 100 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${intToString(e.fakeTearDropsMsPerLevel || 0, 2)} ms Fake Tears/s while moving`;
+            return `Current: +${intToString(e.applyTearDropsMs || 0, 2)} ms Fake Tears per 0.5s while moving`;
         }
     },
     {
@@ -647,6 +744,584 @@ const SKILL_DEFINITION_ROWS = [
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${intToString(e.numbingCrowdsFakeTearsMsPerLevel || 0, 2)} ms Fake Tears/s with 3+ in melee`;
+        }
+    },
+    {
+        version:0,
+        key: "peerPressure",
+        name: "Peer Pressure",
+        category: "combat",
+        initialExpToLevel: 8,
+        shortDescription: "Extra base ego damage per intruder in slap range.",
+        flavorText: "“Everybody's doing it. That's the whole point.”",
+        guestArchetype: "Crowd Instigator",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.2)} base ego damage per intruder in slap range (before Brutality multiplier).`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while any intruder is in slap range.",
+        getEffect: function(sk) {
+            return { peerPressureFlatPerInRange: (sk.level || 0) * 0.2 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals(e.peerPressureFlatPerInRange || 0, 2)} ego dmg per slap-range enemy`;
+        }
+    },
+    {
+        version:0,
+        key: "highHorse",
+        name: "High Horse",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "More ego damage while above half Aud.",
+        flavorText: "“It's not arrogance if you're still winning.”",
+        guestArchetype: "Pedestal Percher",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 4)}% ego damage while above 50% Aud.`;
+        },
+        triggerText: "Trigger: each slap or sandal hit while above 50% Aud.",
+        getEffect: function(sk) {
+            return { highHorseDamageBonusFraction: (sk.level || 0) * 0.04 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals((e.highHorseDamageBonusFraction || 0) * 100, 1)}% dmg above half Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "underdog",
+        name: "Underdog",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "More ego damage while at or below half Aud.",
+        flavorText: "“They love a comeback almost as much as I need one.”",
+        guestArchetype: "Comeback Kid",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 6)}% ego damage while at or below 50% Aud.`;
+        },
+        triggerText: "Trigger: each slap or sandal hit while at or below 50% Aud.",
+        getEffect: function(sk) {
+            return { underdogDamageBonusFraction: (sk.level || 0) * 0.06 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals((e.underdogDamageBonusFraction || 0) * 100, 1)}% dmg at or below half Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "repeatOffender",
+        name: "Repeat Offender",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Extra flat ego damage per previous hit on the same intruder.",
+        flavorText: "“I don't make new points. I make the same point louder.”",
+        guestArchetype: "Habitual Heckler",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.4)} flat ego damage per previous hit on that same intruder.`;
+        },
+        triggerText: "Trigger: hitting an intruder you've hit before.",
+        getEffect: function(sk) {
+            return { repeatOffenderFlatPerPriorHit: (sk.level || 0) * 0.4 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals(e.repeatOffenderFlatPerPriorHit || 0, 2)} dmg per prior hit on target`;
+        }
+    },
+    {
+        version:0,
+        key: "crowdWork",
+        name: "Crowd Work",
+        category: "combat",
+        initialExpToLevel: 8,
+        shortDescription: "More ego damage % while many intruders are visible.",
+        flavorText: "“A packed house is just a bigger mirror.”",
+        guestArchetype: "Room Reader",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 3)}% ego damage while 4 or more intruders are visible.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while 4 or more intruders are visible.",
+        getEffect: function(sk) {
+            return { crowdWorkDamageBonusFraction: (sk.level || 0) * 0.03 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals((e.crowdWorkDamageBonusFraction || 0) * 100, 1)}% dmg with 4+ visible`;
+        }
+    },
+    {
+        version:0,
+        key: "walkingItOff",
+        name: "Walking It Off",
+        category: "combat",
+        initialExpToLevel: 10,
+        shortDescription: "Restore Aud while advancing on the battlefield.",
+        flavorText: "“Keep moving and the sting can't catch up.”",
+        guestArchetype: "Pacing Therapist",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: restore +${round2((sk.level || 0) * 0.08)} Aud per second while moving forward.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while moving forward on the battlefield.",
+        getEffect: function(sk) {
+            return { walkingItOffAudPerSec: (sk.level || 0) * 0.08 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals(e.walkingItOffAudPerSec || 0, 2).toFixed(2)} Aud/s while moving`;
+        }
+    },
+    {
+        version:0,
+        key: "publicApology",
+        name: "Public Apology",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Restore Aud on each intruder removal.",
+        flavorText: "“I'm sorry you made me do that.”",
+        guestArchetype: "Press Conference",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: restore +${round2((sk.level || 0) * 0.5)} Aud on each intruder removal.`;
+        },
+        triggerText: "Trigger: each intruder removal.",
+        getEffect: function(sk) {
+            return { publicApologyAudPerKill: (sk.level || 0) * 0.5 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals(e.publicApologyAudPerKill || 0, 2)} Aud per kill`;
+        }
+    },
+    {
+        version:0,
+        key: "thickSkin",
+        name: "Thick Skin",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Flat incoming ego damage reduction.",
+        flavorText: "“If you can't handle me at my worst, you can't handle me.”",
+        guestArchetype: "Callus Collector",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.2)} armor (flat damage reduction).`;
+        },
+        triggerText: "Trigger: each time an intruder damages you.",
+        getEffect: function(sk) {
+            return { thickSkinArmorFlat: (sk.level || 0) * 0.2 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: ${roundNearestDecimals(e.thickSkinArmorFlat || 0, 2)} armor flat`;
+        }
+    },
+    {
+        version:0,
+        key: "secondWind",
+        name: "Second Wind",
+        category: "combat",
+        initialExpToLevel: 10,
+        shortDescription: "Restore Aud once per clone when dropping very low.",
+        flavorText: "“I'm not done. I'm just catching my breath in public.”",
+        guestArchetype: "Encore Survivalist",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: restore +${round2((sk.level || 0) * 2)} Aud when Aud is below 20% (once per clone run).`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while Aud is below 50%.",
+        getEffect: function(sk) {
+            return { secondWindRestoreAud: (sk.level || 0) * 2 };
+        },
+        effectUiSummary: function(sk, e) {
+            const used = !!(data.battle && data.battle.secondWindRestoreUsed);
+            return `Current: +${roundNearestDecimals(e.secondWindRestoreAud || 0, 2)} Aud below 20% (${used ? "used this clone" : "ready"})`;
+        }
+    },
+    {
+        version:0,
+        key: "stiffUpperLip",
+        name: "Stiff Upper Lip",
+        category: "combat",
+        initialExpToLevel: 8,
+        shortDescription: "Reduces incoming ego damage while hurt.",
+        flavorText: "“Keep smiling. They hate that more than the slap.”",
+        guestArchetype: "Polite Fortress",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function() {
+            return "Reward: while at or below 50% Aud, multiply incoming slap damage by 1 / (1 + 0.03 × Stiff Upper Lip skill level).";
+        },
+        triggerText: "Trigger: each time an intruder attacks you while you are at or below 50% Aud.",
+        getEffect: function(sk) {
+            const lv = sk.level || 0;
+            return { stiffUpperLipIncomingDamageMultiplier: 1 / (1 + lv * 0.03) };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: incoming ×${roundNearestDecimals(e.stiffUpperLipIncomingDamageMultiplier || 1, 3)} at or below half Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "paddingResume",
+        name: "Padding the Resume",
+        category: "combat",
+        initialExpToLevel: 10,
+        shortDescription: "Bonus Aud from character level.",
+        flavorText: "“Every level is another bullet point. Every bullet point is another reason I'm fine.”",
+        guestArchetype: "Credential Stuffer",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${(sk.level || 0) * 2} current and max Aud per character level.`;
+        },
+        triggerText: "Trigger: each time your character level increases.",
+        getEffect: function(sk) {
+            const charLv = (data.battle && data.battle.levelState && data.battle.levelState.level) || 0;
+            const perChar = (sk.level || 0) * 2;
+            return { paddingResumeAudPerCharLevel: perChar, paddingResumeAudBonus: perChar * charLv };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.paddingResumeAudBonus || 0} Aud (${e.paddingResumeAudPerCharLevel || 0} per character level)`;
+        }
+    },
+    {
+        version:0,
+        key: "experienceHog",
+        name: "Experience Hog",
+        category: "combat",
+        initialExpToLevel: 3,
+        shortDescription: "Boosts character leveling exp.",
+        flavorText: "“If there's a lesson here, I'm taking the whole plate.”",
+        guestArchetype: "Spotlight Student",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function() {
+            return "Reward: +2% character leveling exp per Experience Hog skill level (additive, stacks with Hindsight).";
+        },
+        triggerText: "Trigger: each intruder removal.",
+        getEffect: function(sk) {
+            return { experienceHogCharacterExpAdd: 0.02 * (sk.level || 0) };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals((e.experienceHogCharacterExpAdd || 0) * 100, 1)}% char exp`;
+        }
+    },
+    {
+        version:0,
+        key: "studyGroup",
+        name: "Study Group",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Character exp when other combat skills level.",
+        flavorText: "“Your breakthrough is my group project.”",
+        guestArchetype: "Study Buddy",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} character exp when any other combat skill gains a level.`;
+        },
+        triggerText: "Trigger: each time a Combat skill other than this one gains a skill level.",
+        getEffect: function(sk) {
+            return { studyGroupCharacterExpPerLevel: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.studyGroupCharacterExpPerLevel || 0} char exp per other combat skill level-up`;
+        }
+    },
+    {
+        version:0,
+        key: "slowBurn",
+        name: "Slow Burn",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Gain Fury stacks while enemies are in melee.",
+        flavorText: "“Don't rush the resentment. Let it marinate.”",
+        guestArchetype: "Simmering Host",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} Fury stack(s) every 1s while any intruder is in slap range.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while any intruder is in slap range.",
+        getEffect: function(sk) {
+            return { slowBurnFuryPerLevel: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.slowBurnFuryPerLevel || 0} Fury/s with enemies in melee`;
+        }
+    },
+    {
+        version:0,
+        key: "thinIce",
+        name: "Thin Ice",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Gain Fury stacks while below half Aud.",
+        flavorText: "“One more comment and we all go through.”",
+        guestArchetype: "Cracking Smile",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} Fury stack(s) every 0.5s while below 50% Aud.`;
+        },
+        triggerText: "Trigger: 1 skill exp per 0.5s while Aud is below 50%.",
+        getEffect: function(sk) {
+            return { thinIceFuryPerLevel: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.thinIceFuryPerLevel || 0} Fury every 0.5s below half Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "stoic",
+        name: "Stoic",
+        category: "combat",
+        initialExpToLevel: 8,
+        shortDescription: "Desensitized stacks while at max Aud.",
+        flavorText: "“Nothing happened, and I have decided that is the correct amount of feeling.”",
+        guestArchetype: "Marble Statue",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +1 Desensitized stack lasting ${round2(2 + (sk.level || 0) * 0.5)}s every 1s while at max Aud.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while at max Aud.",
+        getEffect: function(sk) {
+            return { stoicDesensitizedMsPerLevel: 2000 + (sk.level || 0) * 500 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +1 Desensitized (${intToString(e.stoicDesensitizedMsPerLevel || 0, 2)} ms) per second at max Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "hotTake",
+        name: "Hot Take",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Outrage when taking damage.",
+        flavorText: "“That was uncalled for, and I will be discussing it at length.”",
+        guestArchetype: "Opinion Cannon",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.1)}s Outrage each time you take damage.`;
+        },
+        triggerText: "Trigger: each damaging intruder attack.",
+        getEffect: function(sk) {
+            return { hotTakeOutrageMsPerLevel: (sk.level || 0) * 100 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${intToString(e.hotTakeOutrageMsPerLevel || 0, 2)} ms Outrage per hit taken`;
+        }
+    },
+    {
+        version:0,
+        key: "righteousRant",
+        name: "Righteous Rant",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Outrage while advancing on the battlefield.",
+        flavorText: "“The speech writes itself if you just keep walking toward them.”",
+        guestArchetype: "Marching Lecture",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.2)}s Outrage every 0.5s while moving forward.`;
+        },
+        triggerText: "Trigger: 1 skill exp per 0.5s while moving forward on the battlefield.",
+        getEffect: function(sk) {
+            return { righteousRantOutrageMs: (sk.level || 0) * 200 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${intToString(e.righteousRantOutrageMs || 0, 2)} ms Outrage per 0.5s while moving`;
+        }
+    },
+    {
+        version:0,
+        key: "heckled",
+        name: "Heckled",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Outrage when surrounded in melee.",
+        flavorText: "“Say that again. Closer. I dare you.”",
+        guestArchetype: "Stage Scrapper",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.2)}s Outrage every 1s while 3+ intruders are in slap range.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while 3+ intruders are in slap range.",
+        getEffect: function(sk) {
+            return { heckledOutrageMsPerLevel: (sk.level || 0) * 200 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${intToString(e.heckledOutrageMsPerLevel || 0, 2)} ms Outrage/s with 3+ in melee`;
+        }
+    },
+    {
+        version:0,
+        key: "simmer",
+        name: "Simmer",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Malice while at max Aud.",
+        flavorText: "“I'm fine. That's what makes it worse.”",
+        guestArchetype: "Polite Kettle",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.25)} Malice every 0.5s while at max Aud.`;
+        },
+        triggerText: "Trigger: 1 skill exp per 0.5s while at max Aud.",
+        getEffect: function(sk) {
+            return { simmerMalicePerLevel: (sk.level || 0) * 0.25 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${round2(e.simmerMalicePerLevel || 0)} Malice every 0.5s at max Aud`;
+        }
+    },
+    {
+        version:0,
+        key: "sobStory",
+        name: "Sob Story",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Fake Tears when taking damage.",
+        flavorText: "“You wouldn't hit me if you knew what I've been through. Anyway.”",
+        guestArchetype: "Sympathy Artist",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.4)}s Fake Tears each time you take damage.`;
+        },
+        triggerText: "Trigger: each damaging intruder attack.",
+        getEffect: function(sk) {
+            return { sobStoryFakeTearsMsPerLevel: (sk.level || 0) * 400 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${intToString(e.sobStoryFakeTearsMsPerLevel || 0, 2)} ms Fake Tears per hit taken`;
+        }
+    },
+    {
+        version:0,
+        key: "stageSob",
+        name: "Stage Sob",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Fake Tears while many intruders are watching.",
+        flavorText: "“If there's an audience, the tears have somewhere to land.”",
+        guestArchetype: "House Lights",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.4)}s Fake Tears every 1s while 4+ intruders are visible.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while 4 or more intruders are visible.",
+        getEffect: function(sk) {
+            return { stageSobFakeTearsMsPerLevel: (sk.level || 0) * 400 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${intToString(e.stageSobFakeTearsMsPerLevel || 0, 2)} ms Fake Tears/s with 4+ visible`;
+        }
+    },
+    {
+        version:0,
+        key: "socialArmor",
+        name: "Social Armor",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Clout when surrounded in melee.",
+        flavorText: "“A crowd is just a very clingy shield.”",
+        guestArchetype: "Entourage",
+        guestRarity: 6,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} Clout every 1s while 3+ intruders are in slap range.`;
+        },
+        triggerText: "Trigger: 1 skill exp per second while 3+ intruders are in slap range.",
+        getEffect: function(sk) {
+            return { socialArmorCloutPerLevel: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.socialArmorCloutPerLevel || 0} Clout/s with 3+ in melee`;
+        }
+    },
+    {
+        version:0,
+        key: "borrowedGlory",
+        name: "Borrowed Glory",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "Clout when max Audacity increases.",
+        flavorText: "“Your growth is my glow-up.”",
+        guestArchetype: "Credit Taker",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${sk.level || 0} Clout whenever max Audacity increases, including from Confidence.`;
+        },
+        triggerText: "Trigger: sqrt(max Audacity gained) when max Audacity increases, including from Confidence.",
+        getEffect: function(sk) {
+            return { borrowedGloryCloutPerLevel: sk.level || 0 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${e.borrowedGloryCloutPerLevel || 0} Clout per max Aud increase`;
+        }
+    },
+    {
+        version:0,
+        key: "marathonEgo",
+        name: "Marathon Ego",
+        category: "combat",
+        initialExpToLevel: 10,
+        shortDescription: "More ego damage the longer the clone fight lasts.",
+        flavorText: "“I don't peak early. I peak constantly, then more.”",
+        guestArchetype: "Distance Divas",
+        guestRarity: 5,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 0.5)}% ego damage per 10 seconds the clone has been fighting.`;
+        },
+        triggerText: "Trigger: 1 skill exp per 10 seconds the clone is alive in combat.",
+        getEffect: function(sk) {
+            return { marathonEgoDamagePercentPerTenSec: (sk.level || 0) * 0.5 };
+        },
+        effectUiSummary: function(sk, e) {
+            const tens = Math.floor(((data.battle && data.battle.cloneAliveMs) || 0) / 10000);
+            const pct = (e.marathonEgoDamagePercentPerTenSec || 0) * tens;
+            return `Current: +${round2(e.marathonEgoDamagePercentPerTenSec || 0)}% dmg per 10s (${round2(pct)}% now)`;
+        }
+    },
+    {
+        version:0,
+        key: "closingArgument",
+        name: "Closing Argument",
+        category: "combat",
+        initialExpToLevel: 5,
+        shortDescription: "More ego damage to badly wounded intruders.",
+        flavorText: "“Let the record show they were already losing.”",
+        guestArchetype: "Final Word",
+        guestRarity: 7,
+        affectedStat: "none",
+        rewardText: function(sk) {
+            return `Reward: +${round2((sk.level || 0) * 8)}% ego damage vs an intruder below 25% of their own max Aud.`;
+        },
+        triggerText: "Trigger: each slap or sandal hit against an intruder below 25% Aud.",
+        getEffect: function(sk) {
+            return { closingArgumentDamageBonusFraction: (sk.level || 0) * 0.08 };
+        },
+        effectUiSummary: function(sk, e) {
+            return `Current: +${roundNearestDecimals((e.closingArgumentDamageBonusFraction || 0) * 100, 1)}% dmg vs under 25% Aud`;
         }
     },
     //scold skills
@@ -1227,6 +1902,25 @@ let skills = {
         const cd = gameData.battle.cooldowns;
         return def.effectUiSummary(sk, e, cd);
     },
+    buffDescriptions: {
+        "Fury": "Your next strike deals +1% damage per stack. All stacks are consumed when you attack.",
+        "Desensitized": "Incoming damage is multiplied by 1 / (1 + 0.03 × stacks). Each stack expires on its own timer.",
+        "Outrage": "Your attack timer recharges 50% faster while active. Additional time extends the buff.",
+        "Malice": "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks.",
+        "Fake Tears": "You take 20% less damage while active. Additional time extends the buff.",
+        "Clout": "Each stack blocks 1 incoming damage. Stacks consumed equal damage prevented."
+    },
+    wrapBuffNamesInHtml: function(text) {
+        const raw = text || "";
+        const names = Object.keys(skills.buffDescriptions).sort(function(a, b) {
+            return b.length - a.length;
+        });
+        const pattern = new RegExp("(" + names.join("|") + ")", "g");
+        return raw.replace(pattern, function(name) {
+            const desc = skills.buffDescriptions[name] || "";
+            return `<span class="showthat skill-buff-tip"><strong>${name}</strong><div class="showthis">${desc}</div></span>`;
+        });
+    },
     getSkillShortDescription: function(skillKey) {
         return skills._byKey[skillKey].shortDescription;
     },
@@ -1265,12 +1959,15 @@ let skills = {
         if (stars.gold) starCount++;
         // Additive star scaling per design: 0 stars x1, 1 star x2, 2 stars x4, 3 stars x6.
         const starMult = starCount > 0 ? (starCount * 2) : 1;
+        const currentClass = data.progress.currentClassKey || "none";
+        const classMult = (currentClass && currentClass !== "none") ? 1.5 : 1;
         return {
             talentMult: talentMult,
             levelMult: levelMult,
             tipsMult: tipsMult,
             starMult: starMult,
-            combinedMult: talentMult * levelMult * tipsMult * starMult
+            classMult: classMult,
+            combinedMult: talentMult * levelMult * tipsMult * starMult * classMult
         };
     },
 
@@ -1288,6 +1985,6 @@ let skills = {
         if (!sk || (sk.level || 0) <= 0) {
             return 1;
         }
-        return Math.pow(1.1, sk.level);
+        return 1 + 0.03 * (sk.level || 0);
     }
 };

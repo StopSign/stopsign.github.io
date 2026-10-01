@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Map Data Helper</title>
+    <link rel="stylesheet" href="stylesheet.css">
+    <link rel="stylesheet" href="mapHelper.css">
+</head>
+<body class="mh-body">
+    <div class="mh-page">
+        <header class="mh-header">
+            <div class="mh-header-row">
+                <h1>Map Data Helper</h1>
+                <a class="tab-button mh-back" href="index.html">Back to game</a>
+            </div>
+            <p class="muted-text mh-lede">Edit waves, check audacity/damage/spacing and spawn overlap, then copy a <code>createMap</code> block into <code>mapData.js</code>. Coins are map-design totals (no skills). Waves spawn as a column at start time; distance is travel stagger at 50 px/s.</p>
+        </header>
+
+        <section class="mh-toolbar">
+            <label class="mh-field">Load map
+                <select id="mhMapSelect"></select>
+            </label>
+            <button type="button" class="tab-button" id="mhReloadMapsBtn">Reload from mapData.js</button>
+            <button type="button" class="tab-button" id="mhCloneMapBtn">Clone map</button>
+            <button type="button" class="tab-button" id="mhNewMapBtn">New blank map</button>
+            <label class="mh-field">Star cycle
+                <select id="mhTierSelect">
+                    <option value="0">Bronze (combat x1, coins x1)</option>
+                    <option value="1">Silver (combat x4, coins x2)</option>
+                    <option value="2">Gold (combat x16, coins x4)</option>
+                </select>
+            </label>
+        </section>
+
+        <section class="mh-card mh-meta">
+            <div class="mh-meta-grid">
+                <label class="mh-field">Name <input type="text" id="mhMapName"></label>
+                <label class="mh-field">Key <input type="text" id="mhMapKey"></label>
+                <label class="mh-field">Base difficulty <input type="number" id="mhBaseDifficulty" min="0.01" step="0.1"></label>
+                <label class="mh-field">Seed <input type="number" id="mhSeed" step="1"></label>
+            </div>
+            <label class="mh-field mh-field-wide">Description <input type="text" id="mhDescription"></label>
+            <div id="mhSummary" class="mh-summary"></div>
+        </section>
+
+        <section class="mh-card">
+            <div class="mh-section-head">
+                <h2>Waves</h2>
+                <button type="button" class="tab-button" id="mhAddWaveBtn">Add wave</button>
+            </div>
+            <div class="mh-table-wrap">
+                <table class="mh-table" id="mhWaveTable">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Count</th>
+                            <th>Type</th>
+                            <th>Start (s)</th>
+                            <th>Distance (px)</th>
+                            <th>Difficulty</th>
+                            <th>Aud/Dmg trade</th>
+                            <th>Coins</th>
+                            <th>Aud</th>
+                            <th>Dmg</th>
+                            <th>Gap (s)</th>
+                            <th>Duration (s)</th>
+                            <th>Last (s)</th>
+                            <th>Coins/kill</th>
+                            <th>Exp/kill</th>
+                            <th>Wave coins</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="mhWaveTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mh-card">
+            <div class="mh-section-head">
+                <h2>Spawn overlap</h2>
+                <label class="mh-field mh-scrub-field">Time
+                    <input type="range" id="mhScrubRange" min="0" max="60" step="0.1" value="0">
+                    <input type="number" id="mhScrubNum" min="0" step="0.1" value="0">
+                    <span>s</span>
+                </label>
+            </div>
+            <div id="mhScrubInfo" class="mh-scrub-info"></div>
+            <div id="mhGantt" class="mh-chart"></div>
+            <h3 class="mh-subhead">Cumulative coins (if spawned units were killed)</h3>
+            <div id="mhCoinsChart" class="mh-chart"></div>
+        </section>
+
+        <section class="mh-card">
+            <h2>Coins by wave</h2>
+            <div class="mh-table-wrap">
+                <table class="mh-table" id="mhCoinsTable">
+                    <thead>
+                        <tr>
+                            <th>Wave</th>
+                            <th>Start (s)</th>
+                            <th>Last unit (s)</th>
+                            <th>Units</th>
+                            <th>This wave</th>
+                            <th>All coins by last unit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mhCoinsTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="mh-card">
+            <div class="mh-section-head">
+                <h2>Export</h2>
+                <button type="button" class="tab-button" id="mhCopyBtn">Copy createMap JS</button>
+                <span id="mhCopyStatus" class="muted-text"></span>
+            </div>
+            <p class="muted-text">Forage zones and shard drops are preserved in this snippet even though they are not edited here.</p>
+            <textarea id="mhExport" class="mh-export" spellcheck="false" readonly></textarea>
+        </section>
+    </div>
+
+    <div id="mhTooltip" class="mh-tooltip" style="display:none"></div>
+
+    <script>
+        (function loadHelperScripts() {
+            const v = Date.now();
+            const files = ["gameData.js", "maps.js", "mapData.js", "mapHelper.js"];
+            let i = 0;
+            function next() {
+                if (i >= files.length) {
+                    mapHelper.init();
+                    return;
+                }
+                const s = document.createElement("script");
+                s.src = files[i++] + "?t=" + v;
+                s.onload = next;
+                s.onerror = function() {
+                    console.error("Failed to load " + s.src);
+                };
+                document.body.appendChild(s);
+            }
+            next();
+        })();
+    </script>
+</body>
+</html>

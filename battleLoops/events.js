@@ -12,6 +12,10 @@ let events = {
         }
     },
     tryAgain: function() {
+        if (bonfire.isApplyLiveSettingsToNextClone()) {
+            bonfire.startNextClone();
+            return;
+        }
         if (data.battle && data.battle.cloneRunSettings) {
             if (!bonfire.retryWithStoredSettings()) {
                 return;
@@ -128,38 +132,40 @@ let events = {
                 }
             }
         }
-        if (scopeKey === "foxDen") {
-            const rh = data.progress.base && data.progress.base.foxDen;
-            const unlocks = rh && rh.unlocks ? rh.unlocks : {};
-            const unlockOrder = resortData.getFoxDenUnlockOrder();
-            for (let ui = 0; ui < unlockOrder.length; ui++) {
-                const uk = unlockOrder[ui];
-                if (!unlocks[uk]) {
-                    seen["foxDenUnlock:" + uk] = true;
-                }
+    },
+    /** Fox Den badge only when a plan row goes from hidden to visible. */
+    syncFoxDenRevealNotifications: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        const unlocks = rh && rh.unlocks ? rh.unlocks : {};
+        const order = resortData.getFoxDenUnlockOrder();
+        const prev = events._foxDenPlanRowShown;
+        if (!prev) {
+            events._foxDenPlanRowShown = {};
+            for (let i = 0; i < order.length; i++) {
+                const uk = order[i];
+                events._foxDenPlanRowShown[uk] = !!unlocks[uk] || !!engine.isFoxDenUnlockRowVisible(uk);
             }
+            return;
+        }
+        let revealed = false;
+        for (let i = 0; i < order.length; i++) {
+            const uk = order[i];
+            const built = !!unlocks[uk];
+            const shown = !built && !!engine.isFoxDenUnlockRowVisible(uk);
+            if (shown && !prev[uk]) {
+                revealed = true;
+            }
+            prev[uk] = shown || built;
+        }
+        if (revealed) {
+            events.markNewBaseContent("foxDen");
         }
     },
     syncBaseContentNotifications: function() {
         const notify = data.progress.baseContentNotify;
         const seen = notify.upgradeSeen;
-        const rh = data.progress.base && data.progress.base.foxDen;
-        const unlocks = rh && rh.unlocks ? rh.unlocks : {};
-        const unlockOrder = resortData.getFoxDenUnlockOrder();
-        for (let ui = 0; ui < unlockOrder.length; ui++) {
-            const uk = unlockOrder[ui];
-            if (!unlocks[uk]) {
-                const seenKey = "foxDenUnlock:" + uk;
-                if (!seen[seenKey]) {
-                    events.markNewBaseContent("foxDen");
-                    const hasMapButton = resortData.baseBuildingOrder.indexOf(uk) >= 0;
-                    if (hasMapButton) {
-                        events.markNewBaseContent(uk === "scrollArchives" ? "scrollArchives" : uk);
-                    }
-                }
-            }
-        }
-        const upgradeScopes = ["torii", "hiddenSpring", "inn", "path", "garden", "atelier", "bonfire"];
+        events.syncFoxDenRevealNotifications();
+        const upgradeScopes = ["torii", "hiddenSpring", "inn", "path", "garden", "atelier", "bonfire", "bambooForest"];
         for (let si = 0; si < upgradeScopes.length; si++) {
             const scopeKey = upgradeScopes[si];
             const bcfg = resortData.buildings[scopeKey];
@@ -175,9 +181,8 @@ let events = {
                 }
                 const visible = typeof u.rowVisible === "function" ? u.rowVisible() : true;
                 const soldOut = typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut();
-                const canBuy = typeof u.canBuy === "function" ? u.canBuy() : true;
                 const seenKey = scopeKey + ":" + pk;
-                if (visible && !soldOut && canBuy && !seen[seenKey]) {
+                if (visible && !soldOut && !seen[seenKey]) {
                     const notifyKey = scopeKey === "scrollArchives" ? "scrollArchives" : scopeKey;
                     events.markNewBaseContent(notifyKey);
                 }
@@ -191,9 +196,18 @@ let events = {
         }
     },
     toggleVentingSurplus: function(enabled) {
-        const garden = data.progress.base && data.progress.base.garden;
-        if (garden) {
-            garden.ventingSurplusEnabled = !!enabled;
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (bf) {
+            bf.startWithFullManaEnabled = !!enabled;
+        }
+        if (typeof engine !== "undefined" && engine.syncPostBattleCloneCountdown) {
+            engine.syncPostBattleCloneCountdown();
+        }
+    },
+    setBuyableTooltipOpen: function(open) {
+        events._buyableTooltipOpen = !!open;
+        if (open && typeof view !== "undefined" && view.updateBuyableUpgradesOverlay) {
+            view.updateBuyableUpgradesOverlay(true);
         }
     },
     /** Sync hide-maxed checkbox from save (call after DOM caches exist; not per-frame). */
@@ -296,6 +310,27 @@ let events = {
             if (events.clickEventHitsElement(e, panel)) {
                 return;
             }
+            const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
+            const compactOn = !forceWide && window.innerWidth < 1420;
+            if (compactOn) {
+                const menuColumn = viewData.cached.menuColumn || document.getElementById("menuColumn");
+                if (!events.clickEventHitsElement(e, menuColumn)) {
+                    return;
+                }
+                const t = e.target;
+                if (t && t.closest && (
+                    t.closest(".resort-building-map-btn")
+                    || t.closest(".resort-building-hidden-spring")
+                    || t.closest(".path-seg-hit")
+                    || t.closest(".spirit-slot")
+                    || t.closest(".spirit-slot-grid")
+                    || t.closest(".fire-launcher-wrap")
+                )) {
+                    return;
+                }
+                events.closeBaseBuildingInfo();
+                return;
+            }
             const battlefieldWrap = viewData.cached.battlefieldWrap || document.getElementById("battlefieldWrap");
             const battleHud = viewData.cached.battleHud || document.getElementById("battleHud");
             if (events.clickEventHitsElement(e, battlefieldWrap) || events.clickEventHitsElement(e, battleHud)) {
@@ -330,7 +365,7 @@ let events = {
                 return;
             }
             const key = btn.id.slice("baseBuilding_".length);
-            if (key === "path" || key === "hiddenSpring") {
+            if (key === "path") {
                 return;
             }
             e.preventDefault();
@@ -341,6 +376,10 @@ let events = {
         const alreadySelected = data.progress.selectedBaseBuilding === buildingKey && !data.progress.selectedSpiritId;
         if (!alreadySelected) {
             events.selectBaseBuilding(buildingKey);
+        }
+        if (buildingKey === "hiddenSpring") {
+            events.startCollectStone();
+            return;
         }
         const keys = resortData.okamiAssignableSiteKeys || [];
         if (keys.indexOf(buildingKey) >= 0) {
@@ -447,6 +486,7 @@ let events = {
         return resortData.baseBuildingOrder.indexOf(buildingKey) >= 0;
     },
     clearBaseBuildingSelection: function() {
+        events.finishSpiritRename();
         data.progress.selectedBaseBuilding = "";
         data.progress.selectedPathSegmentIndex = null;
         data.progress.selectedResortInfoType = "";
@@ -455,6 +495,7 @@ let events = {
         events.refreshBaseBuildingPanels();
     },
     openBaseBuilding: function(buildingKey, pathSegmentIndex) {
+        events.finishSpiritRename();
         if (buildingKey === "path") {
             const idx = pathSegmentIndex;
             if (idx === undefined || idx === null || isNaN(idx)) {
@@ -522,6 +563,9 @@ let events = {
             view.updateFireLauncherInfo();
             view.updateResortMapTokens();
         }
+        if (typeof view.updateBasePanel === "function") {
+            view.updateBasePanel();
+        }
         if (buildingKey && (buildingKey === "spirit" || buildingKey === "path" || viewData.cached[`resortInfo_${buildingKey}`])) {
             return;
         }
@@ -530,9 +574,6 @@ let events = {
             if (viewData.cached[`basePanel_${k}`]) {
                 view.updateVal(`basePanel_${k}`, k === buildingKey ? "" : "none", "style.display");
             }
-        }
-        if (typeof view.updateBasePanel === "function") {
-            view.updateBasePanel();
         }
     },
     /** @deprecated Use refreshBaseBuildingPanels, openBaseBuilding, or clearBaseBuildingSelection */
@@ -691,7 +732,10 @@ let events = {
         if (keys.indexOf(buildingKey) < 0) {
             return;
         }
-        if (buildingKey === "cistern" && !engine.isInnOnsenConverted()) {
+        if (buildingKey === "bonfire" && !engine.isBonfireTendTheFlameUnlocked()) {
+            return;
+        }
+        if (buildingKey === "cistern" && !engine.cisternWorkersRevealed()) {
             return;
         }
         const okami = engine.getOkami();
@@ -708,6 +752,9 @@ let events = {
             }
             if (buildingKey === "inn") {
                 engine.syncInnCarriersToWorkforce();
+            }
+            if (buildingKey === "market") {
+                engine.syncMarketCarriersToWorkforce();
             }
             if (buildingKey === "bambooForest") {
                 engine.clearBambooCutIfNoWorkers();
@@ -731,6 +778,10 @@ let events = {
             okami.assignedBuildingKey = "";
             engine.syncInnCarriersToWorkforce();
         }
+        if (prevAssign === "market" && buildingKey !== "market") {
+            okami.assignedBuildingKey = "";
+            engine.syncMarketCarriersToWorkforce();
+        }
         if (engine.isOkamiWeaving()) {
             engine.pauseAnyActiveWeaving();
         }
@@ -753,6 +804,9 @@ let events = {
         }
         if (buildingKey === "inn") {
             engine.syncInnCarriersToWorkforce();
+        }
+        if (buildingKey === "market") {
+            engine.syncMarketCarriersToWorkforce();
         }
     },
     goToOkamiAssignment: function() {
@@ -779,6 +833,49 @@ let events = {
     },
     closeBaseBuildingInfo: function() {
         events.clearBaseBuildingSelection();
+    },
+    clickSpiritTrainingSlot: function() {
+        if (!engine.isSpiritTrainingSpotBought()) {
+            return;
+        }
+        const selected = engine.getSpiritById(data.progress.selectedSpiritId);
+        const occupant = engine.getSpiritAtLocation("spiritTraining", 0);
+        const refresh = function() {
+            data.progress.selectedBaseBuilding = "spirit";
+            data.progress.selectedResortInfoType = "spirit";
+            data.progress.selectedFireLauncherKey = engine.getFireLauncherKeyForSpirit(
+                engine.getSpiritById(data.progress.selectedSpiritId)
+            );
+            events.refreshBaseBuildingPanels();
+            view.updateSpiritInfo();
+            view.updateResortMapTokens();
+        };
+        if (!selected) {
+            if (occupant) {
+                data.progress.selectedSpiritId = occupant.id;
+                refresh();
+            }
+            return;
+        }
+        const isSameSlot = (selected.location || "") === "spiritTraining" && (selected.slot || 0) === 0;
+        if (isSameSlot) {
+            refresh();
+            return;
+        }
+        if (!occupant) {
+            engine.moveSelectedSpiritTo("spiritTraining", 0);
+            refresh();
+            return;
+        }
+        if (occupant.id === selected.id) {
+            refresh();
+            return;
+        }
+        if (occupant.kind !== selected.kind) {
+            return;
+        }
+        engine.moveSelectedSpiritTo("spiritTraining", 0);
+        refresh();
     },
     clickSpiritSlot: function(kind, location, slotIndex) {
         if (kind !== "earth" && kind !== "water" && kind !== "fire" && kind !== "plant") {
@@ -843,6 +940,7 @@ let events = {
         if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
             return;
         }
+        events.finishSpiritRename();
         data.progress.selectedFireLauncherKey = platformKey;
         data.progress.selectedSpiritId = null;
         data.progress.selectedBaseBuilding = "fireLauncher";
@@ -903,6 +1001,34 @@ let events = {
             bf.fireTendingEnabled = !!checked;
         }
     },
+    toggleBonfireApplyLiveSettings: function(checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (bf) {
+            bf.applyLiveSettingsToNextClone = !!checked;
+        }
+        if (typeof view !== "undefined" && view.updateCloneCostDisplays) {
+            view.updateCloneCostDisplays();
+        }
+    },
+    toggleBonfireAutoRetry: function(checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        bf.autoRetryEnabled = !!checked;
+        if (typeof engine !== "undefined" && engine.syncPostBattleCloneCountdown) {
+            engine.syncPostBattleCloneCountdown();
+        }
+    },
+    toggleShrineLiftedBurdens: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.allowClasslessWithoutDivinity = !!checked;
+        }
+        if (typeof view.updateCloneCostDisplays === "function") {
+            view.updateCloneCostDisplays();
+        }
+    },
     setBonfireFireTendingCap: function(value) {
         const bf = data.progress.base && data.progress.base.bonfire;
         if (!bf) {
@@ -925,23 +1051,112 @@ let events = {
             g.autoWeaveCheapestReady = !!checked;
         }
     },
+    toggleGardenAutoWeaveIncludePaused: function(checked) {
+        const g = data.progress.base && data.progress.base.garden;
+        if (g) {
+            g.autoWeaveIncludePausedWeaves = !!checked;
+        }
+    },
     toggleFoxDenManaOrders: function(checked) {
         const rh = data.progress.base && data.progress.base.foxDen;
         if (rh) {
             rh.manaOrdersEnabled = !!checked;
         }
     },
-    startInnFillMana: function() {
-        const weaveUi = engine.getUpgradeWeaveUi("inn", "fillMana");
+    startFillMana: function(buildingKey) {
+        if (buildingKey === "hiddenSpring") {
+            const cloneUi = engine.getManaCloneTravelUi();
+            if (cloneUi) {
+                if (cloneUi.mode === "paused") {
+                    engine.resumeManaCloneJob();
+                }
+                return;
+            }
+        }
+        const weaveUi = engine.getUpgradeWeaveUi(buildingKey, "fillMana");
         if (weaveUi) {
             if (weaveUi.mode === "paused") {
-                engine.resumeWeaving("inn", "fillMana");
+                engine.resumeWeaving(buildingKey, "fillMana");
             } else {
-                engine.pauseActiveWeaving("inn", "fillMana");
+                engine.pauseActiveWeaving(buildingKey, "fillMana");
             }
             return;
         }
-        engine.startInnFillMana();
+        engine.startFillMana(buildingKey);
+    },
+    startCollectStone: function() {
+        const ui = engine.getCollectStoneTravelUi();
+        if (ui) {
+            if (ui.mode === "paused") {
+                engine.resumeCollectStoneJob();
+            }
+            return;
+        }
+        engine.startCollectStone();
+    },
+    toggleBuildingAllowCarriersMana: function(buildingKey, checked) {
+        const b = data.progress.base && data.progress.base[buildingKey];
+        if (b) {
+            b.allowCarriersBringMana = !!checked;
+        }
+    },
+    toggleStonePileAllowUnduplicated: function(checked) {
+        const pile = data.progress.base && data.progress.base.stonePile;
+        if (pile) {
+            pile.allowUnduplicatedStone = !!checked;
+        }
+    },
+    toggleMarketCreditOnly: function(checked) {
+        const market = data.progress.base && data.progress.base.market;
+        if (market) {
+            market.creditOnlyPurchases = !!checked;
+        }
+    },
+    toggleMarketHaulResource: function(resourceType, checked) {
+        const market = data.progress.base && data.progress.base.market;
+        if (!market) {
+            return;
+        }
+        const field = resourceType === "stone" ? "allowStone"
+            : resourceType === "wood" ? "allowWood"
+            : resourceType === "bars" ? "allowBars"
+            : null;
+        if (!field) {
+            return;
+        }
+        market[field] = !!checked;
+        if (!checked) {
+            engine.cancelMarketCarriers(function(carrier) {
+                return carrier.resourceType === resourceType;
+            });
+        }
+    },
+    toggleMarketTrade: function(tradeKey, checked) {
+        const market = data.progress.base && data.progress.base.market;
+        if (!market || !resortData.marketTrades[tradeKey]) {
+            return;
+        }
+        if (!market.tradeEnabled) {
+            market.tradeEnabled = {};
+        }
+        market.tradeEnabled[tradeKey] = !!checked;
+    },
+    setMarketTradeThreshold: function(tradeKey, value) {
+        const market = data.progress.base && data.progress.base.market;
+        if (!market || !resortData.marketTrades[tradeKey]) {
+            return;
+        }
+        if (!market.tradeThresholds) {
+            market.tradeThresholds = {};
+        }
+        const parsed = Math.max(0, Math.floor(Number(value) || 0));
+        market.tradeThresholds[tradeKey] = parsed;
+    },
+    changeNoodleConversationTopics: function() {
+        engine.changeNoodleConversationTopics();
+    },
+    selectNoodleTipSkill: function(skillKey) {
+        engine.selectNoodleTipSkill(skillKey);
     },
     refreshKitsuneAssignmentTooltip: function() {
         const list = document.getElementById("kitsuneAssignTooltipList");
@@ -958,6 +1173,11 @@ let events = {
                 continue;
             }
             html += `<div class="kitsune-assign-tip-row">${resortData.getScopeDisplayName(sk)}: ${n}</div>`;
+        }
+        const traders = data.progress.base && data.progress.base.market && data.progress.base.market.assignedTraders
+            ? data.progress.base.market.assignedTraders : 0;
+        if (traders > 0) {
+            html += `<div class="kitsune-assign-tip-row">Market Traders: ${traders}</div>`;
         }
         if (!html) {
             html = `<div class="kitsune-assign-tip-row muted-text">None assigned</div>`;
@@ -986,6 +1206,39 @@ let events = {
             cistern.replaceWithHotterWater = !!checked;
         }
     },
+    toggleCisternWaterSpiritsUsePathSpeed: function(checked) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (cistern) {
+            cistern.waterSpiritsUsePathSpeed = !!checked;
+        }
+    },
+    setFireLauncherTargetMode: function(mode) {
+        const key = data.progress.selectedFireLauncherKey;
+        if (!key) {
+            return;
+        }
+        const state = engine.getFireLauncherPlatformState(key);
+        if (!state) {
+            return;
+        }
+        const allowed = {
+            default: true,
+            closest: true,
+            furthest: true,
+            coldest: true,
+            hottest: true
+        };
+        if (!allowed[mode]) {
+            return;
+        }
+        if (mode !== "default" && !engine.isArrangementOfTargetPriorityUnlocked()) {
+            return;
+        }
+        if ((mode === "coldest" || mode === "hottest") && !engine.isArrangementOfHeatTargetingUnlocked()) {
+            return;
+        }
+        state.targetMode = mode;
+    },
     emptyHalfCistern: function() {
         engine.emptyHalfCistern();
     },
@@ -1008,6 +1261,92 @@ let events = {
         }
         spirit.prioritizeOre = !!checked;
     },
+    toggleSpiritAutoReturnToMine: function(checked) {
+        if (!engine.isArrangementOfDiggingUnlocked()) {
+            return;
+        }
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (!spirit || spirit.kind !== "earth") {
+            return;
+        }
+        spirit.autoReturnToMine = !!checked;
+    },
+    beginSpiritRename: function() {
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (!spirit) {
+            return;
+        }
+        if (viewData.spiritNameEdit && viewData.spiritNameEdit.spiritId !== spirit.id) {
+            events.finishSpiritRename();
+        }
+        if (viewData.spiritNameEdit && viewData.spiritNameEdit.spiritId === spirit.id) {
+            return;
+        }
+        const input = viewData.cached.spiritInfoNameInput;
+        if (!input) {
+            return;
+        }
+        viewData.spiritNameEdit = { spiritId: spirit.id };
+        input.value = engine.getSpiritDisplayName(spirit);
+        view.syncSpiritNameEditor(spirit);
+        input.focus();
+        if (input.select) {
+            input.select();
+        }
+    },
+    filterSpiritNameInput: function(el) {
+        if (!el) {
+            return;
+        }
+        const edit = viewData.spiritNameEdit;
+        const spirit = edit ? engine.getSpiritById(edit.spiritId) : null;
+        if (spirit && el.value === engine.getSpiritDefaultName(spirit)) {
+            return;
+        }
+        const cleaned = engine.sanitizeSpiritName(el.value);
+        if (el.value === cleaned) {
+            return;
+        }
+        const start = el.selectionStart || 0;
+        const before = engine.sanitizeSpiritName(el.value.slice(0, start)).length;
+        el.value = cleaned;
+        if (el.setSelectionRange) {
+            el.setSelectionRange(before, before);
+        }
+    },
+    spiritNameInputKeydown: function(e) {
+        if (!e || e.key !== "Enter") {
+            return;
+        }
+        e.preventDefault();
+        events.finishSpiritRename();
+    },
+    finishSpiritRename: function() {
+        const edit = viewData.spiritNameEdit;
+        if (!edit) {
+            return;
+        }
+        const input = viewData.cached.spiritInfoNameInput;
+        const spirit = engine.getSpiritById(edit.spiritId);
+        const raw = input ? input.value : "";
+        viewData.spiritNameEdit = null;
+        if (input) {
+            input.value = "";
+            if (document.activeElement === input) {
+                input.blur();
+            }
+        }
+        if (spirit) {
+            engine.renameSpirit(spirit, raw);
+        }
+        const showing = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (showing) {
+            view.updateVal("spiritInfoTitle", engine.getSpiritDisplayName(showing));
+        } else if (spirit) {
+            view.updateVal("spiritInfoTitle", engine.getSpiritDisplayName(spirit));
+        }
+        view.syncSpiritNameEditor(showing);
+    },
     spendCoinsIfPossible: function(cost) {
         if (data.progress.coins < cost) {
             return false;
@@ -1029,12 +1368,36 @@ let events = {
         }
     },
     startBonfireClone: function() {
-        if (bonfire.startCloneCombat(data.progress.selectedTravelMapKey || data.progress.currentMapKey)) {
+        if (bonfire.startNextClone(data.progress.selectedTravelMapKey || data.progress.currentMapKey)) {
             events.closeBaseBuildingInfo();
         }
     },
+    adjustCloneDensity: function(mode) {
+        const bf = data.progress.base.bonfire;
+        if (!bf.denseClonesUnlocked) {
+            return;
+        }
+        const cur = bonfire.getCloneDensity();
+        const max = bonfire.getMaxCloneDensity();
+        let next = cur;
+        if (mode === "one_inc") {
+            next = cur + 1;
+        } else if (mode === "one_dec") {
+            next = cur - 1;
+        } else if (mode === "ten_inc") {
+            next = cur + 10;
+        } else if (mode === "ten_dec") {
+            next = cur - 10;
+        } else if (mode === "all_inc") {
+            next = max;
+        } else if (mode === "all_dec") {
+            next = 0;
+        }
+        bf.cloneDensity = bonfire.clampCloneDensity(next);
+        view.updateCloneCostDisplays();
+    },
     startTravelWithBonfireSettings: function() {
-        bonfire.startCloneCombat(data.progress.selectedTravelMapKey);
+        bonfire.startNextClone(data.progress.selectedTravelMapKey);
     },
     goToBonfire: function() {
         events.switchTab("base");
@@ -1046,18 +1409,21 @@ let events = {
     },
     bonfireSelectClass: function(classKey) {
         bonfire.selectClass(classKey);
-        view.updateBasePanelBonfire();
+        view.updateBasePanelShrine();
+        view.updateCloneCostDisplays();
     },
     bonfireSelectModifier: function(modKey) {
         bonfire.selectModifier(modKey);
-        view.updateBasePanelBonfire();
+        view.updateBasePanelShrine();
+        view.updateCloneCostDisplays();
     },
     bonfireApplySelection: function(e) {
         if (e && e.stopPropagation) {
             e.stopPropagation();
         }
         bonfire.applyCurrentSelection();
-        view.updateBasePanelBonfire();
+        view.updateBasePanelShrine();
+        view.updateCloneCostDisplays();
     },
     adjustWorkers: function(kind, mode) {
         if (!mode) return;
@@ -1094,10 +1460,14 @@ let events = {
         if (!bf || !bf.plannedGrowthBlessingUnlocked) {
             return;
         }
-        const worked = engine.applyAttributePoint(attributeKey, true);
-        if (!worked) {
+        engine.addAttributePlanEntry(attributeKey);
+    },
+    removeAttributePlanRange: function(startLevel, endLevel) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || !bf.plannedGrowthBlessingUnlocked) {
             return;
         }
+        engine.removeAttributePlanRange(startLevel, endLevel);
     },
     clearAttributePlan: function() {
         const bf = data.progress.base && data.progress.base.bonfire;
@@ -1105,8 +1475,6 @@ let events = {
             return;
         }
         data.progress.attributePlan = [];
-        initialize.applyPlanForCurrentLevel();
-        initialize.calcPlayerStats(false);
     },
     changeMap: function(mapKey) {
         data.progress.selectedTravelMapKey = mapKey;

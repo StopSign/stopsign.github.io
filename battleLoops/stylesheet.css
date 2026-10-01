@@ -122,13 +122,56 @@ body {
 }
 
 .resort-map-progress-orb {
-    bottom: 135px;
+    bottom: 131px;
     left: 48%;
     transform: translateX(-50%);
 }
 
 .resort-map-progress-orb .prog-fill-orb-exp {
     height: 100%;
+}
+
+.resort-map-progress-shrine {
+    bottom: 36px;
+    left: 218px;
+    transform: translateX(-50%);
+}
+
+.resort-map-progress-shrine .prog-fill-divinity {
+    height: 100%;
+}
+
+.resort-map-progress-market {
+    bottom: 50px;
+    left: 5%;
+}
+
+.resort-map-progress-market .prog-fill-market-exp {
+    height: 100%;
+}
+
+.prog-fill-market-exp {
+    background: #3f8f6b;
+}
+
+.prog-fill-noodle-tip {
+    background: #c46a6a;
+}
+
+.cost-amt-unaffordable {
+    color: #ef4444;
+}
+
+.noodle-tip-skill {
+    margin: 8px 0;
+}
+
+.noodle-tip-skill-label {
+    display: block;
+}
+
+.base-mini-progress-fill.prog-fill-market-exp {
+    background: #3f8f6b;
 }
 
 .prog-fill-okami-exp {
@@ -139,8 +182,21 @@ body {
     background: #3c0295;
 }
 
+.prog-fill-divinity {
+    background: #8a6a1a;
+}
+
 .base-mini-progress-fill.prog-fill-mana {
     background: #3c0295;
+}
+
+.prog-fill.prog-fill-water,
+.base-mini-progress-fill.prog-fill-water {
+    background: #7ec8e3;
+}
+
+.base-mini-progress-fill.prog-fill-divinity {
+    background: #8a6a1a;
 }
 
 @media (max-width: 1419px) {
@@ -473,6 +529,53 @@ button {
     z-index: 18;
     pointer-events: none;
     overflow: hidden;
+}
+
+#slapFxLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 36;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.slap-hand-img {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    display: none;
+    pointer-events: none;
+    user-select: none;
+    transform-origin: center center;
+    object-fit: contain;
+}
+
+.intruder-attack-gfx {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    display: none;
+    pointer-events: none;
+    user-select: none;
+    object-fit: contain;
+}
+
+.slap-dmg-num {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    font-size: 22px;
+    line-height: 1;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.slap-dmg-num.float-aud-gain {
+    color: #7CFF9A;
+}
+
+.slap-dmg-num.float-aud-hurt {
+    color: #ff4d4d;
 }
 
 .attack-line-fx-anim {
@@ -888,6 +991,17 @@ button {
     margin-bottom: 6px;
 }
 
+.attribute-plan-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.attribute-plan-title-row .muted-text {
+    margin-top: 0;
+}
+
 .muted-text {
     color: #9ca3af;
     margin-top: 6px;
@@ -905,13 +1019,38 @@ button {
 
 .plan-list {
     display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
 }
 
 .plan-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     padding: 2px 6px;
     border: 1px solid var(--border-color);
+}
+
+.plan-item-remove {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #5a2a2a;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    box-sizing: border-box;
+}
+
+.plan-item-remove:hover {
+    background: #7a3a3a !important;
 }
 
 .plan-next {
@@ -1203,7 +1342,45 @@ button {
 }
 
 .history-row {
-    margin-bottom: 6px;
+    display: grid;
+    grid-template-columns: minmax(11em, 1.6fr) 5.5em 3.6em 3.6em minmax(4.2em, 1fr) 5.5em;
+    column-gap: 10px;
+    margin-bottom: 2px;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+}
+
+.history-row > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.history-header {
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.history-talent {
+    margin: 0 0 1px 0;
+    font-size: 11px;
+}
+
+.history-shards {
+    margin: 0 0 8px 0;
+    font-size: 11px;
+}
+
+.skill-buff-tip {
+    position: relative;
+    display: inline;
+    cursor: help;
+}
+
+.skill-buff-tip .showthis {
+    min-width: 180px;
+    max-width: 260px;
+    white-space: normal;
 }
 
 #tabPane_base {
@@ -1216,6 +1393,41 @@ button {
 #tabPane_base .pane-title {
     position: relative;
     z-index: 30;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pane-title-buyable {
+    margin-left: 8px;
+    white-space: nowrap;
+}
+
+.pane-title-buyable .showthis {
+    right: 0;
+    left: auto;
+    min-width: 400px;
+}
+
+#baseBuyableTooltip {
+    min-width: 400px;
+}
+
+.buyable-tip-row {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.buyable-tip-building,
+.buyable-tip-name {
+    flex: 1 1 auto;
+}
+
+.buyable-tip-cost {
+    margin-left: auto;
+    text-align: right;
+    flex: 0 0 auto;
 }
 
 .base-map-wrap {
@@ -1282,6 +1494,54 @@ button {
     pointer-events: none;
 }
 
+.dirt-road-svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.dirt-road-hover-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.dirt-road-hotspot {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.dirt-road-hotspot-hit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 12px;
+    pointer-events: auto;
+    background: transparent;
+}
+
+.dirt-road-tooltip {
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+.dirt-road-line {
+    fill: none;
+    stroke: #6b4423;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
 .resort-building-label {
     z-index: 12;
     text-shadow: 0 1px 3px #000;
@@ -1289,10 +1549,9 @@ button {
 }
 
 .resort-building-map-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
+    display: block;
+    width: 40px;
+    height: 40px;
     padding: 0;
     border: none;
     background: transparent;
@@ -1300,6 +1559,30 @@ button {
     color: inherit;
     font: inherit;
     font-size: 12px;
+    overflow: visible;
+}
+
+.resort-building-map-btn .resort-building-art {
+    display: block;
+    width: 40px;
+    height: 40px;
+}
+
+.resort-building-map-btn .resort-building-label-text,
+.resort-building-map-btn .resort-building-display {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+
+.resort-building-map-btn .resort-building-label-text {
+    top: 100%;
+    margin-top: 2px;
+}
+
+.resort-building-map-btn .resort-building-display {
+    top: calc(100% + 1.15em + 2px);
 }
 
 .resort-building-notify-badge {
@@ -1354,10 +1637,13 @@ button {
     text-align: center;
     min-width: 100%;
     line-height: 1.2;
+    white-space: nowrap;
+    overflow: visible;
+    flex-shrink: 0;
 }
 
 .resort-building-hidden-spring {
-    top: 73px;
+    top: 30px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 11;
@@ -1380,39 +1666,78 @@ button {
     transform: none;
 }
 
-.resort-building-bar {
-    left: 37%;
-    bottom: 203px;
+.inn-bead-float {
+    --inn-bead-x: 0px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    pointer-events: none;
+    font-size: 16px;
+    line-height: 1;
+    white-space: nowrap;
+    color: #17edfd;
+    animation: inn-bead-float 2s linear forwards;
+}
+
+.inn-bead-float.hypervisible {
+    color: #17edfd;
+}
+
+@keyframes inn-bead-float {
+    0% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--inn-bead-x)), -50%);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% - 18px));
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% - 36px));
+    }
+}
+
+.resort-building-noodleBar {
+    left: 246px;
+    bottom: 241px;
     transform: none;
 }
 
 .resort-building-laundry {
-    left: 11%;
-    bottom: 293px;
+    left: 53px;
+    bottom: 300px;
     transform: none;
 }
 
 .resort-building-torii {
-    bottom: 28px;
-    left: 50%;
+    bottom: 60px;
+    left: 333px;
+    transform: translateX(-50%);
+}
+
+.resort-building-shrine {
+    bottom: 74px;
+    left: 220px;
     transform: translateX(-50%);
 }
 
 .resort-building-cistern {
-    left: 80%;
-    bottom: 290px;
+    left: 538px;
+    bottom: 311px;
     transform: none;
 }
 
 .resort-building-pond {
-    left: 66%;
-    bottom: 280px;
+    left: 439px;
+    bottom: 295px;
     transform: none;
 }
 
 .resort-building-bonfire {
-    left: 88%;
-    bottom: 34px;
+    left: 586px;
+    bottom: 47px;
     transform: none;
 }
 
@@ -1503,6 +1828,27 @@ button {
     margin-left: 6px;
 }
 
+.market-trade-threshold {
+    width: 5em;
+    margin: 0 4px;
+}
+
+.market-trade-side {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    min-width: 90px;
+}
+
+.market-trade-prog {
+    width: 90px;
+}
+
+.market-trade-locked {
+    opacity: 0.55;
+}
+
 .bonfire-info-panel {
     flex: 0 0 42%;
     min-height: 120px;
@@ -1519,31 +1865,31 @@ button {
 
 .resort-building-garden {
     left: 71%;
-    bottom: 59px;
+    bottom: 64px;
     transform: none;
 }
 
 .resort-building-atelier {
-    left: 75%;
-    bottom: 182px;
+    left: 500px;
+    bottom: 209px;
     transform: none;
 }
 
 .resort-building-scrollArchives {
-    left: 58%;
-    bottom: 139px;
+    left: 393px;
+    bottom: 134px;
     transform: none;
 }
 
 .resort-building-market {
     left: 5%;
-    bottom: 9px;
+    bottom: 42px;
     transform: none;
 }
 
 .resort-building-mage-tower {
-    left: 45%;
-    bottom: 143px;
+    left: 300px;
+    bottom: 168px;
     transform: none;
 }
 
@@ -1564,8 +1910,8 @@ button {
 }
 
 .resort-building-fox-den {
-    bottom: 260px;
-    left: 52%;
+    bottom: 313px;
+    left: 346px;
     top: auto;
     transform: translateX(-50%);
     z-index: 13;
@@ -1589,6 +1935,7 @@ button {
     transform: translate(-50%, -50%);
     z-index: 11;
     pointer-events: none;
+    overflow: visible;
 }
 
 .fox-den-build-art {
@@ -1626,6 +1973,14 @@ button {
 
 .spirit-slot-grid-earth { top: 70px; left: 195px; }
 .spirit-slot-grid-water { top: 70px; left: 398px; }
+.spirit-slot-grid-training {
+    top: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    grid-template-columns: 22px;
+    grid-template-rows: 22px;
+    z-index: 15;
+}
 .spirit-slot-grid-mine-earth {
     top: 81px;
     left: 41px;
@@ -1649,8 +2004,8 @@ button {
 }
 
 .spirit-slot-grid-atelier-fire {
-    left: 79%;
-    bottom: 157px;
+    left: 520px;
+    bottom: 155px;
     transform: translateX(-50%);
     grid-template-columns: repeat(3, 22px);
     grid-template-rows: 22px;
@@ -1669,23 +2024,24 @@ button {
     z-index: 15;
     width: 28px;
     cursor: pointer;
+    overflow: visible;
 }
 
 .fire-launcher-pathMid {
-    left: 42%;
-    top: 52%;
+    left: 325px;
+    top: 242px;
     transform: translate(-50%, -50%);
 }
 
 .fire-launcher-bendTop {
-    left: 68%;
-    top: 22%;
+    left: 428px;
+    top: 159px;
     transform: translate(-50%, -50%);
 }
 
 .fire-launcher-pathLower {
-    left: 72%;
-    top: 68%;
+    left: 446px;
+    top: 283px;
     transform: translate(-50%, -50%);
 }
 
@@ -1706,6 +2062,10 @@ button {
     pointer-events: none;
     z-index: 0;
     box-sizing: border-box;
+}
+
+.fire-launcher-slot .fire-launcher-range {
+    z-index: 0;
 }
 
 .fire-launcher-wrap:hover .fire-launcher-range,
@@ -1733,8 +2093,8 @@ button {
 
 .fire-launcher-projectile {
     position: absolute;
-    width: 14px;
-    height: 14px;
+    width: 28px;
+    height: 28px;
     z-index: 16;
     pointer-events: none;
 }
@@ -1909,6 +2269,8 @@ button {
     line-height: 1;
     color: #f3f4f6;
     cursor: pointer;
+    overflow: visible;
+    position: relative;
 }
 
 .spirit-slot.spirit-slot-selected {
@@ -1924,6 +2286,7 @@ button {
 .spirit-slot-earth { border: 1px solid #8a5a2b; }
 .spirit-slot-water { border: 1px solid #4da3ff; }
 .spirit-slot-fire { border: 1px solid #ff8a3d; }
+.spirit-slot-training { border: 1px solid #fff; }
 
 .earth-spirit-token {
     position: absolute;
@@ -1964,11 +2327,27 @@ button {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #4a9fd4;
+    background: transparent;
     border: 1px solid #7ec8e8;
     z-index: 13;
     box-sizing: border-box;
     pointer-events: none;
+}
+
+.droplet-token-inner {
+    position: absolute;
+    inset: 1px;
+    border-radius: 50%;
+    background: #4a9fd4;
+}
+
+.fire-launcher-target-radios label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 .path-token-amount-label {
@@ -2065,6 +2444,10 @@ button {
     transform: scaleX(-1);
 }
 
+.fox-travel-mirror {
+    transform: scaleX(-1);
+}
+
 .resort-path-svg {
     position: absolute;
     inset: 0;
@@ -2155,21 +2538,66 @@ button {
 }
 
 .resort-map-progress-laundry {
-    bottom: 282px;
-    left: 79px;
+    bottom: 276px;
+    left: 39px;
 }
 
 .resort-map-progress-torii {
-    bottom: 17px;
+    bottom: 22px;
     left: 50%;
     transform: translateX(-50%);
 }
 
 .resort-map-progress-inn-mana {
-    bottom: 190px;
-    left: 132px;
+    bottom: 162px;
+    left: 125px;
 }
 
+.resort-map-progress-inn-water {
+    bottom: 152px;
+    left: 125px;
+}
+
+.resort-map-progress-hidden-spring-mana {
+    top: 94px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.resort-map-progress-torii-mana {
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.resort-map-progress-torii-water {
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.water-prog-track {
+    position: relative;
+    width: 100%;
+}
+
+.water-prog-track .game-progress-bar-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #f4fbff;
+    text-shadow: 0 1px 2px #0b1c24, 0 0 3px #0b1c24;
+}
+
+.resort-map-progress-stone-pile-mana {
+    left: calc(var(--path-end-x) - 9px);
+    top: calc(var(--path-end-y) + 92px);
+    transform: translate(-50%, 0);
+    bottom: auto;
+}
+
+.building-mana-row,
 .inn-mana-row {
     display: flex;
     align-items: center;
@@ -2177,12 +2605,15 @@ button {
     flex-wrap: wrap;
 }
 
-.inn-mana-row .inn-mana-prog-track {
+.building-mana-row .building-mana-prog-track,
+.inn-mana-row .inn-mana-prog-track,
+.building-mana-row .inn-mana-prog-track {
     flex: 1;
     min-width: 160px;
     position: relative;
 }
 
+.building-mana-prog-track .game-progress-bar-label,
 .inn-mana-prog-track .game-progress-bar-label {
     position: absolute;
     inset: 0;
@@ -2192,6 +2623,11 @@ button {
     pointer-events: none;
     font-size: 12px;
     z-index: 1;
+}
+
+.stone-pile-dupe-progress {
+    width: 180px;
+    margin: 4px 0;
 }
 
 .kitsune-assign-tooltip {
@@ -2373,6 +2809,21 @@ button {
     opacity: 0.72;
 }
 
+.upgrade-btn-locked {
+    opacity: 0.55;
+    font-style: italic;
+}
+
+.tab-button.upgrade-btn-queue-full {
+    cursor: default;
+    opacity: 0.45;
+}
+
+.tab-button.upgrade-btn-queue-full:hover {
+    background: #1f2b3e !important;
+    cursor: default;
+}
+
 .tab-button.upgrade-btn-ready {
     border-color: #4dc719;
     background: #134f73;
@@ -2398,6 +2849,42 @@ button {
 .base-info-title {
     font-weight: bold;
     margin-bottom: 6px;
+}
+
+.spirit-info-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.spirit-rename-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    flex: 0 0 auto;
+    border: 1px solid var(--border-color);
+    background: #1f2b3e;
+    color: #e5e7eb;
+    cursor: pointer;
+}
+
+.spirit-rename-btn:hover {
+    background: #2d4e7a;
+}
+
+.spirit-rename-input {
+    font: inherit;
+    font-weight: bold;
+    color: var(--text-primary);
+    background: #111827;
+    border: 1px solid var(--border-color);
+    padding: 2px 6px;
+    width: 100%;
+    max-width: 240px;
+    box-sizing: border-box;
 }
 
 .base-row {
@@ -2499,6 +2986,7 @@ button {
     padding: 8px;
     background: rgba(0, 0, 0, 0.15);
     position: relative;
+    overflow: visible;
 }
 
 .scroll-archives-choice-shard {
@@ -2527,7 +3015,7 @@ button {
 
 .scroll-archives-choice-type {
     font-weight: bold;
-    font-size: 10px;
+    font-size: 14px;
     margin-bottom: 4px;
     padding-right: 22px;
 }
@@ -2672,9 +3160,16 @@ button {
 
 .mine-info-body {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    align-items: stretch;
     gap: 10px;
     margin-top: 6px;
+}
+
+.mine-grid-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .mine-info-side {
@@ -2726,8 +3221,22 @@ button {
     background: #1a3a6b;
 }
 
+.mine-play-block {
+    width: 100%;
+}
+
+.mine-play-label {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.mine-play-detail {
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
 .mine-play-progress {
-    margin-top: 8px;
+    margin-top: 0;
 }
 
 .base-skill-short {
@@ -2761,6 +3270,56 @@ button {
 }
 
 
+
+.inline-res-icon {
+    height: 1.5em;
+    width: 1.5em;
+    vertical-align: -0.35em;
+    display: inline-block;
+}
+
+.resort-building-display .inline-res-icon {
+    height: 1em;
+    width: 1em;
+    vertical-align: -0.15em;
+}
+
+.cost-amt-affordable {
+    color: #2ad15f;
+}
+
+.mine-depth-ready {
+    color: #2ad15f;
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+.dirt-road-mouse-tip {
+    position: absolute;
+    z-index: 50;
+    pointer-events: none;
+    white-space: nowrap;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 3px 5px;
+    border-radius: 4px;
+    color: var(--text-primary);
+    text-align: left;
+}
+
+#tabPane_history {
+    max-height: 720px;
+    overflow: hidden;
+}
+
+#tabPane_history .pane-title {
+    flex: 0 0 auto;
+}
+
+#historyList {
+    max-height: 680px;
+    overflow-y: auto;
+}
 
 .showthat:hover .showthis {
     display:block;

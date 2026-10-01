@@ -14,12 +14,18 @@ let onLoad = {
         return n;
     },
 
-    computeResearchTaskRequired: function(completedCount) {
-        let req = 10;
-        for (let i = 0; i < completedCount; i++) {
-            req = Math.floor(req * 1.5 + 5);
+    applyResearchTaskRequired: function(lib) {
+        if (!lib) {
+            return;
         }
-        return req;
+        const curveLen = Array.isArray(lib.researchCoinCosts) ? lib.researchCoinCosts.length : 0;
+        const prev = lib.researchTaskRequired || 0;
+        const progress = lib.researchTaskProgress || 0;
+        engine.syncScrollArchivesResearchCost(lib);
+        const next = lib.researchTaskRequired || 0;
+        if (curveLen <= 1 && prev > 0 && next > 0 && progress > 0 && prev !== next) {
+            lib.researchTaskProgress = progress * (next / prev);
+        }
     },
 
     returnSkillStarsToPool: function(skill) {
@@ -116,7 +122,85 @@ let onLoad = {
         data.progress.skills[skillKey] = skills.createFreshSkillState(skillKey);
     },
 
+    renameSkillKey: function(oldKey, newKey) {
+        if (!oldKey || !newKey || oldKey === newKey) {
+            return;
+        }
+        const sks = data.progress.skills || {};
+        if (sks[oldKey]) {
+            if (!sks[newKey]) {
+                sks[newKey] = sks[oldKey];
+                sks[newKey].key = newKey;
+                const def = skills._byKey[newKey];
+                if (def && def.name) {
+                    sks[newKey].name = def.name;
+                }
+            }
+            delete sks[oldKey];
+        }
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (lib && lib.unlockedSkills) {
+            if (lib.unlockedSkills[oldKey]) {
+                lib.unlockedSkills[newKey] = true;
+            }
+            delete lib.unlockedSkills[oldKey];
+        }
+        if (lib && lib.researchChoices) {
+            for (let i = 0; i < lib.researchChoices.length; i++) {
+                if (lib.researchChoices[i] === oldKey) {
+                    lib.researchChoices[i] = newKey;
+                }
+            }
+        }
+        if (lib && lib.selectedResearchChoice === oldKey) {
+            lib.selectedResearchChoice = newKey;
+        }
+        if (data.progress.selectedSkillDetailKey === oldKey) {
+            data.progress.selectedSkillDetailKey = newKey;
+        }
+        const inn = data.progress.base && data.progress.base.inn;
+        if (inn && inn.guests) {
+            for (let gi = 0; gi < inn.guests.length; gi++) {
+                if (inn.guests[gi].skillKey === oldKey) {
+                    inn.guests[gi].skillKey = newKey;
+                }
+            }
+        }
+        if (data.battle && data.battle.runSkillTalentStart && data.battle.runSkillTalentStart[oldKey] !== undefined) {
+            if (data.battle.runSkillTalentStart[newKey] === undefined) {
+                data.battle.runSkillTalentStart[newKey] = data.battle.runSkillTalentStart[oldKey];
+            }
+            delete data.battle.runSkillTalentStart[oldKey];
+        }
+    },
+
+    ensureAllSkillStates: function() {
+        if (!data.progress.skills) {
+            data.progress.skills = {};
+        }
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const k = skills.keysInOrder[i];
+            if (!data.progress.skills[k]) {
+                data.progress.skills[k] = skills.createFreshSkillState(k);
+            } else {
+                const def = skills._byKey[k];
+                if (def) {
+                    data.progress.skills[k].key = k;
+                    data.progress.skills[k].name = def.name;
+                }
+            }
+        }
+    },
+
     applySaveVersionMigrations: function(loadedSaveVersion) {
+        onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
+        onLoad.ensureAllSkillStates();
+        if (data.battle) {
+            if (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null) {
+                data.battle.applyTearDropsAccMs = data.battle.fakeTearDropsSecondAccMs || 0;
+            }
+            delete data.battle.fakeTearDropsSecondAccMs;
+        }
         data.progress.mapDefinitions = mapData.getDefaultMaps();
         const maps = data.progress.mapDefinitions;
         for (let mi = 0; mi < maps.length; mi++) {
@@ -145,15 +229,34 @@ let onLoad = {
         }
 
         if (wipedUnlockedCount > 0) {
-            const completed = onLoad.countUnlockedSkills(lib.unlockedSkills) + (lib.researchesToChoose || 0);
-            lib.researchTaskRequired = onLoad.computeResearchTaskRequired(completed);
             lib.researchesToChoose = (lib.researchesToChoose || 0) + wipedUnlockedCount;
             lib.researchChoices = [];
             lib.selectedResearchChoice = "";
         }
+        onLoad.applyResearchTaskRequired(lib);
 
         if ((lib.researchesToChoose || 0) > 0 && (!lib.researchChoices || !lib.researchChoices.length)) {
             engine.rollScrollArchivesResearchChoices();
+        }
+        onLoad.syncKitsuneTotalFromRescues();
+    },
+
+    /** Rescues used to update the map counter without adding workers. Raise the pool to match. */
+    syncKitsuneTotalFromRescues: function() {
+        if (!data.progress.kitsune) {
+            data.progress.kitsune = { total: 2 };
+        }
+        const found = data.progress.mapWorkersFound || {};
+        const foundKeys = Object.keys(found);
+        let rescued = 0;
+        for (let i = 0; i < foundKeys.length; i++) {
+            rescued += found[foundKeys[i]] || 0;
+        }
+        const torii = data.progress.base && data.progress.base.torii;
+        const calls = (torii && torii.callForAllyBought) || 0;
+        const expected = 2 + calls + rescued;
+        if ((data.progress.kitsune.total || 0) < expected) {
+            data.progress.kitsune.total = expected;
         }
     },
 
@@ -170,11 +273,18 @@ let onLoad = {
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
+        onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
+        onLoad.ensureAllSkillStates();
+        if (data.battle && (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null)) {
+            data.battle.applyTearDropsAccMs = data.battle.fakeTearDropsSecondAccMs || 0;
+            delete data.battle.fakeTearDropsSecondAccMs;
+        }
 
         initialize.initializeBaseContentNotify();
         initialize.initializeBambooForest();
         initialize.initializeScrollArchives();
         initialize.initializeInn();
+        initialize.initializeManaBuildings();
         initialize.initializeHiddenSpring();
         initialize.initializeFireLaunchers();
         initialize.initializeOkami();
@@ -182,13 +292,25 @@ let onLoad = {
         initialize.initializeMapRevealed();
         initialize.initializeAtelier();
         initialize.initializeGarden();
+        initialize.initializeBonfire();
+        initialize.initializeMageTower();
+        initialize.initializeShrine();
         initialize.initializeCistern();
+        initialize.initializeNoodleBar();
+        initialize.initializePond();
         initialize.initializeMine();
         initialize.initializePathSegments();
 
         onLoad.applySaveVersionMigrations(loadedSaveVersion);
         data.saveVersion = CODE_SAVE_VERSION;
 
+        if (!data.battle.cloneAttributePlan) {
+            data.battle.cloneAttributePlan = engine.copyAttributePlan(data.progress.attributePlan);
+        }
+        if (data.progress.highestLevelReached === undefined || data.progress.highestLevelReached === null) {
+            data.progress.highestLevelReached = 0;
+        }
+        engine.noteHighestLevelReached(data.battle.levelState && data.battle.levelState.level);
         initialize.applyPlanForCurrentLevel();
         initialize.calcPlayerStats(false);
     },

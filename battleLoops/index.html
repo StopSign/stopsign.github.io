@@ -62,9 +62,12 @@
         </div>
         <div id="menuContent">
             <div id="tabPane_base" class="tab-pane">
-                <div class="pane-title"><span class="showthat" onmouseenter="events.refreshKitsuneAssignmentTooltip()">Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><div id="kitsuneAssignTooltip" class="showthis kitsune-assign-tooltip"><div id="kitsuneAssignTooltipList"></div></div></span><span id="basePaneTitleCoins"> | Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | Star Beads: <span id="baseStarBeadsText"></span></span></div>
+                <div class="pane-title"><span class="pane-title-left"><span class="showthat" onmouseenter="events.refreshKitsuneAssignmentTooltip()"><img class="inline-res-icon" src="img/foxWorker.svg" alt="" draggable="false"> Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><div id="kitsuneAssignTooltip" class="showthis kitsune-assign-tooltip"><div id="kitsuneAssignTooltipList"></div></div></span><span id="basePaneTitleCoins"> | <img class="inline-res-icon" src="img/coins.svg" alt="" draggable="false">Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | <img class="inline-res-icon" src="img/starBead.svg" alt="" draggable="false">Star Beads: <span id="baseStarBeadsText"></span></span></span><span id="baseBuyableWrap" class="showthat pane-title-buyable" style="display:none" onmouseenter="events.setBuyableTooltipOpen(true)" onmouseleave="events.setBuyableTooltipOpen(false)">Buyable: <span id="baseBuyableCount">0</span><div id="baseBuyableTooltip" class="showthis kitsune-assign-tooltip"><div id="baseBuyableTooltipList"></div></div></span></div>
                 <div id="baseResortMap" class="base-map-wrap">
                     <div class="resort-map-cave" aria-hidden="true"></div>
+                    <svg id="dirtRoadLayer" class="dirt-road-svg" aria-hidden="true"></svg>
+                    <div id="dirtRoadHoverLayer" class="dirt-road-hover-layer"></div>
+                    <div id="dirtRoadMouseTip" class="dirt-road-mouse-tip" style="display:none"></div>
                     <button id="baseBuilding_foxDen" class="base-building-label resort-building-label resort-building-map-btn resort-building-fox-den" onclick="events.selectBaseBuilding('foxDen')">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/den.svg" alt="" draggable="false">
@@ -72,6 +75,10 @@
                         <span id="foxDenMapDisplay" class="resort-building-display"></span>
                     </button>
                     <button id="baseBuilding_hiddenSpring" class="base-building-label resort-building-label resort-building-hidden-spring map-building-locked" onclick="events.selectBaseBuilding('hiddenSpring')"><img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false"><span class="resort-building-label-text" style="font-size:15px">Hidden Spring</span></button>
+                    <div id="mapHiddenSpringManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-hidden-spring-mana" style="display:none"><div id="mapHiddenSpringManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
+                    <div id="spiritSlots_spiritTraining" class="spirit-slot-grid spirit-slot-grid-training" style="display:none">
+                        <div id="spiritSlot_spiritTraining_any_0" class="spirit-slot spirit-slot-training" onclick="events.clickSpiritTrainingSlot()"></div>
+                    </div>
                     <div id="spiritSlots_earth" class="spirit-slot-grid spirit-slot-grid-earth"></div>
                     <div id="spiritSlots_water" class="spirit-slot-grid spirit-slot-grid-water" style="display:none"></div>
                     <button id="baseBuilding_mine" class="base-building-label resort-building-label resort-building-map-btn resort-building-mine" onclick="events.selectBaseBuilding('mine')" style="display:none">
@@ -93,6 +100,7 @@
                         <span id="innMapDisplay" class="resort-building-display"></span>
                     </button>
                     <div id="mapInnManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-inn-mana" style="display:none"><div id="mapInnManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
+                    <div id="mapInnWaterProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-inn-water" style="display:none"><div id="mapInnWaterProgressFill" class="base-mini-progress-fill prog-fill-water"></div></div>
                     <button id="baseBuilding_bonfire" class="base-building-label resort-building-label resort-building-map-btn resort-building-bonfire" onclick="events.selectBaseBuilding('bonfire')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/bonfire.svg" alt="" draggable="false">
@@ -116,16 +124,18 @@
                         <img class="resort-building-art" src="img/archives.svg" alt="" draggable="false">
                         <span class="resort-building-label-text">Scroll Archives</span>
                     </button>
-                    <button id="baseBuilding_bar" class="base-building-label resort-building-label resort-building-map-btn resort-building-bar" onclick="events.selectBaseBuilding('bar')" style="display:none">
+                    <button id="baseBuilding_noodleBar" class="base-building-label resort-building-label resort-building-map-btn resort-building-noodleBar" onclick="events.selectBaseBuilding('noodleBar')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
-                        <img class="resort-building-art" src="img/bar.svg" alt="" draggable="false">
-                        <span class="resort-building-label-text">Bar</span>
+                        <img class="resort-building-art" src="img/noodleBar.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Noodle Bar</span>
                     </button>
                     <button id="baseBuilding_market" class="base-building-label resort-building-label resort-building-map-btn resort-building-market" onclick="events.selectBaseBuilding('market')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/market.svg" alt="" draggable="false">
                         <span class="resort-building-label-text">Market</span>
+                        <span id="marketMapDisplay" class="resort-building-display">0</span>
                     </button>
+                    <div id="mapMarketProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-market" style="display:none"><div id="mapMarketProgressFill" class="base-mini-progress-fill prog-fill-market-exp"></div></div>
                     <button id="baseBuilding_mage_tower" class="base-building-label resort-building-label resort-building-map-btn resort-building-mage-tower" onclick="events.selectBaseBuilding('mage_tower')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/orb.svg" alt="" draggable="false">
@@ -133,6 +143,13 @@
                         <span id="mageTowerMapDisplay" class="resort-building-display">0</span>
                     </button>
                     <div id="mapOrbProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-orb" style="display:none"><div id="mapOrbProgressFill" class="base-mini-progress-fill prog-fill-orb-exp"></div></div>
+                    <button id="baseBuilding_shrine" class="base-building-label resort-building-label resort-building-map-btn resort-building-shrine" onclick="events.selectBaseBuilding('shrine')" style="display:none">
+                        <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
+                        <img class="resort-building-art" src="img/shrine.svg" alt="" draggable="false">
+                        <span class="resort-building-label-text">Shrine</span>
+                        <span id="shrineMapDisplay" class="resort-building-display">0</span>
+                    </button>
+                    <div id="mapShrineProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-shrine" style="display:none"><div id="mapShrineProgressFill" class="base-mini-progress-fill prog-fill-divinity"></div></div>
                     <button id="baseBuilding_torii" class="base-building-label resort-building-label resort-building-map-btn resort-building-torii" onclick="events.selectBaseBuilding('torii')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/torii.svg" alt="" draggable="false">
@@ -140,6 +157,8 @@
                         <span id="toriiMapDisplay" class="resort-building-display"></span>
                     </button>
                     <div id="mapToriiProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-torii" style="display:none"><div id="mapToriiProgressFill" class="base-mini-progress-fill"></div></div>
+                    <div id="mapToriiManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-torii-mana" style="display:none"><div id="mapToriiManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
+                    <div id="mapToriiWaterProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-torii-water" style="display:none"><div id="mapToriiWaterProgressFill" class="base-mini-progress-fill prog-fill-water"></div></div>
                     <button id="baseBuilding_cistern" class="base-building-label resort-building-label resort-building-map-btn resort-building-cistern" onclick="events.selectBaseBuilding('cistern')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/cistern.svg" alt="" draggable="false">
@@ -157,6 +176,7 @@
                         <span class="resort-building-label-text">Stone Pile</span>
                         <span id="stonePileMapValue" class="resort-building-display">0</span>
                     </button>
+                    <div id="mapStonePileManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-stone-pile-mana" style="display:none"><div id="mapStonePileManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
                     <button id="baseBuilding_bambooForest" class="base-building-label resort-building-label resort-building-map-btn resort-building-bamboo" onclick="events.selectBaseBuilding('bambooForest')">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/bamboo.svg" alt="" draggable="false">
@@ -168,18 +188,21 @@
                     <div id="foxDenMapSlotPool"></div>
                     <div id="pebbleMapPool"></div>
                     <div id="fireLauncher_pathMid_wrap" class="fire-launcher-wrap fire-launcher-pathMid" style="display:none" onclick="events.clickFireLauncher('pathMid')">
-                        <div id="fireLauncher_pathMid_range" class="fire-launcher-range"></div>
-                        <div id="spiritSlot_fireLauncher_pathMid_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathMid')"></div>
+                        <div id="spiritSlot_fireLauncher_pathMid_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathMid')">
+                            <div id="fireLauncher_pathMid_range" class="fire-launcher-range"></div>
+                        </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_pathMid_emberFill" class="fire-launcher-ember-fill"></div></div>
                     </div>
                     <div id="fireLauncher_bendTop_wrap" class="fire-launcher-wrap fire-launcher-bendTop" style="display:none" onclick="events.clickFireLauncher('bendTop')">
-                        <div id="fireLauncher_bendTop_range" class="fire-launcher-range"></div>
-                        <div id="spiritSlot_fireLauncher_bendTop_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('bendTop')"></div>
+                        <div id="spiritSlot_fireLauncher_bendTop_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('bendTop')">
+                            <div id="fireLauncher_bendTop_range" class="fire-launcher-range"></div>
+                        </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_bendTop_emberFill" class="fire-launcher-ember-fill"></div></div>
                     </div>
                     <div id="fireLauncher_pathLower_wrap" class="fire-launcher-wrap fire-launcher-pathLower" style="display:none" onclick="events.clickFireLauncher('pathLower')">
-                        <div id="fireLauncher_pathLower_range" class="fire-launcher-range"></div>
-                        <div id="spiritSlot_fireLauncher_pathLower_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathLower')"></div>
+                        <div id="spiritSlot_fireLauncher_pathLower_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathLower')">
+                            <div id="fireLauncher_pathLower_range" class="fire-launcher-range"></div>
+                        </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_pathLower_emberFill" class="fire-launcher-ember-fill"></div></div>
                     </div>
 
@@ -219,15 +242,14 @@
                     <div class="leveling-stat-card showthat">
                         <div class="leveling-stat-name">Spd</div>
                         <div class="leveling-stat-val" id="spdText"></div>
-                        <div class="showthis">+10% push speed per point</div>
+                        <div class="showthis">+10% move speed per point</div>
                     </div>
                     <div class="leveling-stat-card showthat">
                         <div class="leveling-stat-name">Soul</div>
                         <div class="leveling-stat-val" id="soulText"></div>
-                        <div class="showthis"></div>
+                        <div class="showthis" id="soulStatTip"></div>
                     </div>
                 </div>
-                <div id="levelingPlayStats" class="leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
                 <div id="levelingAssignButtons" class="row-buttons row-buttons-wrap">
                     <button class="tab-button" onclick="events.assignAttribute('str')">+ Bru</button>
                     <button class="tab-button" onclick="events.assignAttribute('con')">+ Con</button>
@@ -235,7 +257,11 @@
                     <button class="tab-button" onclick="events.assignAttribute('soul')">+ Soul</button>
                     <button class="tab-button" onclick="events.clearAttributePlan()">Clear Plan</button>
                 </div>
-                <div id="attributePlanTitle" class="pane-subtitle">Attribute Plan</div>
+                <div id="attributePlanTitle" class="pane-subtitle attribute-plan-title-row" style="display:none">
+                    <span>Attribute Plan</span>
+                    <span id="attributePlanHighest" class="muted-text"></span>
+                    <span id="attributePlanPending" class="muted-text" style="display:none">Applying changes on next clone...</span>
+                </div>
                 <div id="attributePlanList" class="plan-list"></div>
             </div>
 
@@ -246,7 +272,10 @@
                     <button id="skillSubTab_foraging" class="tab-button" onclick="events.switchSkillsTab('foraging')">Foraging</button>
                     <button id="skillSubTab_class" class="tab-button" onclick="events.switchSkillsTab('class')">Class</button>
                 </div>
-                <div id="combatStarsInventory" class="base-row muted-text"></div>
+                <div id="combatStarsInventory" class="base-row" style="display:none">
+                    <div id="combatStarsCounts"></div>
+                    <div class="muted-text">Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill gives x2 exp gain to that skill.</div>
+                </div>
                 <div id="skillsList"></div>
             </div>
             <div id="tabPane_stats" class="tab-pane">
@@ -264,10 +293,10 @@
             <div id="tabPane_travel" class="tab-pane">
                 <div class="pane-title">Travel</div>
                 <div class="travel-launch-row row-buttons">
-                    <button type="button" id="travelBonfireLaunchBtn" class="tab-button" onclick="events.startTravelWithBonfireSettings()">Travel with Bonfire settings for <span id="travelBonfireManaCost">0</span> mana</button>
+                    <button type="button" id="travelBonfireLaunchBtn" class="tab-button" onclick="events.startTravelWithBonfireSettings()">Travel with Bonfire settings for <span id="travelBonfireManaCost">0 mana</span></button>
                     <button type="button" id="travelGoBonfireBtn" class="tab-button" onclick="events.goToBonfire()">Go to Bonfire</button>
                 </div>
-                <div id="travelVentingSurplus_row" class="base-row" style="display:none"><label><input type="checkbox" id="travelVentingSurplus_chk" checked onchange="events.toggleVentingSurplus(this.checked)"> Auto-retry with same settings when mana is full</label></div>
+                <div id="travelVentingSurplus_row" class="base-row" style="display:none"><label><input type="checkbox" id="travelVentingSurplus_chk" checked onchange="events.toggleVentingSurplus(this.checked)"> Start When Full Mana</label></div>
                 <div class="travel-subtabs-row">
                     <button type="button" id="travelSubTab_maps" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('maps')">Maps</button>
                     <button type="button" id="travelSubTab_challenges" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('challenges')">Challenges</button>
@@ -282,6 +311,7 @@
             </div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
+                <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
                 <div class="options-row"><button type="button" id="manualSaveButton" class="tab-button" onclick="saving.save()">Save now</button></div>
                 <div class="options-row" id="saveToFileRow" style="display:none"><button type="button" id="saveToFileButton" class="tab-button" onclick="saving.saveToFile()">Save to file</button></div>
                 <label class="options-row"><input type="checkbox" id="hideMaxedUpgradesToggle" onchange="events.setHideMaxedUpgrades(this.checked)"> Hide maxed upgrades</label>
@@ -295,11 +325,16 @@
     </div>
     <div id="battleColumn" class="game-column" style="display:none">
         <div id="battlefieldWrap">
-            <button type="button" id="battleEndRunBtn" class="battle-end-run-btn tab-button" onclick="events.endRunNow()" title="End run (set Aud to 0)">End run</button>
+            <button type="button" id="battleEndRunBtn" class="battle-end-run-btn" onclick="events.endRunNow()" title="End run (set Aud to 0)">End run</button>
             <div id="battlefield">
                 <div id="waveInfo"></div>
                 <div id="rangeMarkers"></div>
                 <div id="attackLines"></div>
+                <div id="slapFxLayer">
+                    <img id="slapHandOuter" class="slap-hand-img" src="img/hand_outer.svg" alt="" draggable="false">
+                    <img id="slapHandSide" class="slap-hand-img" src="img/hand_side_right.svg" alt="" draggable="false">
+                    <img id="slapHandInner" class="slap-hand-img" src="img/hand_inner.svg" alt="" draggable="false">
+                </div>
                 <div id="playerBuffRow" class="player-buff-row" aria-label="Battle buffs"></div>
                 <div id="playerStack">
                     <div id="playerAvatarWrap">
@@ -308,7 +343,7 @@
                             <div id="playerTokenAudLayer"></div>
                         </div>
                         <div id="playerTokenOverlay" class="player-token-overlay intruder-overlay">
-                            <div id="playerStatAudLine" class="intruder-stat-aud"></div>
+                            <div id="playerStatAudLine" class="intruder-stat-aud" style="top:30px"></div>
                             <div id="playerStatDmgLine" class="intruder-stat-dmg"></div>
                         </div>
                     </div>
@@ -340,6 +375,7 @@
             </div>
             <div id="deathOverlay" style="display:none;">
                 <div id="deathTitle">The clone has dispersed in embarrasment (no Aud).</div>
+                <div id="deathManaBonus" class="muted-text"></div>
                 <div id="deathSummary"></div>
                 <div id="deathTalentDetails" class="death-talent-block"></div>
                 <button id="tryAgainButton" onclick="events.tryAgain()">Try Again?</button>
@@ -368,7 +404,13 @@
         <div id="manaProgressBar" class="game-progress-bar" style="display:none">
             <div class="prog-track game-progress-track mana-progress-track">
                 <div id="manaFill" class="prog-fill prog-fill-mana"></div>
-                <div class="game-progress-bar-label">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s</div>
+                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">—</span></div>
+            </div>
+        </div>
+        <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
+            <div class="prog-track game-progress-track divinity-progress-track">
+                <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
+                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">10000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
             </div>
         </div>
     </div>
