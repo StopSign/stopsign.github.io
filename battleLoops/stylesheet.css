@@ -142,8 +142,8 @@ body {
 }
 
 .resort-map-progress-market {
-    bottom: 50px;
-    left: 5%;
+    bottom: 3px;
+    left: 18px;
 }
 
 .resort-map-progress-market .prog-fill-market-exp {
@@ -166,8 +166,21 @@ body {
     margin: 8px 0;
 }
 
+.noodle-tip-skill-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .noodle-tip-skill-label {
     display: block;
+    min-width: 0;
+}
+
+.noodle-tip-skill-meta {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .base-mini-progress-fill.prog-fill-market-exp {
@@ -696,8 +709,16 @@ button {
     line-height: 1.35;
 }
 
-.skill-reward {
+.skill-current {
+    font-size: 11px;
     color: #a6e3a1;
+    margin: 6px 0 3px;
+    line-height: 1.35;
+}
+
+.skill-reward,
+#skillInfo_trigger {
+    color: #9ca3af;
 }
 
 .intruder-token {
@@ -1077,6 +1098,28 @@ button {
     min-width: 0;
     overflow-y:auto;
     max-height: 615px;
+}
+
+.skills-info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.skill-sort-radios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    font-size: 12px;
+}
+
+.skill-sort-radios label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
 }
 
 .skills-list-empty {
@@ -1743,6 +1786,39 @@ button {
     100% {
         opacity: 0;
         transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% - 36px));
+    }
+}
+
+.noodle-tip-float {
+    --noodle-tip-x: 0px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 4;
+    pointer-events: none;
+    font-size: 16px;
+    line-height: 1;
+    white-space: nowrap;
+    color: #c46a6a;
+    animation: noodle-tip-float 2s linear forwards;
+}
+
+.noodle-tip-float.hypervisible {
+    color: #c46a6a;
+}
+
+@keyframes noodle-tip-float {
+    0% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--noodle-tip-x)), -50%);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--noodle-tip-x)), calc(-50% - 18px));
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--noodle-tip-x)), calc(-50% - 36px));
     }
 }
 
@@ -2611,6 +2687,11 @@ button {
     left: 125px;
 }
 
+.resort-map-progress-noodle-tip {
+    left: 246px;
+    bottom: 241px;
+}
+
 .resort-map-progress-hidden-spring-mana {
     top: 94px;
     left: 50%;
@@ -2865,6 +2946,16 @@ button {
 .upgrade-btn-locked {
     opacity: 0.55;
     font-style: italic;
+}
+
+#marketExchangeCredit_btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+#marketExchangeCredit_btn:disabled:hover {
+    background: #1f2b3e !important;
+    cursor: default;
 }
 
 .tab-button.upgrade-btn-queue-full {

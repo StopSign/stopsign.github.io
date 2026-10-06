@@ -329,7 +329,7 @@ let view = {
             }
         }
 
-        view.updateVal("baseCoinsText", (Math.round((data.progress.coins || 0) * 10) / 10).toFixed(1));
+        view.updateVal("baseCoinsText", data.progress.coins, "textContent", 1);
 
         const ls = data.battle.levelState;
         const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
@@ -392,9 +392,9 @@ let view = {
         }
         view.updateVal("conStatTip", conStatTip, "innerHTML");
         view.updateVal("spdText", ls.levelSpd || 0, "textContent", 1);
-        view.updateVal("soulText", ls.levelSoul || 0, "textContent", 1);
-        const soulLv = ls.levelSoul || 0;
-        view.updateVal("soulStatTip", `Soul - +5% skill exp per level (additive) and +20% Okami exp on clone death per level (additive).<br>Current: +${soulLv * 5}% skill exp, +${soulLv * 20}% Okami exp on clone death.`, "innerHTML");
+        view.updateVal("soulText", engine.getCloneSoulLevel(), "textContent", 1);
+        const soulLv = engine.getCloneSoulLevel();
+        view.updateVal("soulStatTip", `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`, "innerHTML");
         view.renderAttributePlanList();
 
         view.updateSkillsListVisibility(skillsTabNow);
@@ -443,7 +443,6 @@ let view = {
         const cdCfg = gameData.battle.cooldowns;
         const fortInner = skills.getSkillEffect("shameless").enduranceBaseAudInnerBonus || 0;
         const tenB = skills.getSkillEffect("corneredEgo").tenacityAudInnerBonus || 0;
-        const tenFlatScaled = Math.ceil((2 * tenB) * (1 + conTotal / gc.conStrStatDivisor));
         const forceFlatStats = roundNearestDecimals(skills.getSkillEffect("force").slapFlatBeforeStr || 0, 2);
         const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").wisdomCharacterExpMultiplier || 1, 2);
         const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").greedKillCoinsMultiplier || 1, 2);
@@ -460,7 +459,7 @@ let view = {
             audTip += `<br>Shameless: +${fortInner}`;
         }
         if (corneredResearched) {
-            audTip += `<br>Cornered Ego: +${tenB} inner, +${tenFlatScaled} current (2× inner × Con)`;
+            audTip += `<br>Cornered Ego: +${tenB}`;
         }
         if (skills.isSkillUnlocked("adaptation")) {
             audTip += `<br>Adaptation: +${skills.getSkillEffect("adaptation").adaptationBonusCon || 0} Con from skill levels`;
@@ -727,6 +726,9 @@ let view = {
                     view.updateVal(rowEl, show ? "" : "none", "style.display");
                 }
                 view.updateVal(extraEl, resortData.insertResourceIcons(resortData.getUpgradeExtraText(u, buildingSegment) || ""), "innerHTML");
+                if (typeof u.description === "function") {
+                    view.updateVal(`base_${buildingSegment}_desc_${slug}`, u.description(), "innerHTML");
+                }
                 let btnText = typeof o.buyButtonText === "function" ? o.buyButtonText(pk, u) : soldOutOrBuyLabel(u, buildingSegment);
                 let btnDisabled = typeof o.buttonDisabled === "function" ? o.buttonDisabled(pk, u) : false;
                 let weaveMode = false;
@@ -975,11 +977,20 @@ let view = {
             }
         }
         const flameTended = !!bf.tendTheFlameUnlocked;
+        const marketBuilt = engine.isMarketBuilt();
         view.updateVal("bonfireWoodCarry_row", flameTended ? "" : "none", "style.display");
         if (flameTended) {
+            view.updateVal("bonfireWoodCarryLabel", marketBuilt ? "Wood/Coal carry" : "Wood carry");
             view.updateVal("bonfireWoodCarry", resortData.getKitsuneWoodCarryAmount());
         }
-        const marketBuilt = engine.isMarketBuilt();
+        view.updateVal("bonfireHeatPerFuel_row", flameTended ? "" : "none", "style.display");
+        if (flameTended) {
+            view.updateVal("bonfireHeatPerWood", bonfireConfig.heatPerWood);
+            view.updateVal("bonfireHeatPerCoalPart", marketBuilt ? "" : "none", "style.display");
+            if (marketBuilt) {
+                view.updateVal("bonfireHeatPerCoal", bonfireConfig.heatPerWood * bonfireConfig.heatPerCoalMult);
+            }
+        }
         view.updateVal("bonfireCoal_row", marketBuilt ? "" : "none", "style.display");
         if (marketBuilt) {
             view.updateVal("bonfireCoalText", intToStringRound(engine.getMarketGoodAmount("coal")));
@@ -1197,7 +1208,7 @@ let view = {
             const units = engine.getOrbWorkerUnits();
             const expRate = engine.getOrbExpGainPerSecond();
             const manaRate = engine.getEffectiveManaRatePerSecond();
-            let orbProdText = `Workers for Orb exp: ${units} (x${round2(Math.pow(1.1, units))} exp) | Exp: ${round2(expRate)}/s | Mana: ${round2(manaRate)}/s`;
+            let orbProdText = `Workers for Orb exp: ${units} (+${units * 20}% exp) | Exp: ${round2(expRate)}/s | Mana: ${round2(manaRate)}/s`;
             if (okamiHere) {
                 orbProdText += ` | Inspiration x${round2(engine.getOkamiInspirationBonus())} on mana`;
             }
@@ -1222,14 +1233,16 @@ let view = {
             const lib = base.scrollArchives;
             const researcherCount = assigned + (okamiHere ? 1 : 0);
             const researchRate = engine.getScrollArchivesResearchRate();
+            const literacyBought = engine.getLiteracyLessonsBought();
+            const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
             const progress = lib.researchTaskProgress || 0;
             const required = lib.researchTaskRequired || 10;
             const pct = required > 0 ? Math.max(0, Math.min(100, (progress / required) * 100)) : 0;
-            let prodText = `Researchers: ${researcherCount} | Research speed: ${round1(researchRate)}/s`;
+            let prodText = `Researchers: ${researcherCount} | Research speed: ${round1(gainedRate)}/s`;
             if (okamiHere) {
                 prodText += ` (${round1(engine.getOkamiInspirationBonus())}× from inspiration)`;
             }
-            prodText += `<br>Research: ${round1(progress)} / ${round1(required)} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 5)} mana/s)`;
+            prodText += `<br>Research: ${round1(progress)} / ${round1(required)} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
             if (lib.researchPaused) {
                 prodText += "<br>Paused - need more coins, star beads, or mana";
             }
@@ -1658,7 +1671,7 @@ let view = {
         const lib = data.progress.base && data.progress.base.scrollArchives;
         const researchRate = typeof engine.getScrollArchivesResearchRate === "function" ? engine.getScrollArchivesResearchRate() : 0;
         const researching = researchRate > 0 && lib && !lib.researchPaused;
-        const drain = researching ? researchRate * 5 : 0;
+        const drain = researching ? researchRate * 10 : 0;
         view.updateVal("manaRateArchiveDrain", researching ? ` (-${round1(drain)}/s)` : "");
         const remainMana = Math.max(0, cap - amount);
         const netRate = rate - drain;
@@ -1831,6 +1844,40 @@ let view = {
         view.updateVal("mageTowerMapDisplay", `Lvl ${level}`, "textContent");
         view.updateVal("mapOrbProgressFill", `${pct}%`, "style.width");
     },
+    updateMarketExchangeButton: function() {
+        const btnId = "marketExchangeCredit_btn";
+        const btnNode = viewData.cached[btnId];
+        const weaveUi = engine.getUpgradeWeaveUi("market", "exchangeCredit");
+        const canStart = engine.canStartExchangeCredit();
+        view.updateVal(btnId, (!canStart && !weaveUi) || !!(weaveUi && weaveUi.disabled), "disabled");
+        if (weaveUi) {
+            let remainMs = 0;
+            const weaving = data.progress.weaving;
+            if (weaving && weaving.active && weaving.active.scopeKey === "market" && weaving.active.upgradeKey === "exchangeCredit") {
+                remainMs = weaving.active.remainMs || 0;
+            } else {
+                const paused = engine.getPausedWeavingEntry("market", "exchangeCredit");
+                remainMs = paused ? (paused.remainMs || 0) : 0;
+            }
+            const time = secondsToTime(remainMs / 1000);
+            const label = weaveUi.mode === "paused"
+                ? `Paused, finished in ${time}`
+                : `Exchanging, finished in ${time}`;
+            view.updateVal(btnId, label);
+        } else {
+            view.updateVal(btnId, "Exchange 1000 coins for 1000 credits in 40 threads to weave.");
+        }
+        if (btnNode) {
+            const weaving = !!weaveUi;
+            btnNode.classList.toggle("upgrade-btn-weaving", weaving);
+            btnNode.classList.toggle("upgrade-btn-paused", !!(weaveUi && weaveUi.mode === "paused"));
+            if (weaving && weaveUi.pct !== null && weaveUi.pct !== undefined) {
+                btnNode.style.setProperty("--weave-pct", `${weaveUi.pct}%`);
+            } else {
+                btnNode.style.removeProperty("--weave-pct");
+            }
+        }
+    },
     updateMarketProgressDisplays: function() {
         const market = data.progress.base && data.progress.base.market;
         const unlocked = engine.isMarketBuilt();
@@ -1840,7 +1887,7 @@ let view = {
         }
         const level = market.level || 0;
         const exp = market.exp || 0;
-        const expToLevel = market.expToLevel || 5000;
+        const expToLevel = market.expToLevel || 30000;
         const pct = expToLevel > 0 ? Math.max(0, Math.min(100, (exp / expToLevel) * 100)) : 0;
         view.updateVal("marketLevelText", level, "textContent", "floor");
         view.updateVal("marketExpText", Math.round(exp), "textContent", "floor");
@@ -2171,6 +2218,8 @@ let view = {
         view.updateMapBuildingManaBar("torii", "mapToriiManaProgressWrap", "mapToriiManaProgressFill");
         view.updateMapWaterBar(engine.isToriiDrinkingBowlUnlocked(), torii.water || 0, engine.getToriiWaterCapacity(), "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill");
         view.updateMapWaterBar(engine.isInnOnsenConverted(), inn.hotWater || 0, engine.getInnHotWaterCapacity(), "mapInnWaterProgressWrap", "mapInnWaterProgressFill");
+        const noodleBar = base.noodleBar || {};
+        view.updateMapWaterBar(engine.isNoodleBarBuilt(), Math.min(100, noodleBar.tipProgress || 0), 100, "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill");
         view.updateMapBuildingManaBar("stonePile", "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill");
         view.updateMapBuildingManaBar("hiddenSpring", "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill");
         const manaKeys = engine.getBuildingManaKeys();
@@ -2197,7 +2246,7 @@ let view = {
         setChk("marketAllowStone_chk", market.allowStone);
         setChk("marketAllowWood_chk", market.allowWood);
         setChk("marketAllowBars_chk", market.allowBars);
-        setChk("marketCreditOnly_chk", market.creditOnlyPurchases);
+        view.updateMarketExchangeButton();
         this.updateResortWorkerControls("market", engine.getMarketCarrierCapacity() > 0);
         t.refreshOrderedPurchasables("market", resortData.buildings.market.upgradesOrder, { hideMaxed: t.hideMaxed });
 
@@ -2278,12 +2327,7 @@ let view = {
         view.updateVal("noodleBarHotWaterText", `Hot Water: ${round1(noodleWater)}/${noodleCap}`);
         view.updateVal("noodleBarHotWaterFill", noodleCap > 0 ? `${Math.max(0, Math.min(100, (noodleWater / noodleCap) * 100))}%` : "0%", "style.width");
         view.syncAllowCarriersWaterCheckbox("noodleBar", engine.isNoodleBarBuilt());
-        let cisternTemp = "Cistern not built";
-        if (engine.isCisternBuiltFromFoxDen()) {
-            const cistern = data.progress.base.cistern || {};
-            cisternTemp = `Cistern: ${round1(cistern.temperature || 0)}C`;
-        }
-        view.updateVal("noodleBarCisternTempText", cisternTemp);
+        view.updateVal("noodleBarEatRestBonusText", engine.getNoodleEatRestBonus());
         const shown = Math.min(100, Math.max(0, bar.tipProgress || 0));
         view.updateVal("noodleTipProgressText", round1(shown));
         view.updateVal("noodleTipProgressFill", `${shown}%`, "style.width");
@@ -2307,13 +2351,13 @@ let view = {
                     btn.style.removeProperty("--weave-pct");
                 }
             }
+            const cost = engine.getNoodleTopicCost();
+            const affordable = (data.progress.coins || 0) >= cost;
+            const shownCost = cost >= 10000 ? intToStringRound(cost) : cost;
+            const costHtml = `${resortData.resourceIconHtml("coins")} <span class="cost-amt ${affordable ? "cost-amt-affordable" : "cost-amt-unaffordable"}">${shownCost}</span> coins`;
             if (cooling) {
-                view.updateVal("noodleTopicBtn", `Discussing.. ready again in ${secondsToTime(remain / 1000)}`, "innerHTML");
+                view.updateVal("noodleTopicBtn", `Discussing... ready again in ${secondsToTime(remain / 1000)} for ${costHtml}`, "innerHTML");
             } else {
-                const cost = engine.getNoodleTopicCost();
-                const affordable = (data.progress.coins || 0) >= cost;
-                const shownCost = cost >= 10000 ? intToStringRound(cost) : cost;
-                const costHtml = `<span class="cost-amt ${affordable ? "cost-amt-affordable" : "cost-amt-unaffordable"}">${shownCost}</span> ${resortData.resourceIconHtml("coins")} coins`;
                 view.updateVal("noodleTopicBtn", `Change Conversation Topics for ${costHtml}`, "innerHTML");
             }
             view.updateVal("noodleTopicBtn", cooling, "disabled");
@@ -2329,7 +2373,7 @@ let view = {
                 const skill = data.progress.skills && data.progress.skills[key];
                 view.updateVal(`noodleTipSkill_${i}_name`, engine.getNoodleSkillDisplayName(key));
                 view.updateVal(`noodleTipSkill_${i}_desc`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(key)), "innerHTML");
-                view.updateVal(`noodleTipSkill_${i}_tips`, `Tips: ${(skill && skill.tips) || 0}`);
+                view.updateVal(`noodleTipSkill_${i}_tips`, `Talent: ${(skill && skill.talentLevel) || 0} | Tips: ${(skill && skill.tips) || 0}`);
                 const radio = viewData.cached[`noodleTipSkill_${i}_radio`];
                 if (radio) {
                     radio.value = key;
@@ -2577,8 +2621,12 @@ let view = {
             const t = Math.min(1, (p.progress || 0) / (p.durationMs || 1050));
             const x = (p.fromX || 0) + ((p.toX || 0) - (p.fromX || 0)) * t;
             const y = (p.fromY || 0) + ((p.toY || 0) - (p.fromY || 0)) * t;
-            view.updateVal(pid, `${Math.round(x - 14)}px`, "style.left");
-            view.updateVal(pid, `${Math.round(y - 14)}px`, "style.top");
+            const size = p.sizePx || 28;
+            const half = size / 2;
+            view.updateVal(pid, `${size}px`, "style.width");
+            view.updateVal(pid, `${size}px`, "style.height");
+            view.updateVal(pid, `${Math.round(x - half)}px`, "style.left");
+            view.updateVal(pid, `${Math.round(y - half)}px`, "style.top");
         }
         const pulses = (fl && fl.aoePulses) || [];
         for (let ai = 0; ai < 8; ai++) {
@@ -2948,9 +2996,13 @@ let view = {
                 const pct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
-                const batchSize = Math.floor(Math.sqrt(engine.getEffectiveSpiritPower(spirit) || 1));
+                const batchSize = engine.getForgeSmeltBatch(spirit);
+                const forgeLevel = engine.getLargerForgeBought();
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
-                view.updateVal("spiritInfoFireNote", `Smelting floor(√spirit power) = ${batchSize} ore into bars every 60s. Exp = bars × 3.`);
+                const forgeNote = forgeLevel > 0
+                    ? `Smelting ceil(√spirit power × ${round2(1 + 0.2 * forgeLevel)}) = ${batchSize} ore into bars every 60s. +20% per Larger Forge, rounded up. Exp = bars × 3.`
+                    : `Smelting floor(√spirit power) = ${batchSize} ore into bars every 60s. Exp = bars × 3.`;
+                view.updateVal("spiritInfoFireNote", forgeNote);
                 view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "bonfire") {
@@ -3339,6 +3391,14 @@ let view = {
             view.updateVal("cisternWishingWellCoins", wellCoins > 0 ? wellCoins.toFixed(1) : "");
             view.updateVal("cisternWaterCarry", resortData.getCisternWaterCarryAmount());
             const garden = base.garden || {};
+            const thirstUnlocked = !!garden.arrangementOfThirstUnlocked;
+            view.updateVal("cisternRefuseWater_row", thirstUnlocked ? "" : "none", "style.display");
+            if (thirstUnlocked) {
+                const refuseChk = viewData.cached.cisternRefuseWater_chk || document.getElementById("cisternRefuseWater_chk");
+                if (refuseChk) {
+                    refuseChk.checked = !!cistern.refuseIncomingWater;
+                }
+            }
             const hotWaterUnlocked = !!garden.arrangementOfHotWaterUnlocked;
             view.updateVal("cisternReplaceHotWater_row", hotWaterUnlocked ? "" : "none", "style.display");
             if (hotWaterUnlocked) {
@@ -3367,7 +3427,8 @@ let view = {
             const pond = base.pond || {};
             view.updateVal("pondInfoWater", `${round2(pond.waterVolume || 0)}L`);
             const wellRate = engine.getWishingWellWaterRate ? engine.getWishingWellWaterRate() : 0;
-            view.updateVal("pondWishingWellRate", wellRate > 0 ? `+${wellRate} L/s` : "");
+            const drainText = `-${round2(engine.getPondForestDrainPerSecond())} L/s`;
+            view.updateVal("pondWishingWellRate", wellRate > 0 ? `+${wellRate} L/s | ${drainText}` : drainText);
             const pondWater = pond.waterVolume || 0;
             const pondExp = pondWater > 0 ? round2(Math.sqrt(pondWater) / 50) : 0;
             view.updateVal("pondWaterSpiritExp", pondWater > 0 ? `√(water)/50 = ${pondExp}/s` : `√(water)/50 = 0/s`);
@@ -3389,7 +3450,8 @@ let view = {
         const pile = base.stonePile || {};
         const stoneIcon = resortData.resourceIconHtml("stone");
         if (pile.stoneDuplicatorUnlocked) {
-            view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)} | ${intToStringRound(pile.usedStone || 0)} | ${intToStringRound(pile.dupedStone || 0)}`, "innerHTML");
+            const processedStone = (pile.usedStone || 0) + (pile.dupedStone || 0);
+            view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)} | ${intToStringRound(processedStone)}`, "innerHTML");
         } else {
             view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)}`, "innerHTML");
         }
@@ -3607,6 +3669,9 @@ let view = {
         }
         for (let i = 0; i < entries.length; i++) {
             const entry = entries[i];
+            if (entry.scopeKey === "market" && entry.upgradeKey === "exchangeCredit") {
+                continue;
+            }
             let btnEl = "";
             if (entry.scopeKey === "foxDenUnlock") {
                 btnEl = resortData.idBtn("foxDen", entry.upgradeKey);
@@ -3807,6 +3872,7 @@ let view = {
                 wrap.style.display = visible[k] ? "" : "none";
             }
         }
+        view.applySkillListSort();
         const emptyEl = viewData.cached.skillsListEmpty;
         if (!emptyEl) {
             return;
@@ -3827,6 +3893,97 @@ let view = {
             msg = "No combat skills unlocked yet. Visit the Scroll Archives in Base.";
         }
         emptyEl.textContent = msg;
+    },
+    applySkillListSort: function() {
+        const column = viewData.cached.skillsListColumn;
+        if (!column) {
+            return;
+        }
+        const sort = data.progress.skillListSort === "talent" || data.progress.skillListSort === "alpha"
+            ? data.progress.skillListSort
+            : "oldest";
+        const oldestRadio = viewData.cached.skillSortOldest;
+        const talentRadio = viewData.cached.skillSortTalent;
+        const alphaRadio = viewData.cached.skillSortAlpha;
+        if (oldestRadio) {
+            oldestRadio.checked = sort === "oldest";
+        }
+        if (talentRadio) {
+            talentRadio.checked = sort === "talent";
+        }
+        if (alphaRadio) {
+            alphaRadio.checked = sort === "alpha";
+        }
+        const unlocked = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.unlockedSkills) || {};
+        const unlockIndex = {};
+        const unlockKeys = Object.keys(unlocked);
+        for (let ui = 0; ui < unlockKeys.length; ui++) {
+            unlockIndex[unlockKeys[ui]] = ui;
+        }
+        const keys = skills.keysInOrder.slice();
+        keys.sort(function(a, b) {
+            const sa = data.progress.skills[a];
+            const sb = data.progress.skills[b];
+            if (sort === "talent") {
+                const ta = (sa && sa.talentLevel) || 0;
+                const tb = (sb && sb.talentLevel) || 0;
+                if (tb !== ta) {
+                    return tb - ta;
+                }
+                const pa = sa && sa.talentToLevel ? (sa.talent || 0) / sa.talentToLevel : 0;
+                const pb = sb && sb.talentToLevel ? (sb.talent || 0) / sb.talentToLevel : 0;
+                if (pb !== pa) {
+                    return pb - pa;
+                }
+            } else if (sort === "alpha") {
+                const na = (sa && sa.name) || a;
+                const nb = (sb && sb.name) || b;
+                const cmp = na.localeCompare(nb);
+                if (cmp !== 0) {
+                    return cmp;
+                }
+            } else {
+                const ia = unlockIndex[a];
+                const ib = unlockIndex[b];
+                const aMissing = ia === undefined;
+                const bMissing = ib === undefined;
+                if (aMissing !== bMissing) {
+                    return aMissing ? 1 : -1;
+                }
+                if (!aMissing && ia !== ib) {
+                    return ia - ib;
+                }
+            }
+            const na = (sa && sa.name) || a;
+            const nb = (sb && sb.name) || b;
+            return na.localeCompare(nb);
+        });
+        const current = [];
+        for (let ci = 0; ci < column.children.length; ci++) {
+            const child = column.children[ci];
+            if (child.id && child.id.indexOf("skill_wrap_") === 0) {
+                current.push(child.getAttribute("data-skill-key"));
+            }
+        }
+        let same = current.length === keys.length;
+        for (let si = 0; same && si < keys.length; si++) {
+            if (current[si] !== keys[si]) {
+                same = false;
+            }
+        }
+        if (same) {
+            return;
+        }
+        for (let ki = 0; ki < keys.length; ki++) {
+            const wrap = viewData.cached[`skill_wrap_${keys[ki]}`];
+            if (wrap) {
+                column.appendChild(wrap);
+            }
+        }
+        const emptyEl = viewData.cached.skillsListEmpty;
+        if (emptyEl) {
+            column.insertBefore(emptyEl, column.firstChild);
+        }
     },
     syncSelectedSkillDetailKey: function(tab) {
         const t = tab !== undefined && tab !== null ? tab : (data.progress.selectedSkillsTab || "combat");
@@ -3935,7 +4092,7 @@ let view = {
         const skill = data.progress.skills[skillKey];
         const parts = skills.skillExpGainParts(skill);
         const intMultOthers = skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1;
-        const soulMult = 1 + 0.05 * engine.getCloneSoulLevel();
+        const soulMult = engine.getSoulSkillExpMultiplier();
         const expPerTrigger = skills.expGainForSkillTrigger(skill, 1) * intMultOthers * soulMult;
         const expPct = Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100));
         const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
@@ -4604,7 +4761,6 @@ let view = {
         if (!viewData.slapDmgRender.length) {
             viewData.slapDmgRender = [];
         }
-        const dmgMs = engine.SLAP_DMG_MS || 1000;
         for (let i = 0; i < dmgEls.length; i++) {
             const el = dmgEls[i];
             const slot = fx.dmgSlots[i];
@@ -4619,12 +4775,12 @@ let view = {
                 }
                 continue;
             }
-            const t = Math.max(0, Math.min(1, slot.elapsedMs / dmgMs));
+            const motion = view.floatHoldThenRise(slot.elapsedMs);
             const text = view.formatSlapDamageText(slot.damage);
             const left = `${Math.round(slot.x)}px`;
             const top = `${Math.round(slot.y)}px`;
-            const opacity = String(1 - t);
-            const transform = `translate(-50%, ${Math.round(-28 * t)}px)`;
+            const opacity = motion.opacity;
+            const transform = motion.transform;
             if (!render.active) {
                 el.style.display = "block";
                 render.active = true;
@@ -4651,6 +4807,19 @@ let view = {
             }
         }
     },
+    floatHoldThenRise: function(elapsedMs) {
+        const holdMs = engine.FLOAT_HOLD_MS || 500;
+        const riseMs = engine.FLOAT_RISE_MS || 1500;
+        const risePx = engine.FLOAT_RISE_PX || 28;
+        if (elapsedMs <= holdMs) {
+            return { opacity: "1", transform: "translate(-50%, 0px)" };
+        }
+        const t = Math.max(0, Math.min(1, (elapsedMs - holdMs) / riseMs));
+        return {
+            opacity: String(1 - t),
+            transform: `translate(-50%, ${Math.round(-risePx * t)}px)`
+        };
+    },
     renderPlayerFloats: function() {
         const els = viewData.playerFloatElements;
         const fx = data.battle && data.battle.playerFloatFx;
@@ -4660,7 +4829,6 @@ let view = {
         if (!viewData.playerFloatRender.length) {
             viewData.playerFloatRender = [];
         }
-        const floatMs = engine.PLAYER_FLOAT_MS || 1000;
         for (let i = 0; i < els.length; i++) {
             const el = els[i];
             const slot = fx.slots[i];
@@ -4675,12 +4843,12 @@ let view = {
                 }
                 continue;
             }
-            const t = Math.max(0, Math.min(1, slot.elapsedMs / floatMs));
+            const motion = view.floatHoldThenRise(slot.elapsedMs);
             const text = slot.text || "";
             const left = `${Math.round(slot.x)}px`;
             const top = `${Math.round(slot.y)}px`;
-            const opacity = String(1 - t);
-            const transform = `translate(-50%, ${Math.round(-28 * t)}px)`;
+            const opacity = motion.opacity;
+            const transform = motion.transform;
             const cls = slot.kind === "hurt"
                 ? "slap-dmg-num hypervisible float-aud-hurt"
                 : "slap-dmg-num hypervisible float-aud-gain";
@@ -4745,6 +4913,9 @@ let view = {
         }, { once: true });
     },
     spawnKillRewardFloater: function(centerXPx, topYPx, lines) {
+        if (document.hidden) {
+            return;
+        }
         const battlefield = viewData.cached.battlefield;
         if (!battlefield || !lines || !lines.length) {
             return;
@@ -4848,6 +5019,9 @@ let view = {
     },
 
     spawnInnBeadFloat: function(beads) {
+        if (document.hidden) {
+            return;
+        }
         const innBtn = viewData.cached.baseBuilding_inn || document.getElementById("baseBuilding_inn");
         if (!innBtn) {
             return;
@@ -4864,6 +5038,25 @@ let view = {
             el.remove();
         });
         innBtn.appendChild(el);
+    },
+    spawnNoodleTipFloat: function(skillName) {
+        if (document.hidden) {
+            return;
+        }
+        const noodleBtn = viewData.cached.baseBuilding_noodleBar || document.getElementById("baseBuilding_noodleBar");
+        if (!noodleBtn || !skillName) {
+            return;
+        }
+        const el = document.createElement("div");
+        el.className = "noodle-tip-float hypervisible";
+        el.textContent = `+${skillName} Tip`;
+        const slot = noodleBtn.querySelectorAll(".noodle-tip-float").length % 5;
+        const offsets = [0, -14, 14, -28, 28];
+        el.style.setProperty("--noodle-tip-x", `${offsets[slot]}px`);
+        el.addEventListener("animationend", function() {
+            el.remove();
+        });
+        noodleBtn.appendChild(el);
     },
 
     //helpers

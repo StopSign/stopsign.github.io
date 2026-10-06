@@ -26,7 +26,7 @@ var resortData = {
     },
 
     kitsuneCarryCapacity: 1,
-    kitsuneWaterCarryAmount: 20,
+    kitsuneWaterCarryAmount: 50,
     kitsuneWoodCarryAmount: 1,
     manaCarryAmount: 50,
     manaBuildingKeys: ["inn", "torii", "stonePile"],
@@ -50,16 +50,18 @@ var resortData = {
         return base + bought * 50;
     },
     getKitsuneWaterCarryAmount: function() {
-        return resortData.kitsuneWaterCarryAmount !== undefined ? resortData.kitsuneWaterCarryAmount : 20;
+        return resortData.kitsuneWaterCarryAmount !== undefined ? resortData.kitsuneWaterCarryAmount : 50;
     },
     getCisternWaterCarryAmount: function() {
-        const base = resortData.kitsuneWaterCarryAmount !== undefined ? resortData.kitsuneWaterCarryAmount : 20;
+        const base = resortData.kitsuneWaterCarryAmount !== undefined ? resortData.kitsuneWaterCarryAmount : 50;
         const a = data.progress.base && data.progress.base.atelier;
         const bought = a && a.bucketsBought ? a.bucketsBought : 0;
-        return base + bought * 20;
+        return base + bought * 50;
     },
     getKitsuneWoodCarryAmount: function() {
-        return resortData.kitsuneWoodCarryAmount !== undefined ? resortData.kitsuneWoodCarryAmount : 1;
+        const bought = (data.progress && data.progress.base && data.progress.base.market
+            && data.progress.base.market.arsonistJournalsBought) || 0;
+        return fibonacci(bought + 1);
     },
 
     foxDenCarrierSpawnMinMs: 1000,
@@ -91,7 +93,8 @@ var resortData = {
             emberCost: 200,
             heatPerStrike: 3,
             maxEmbers: 1000,
-            projectileDurationMs: 1050
+            projectileDurationMs: 1050,
+            mapPos: { x: 325, y: 242 }
         },
         {
             key: "bendTop",
@@ -101,7 +104,8 @@ var resortData = {
             intervalMs: 1000,
             emberCost: 300,
             heatPerStrike: 10,
-            maxEmbers: 1000
+            maxEmbers: 1000,
+            mapPos: { x: 428, y: 159 }
         },
         {
             key: "pathLower",
@@ -112,7 +116,9 @@ var resortData = {
             emberCost: 50,
             heatPerStrike: 1,
             maxEmbers: 1000,
-            projectileDurationMs: 1050
+            projectileDurationMs: 1050,
+            projectileSizePx: 14,
+            mapPos: { x: 446, y: 283 }
         }
     ],
 
@@ -125,7 +131,7 @@ var resortData = {
     workerDockSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "bonfire", "cistern", "scrollArchives",  "mage_tower", "market"],
 
     /** Credit paid per unit of each haulable resource delivered to the Market. */
-    marketCreditPerResource: { stone: 2, wood: 1, bars: 5 },
+    marketCreditPerResource: { stone: 5, wood: 3, bars: 10 },
     marketHaulResourceOrder: ["stone", "wood", "bars"],
 
     /** Market Resources trades bought by assigned Traders. Order drives round-robin. */
@@ -135,7 +141,7 @@ var resortData = {
             key: "fertilizer",
             name: "Fertilizer",
             creditCost: 50,
-            seconds: 10,
+            seconds: 30,
             yieldAmount: 100,
             note: "Bamboo grows twice as fast while fertilizer is available."
         },
@@ -143,15 +149,15 @@ var resortData = {
             key: "coal",
             name: "Coal",
             creditCost: 100,
-            seconds: 10,
-            yieldAmount: 100,
+            seconds: 30,
+            yieldAmount: 20,
             note: "Bonfire carriers bring coal before wood; each coal gives 5x the heat."
         },
         soap: {
             key: "soap",
             name: "Soap",
             creditCost: 100,
-            seconds: 10,
+            seconds: 30,
             yieldAmount: 10,
             note: "A hot bath uses one soap to double its Star Bead bonus."
         },
@@ -159,7 +165,7 @@ var resortData = {
             key: "towels",
             name: "Towels",
             creditCost: 200,
-            seconds: 10,
+            seconds: 30,
             yieldAmount: 5,
             minMarketLevel: 2,
             note: "A hot bath uses one towel for +100 restfulness."
@@ -168,7 +174,7 @@ var resortData = {
             key: "driedNoodles",
             name: "Dried Noodles",
             creditCost: 100,
-            seconds: 10,
+            seconds: 30,
             yieldAmount: 10,
             requiresBuilding: "noodleBar",
             note: "Guests eat these at the Noodle Bar."
@@ -195,20 +201,30 @@ var resortData = {
         if (html === undefined || html === null || html === "") {
             return html;
         }
-        let s = String(html);
-        s = s.replace(/(<img\b[^>]*starBead\.svg[^>]*>\s*)?(\b[Ss]tar [Bb]eads\b)/g, function(full, img, word) {
-            return img ? full : (resortData.resourceIconHtml("starBeads") + " " + word);
+        const rules = [
+            { re: /\b[Ss]tar [Bb]eads\b/g, file: "starBead.svg", key: "starBeads" },
+            { re: /\b[Cc]oins\b/g, file: "coins.svg", key: "coins" },
+            { re: /\b[Mm]ana\b/g, file: "mana.svg", key: "mana" },
+            { re: /\b[Cc]redit\b/g, file: "credit.svg", key: "credit" }
+        ];
+        const tags = [];
+        let s = String(html).replace(/<[^>]*>/g, function(tag) {
+            tags.push(tag);
+            return "\u0000" + (tags.length - 1) + "\u0000";
         });
-        s = s.replace(/(<img\b[^>]*coins\.svg[^>]*>\s*)?(\b[Cc]oins\b)/g, function(full, img, word) {
-            return img ? full : (resortData.resourceIconHtml("coins") + " " + word);
+        for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+            s = s.replace(rule.re, function(word, offset, whole) {
+                const prev = whole.slice(0, offset).match(/\u0000(\d+)\u0000\s*$/);
+                if (prev && tags[Number(prev[1])].indexOf(rule.file) !== -1) {
+                    return word;
+                }
+                return resortData.resourceIconHtml(rule.key) + " " + word;
+            });
+        }
+        return s.replace(/\u0000(\d+)\u0000/g, function(_, n) {
+            return tags[Number(n)];
         });
-        s = s.replace(/(<img\b[^>]*mana\.svg[^>]*>\s*)?(\b[Mm]ana\b)/g, function(full, img, word) {
-            return img ? full : (resortData.resourceIconHtml("mana") + " " + word);
-        });
-        s = s.replace(/(<img\b[^>]*credit\.svg[^>]*>\s*)?(\b[Cc]redit\b)/g, function(full, img, word) {
-            return img ? full : (resortData.resourceIconHtml("credit") + " " + word);
-        });
-        return s;
     },
     ownedAmountForCostKey: function(key) {
         const base = data.progress && data.progress.base ? data.progress.base : {};
@@ -242,10 +258,9 @@ var resortData = {
         }
         return 0;
     },
-    /** Coins cover any Credit shortfall unless the Market's credit-only toggle is on. */
+    /** Coins never cover a Credit cost. */
     coinsCountForCredit: function() {
-        const market = data.progress && data.progress.base && data.progress.base.market;
-        return !(market && market.creditOnlyPurchases);
+        return false;
     },
     formatCostAmountHtml: function(amount, key, label) {
         const owned = resortData.ownedAmountForCostKey(key);
@@ -271,13 +286,13 @@ var resortData = {
     costToParts: function(cost) {
         const c = cost || {};
         const parts = [];
+        if ((c.bars || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.bars, "bars", "bars"));
+        if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
+        if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
+        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
         if ((c.coins || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.coins, "coins", "coins"));
         if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
         if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
-        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
-        if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
-        if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
-        if ((c.bars || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.bars, "bars", "bars"));
         if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
         return parts;
     },
@@ -559,7 +574,7 @@ var resortData = {
             const fromCredit = Math.min(base.market.credit || 0, c.credit);
             base.market.credit = Math.max(0, (base.market.credit || 0) - fromCredit);
             const fromCoins = c.credit - fromCredit;
-            if (fromCoins > 0) {
+            if (fromCoins > 0 && resortData.coinsCountForCredit()) {
                 data.progress.coins = Math.max(0, data.progress.coins - fromCoins);
             }
         }
@@ -1417,14 +1432,18 @@ var resortData = {
             constructionCost: { wood: 0, stone: 100 },
             progressDefaults: {
                 capacityBought: 0,
+                reinforceToriiCapacityBought: 0,
+                reinforceOnsenCapacityBought: 0,
+                reinforceNoodleCapacityBought: 0,
                 replaceWithHotterWater: false,
+                refuseIncomingWater: false,
                 waterSpiritsUsePathSpeed: true,
                 assignedWorkers: 0,
                 waterCarriers: [],
                 carrierIdCounter: 1,
                 wishingWellBought: 0
             },
-            upgradesOrder: ["increaseCapacity", "buildWishingWell"],
+            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell"],
             upgrades: {
                 increaseCapacity: {
                     key: "increase_capacity",
@@ -1432,10 +1451,11 @@ var resortData = {
                     description: "Increases cistern maximum capacity (scaling per upgrade).",
                     getCost: function() {
                         const bought = (data.progress.base.cistern.capacityBought || 0);
-                        return { stone: 50 + bought * 50 };
+                        const mult = Math.pow(1.5, bought);
+                        return { stone: 50 * mult };
                     },
-                    weavingTime: 50,
-                    weavingTimeIncreaseAdd: 5,
+                    weavingTime: 60,
+                    weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.cistern.capacityBought || 0;
                     },
@@ -1456,9 +1476,126 @@ var resortData = {
                     extraInfo: function() {
                         const bought = data.progress.base.cistern.capacityBought || 0;
                         const nextN = bought + 1;
-                        const addL = 100 * nextN * (nextN + 1) / 2;
+                        const addL = 10 * nextN * (nextN + 1) / 2;
                         const nextMax = engine.getCisternMaxCapacity() + addL;
                         return `Next: +${intToStringRound(addL)}L → ${round2(nextMax)}L max`;
+                    }
+                },
+                reinforceToriiCapacity: {
+                    key: "reinforce_torii_capacity",
+                    name: "Reinforce Torii Gate's Capacity",
+                    description: "Reinforce the Torii drinking bowl. Each purchase adds +700L hot water capacity (up to 4 times).",
+                    getCost: function() {
+                        const n = (data.progress.base.cistern.reinforceToriiCapacityBought || 0);
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            mana: Math.round(50000 * mult),
+                            wood: Math.round(500 * mult),
+                            stone: Math.round(250 * mult)
+                        };
+                    },
+                    weavingTime: 240,
+                    weavingTimeIncreaseAdd: 120,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.cistern.reinforceToriiCapacityBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isToriiDrinkingBowlUnlocked()
+                            && (data.progress.base.cistern.reinforceToriiCapacityBought || 0) < 4;
+                    },
+                    onBuy: function() {
+                        data.progress.base.cistern.reinforceToriiCapacityBought =
+                            (data.progress.base.cistern.reinforceToriiCapacityBought || 0) + 1;
+                    },
+                    maxPurchases: 4,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.reinforceToriiCapacityBought || 0) >= 4;
+                    },
+                    soldOutButtonLabel: "Max reinforced",
+                    rowVisible: function() {
+                        return engine.isToriiDrinkingBowlUnlocked()
+                            && (data.progress.base.cistern.reinforceToriiCapacityBought || 0) < 4;
+                    },
+                    extraInfo: function() {
+                        return "Next: +700L";
+                    }
+                },
+                reinforceOnsenCapacity: {
+                    key: "reinforce_onsen_capacity",
+                    name: "Reinforce Tatami Onsen's Capacity",
+                    description: "Reinforce the Onsen reservoir. Each purchase adds +1000L hot water capacity (up to 4 times).",
+                    getCost: function() {
+                        const n = (data.progress.base.cistern.reinforceOnsenCapacityBought || 0);
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            mana: Math.round(60000 * mult),
+                            wood: Math.round(600 * mult),
+                            stone: Math.round(300 * mult)
+                        };
+                    },
+                    weavingTime: 300,
+                    weavingTimeIncreaseAdd: 150,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.cistern.reinforceOnsenCapacityBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isInnOnsenConverted()
+                            && (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) < 4;
+                    },
+                    onBuy: function() {
+                        data.progress.base.cistern.reinforceOnsenCapacityBought =
+                            (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) + 1;
+                    },
+                    maxPurchases: 4,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) >= 4;
+                    },
+                    soldOutButtonLabel: "Max reinforced",
+                    rowVisible: function() {
+                        return engine.isInnOnsenConverted()
+                            && (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) < 4;
+                    },
+                    extraInfo: function() {
+                        return "Next: +1000L";
+                    }
+                },
+                reinforceNoodleCapacity: {
+                    key: "reinforce_noodle_capacity",
+                    name: "Reinforce Noodle Bar's Capacity",
+                    description: "Reinforce the Noodle Bar kettle. Each purchase adds +1500L hot water capacity (up to 4 times).",
+                    getCost: function() {
+                        const n = (data.progress.base.cistern.reinforceNoodleCapacityBought || 0);
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            mana: Math.round(75000 * mult),
+                            wood: Math.round(800 * mult),
+                            stone: Math.round(400 * mult)
+                        };
+                    },
+                    weavingTime: 360,
+                    weavingTimeIncreaseAdd: 180,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.cistern.reinforceNoodleCapacityBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isNoodleBarBuilt()
+                            && (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) < 4;
+                    },
+                    onBuy: function() {
+                        data.progress.base.cistern.reinforceNoodleCapacityBought =
+                            (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) + 1;
+                    },
+                    maxPurchases: 4,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) >= 4;
+                    },
+                    soldOutButtonLabel: "Max reinforced",
+                    rowVisible: function() {
+                        return engine.isNoodleBarBuilt()
+                            && (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) < 4;
+                    },
+                    extraInfo: function() {
+                        return "Next: +1500L";
                     }
                 },
                 buildWishingWell: {
@@ -1894,7 +2031,7 @@ var resortData = {
                         const mult = Math.pow(1.5, n);
                         return {
                             mana: Math.round(10000 * mult),
-                            starBeads: Math.round(2000 * mult)
+                            starBeads: Math.round(4000 * mult)
                         };
                     },
                     weavingTime: 120,
@@ -1941,7 +2078,7 @@ var resortData = {
                 guestsVisitPond: false,
                 onsenConverted: false,
                 hotWater: 0,
-                hotWaterCapacity: 200,
+                hotWaterCapacity: 500,
                 waterCarriers: [],
                 carrierIdCounter: 1,
                 assignedWorkers: 0,
@@ -2077,7 +2214,7 @@ var resortData = {
                         return { bars: 300 * mult, coins: 6000 * mult };
                     },
                     weavingTime: 180,
-                    weavingTimeIncreaseAdd: 120,
+                    weavingTimeIncrease: 2,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.inn.reinforceJointsBought || 0;
                     },
@@ -2105,7 +2242,7 @@ var resortData = {
                 convertToOnsen: {
                     key: "convert_to_onsen",
                     name: "Convert to Onsen",
-                    description: "Convert the Tatami Inn into a Tatami Onsen with hot spring soaking. Needs hot water. Reveals other upgrades.",
+                    description: "Convert the Tatami Inn into a Tatami Onsen with hot bath soaking. Needs hot water. Reveals other upgrades.",
                     cost: { bars: 200, stone: 1000 },
                     weavingTime: 450,
                     canBuy: function() {
@@ -2298,13 +2435,14 @@ var resortData = {
                 sprinkleOreOnRoadsBought: 0,
                 improveDirtRoadsBought: 0,
                 mineshaftBeamsBought: 0,
+                largerForgeBought: 0,
                 forgeBuilt: false,
                 fireLaunchersBought: 0,
                 formDirtRoadsUnlocked: false,
                 ore: 0,
                 bars: 0
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "mineshaftBeams"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "mineshaftBeams"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -2315,8 +2453,8 @@ var resortData = {
                         const mult = Math.pow(2, n);
                         return { wood: 5 * mult, starBeads: 40 * mult };
                     },
-                    weavingTime: 10,
-                    weavingTimeIncrease: 2,
+                    weavingTime: 30,
+                    weavingTimeIncreaseAdd: 30,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.magicLoomsBought || 0;
                     },
@@ -2341,7 +2479,14 @@ var resortData = {
                 addForge: {
                     key: "add_forge",
                     name: "Add Forge",
-                    description: "Build a forge below the Atelier where fire spirits smelt floor(√spirit power) ore into bars every 60s, gaining exp equal to bars × 3. Requires Fire Spirit to work.",
+                    description: function() {
+                        const n = engine.getLargerForgeBought();
+                        if (n > 0) {
+                            const mult = round2(1 + 0.2 * n);
+                            return `Build a forge below the Atelier where fire spirits smelt ceil(√spirit power × ${mult}) ore into bars every 60s, gaining exp equal to bars × 3. Requires Fire Spirit to work.`;
+                        }
+                        return "Build a forge below the Atelier where fire spirits smelt floor(√spirit power) ore into bars every 60s, gaining exp equal to bars × 3. Requires Fire Spirit to work.";
+                    },
                     cost: { stone: 600 },
                     weavingTime: 240,
                     weavingTimeIncrease: 0,
@@ -2362,6 +2507,34 @@ var resortData = {
                         return !!data.progress.base.atelier.forgeBuilt;
                     },
                     soldOutButtonLabel: "Forged"
+                },
+                largerForge: {
+                    key: "larger_forge",
+                    name: "Larger Forge",
+                    description: "Widen the forge so fire spirits smelt more ore. Each purchase raises the batch by 20%, rounded up.",
+                    getCost: function() {
+                        const n = engine.getLargerForgeBought();
+                        return { stone: Math.round(5000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 800,
+                    weavingTimeIncreaseAdd: 800,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getLargerForgeBought();
+                    },
+                    maxPurchases: 5,
+                    canBuy: function() {
+                        return engine.isForgingInstructionsBought() && engine.getLargerForgeBought() < 5;
+                    },
+                    onBuy: function() {
+                        data.progress.base.atelier.largerForgeBought = engine.getLargerForgeBought() + 1;
+                    },
+                    rowVisible: function() {
+                        return engine.isForgingInstructionsBought();
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getLargerForgeBought() >= 5;
+                    },
+                    soldOutButtonLabel: "Max forge"
                 },
                 createMetalFireLauncher: {
                     key: "create_metal_fire_launcher",
@@ -2528,7 +2701,7 @@ var resortData = {
                 makeBuckets: {
                     key: "make_buckets",
                     name: "Make Buckets",
-                    description: "Create buckets so cistern-assigned carriers haul +20L more water per trip.",
+                    description: "Create buckets so cistern-assigned carriers haul +50L more water per trip.",
                     getCost: function() {
                         const bought = data.progress.base.atelier.bucketsBought || 0;
                         const mult = Math.pow(2, bought);
@@ -2536,19 +2709,24 @@ var resortData = {
                     },
                     weavingTime: 120,
                     weavingTimeIncreaseAdd: 120,
+                    maxPurchases: 4,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.bucketsBought || 0;
                     },
                     canBuy: function() {
-                        return true;
+                        return (data.progress.base.atelier.bucketsBought || 0) < 4;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.bucketsBought = (data.progress.base.atelier.bucketsBought || 0) + 1;
                     },
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.atelier.bucketsBought || 0) >= 4;
+                    },
+                    soldOutButtonLabel: "Max buckets",
                     extraInfo: function() {
                         const bought = data.progress.base.atelier.bucketsBought || 0;
                         const cap = resortData.getCisternWaterCarryAmount();
-                        return `Cistern water carry: ${cap}L per trip (${bought} woven)`;
+                        return `Cistern water carry: ${cap}L per trip (${bought}/4)`;
                     },
                     rowVisible: function() {
                         return engine.isInnOnsenConverted();
@@ -2747,6 +2925,7 @@ var resortData = {
                 arrangementOfFireTendingUnlocked: false,
                 arrangementOfTraderResponsibilityUnlocked: false,
                 arrangementOfHotWaterUnlocked: false,
+                arrangementOfThirstUnlocked: false,
                 arrangementOfViscosityUnlocked: false,
                 arrangementOfTargetPriorityUnlocked: false,
                 arrangementOfHeatTargetingUnlocked: false,
@@ -2765,7 +2944,7 @@ var resortData = {
             upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfAppraisal", "arrangementOfReview",
                 "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
                 "arrangementOfTargetPriority", "arrangementOfHeatTargeting", "arrangementOfManaOrders", "arrangementOfDoubledStone",
-                "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfTraderResponsibility", "arrangementOfLiftedBurdens", "smartHarvest"],
+                "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility", "arrangementOfLiftedBurdens", "smartHarvest"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -2798,7 +2977,7 @@ var resortData = {
                 arrangementOfRemembrance: {
                     key: "arrangement_of_remembrance",
                     name: "Arrangement of Remembrance",
-                    description: "After weaving, the Okami returns to her previous non-weaving assignment.",
+                    description: "After weaving, the Okami returns to the last place she was a worker.",
                     cost: { stone: 10 },
                     weavingTime: 30,
                     weavingTimeIncrease: 1,
@@ -3033,7 +3212,7 @@ var resortData = {
                     name: "Arrangement of Trader Responsibility",
                     description: "Adds a number input to each Market Resource. Traders only buy a good while its stock is below that number. 0 means no limit.",
                     cost: { stone: 2500 },
-                    weavingTime: 300,
+                    weavingTime: 900,
                     maxPurchases: 1,
                     canBuy: function() {
                         const g = data.progress.base.garden;
@@ -3076,6 +3255,34 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfHotWaterUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfThirst: {
+                    key: "arrangement_of_thirst",
+                    name: "Arrangement of Thirst",
+                    description: "Unlocks a Cistern checkbox. While checked, incoming water is dumped to the Pond instead of stored in the Cistern.",
+                    cost: { stone: 1500 },
+                    weavingTime: 750,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isPondBuiltFromFoxDen() && !(g && g.arrangementOfThirstUnlocked);
+                    },
+                    onBuy: function() {
+                        const g = data.progress.base.garden;
+                        g.arrangementOfThirstUnlocked = true;
+                        const cistern = data.progress.base.cistern;
+                        if (cistern && cistern.refuseIncomingWater === undefined) {
+                            cistern.refuseIncomingWater = false;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isPondBuiltFromFoxDen() && !(g && g.arrangementOfThirstUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfThirstUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 },
@@ -3334,10 +3541,10 @@ var resortData = {
             label: "Noodle Bar",
             description: "Guests eat noodles here, and their talk becomes tips for researched skills.",
             mapSlot: { left: "30%", bottom: 203 },
-            constructionCost: { wood: 3000 },
+            constructionCost: { wood: 6000, stone: 3000 },
             progressDefaults: {
                 hotWater: 0,
-                hotWaterCapacity: 500,
+                hotWaterCapacity: 1000,
                 tipProgress: 0,
                 topicPresses: 0,
                 topicCooldownRemainMs: 0,
@@ -3357,8 +3564,8 @@ var resortData = {
                     getCost: function() {
                         const n = engine.getNoodleCrossTalkBought();
                         return {
-                            coins: Math.round(3000 * Math.pow(2, n)),
-                            starBeads: Math.round(20000 * Math.pow(2, n))
+                            coins: Math.round(20000 * Math.pow(2, n)),
+                            starBeads: Math.round(80000 * Math.pow(2, n))
                         };
                     },
                     weavingTime: 600,
@@ -3390,10 +3597,10 @@ var resortData = {
                     description: "Softer seats. Guests eating noodles gain +5 restfulness/s per purchase.",
                     getCost: function() {
                         const n = engine.getNoodleComfyStoolsBought();
-                        return { wood: Math.round(2000 * Math.pow(2, n)) };
+                        return { wood: Math.round(3000 * Math.pow(2, n)) };
                     },
-                    weavingTime: 240,
-                    weavingTimeIncreaseAdd: 120,
+                    weavingTime: 360,
+                    weavingTimeIncreaseAdd: 180,
                     getWeavingPurchaseIndex: function() {
                         return engine.getNoodleComfyStoolsBought();
                     },
@@ -3417,10 +3624,10 @@ var resortData = {
                     description: "The walls do the talking. Each purchase halves the coin cost of changing conversation topics.",
                     getCost: function() {
                         const n = engine.getNoodleTrophyDecorationsBought();
-                        return { stone: Math.round(2000 * Math.pow(2, n)) };
+                        return { stone: Math.round(8000 * Math.pow(2, n)) };
                     },
-                    weavingTime: 240,
-                    weavingTimeIncreaseAdd: 120,
+                    weavingTime: 360,
+                    weavingTimeIncreaseAdd: 180,
                     getWeavingPurchaseIndex: function() {
                         return engine.getNoodleTrophyDecorationsBought();
                     },
@@ -3430,9 +3637,6 @@ var resortData = {
                     onBuy: function() {
                         const bar = data.progress.base.noodleBar;
                         bar.trophyDecorationsBought = engine.getNoodleTrophyDecorationsBought() + 1;
-                    },
-                    extraInfo: function() {
-                        return `Next topic cost: ${intToStringRound(engine.getNoodleTopicCost())} coins`;
                     },
                     rowVisible: function() {
                         return true;
@@ -3457,7 +3661,7 @@ var resortData = {
             progressDefaults: {
                 level: 0,
                 exp: 0,
-                expToLevel: 5000,
+                expToLevel: 30000,
                 credit: 0,
                 assignedWorkers: 0,
                 assignedTraders: 0,
@@ -3482,9 +3686,13 @@ var resortData = {
                 cookingEquipmentBought: 0,
                 tradingExperienceBought: 0,
                 buyAdvertisingBought: 0,
-                improveStoneDuplicatorBought: 0
+                improveStoneDuplicatorBought: 0,
+                literacyLessonsBought: 0,
+                forgingInstructionsBought: 0,
+                arsonistJournalsBought: 0,
+                lostScrollsBought: 0
             },
-            upgradesOrder: ["mysticalGloves", "anchoringRing", "cookingEquipment", "tradingExperience", "buyAdvertising", "improveStoneDuplicator"],
+            upgradesOrder: ["anchoringRing", "mysticalGloves", "cookingEquipment", "improveStoneDuplicator", "tradingExperience", "buyAdvertising", "literacyLessons", "forgingInstructions", "arsonistJournals", "lostScrolls"],
             upgrades: {
                 mysticalGloves: {
                     key: "mystical_gloves",
@@ -3492,10 +3700,10 @@ var resortData = {
                     description: "Silk gloves that quicken a clone's hands. Each pair reduces created clones' slap cooldown by 100ms.",
                     getCost: function() {
                         const n = engine.getMarketMysticalGlovesBought();
-                        return { credit: Math.round(2000 * Math.pow(10, n)) };
+                        return { credit: Math.round(10000 * Math.pow(10, n)) };
                     },
-                    weavingTime: 90,
-                    weavingTimeIncreaseAdd: 90,
+                    weavingTime: 240,
+                    weavingTimeIncrease: 3,
                     getWeavingPurchaseIndex: function() {
                         return engine.getMarketMysticalGlovesBought();
                     },
@@ -3531,13 +3739,13 @@ var resortData = {
                 anchoringRing: {
                     key: "anchoring_ring",
                     name: "Anchoring Ring",
-                    description: "A ring that anchors a clone's spirit. Each one grants created clones +1 Soul.",
+                    description: "A ring that anchors a clone's spirit. Each one grants created clones +1 Soul. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
                         const n = engine.getMarketAnchoringRingBought();
-                        return { credit: Math.round(2000 * Math.pow(2, n)) };
+                        return { credit: Math.round(8000 * Math.pow(2, n)) };
                     },
-                    weavingTime: 90,
-                    weavingTimeIncreaseAdd: 30,
+                    weavingTime: 240,
+                    weavingTimeIncrease: 1.5,
                     getWeavingPurchaseIndex: function() {
                         return engine.getMarketAnchoringRingBought();
                     },
@@ -3573,12 +3781,12 @@ var resortData = {
                 cookingEquipment: {
                     key: "cooking_equipment",
                     name: "Cooking Equipment",
-                    description: "Pots, knives, and a proper stove. Lets the Fox Den plan the Noodle Bar.",
-                    cost: { credit: 5000 },
-                    weavingTime: 120,
+                    description: "Pots, knives, and a proper stove. Lets the Fox Den plan the Noodle Bar, which uses hotter water for more restfulness. Satisfied guests also give tips about your skills.",
+                    cost: { credit: 30000 },
+                    weavingTime: 600,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return !engine.isMarketCookingEquipmentBought();
+                        return engine.getMarketLevel() >= 1 && !engine.isMarketCookingEquipmentBought();
                     },
                     onBuy: function() {
                         data.progress.base.market.cookingEquipmentBought = 1;
@@ -3592,14 +3800,17 @@ var resortData = {
                     upgradeSoldOut: function() {
                         return engine.isMarketCookingEquipmentBought();
                     },
-                    soldOutButtonLabel: "Equipped"
+                    soldOutButtonLabel: "Equipped",
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 1 ? "" : "Unlocks at Market level 1";
+                    }
                 },
                 tradingExperience: {
                     key: "trading_experience",
                     name: "Trading Experience",
-                    description: "Traders keep ledgers. The Market also gains exp for every Credit and coin they spend.",
-                    cost: { credit: 4000 },
-                    weavingTime: 200,
+                    description: "Traders keep ledgers. The Market also gains exp for every Credit they spend.",
+                    cost: { credit: 15000 },
+                    weavingTime: 400,
                     maxPurchases: 1,
                     canBuy: function() {
                         return engine.getMarketLevel() >= 1 && !engine.isMarketTradingExperienceBought();
@@ -3627,10 +3838,10 @@ var resortData = {
                     description: "Post word of the resort along the roads. Each purchase cuts the wait for the next visitor at the Torii Gate by 5%.",
                     getCost: function() {
                         const n = engine.getMarketBuyAdvertisingBought();
-                        return { credit: Math.round(3000 * Math.pow(1.5, n)) };
+                        return { credit: Math.round(15000 * Math.pow(1.5, n)) };
                     },
-                    weavingTime: 90,
-                    weavingTimeIncreaseAdd: 30,
+                    weavingTime: 400,
+                    weavingTimeIncreaseAdd: 400,
                     getWeavingPurchaseIndex: function() {
                         return engine.getMarketBuyAdvertisingBought();
                     },
@@ -3661,12 +3872,13 @@ var resortData = {
                     key: "improve_stone_duplicator",
                     name: "Improve Stone Duplicator",
                     description: "The duplicator works in batches. Every 10 seconds, 10 stone and 500 mana become 10 used stone and 10 duplicated stone. It skips a tick when fewer than 10 stone are stored.",
-                    cost: { credit: 2000 },
-                    weavingTime: 300,
+                    cost: { credit: 30000 },
+                    weavingTime: 600,
                     canBuy: function() {
                         const pile = data.progress.base.stonePile;
                         const market = data.progress.base.market;
-                        return !!(pile && pile.stoneDuplicatorUnlocked && market && !market.improveStoneDuplicatorBought);
+                        return engine.getMarketLevel() >= 1
+                            && !!(pile && pile.stoneDuplicatorUnlocked && market && !market.improveStoneDuplicatorBought);
                     },
                     onBuy: function() {
                         data.progress.base.market.improveStoneDuplicatorBought = 1;
@@ -3678,7 +3890,160 @@ var resortData = {
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.market && data.progress.base.market.improveStoneDuplicatorBought);
                     },
-                    soldOutButtonLabel: "Improved"
+                    soldOutButtonLabel: "Improved",
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 1 ? "" : "Unlocks at Market level 1";
+                    }
+                },
+                exchangeCredit: {
+                    key: "exchange_credit",
+                    name: "Exchange Credit",
+                    description: "The Okami turns 1000 coins into 1000 Credit and 1000 Market exp.",
+                    directWeave: true,
+                    weavingTime: 40,
+                    cost: {},
+                    canBuy: function() {
+                        return engine.canStartExchangeCredit();
+                    },
+                    onBuy: function() {
+                        engine.completeExchangeCredit();
+                    },
+                    rowVisible: function() {
+                        return false;
+                    }
+                },
+                literacyLessons: {
+                    key: "literacy_lessons",
+                    name: "Literacy Lessons",
+                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2. Coins, star beads, and mana spent stay the same.",
+                    getCost: function() {
+                        const n = engine.getLiteracyLessonsBought();
+                        return { credit: Math.round(40000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 600,
+                    weavingTimeIncreaseAdd: 400,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getLiteracyLessonsBought();
+                    },
+                    canBuy: function() {
+                        return engine.getMarketLevel() >= 2
+                            && engine.getLiteracyLessonsBought() < engine.getLiteracyLessonsMax();
+                    },
+                    onBuy: function() {
+                        data.progress.base.market.literacyLessonsBought = engine.getLiteracyLessonsBought() + 1;
+                    },
+                    extraInfo: function() {
+                        const mult = round2(engine.getLiteracyResearchMultiplier());
+                        return `Research gained: x${mult}. Max at this level: ${engine.getLiteracyLessonsMax()}`;
+                    },
+                    rowVisible: function() {
+                        return engine.getMarketLevel() >= 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getLiteracyLessonsBought() >= engine.getLiteracyLessonsMax();
+                    },
+                    soldOutButtonLabel: "Max lessons",
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 2 ? "" : "Unlocks at Market level 2";
+                    }
+                },
+                forgingInstructions: {
+                    key: "forging_instructions",
+                    name: "Forging Instructions",
+                    description: "Notes on hotter fires. Reveals Larger Forge in the Atelier.",
+                    cost: { credit: 60000 },
+                    weavingTime: 800,
+                    canBuy: function() {
+                        return engine.getMarketLevel() >= 2 && !engine.isForgingInstructionsBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.market.forgingInstructionsBought = 1;
+                    },
+                    rowVisible: function() {
+                        return engine.getMarketLevel() >= 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isForgingInstructionsBought();
+                    },
+                    soldOutButtonLabel: "Studied",
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 2 ? "" : "Unlocks at Market level 2";
+                    }
+                },
+                arsonistJournals: {
+                    key: "arsonist_journals",
+                    name: "Buy Arsonist Journals",
+                    description: "Bonfire carriers learn to stack fuel. Wood and coal carry follows the same steps as Attach Baskets.",
+                    getCost: function() {
+                        const n = engine.getArsonistJournalsBought();
+                        return { credit: Math.round(80000 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getArsonistJournalsBought();
+                    },
+                    canBuy: function() {
+                        return engine.getMarketLevel() >= 2;
+                    },
+                    onBuy: function() {
+                        data.progress.base.market.arsonistJournalsBought = engine.getArsonistJournalsBought() + 1;
+                    },
+                    extraInfo: function() {
+                        const bought = engine.getArsonistJournalsBought();
+                        const cap = resortData.getKitsuneWoodCarryAmount();
+                        return `Wood/Coal carry: ${cap} | Next journal: +${fibonacci(bought)}`;
+                    },
+                    rowVisible: function() {
+                        return engine.getMarketLevel() >= 1;
+                    },
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 2 ? "" : "Unlocks at Market level 2";
+                    }
+                },
+                lostScrolls: {
+                    key: "lost_scrolls",
+                    name: "Lost Scrolls",
+                    description: "A scroll that was never catalogued. Each purchase adds one research choice and does not raise the price of the next paid research.",
+                    getCost: function() {
+                        const n = engine.getLostScrollsBought();
+                        return { credit: Math.round(100000 * Math.pow(3, n)) };
+                    },
+                    weavingTime: 1500,
+                    weavingTimeIncrease: 2,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getLostScrollsBought();
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getLostScrollsMax();
+                    },
+                    canBuy: function() {
+                        return engine.getMarketLevel() >= 3
+                            && engine.getLostScrollsBought() < engine.getLostScrollsMax();
+                    },
+                    onBuy: function() {
+                        const market = data.progress.base.market;
+                        market.lostScrollsBought = engine.getLostScrollsBought() + 1;
+                        const lib = data.progress.base.scrollArchives;
+                        if (!lib) {
+                            return;
+                        }
+                        lib.researchesToChoose = (lib.researchesToChoose || 0) + 1;
+                        if ((lib.researchesToChoose || 0) > 0 && !(lib.researchChoices && lib.researchChoices.length)) {
+                            engine.rollScrollArchivesResearchChoices();
+                        }
+                        events.markNewBaseContent("scrollArchives");
+                    },
+                    rowVisible: function() {
+                        return engine.getMarketLevel() >= 2;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getLostScrollsBought() >= engine.getLostScrollsMax();
+                    },
+                    soldOutButtonLabel: "Max scrolls",
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 3 ? "" : "Unlocks at Market level 3";
+                    }
                 }
             }
         },
@@ -3770,7 +4135,7 @@ var resortData = {
                     description: "Raise walls around the Orb. Each wall increases Orb exp gain by 10%. Every 4 walls unlock another Stairs, and each Floor raises the wall maximum by 4.",
                     getCost: function() {
                         const n = engine.getOrbBuildWallsBought();
-                        return { wood: Math.floor(40 * Math.pow(1.5, Math.floor(n / 4))) };
+                        return { wood: Math.floor(40 * Math.pow(2, Math.floor(n / 4))) };
                     },
                     weavingTime: 30,
                     weavingTimeIncreaseAdd: 30,
@@ -3803,12 +4168,12 @@ var resortData = {
                         const n = engine.getOrbBuildStairsBought();
                         return {
                             wood: Math.floor(200 * Math.pow(1.5, n)),
-                            starBeads: Math.floor(1000 * Math.pow(1.5, n)),
-                            coins: Math.floor(300 * Math.pow(1.5, n))
+                            starBeads: Math.floor(1000 * Math.pow(3, n)),
+                            coins: Math.floor(300 * Math.pow(3, n))
                         };
                     },
                     weavingTime: 60,
-                    weavingTimeIncreaseAdd: 30,
+                    weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
                         return engine.getOrbBuildStairsBought();
                     },
@@ -3838,7 +4203,7 @@ var resortData = {
                     getCost: function() {
                         const n = engine.getOrbBuildFloorBought();
                         return {
-                            wood: Math.floor(500 * Math.pow(1.5, n)),
+                            wood: Math.floor(500 * Math.pow(2, n)),
                             bars: Math.floor(200 * Math.pow(1.5, n))
                         };
                     },
@@ -3870,7 +4235,15 @@ var resortData = {
                     key: "increase_inn_mana_capacity",
                     name: "Increase Inn's Capacity",
                     description: "Expand the Tatami Inn's mana reservoir by +4000 per purchase (up to 4 times).",
-                    cost: { wood: 150, stone: 50, mana: 8000 },
+                    getCost: function() {
+                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            wood: Math.round(150 * mult),
+                            stone: Math.round(50 * mult),
+                            mana: Math.round(8000 * mult)
+                        };
+                    },
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
@@ -3890,7 +4263,7 @@ var resortData = {
                         const inn = data.progress.base && data.progress.base.inn;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
                         return !!(inn && inn.gentleLightsUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.cost));
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
                     },
                     upgradeSoldOut: function() {
                         return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0) >= 4;
@@ -3906,7 +4279,15 @@ var resortData = {
                     key: "increase_gate_mana_capacity",
                     name: "Increase Gate's Capacity",
                     description: "Expand the Zenko Torii Gate's mana reservoir by +4000 per purchase (up to 4 times).",
-                    cost: { wood: 150, stone: 50, mana: 8000 },
+                    getCost: function() {
+                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            wood: Math.round(150 * mult),
+                            stone: Math.round(50 * mult),
+                            mana: Math.round(8000 * mult)
+                        };
+                    },
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
@@ -3926,7 +4307,7 @@ var resortData = {
                         const torii = data.progress.base && data.progress.base.torii;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
                         return !!(torii && torii.enticingLightsUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.cost));
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
                     },
                     upgradeSoldOut: function() {
                         return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0) >= 4;
@@ -3942,7 +4323,15 @@ var resortData = {
                     key: "increase_stone_pile_mana_capacity",
                     name: "Increase Stone Pile's Capacity",
                     description: "Expand the Stone Pile's mana reservoir by +4000 per purchase (up to 4 times).",
-                    cost: { wood: 150, stone: 50, mana: 8000 },
+                    getCost: function() {
+                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
+                        const mult = Math.pow(1.2, n);
+                        return {
+                            wood: Math.round(150 * mult),
+                            stone: Math.round(50 * mult),
+                            mana: Math.round(8000 * mult)
+                        };
+                    },
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
@@ -3962,7 +4351,7 @@ var resortData = {
                         const pile = data.progress.base && data.progress.base.stonePile;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
                         return !!(pile && pile.stoneDuplicatorUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.cost));
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
                     },
                     upgradeSoldOut: function() {
                         return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0) >= 4;

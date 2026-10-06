@@ -10,6 +10,7 @@ var bonfireConfig = {
     modifierManaMult: 1.2,
     heatDecayPerTick: 0.0005,
     heatPerWood: 10,
+    heatPerCoalMult: 5,
     heatBonusThreshold: 50,
     heatBonusThresholdStep: 1.5,
     heatBonusMultStart: 1.2,

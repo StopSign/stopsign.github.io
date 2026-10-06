@@ -75,22 +75,23 @@ mapData.getDefaultMaps = function() {
         mapData.createMap({
             version: 0,
             key: "map_4",
-            name: "Romance Novelists",
-            description: "Some intruders are determined in their pursuit of seeing the secrets of the hotspring. The Okami must fill their hearts with shame.",
+            name: "Muse-Seekers",
+            description: "Artists seeking muses have heard rumors of beauties in the mist. They will have shame after the Okami has finished with them.",
             seed: 7777,
-            baseDifficulty: 2,
+            baseDifficulty: 2.2,
             unlocksAfterMapKey: "map_3",
             zones: [
-                mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 20),
-                mapData.createZone(3, "lecher", 2000, 400, 1.2, 0.75, 25),
-                mapData.createZone(5, "scoundrel", 22000, 250, 1.5, 1, 30),
-                mapData.createZone(2, "lecher", 26000, 500, 1.7, 0.75, 35),
-                mapData.createZone(4, "scoundrel", 41000, 200, 2, 1.25, 40),
+                mapData.createZone(6, "lecher", 0, 150, 1, 1, 20),
+                mapData.createZone(2, "scoundrel", 2000, 600, 1.4, 1.25, 25),
+                mapData.createZone(6, "lecher", 22000, 225, 1.4, 1, 30),
+                mapData.createZone(3, "scoundrel", 24000, 500, 1.6, 1.25, 35),
+                mapData.createZone(6, "lecher", 52000, 200, 1.8, 1.25, 40),
+                mapData.createZone(2, "scoundrel", 56000, 400, 2, 1, 40),
             ],
             zoneShards: [
                 { key: "grudge", gain: 1, chance: 0.005, cap: 10 },
-                { key: "shockValue", gain: 1, chance: 0.005, cap: 10 },
-                { key: "windFallSwagger", gain: 1, chance: 0.005, cap: 10 }
+                { key: "seethe", gain: 1, chance: 0.005, cap: 10 },
+                { key: "brokenRecord", gain: 1, chance: 0.005, cap: 10 }
             ]
         }),
         mapData.createMap({
@@ -102,24 +103,28 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 3,
             unlocksAfterMapKey: "map_4",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 300, 1.4, 1.2, 50),
-                mapData.createZone(2, "scoundrel", 18000, 400, 1.8, 1.2, 70),
-                mapData.createZone(2, "scoundrel", 30000, 300, 2.2, 1.2, 90),
-                mapData.createZone(2, "scoundrel", 45000, 300, 2.6, 1.2, 110),
+                mapData.createZone(3, "scoundrel", 0, 400, 1.4, 2, 50),
+                mapData.createZone(1, "lecher", 1000, 200, 1.4, 1, 50),
+                mapData.createZone(2, "scoundrel", 24000, 300, 1.8, 2, 70),
+                mapData.createZone(1, "lecher", 25000, 200, 1.8, 1, 70),
+                mapData.createZone(2, "scoundrel", 36000, 300, 2.2, 2, 90),
+                mapData.createZone(1, "lecher", 37000, 200, 2.2, 1, 90),
+                mapData.createZone(2, "scoundrel", 48000, 300, 2.6, 2, 110),
+                mapData.createZone(1, "lecher", 49000, 200, 2.6, 1, 110),
             ],
             zoneShards: [
-                { key: "extortion", gain: 1, chance: 0.0025, cap: 10 },
-                { key: "bitterRivalry", gain: 1, chance: 0.0025, cap: 10 },
-                { key: "seethe", gain: 1, chance: 0.0025, cap: 10 }
+                { key: "extortion", gain: 1, chance: 0.005, cap: 10 },
+                { key: "bitterRivalry", gain: 1, chance: 0.005, cap: 10 },
+                { key: "shockValue", gain: 1, chance: 0.005, cap: 10 }
             ]
         }),
         mapData.createMap({
             version: 0,
             key: "map_6",
-            name: "Muse-Seekers",
-            description: "Artists seeking muses have heard rumors of beauties in the mist. They will have shame after the Okami has finished with them.",
+            name: "Romance Novelists",
+            description: "Masses of novelists are determined in their pursuit of finding inspiration from the truth of the rumor's surrounding the hotspring. The Okami must fill their hearts with shame for their vanity.",
             seed: 9944,
-            baseDifficulty: 2.5,
+            baseDifficulty: 3,
             unlocksAfterMapKey: "map_5",
             zones: [
                 mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 20),
@@ -152,7 +157,7 @@ mapData.getDefaultMaps = function() {
             zoneShards: [
                 { key: "echoChamber", gain: 1, chance: 0.000625, cap: 10 },
                 { key: "narcissism", gain: 1, chance: 0.000625, cap: 10 },
-                { key: "numbingCrowds", gain: 1, chance: 0.000625, cap: 10 }
+                { key: "temper", gain: 1, chance: 0.000625, cap: 10 }
             ]
         }),
         mapData.createMap({

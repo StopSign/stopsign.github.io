@@ -137,7 +137,7 @@ let engine = {
         return (st.pct >= 100 || st.activeMs > 0) && st.activeMs > 0;
     },
     getSandalIntruderStopY: function(playerTopY, battleHeight) {
-        return playerTopY - 200;
+        return playerTopY - 250;
     },
     isLaneSpotOccupied: function(targetLane, yPx, sizePx, skipIntruderId) {
         for (let i = 0; i < data.battle.enemies.length; i++) {
@@ -407,13 +407,32 @@ let engine = {
                     } else {
                         const below = laneEnemies[j + 1];
                         const maxY = below.yPx - intruder.sizePx - stackGap;
-                        const blockedByFront = tentativeY > maxY;
-                        if (tentativeY > maxY) {
-                            tentativeY = maxY;
+                        const baseDy = intruder.speedPxPerSecond * deltaSeconds;
+                        const pushDy = pushBonus * deltaSeconds;
+                        let baseY = intruder.yPx;
+                        if (baseY < stopY) {
+                            baseY = Math.min(stopY, baseY + baseDy);
                         }
-                        intruder.yPx = tentativeY;
-                        intruder.inRange = false;
-                        intruder.lecherReady = false;
+                        let nextY = baseY + pushDy;
+                        if (nextY > maxY) {
+                            nextY = maxY;
+                        }
+                        const blockedByFront = (baseY + pushDy) > maxY && baseY < stopY;
+                        if (nextY + intruder.sizePx >= playerTopY) {
+                            intruder.yPx = Math.min(nextY, playerTopY - intruder.sizePx);
+                            intruder.inRange = true;
+                            if (!intruder.hasEnteredSlapQueue) {
+                                intruder.hasEnteredSlapQueue = true;
+                                data.battle.slapQueue.push(intruder.id);
+                            }
+                        } else {
+                            intruder.yPx = nextY;
+                            intruder.inRange = false;
+                        }
+                        intruder.lecherReady = intruder.inRange || (intruder.yPx >= stopY);
+                        if (!wasReady && intruder.lecherReady) {
+                            intruder.attackTimerMs = intruder.attackCooldownMs * 2;
+                        }
                         if (blockedByFront) {
                             intruder.blockedByLecherMs = (intruder.blockedByLecherMs || 0) + tickMs;
                             if (intruder.blockedByLecherMs >= 500) {
@@ -536,7 +555,7 @@ let engine = {
         p.attackCooldownMs = engine.getEffectiveSlapCooldownMs();
         p.sandalAttackCooldownMs = engine.getEffectiveSandalCooldownMs();
     },
-    /** Shameless skill exp: every 10s of combat time; exp = √(current Aud) per trigger. */
+    /** Shameless skill exp: every 5s of combat time; exp = max(log10(current Aud), 1) per trigger. */
     updateShamelessSkillExp: function(tickMs) {
         if (!skills.isSkillUnlocked("shameless")) {
             return;
@@ -546,11 +565,10 @@ let engine = {
             data.battle.shamelessExpAccMs = 0;
         }
         data.battle.shamelessExpAccMs += dt;
-        while (data.battle.shamelessExpAccMs >= 10000) {
-            data.battle.shamelessExpAccMs -= 10000;
+        while (data.battle.shamelessExpAccMs >= 5000) {
+            data.battle.shamelessExpAccMs -= 5000;
             const p = data.battle.player;
-            const amt = Math.sqrt(Math.max(0, p.aud || 0));
-            engine.addSkillExp("shameless", amt);
+            engine.addSkillExp("shameless", Math.max(1, engine.positiveLog(p.aud || 0, 10)));
         }
     },
     updateMainCharacterSkillExp: function(tickMs) {
@@ -726,6 +744,14 @@ let engine = {
                 }
                 engine.addSkillExp("stoic", 1);
             }
+            if (atMax && skills.isSkillUnlocked("brandRecognition")) {
+                const brEff = skills.getSkillEffect("brandRecognition");
+                const clout = brEff.brandRecognitionCloutPerSec || 0;
+                if (clout > 0) {
+                    engine.addCloutStacks(clout);
+                }
+                engine.addSkillExp("brandRecognition", 1);
+            }
             if (slapCount >= 3) {
                 if (skills.isSkillUnlocked("heckled")) {
                     const heckEff = skills.getSkillEffect("heckled");
@@ -757,7 +783,7 @@ let engine = {
             }
         });
 
-        engine.advanceBattleAccMs("combatSkillTenSecondAccMs", tickMs, 10000, function() {
+        engine.advanceBattleAccMs("combatSkillFiveSecondAccMs", tickMs, 5000, function() {
             engine.addSkillExp("marathonEgo", 1);
         });
     },
@@ -1309,8 +1335,17 @@ let engine = {
         return assigned + engine.getMarketAnchoringRingBought();
     },
     getPendingOkamiExpWithSoul: function() {
-        const raw = (data.battle && data.battle.pendingOkamiExp) || 0;
-        return raw * (1 + 0.20 * engine.getCloneSoulLevel());
+        return (data.battle && data.battle.pendingOkamiExp) || 0;
+    },
+    getSoulSkillExpMultiplier: function() {
+        return 1 + 0.03 * engine.getCloneSoulLevel();
+    },
+    getCharacterExpMultiplier: function() {
+        const e = skills.getSkillEffect("hindsight");
+        const hog = skills.getSkillEffect("experienceHog");
+        const hindsight = e.wisdomCharacterExpMultiplier !== undefined ? e.wisdomCharacterExpMultiplier : 1;
+        const hogAdd = hog.experienceHogCharacterExpAdd || 0;
+        return hindsight + hogAdd + 0.10 * engine.getCloneSoulLevel();
     },
     getValidationAudFromKills: function() {
         if (!skills.isSkillUnlocked("validation")) {
@@ -1366,7 +1401,7 @@ let engine = {
         engine.addSkillExp("extortion", 1);
         engine.addSkillExp("nickelAndDime", Math.sqrt(Math.max(0, coinsGain)));
         engine.addSkillExp("validation", 1);
-        engine.addSkillExp("windfallSwagger", Math.sqrt(Math.max(0, coinsGain)));
+        engine.addSkillExp("windfallSwagger", engine.positiveLog(coinsGain, 10));
         if (skills.isSkillUnlocked("publicApology")) {
             const paEff = skills.getSkillEffect("publicApology");
             const heal = paEff.publicApologyAudPerKill || 0;
@@ -1381,7 +1416,7 @@ let engine = {
             if (desMs > 0) {
                 engine.addDesensitizedStack(desMs);
             }
-            engine.addSkillExp("retailTherapy", Math.sqrt(Math.max(0, coinsGain)));
+            engine.addSkillExp("retailTherapy", engine.positiveLog(coinsGain, 10));
         }
         if (skills.isSkillUnlocked("bloodRush") && engine.isPlayerAboveHalfAud()) {
             const brEff = skills.getSkillEffect("bloodRush");
@@ -1398,7 +1433,7 @@ let engine = {
             if (maliceAmt > 0) {
                 engine.addMalice(maliceAmt);
             }
-            engine.addSkillExp("sadism", Math.sqrt(Math.max(0, overkillDamage)));
+            engine.addSkillExp("sadism", engine.positiveLog(overkillDamage, 2));
         }
         initialize.calcPlayerStats(false);
         if (data.battle.state === "running") {
@@ -1425,14 +1460,17 @@ let engine = {
             engine.applyOverkillAttackProgressAfterKill(opts.__OVERKILL__BoostKind);
         }
     },
-    /** Matches `onIntruderKilled`: hindsight scales exp from zone `expBase`. */
+    /** log2 or log10 of a positive trigger amount. Values at or below 1 grant no exp. */
+    positiveLog: function(value, base) {
+        if (!(value > 1)) {
+            return 0;
+        }
+        return base === 10 ? Math.log10(value) : Math.log2(value);
+    },
+    /** Matches `onIntruderKilled`: hindsight, Experience Hog, and Soul scale exp from zone `expBase`. */
     expAwardFromIntruderExpBase: function(expBase) {
         const b = expBase !== undefined ? expBase : 1;
-        const e = skills.getSkillEffect("hindsight");
-        const hog = skills.getSkillEffect("experienceHog");
-        const mult = (e.wisdomCharacterExpMultiplier !== undefined ? e.wisdomCharacterExpMultiplier : 1)
-            + (hog.experienceHogCharacterExpAdd || 0);
-        return b * mult;
+        return b * engine.getCharacterExpMultiplier();
     },
     /** Matches `onIntruderKilled`: nickelAndDime flat + extortion coins multiplier over stored zone gain. */
     coinsAwardFromIntruderGain: function(storedGain) {
@@ -1795,9 +1833,10 @@ let engine = {
         if (!amount || amount <= 0) {
             return;
         }
-        engine.addPendingOkamiExpFromClone(amount);
+        const granted = amount * engine.getCharacterExpMultiplier();
+        engine.addPendingOkamiExpFromClone(granted);
         if (bonfire.isGrowthBlessingUnlocked()) {
-            data.battle.levelState.exp += amount;
+            data.battle.levelState.exp += granted;
             engine.resolveLevelUps();
         }
     },
@@ -2001,8 +2040,7 @@ let engine = {
         if (!target || !skills.isSkillUnlocked("closingArgument")) {
             return damage;
         }
-        const maxAud = Math.max(1, target.maxAud || 1);
-        if ((target.aud / maxAud) >= 0.25) {
+        if ((target.timesHitByPlayer || 0) <= 0) {
             return damage;
         }
         const eff = skills.getSkillEffect("closingArgument");
@@ -2018,7 +2056,7 @@ let engine = {
         if (engine.isPlayerAtOrBelowAudFraction(0.5)) {
             engine.addSkillExp("underdog", 1);
         }
-        if (target && (target.aud / Math.max(1, target.maxAud || 1)) < 0.25) {
+        if (target && (target.aud / Math.max(1, target.maxAud || 1)) < 0.5) {
             engine.addSkillExp("closingArgument", 1);
         }
     },
@@ -2077,13 +2115,9 @@ let engine = {
         }
         const eff = skills.getSkillEffect("narcissism");
         const bonusMult = eff.narcissismAudGainMultPerLevel || 0;
-        let gained = currentRise;
         if (bonusMult > 0) {
-            const beforeBonus = currentAud;
             currentAud = Math.min(maxAud, currentAud + currentRise * bonusMult);
-            gained += Math.max(0, currentAud - beforeBonus);
         }
-        engine.addSkillExp("narcissism", Math.sqrt(Math.max(0, gained)));
         return currentAud;
     },
     applyCombatOutgoingDamage: function(baseDamage, target, opts) {
@@ -2276,6 +2310,9 @@ let engine = {
         return best;
     },
     pushAttackLineFx: function(target, kind) {
+        if (document.hidden) {
+            return;
+        }
         if (!data.battle.lineFxQueue) {
             data.battle.lineFxQueue = [];
         }
@@ -2296,7 +2333,7 @@ let engine = {
         });
     },
     pushIntruderSandalLineFx: function(attacker) {
-        if (!attacker) {
+        if (document.hidden || !attacker) {
             return;
         }
         if (!data.battle.lineFxQueue) {
@@ -2323,7 +2360,7 @@ let engine = {
     SLAP_WINDUP_MS: 300,
     SLAP_SIDE_MS: 200,
     SLAP_INNER_MS: 300,
-    SLAP_DMG_MS: 1000,
+    SLAP_DMG_MS: 2000,
     SLAP_DMG_SLOTS: 8,
     INTRUDER_ATTACK_FX_SLOTS: 12,
     INTRUDER_ATTACK_GFX_SIZE_PX: 42,
@@ -2515,7 +2552,10 @@ let engine = {
         slot.damage = damage;
         slot.elapsedMs = 0;
     },
-    PLAYER_FLOAT_MS: 1000,
+    PLAYER_FLOAT_MS: 2000,
+    FLOAT_HOLD_MS: 500,
+    FLOAT_RISE_MS: 1500,
+    FLOAT_RISE_PX: 28,
     PLAYER_FLOAT_SLOTS: 12,
     createEmptyPlayerFloatFx: function() {
         const slots = [];
@@ -3148,7 +3188,7 @@ let engine = {
         }
         const gainBase = skills.expGainForSkillTrigger(skill, amount);
         const intMult = skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1;
-        const soulMult = 1 + 0.05 * engine.getCloneSoulLevel();
+        const soulMult = engine.getSoulSkillExpMultiplier();
         const gain = gainBase * intMult * soulMult;
         skill.exp += gain;
         skill.talent += gain * 0.1;
@@ -3180,7 +3220,7 @@ let engine = {
                 engine.addCloutStacks(cloutGain);
             }
             if (skill.key !== "recognition") {
-                engine.addSkillExp("recognition", skill.level);
+                engine.addSkillExp("recognition", 1);
             }
         }
         if (skill.key !== "studyGroup" && cat === "combat" && skills.isSkillUnlocked("studyGroup")) {
@@ -3197,10 +3237,10 @@ let engine = {
         } else if (skill.key === "savageLessons") {
             data.battle.levelState.skillStrBonus++;
             initialize.calcPlayerStats(false);
-        } else if (skill.affectedStat === "str") {
+        } else if (skill.key === "adrenaline") {
             data.battle.levelState.skillStrBonus++;
             initialize.calcPlayerStats(false);
-        } else if (skill.affectedStat === "con") {
+        } else if (skill.key === "no_skill_yet") {
             data.battle.levelState.skillConBonus++;
             initialize.calcPlayerStats(false);
         } else if (skill.key === "alacrity") {
@@ -3298,6 +3338,8 @@ let engine = {
         engine.updateEarthSpirits(tickMs);
         engine.updateWaterSpirits(tickMs);
         engine.updatePebbles(tickMs);
+        engine.updateInnWaterCarriers(tickMs);
+        engine.updateCisternWaterCarriers(tickMs);
         engine.updateDroplets(tickMs);
         engine.updateFireSpirits(tickMs);
         engine.updateFireLaunchers(tickMs);
@@ -3313,8 +3355,6 @@ let engine = {
         engine.updateBonfireWoodCarriers(tickMs);
         engine.updateMarketCreditCarriers(tickMs);
         engine.updateMarketTrades(tickMs);
-        engine.updateInnWaterCarriers(tickMs);
-        engine.updateCisternWaterCarriers(tickMs);
         engine.updateDirtRoads(tickMs);
         engine.updateWeaving(tickMs);
         engine.syncInnRoomCounts();
@@ -3371,7 +3411,11 @@ let engine = {
         return engine.isInnOnsenConverted() ? "Tatami Onsen" : "Tatami Inn";
     },
     getInnHotWaterCapacity: function() {
-        return data.progress.base.inn.hotWaterCapacity;
+        const inn = data.progress.base && data.progress.base.inn;
+        const base = (inn && inn.hotWaterCapacity) || 500;
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const bonus = ((cistern && cistern.reinforceOnsenCapacityBought) || 0) * 1000;
+        return base + bonus;
     },
     isInnHotWaterFull: function() {
         const inn = data.progress.base.inn;
@@ -3386,7 +3430,12 @@ let engine = {
         return !!(torii && torii.drinkingBowlUnlocked);
     },
     getToriiWaterCapacity: function() {
-        return engine.isToriiDrinkingBowlUnlocked() ? 200 : 0;
+        if (!engine.isToriiDrinkingBowlUnlocked()) {
+            return 0;
+        }
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const bonus = ((cistern && cistern.reinforceToriiCapacityBought) || 0) * 700;
+        return 200 + bonus;
     },
     isToriiWaterFull: function() {
         const cap = engine.getToriiWaterCapacity();
@@ -3472,7 +3521,8 @@ let engine = {
     },
     /**
      * Valid water delivery targets: temperature first, then lowest stored-plus-inbound liters.
-     * A target is included only when it can accept a full carrier load.
+     * Room left is capacity minus water already stored. Water on carriers does not count toward that capacity.
+     * A target is included only when that stored room can accept a full carrier load.
      */
     getWaterDeliveryTargets: function() {
         const cistern = data.progress.base && data.progress.base.cistern;
@@ -3490,12 +3540,12 @@ let engine = {
             if (!hotEnough || !engine.isBuildingAllowingWaterCarriers(sink.key)) {
                 continue;
             }
-            const scheduled = (sink.current || 0) + engine.getCisternInboundWater(sink.key);
-            const room = (sink.capacity || 0) - scheduled;
+            const stored = sink.current || 0;
+            const room = (sink.capacity || 0) - stored;
             if (room < fullLoad) {
                 continue;
             }
-            sink.scheduled = scheduled;
+            sink.scheduled = stored + engine.getCisternInboundWater(sink.key);
             targets.push(sink);
         }
         targets.sort(function(a, b) {
@@ -3546,7 +3596,7 @@ let engine = {
         return !engine.isCisternWaterHotEnoughForOnsen();
     },
     getInnSoakHotWaterCost: function() {
-        return 20;
+        return 50;
     },
     canGuestStartSoak: function() {
         const inn = data.progress.base.inn;
@@ -4074,7 +4124,7 @@ let engine = {
         const bought = cistern.capacityBought || 0;
         let cap = 100;
         for (let n = 1; n <= bought; n++) {
-            cap += 100 * n * (n + 1) / 2;
+            cap += 10 * n * (n + 1) / 2;
         }
         return cap;
     },
@@ -4147,8 +4197,31 @@ let engine = {
         }
         data.progress.coins = (data.progress.coins || 0) + rate * (tickMs / 1000);
     },
+    isCisternRefusingWater: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        const cistern = data.progress.base && data.progress.base.cistern;
+        return !!(garden && garden.arrangementOfThirstUnlocked && cistern && cistern.refuseIncomingWater);
+    },
+    refundCisternWater: function(liters) {
+        if (liters <= 0) {
+            return;
+        }
+        if (engine.isCisternRefusingWater()) {
+            engine.addWaterToPond(liters);
+            return;
+        }
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (!cistern) {
+            return;
+        }
+        cistern.waterVolume = round1((cistern.waterVolume || 0) + liters);
+    },
     addWaterToCistern: function(liters, tempC) {
         if (liters <= 0) {
+            return;
+        }
+        if (engine.isCisternRefusingWater()) {
+            engine.addWaterToPond(liters);
             return;
         }
         const cistern = data.progress.base.cistern;
@@ -4227,7 +4300,7 @@ let engine = {
             return "Watch Water Spirits Play";
         }
         if (stepKey === "soakHotSprings") {
-            return "Soak in Hot Springs";
+            return "Soak in Hot Bath";
         }
         if (stepKey === "eatNoodles") {
             return "Eat Noodles";
@@ -4248,7 +4321,13 @@ let engine = {
             lines.push(`Watch Water Spirits Play for ${pondSec}s - requires Water Spirits in the Pond`);
         }
         if (engine.isInnOnsenConverted()) {
-            lines.push("Soak in Hot Springs for 5s");
+            const beadPct = Math.round((engine.getInnSoakBeadMultiplier(false) - 1) * 100);
+            let soakLine = `Soak in Hot Bath for 5s (+0.5 restfulness/s, +${beadPct}% Star Beads)`;
+            if (engine.isMarketBuilt()) {
+                const soapPct = Math.round((engine.getInnSoakBeadMultiplier(true) - 1) * 100);
+                soakLine = `Soak in Hot Bath for 5s (+0.5 restfulness/s, +${beadPct}% Star Beads, +${soapPct}% with soap)`;
+            }
+            lines.push(soakLine);
         }
         if (engine.isNoodleBarBuilt()) {
             lines.push(`Eat Noodles for 10s (+${engine.getNoodleEatRestBonus()} restfulness/s) - Requires 100L hot water and 1 Dried Noodle`);
@@ -4327,6 +4406,14 @@ let engine = {
             }
         }
     },
+    getPondForestDrainPerSecond: function() {
+        const pond = data.progress.base && data.progress.base.pond;
+        const avail = (pond && pond.waterVolume) || 0;
+        if (avail <= 0) {
+            return 0;
+        }
+        return avail * 0.001;
+    },
     updatePondWaterTransfer: function(tickMs) {
         if (!engine.isPondBuiltFromFoxDen()) {
             return;
@@ -4337,7 +4424,7 @@ let engine = {
             return;
         }
         const sec = tickMs / 1000;
-        const transfer = Math.min(avail, avail * 0.001 * sec);
+        const transfer = Math.min(avail, engine.getPondForestDrainPerSecond() * sec);
         if (transfer <= 0) {
             return;
         }
@@ -4348,34 +4435,37 @@ let engine = {
     isOkamiWeaving: function() {
         return !!(data.progress.weaving && data.progress.weaving.active);
     },
+    isOkamiWorkerSite: function(buildingKey) {
+        const keys = resortData.okamiAssignableSiteKeys || [];
+        return keys.indexOf(buildingKey) >= 0;
+    },
+    rememberOkamiWorkerSite: function(buildingKey) {
+        if (engine.isOkamiWorkerSite(buildingKey)) {
+            engine.getOkami().lastAssignedBuildingKey = buildingKey;
+        }
+    },
+    syncOkamiWorkerSite: function(buildingKey) {
+        if (buildingKey === "foxDen") {
+            engine.syncFoxDenCarriersToWorkforce();
+        } else if (buildingKey === "bonfire") {
+            engine.syncBonfireCarriersToWorkforce();
+        } else if (buildingKey === "cistern") {
+            engine.syncCisternCarriersToWorkforce();
+        } else if (buildingKey === "inn") {
+            engine.syncInnCarriersToWorkforce();
+        } else if (buildingKey === "market") {
+            engine.syncMarketCarriersToWorkforce();
+        } else if (buildingKey === "bambooForest") {
+            engine.clearBambooCutIfNoWorkers();
+        }
+    },
     unassignOkamiForWeaving: function() {
         const okami = engine.getOkami();
-        if (!okami.lastAssignedBuildingKey && okami.pathJob && !engine.isManaCloneJob(okami.pathJob)
-            && !engine.isCollectStoneJob(okami.pathJob)
-            && okami.pathJob.segmentIndex !== undefined && okami.pathJob.segmentIndex !== null) {
-            okami.lastAssignedBuildingKey = engine.getPathSegmentAssignmentKey(okami.pathJob.segmentIndex);
-        }
         if (okami.assignedBuildingKey) {
             const prev = okami.assignedBuildingKey;
-            if (prev !== "hiddenSpring") {
-                okami.lastAssignedBuildingKey = prev;
-            }
+            engine.rememberOkamiWorkerSite(prev);
             okami.assignedBuildingKey = "";
-            if (prev === "foxDen") {
-                engine.syncFoxDenCarriersToWorkforce();
-            }
-            if (prev === "bonfire") {
-                engine.syncBonfireCarriersToWorkforce();
-            }
-            if (prev === "cistern") {
-                engine.syncCisternCarriersToWorkforce();
-            }
-            if (prev === "inn") {
-                engine.syncInnCarriersToWorkforce();
-            }
-            if (prev === "bambooForest") {
-                engine.clearBambooCutIfNoWorkers();
-            }
+            engine.syncOkamiWorkerSite(prev);
         }
         if (okami.pathJob && !okami.pathJob.paused) {
             engine.pauseOkamiPathJob();
@@ -4808,18 +4898,11 @@ let engine = {
         return engine.getSpiritAtLocation(engine.getFireLauncherLocationKey(platformKey), 0, "fire");
     },
     getFireLauncherPlatformMapPos: function(platformKey) {
-        const wrap = document.getElementById("fireLauncher_" + platformKey + "_wrap");
-        const map = document.getElementById("baseResortMap");
-        if (!wrap || !map) {
-            return { x: 0, y: 0 };
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        if (def && def.mapPos) {
+            return { x: def.mapPos.x, y: def.mapPos.y };
         }
-        const mapRect = map.getBoundingClientRect();
-        const slot = wrap.querySelector(".fire-launcher-slot") || wrap;
-        const rect = slot.getBoundingClientRect();
-        return {
-            x: rect.left - mapRect.left + rect.width / 2,
-            y: rect.top - mapRect.top + rect.height / 2
-        };
+        return { x: 0, y: 0 };
     },
     getDropletMapPosition: function(droplet) {
         if (!droplet) {
@@ -5001,6 +5084,7 @@ let engine = {
         if (!to) {
             return;
         }
+        const def = engine.getFireLauncherPlatformDef(platformKey);
         fl.projectiles.push({
             id: (fl.projectileIdCounter || 1),
             platformKey: platformKey,
@@ -5011,7 +5095,8 @@ let engine = {
             toX: to.x,
             toY: to.y,
             progress: 0,
-            durationMs: flightMs
+            durationMs: flightMs,
+            sizePx: (def && def.projectileSizePx) ? def.projectileSizePx : 28
         });
         fl.projectileIdCounter = (fl.projectileIdCounter || 1) + 1;
     },
@@ -5985,7 +6070,7 @@ let engine = {
                 spirit.forgeTimerMs = (spirit.forgeTimerMs || 0) + tickMs;
                 while (spirit.forgeTimerMs >= forgeCycleMs && (atelier.ore || 0) > 0) {
                     spirit.forgeTimerMs -= forgeCycleMs;
-                    const batchSize = Math.floor(Math.sqrt(engine.getEffectiveSpiritPower(spirit) || 1));
+                    const batchSize = engine.getForgeSmeltBatch(spirit);
                     const toProcess = Math.min(batchSize, atelier.ore || 0);
                     if (toProcess <= 0) {
                         break;
@@ -6022,8 +6107,10 @@ let engine = {
             const cistern = data.progress.base.cistern;
             const dropletVol = d.waterVolume || 0;
             const dropletHeat = d.heat || 0;
-            if (cistern.replaceWithHotterWater && dropletHeat > (cistern.temperature || 0)) {
-                const dumpVol = Math.min(dropletVol, cistern.waterVolume || 0);
+            const stored = cistern.waterVolume || 0;
+            const atCapacity = stored >= engine.getCisternMaxCapacity();
+            if (!engine.isCisternRefusingWater() && cistern.replaceWithHotterWater && atCapacity && dropletHeat > (cistern.temperature || 0)) {
+                const dumpVol = Math.min(dropletVol, stored);
                 if (dumpVol > 0) {
                     engine.addWaterToPond(dumpVol);
                     cistern.waterVolume = (cistern.waterVolume || 0) - dumpVol;
@@ -6729,10 +6816,7 @@ let engine = {
         if (avail < totalCost) {
             return false;
         }
-        if (okami.assignedBuildingKey && engine.parsePathAssignmentKey(okami.assignedBuildingKey) === null
-            && okami.assignedBuildingKey !== "hiddenSpring") {
-            okami.lastAssignedBuildingKey = okami.assignedBuildingKey;
-        }
+        engine.rememberOkamiWorkerSite(okami.assignedBuildingKey);
         engine.interruptOkamiForPathJob();
         if (okami.pathJob) {
             engine.pauseActivePathJobToStorage();
@@ -6880,10 +6964,7 @@ let engine = {
         if (okami.pathJob && engine.isCollectStoneJob(okami.pathJob) && !okami.pathJob.paused) {
             return false;
         }
-        if (okami.assignedBuildingKey && engine.parsePathAssignmentKey(okami.assignedBuildingKey) === null
-            && okami.assignedBuildingKey !== "hiddenSpring") {
-            okami.lastAssignedBuildingKey = okami.assignedBuildingKey;
-        }
+        engine.rememberOkamiWorkerSite(okami.assignedBuildingKey);
         engine.interruptOkamiForPathJob();
         if (okami.pathJob) {
             engine.pauseActivePathJobToStorage();
@@ -7206,32 +7287,12 @@ let engine = {
             return;
         }
         const garden = data.progress.base && data.progress.base.garden;
-        if (!garden || !garden.arrangementOfRemembranceUnlocked || !okami.lastAssignedBuildingKey) {
+        const site = okami.lastAssignedBuildingKey;
+        if (!garden || !garden.arrangementOfRemembranceUnlocked || !engine.isOkamiWorkerSite(site)) {
             return;
         }
-        if (okami.lastAssignedBuildingKey === "hiddenSpring") {
-            return;
-        }
-        okami.assignedBuildingKey = okami.lastAssignedBuildingKey;
-        const segIdx = engine.parsePathAssignmentKey(okami.lastAssignedBuildingKey);
-        if (segIdx !== null) {
-            const paused = data.progress.okami.pausedPathJobs;
-            if (paused[segIdx]) {
-                engine.resumeOkamiPathJob(segIdx);
-            } else {
-                okami.assignedBuildingKey = "";
-            }
-            return;
-        }
-        if (okami.assignedBuildingKey === "foxDen") {
-            engine.syncFoxDenCarriersToWorkforce();
-        } else if (okami.assignedBuildingKey === "bonfire") {
-            engine.syncBonfireCarriersToWorkforce();
-        } else if (okami.assignedBuildingKey === "cistern") {
-            engine.syncCisternCarriersToWorkforce();
-        } else if (okami.assignedBuildingKey === "inn") {
-            engine.syncInnCarriersToWorkforce();
-        }
+        okami.assignedBuildingKey = site;
+        engine.syncOkamiWorkerSite(site);
     },
     canStartPathSegmentJob: function(segmentIndex, jobType) {
         const seg = engine.getPathSegmentData(segmentIndex);
@@ -7266,9 +7327,7 @@ let engine = {
         if (job && job.segmentIndex === segmentIndex && !job.paused) {
             return false;
         }
-        if (okami.assignedBuildingKey && engine.parsePathAssignmentKey(okami.assignedBuildingKey) === null) {
-            okami.lastAssignedBuildingKey = okami.assignedBuildingKey;
-        }
+        engine.rememberOkamiWorkerSite(okami.assignedBuildingKey);
         engine.interruptOkamiForPathJob();
         if (job) {
             engine.pauseActivePathJobToStorage();
@@ -8984,7 +9043,7 @@ let engine = {
             c.progress = (c.progress || 0) + (speed * (tickMs / 1000)) / (c.totalDist || 1);
             if (c.progress >= 1) {
                 engine.addDirtRoadProgress(c.fromKey, c.toKey);
-                const heatPer = bonfireConfig.heatPerWood * (c.resourceType === "coal" ? 5 : 1);
+                const heatPer = bonfireConfig.heatPerWood * (c.resourceType === "coal" ? bonfireConfig.heatPerCoalMult : 1);
                 bf.heat = (bf.heat || 0) + (c.amount || 0) * heatPer;
             } else {
                 next.push(c);
@@ -9457,9 +9516,8 @@ let engine = {
     cancelInnCarriers: function() {
         const inn = data.progress.base.inn;
         const carriers = inn.waterCarriers || [];
-        const cistern = data.progress.base.cistern || {};
         for (let i = 0; i < carriers.length; i++) {
-            cistern.waterVolume = round1((cistern.waterVolume || 0) + (carriers[i].amount || 0));
+            engine.refundCisternWater(carriers[i].amount || 0);
         }
         inn.waterCarriers = [];
     },
@@ -9492,7 +9550,6 @@ let engine = {
                 removeIds[sorted[ri].id] = true;
             }
         }
-        const cistern = data.progress.base.cistern || {};
         const next = [];
         for (let ci = 0; ci < (inn.waterCarriers || []).length; ci++) {
             const c = inn.waterCarriers[ci];
@@ -9500,10 +9557,10 @@ let engine = {
                 if (okamiHere) {
                     next.push(c);
                 } else {
-                    cistern.waterVolume = round1((cistern.waterVolume || 0) + (c.amount || 0));
+                    engine.refundCisternWater(c.amount || 0);
                 }
             } else if (removeIds[c.id]) {
-                cistern.waterVolume = round1((cistern.waterVolume || 0) + (c.amount || 0));
+                engine.refundCisternWater(c.amount || 0);
             } else {
                 next.push(c);
             }
@@ -9656,7 +9713,7 @@ let engine = {
         const cistern = data.progress.base.cistern;
         const carriers = cistern.waterCarriers || [];
         for (let i = 0; i < carriers.length; i++) {
-            cistern.waterVolume = round1((cistern.waterVolume || 0) + (carriers[i].amount || 0));
+            engine.refundCisternWater(carriers[i].amount || 0);
         }
         cistern.waterCarriers = [];
     },
@@ -9696,10 +9753,10 @@ let engine = {
                 if (okamiHere) {
                     next.push(c);
                 } else {
-                    cistern.waterVolume = round1((cistern.waterVolume || 0) + (c.amount || 0));
+                    engine.refundCisternWater(c.amount || 0);
                 }
             } else if (removeIds[c.id]) {
-                cistern.waterVolume = round1((cistern.waterVolume || 0) + (c.amount || 0));
+                engine.refundCisternWater(c.amount || 0);
             } else {
                 next.push(c);
             }
@@ -9707,28 +9764,35 @@ let engine = {
         cistern.waterCarriers = next;
     },
     deliverCisternWaterToTarget: function(targetKey, amount) {
+        const amt = amount || 0;
+        let accepted = 0;
         if (targetKey === "inn") {
             const inn = data.progress.base.inn;
             const cap = engine.getInnHotWaterCapacity();
-            inn.hotWater = Math.min(cap, (inn.hotWater || 0) + (amount || 0));
-            return;
-        }
-        if (targetKey === "noodleBar") {
+            const room = Math.max(0, cap - (inn.hotWater || 0));
+            accepted = Math.min(amt, room);
+            inn.hotWater = (inn.hotWater || 0) + accepted;
+        } else if (targetKey === "noodleBar") {
             const bar = data.progress.base.noodleBar;
-            if (!bar) {
-                return;
+            if (bar) {
+                const cap = engine.getNoodleBarHotWaterCapacity();
+                const room = Math.max(0, cap - (bar.hotWater || 0));
+                accepted = Math.min(amt, room);
+                bar.hotWater = round1((bar.hotWater || 0) + accepted);
             }
-            const cap = engine.getNoodleBarHotWaterCapacity();
-            bar.hotWater = round1(Math.min(cap, (bar.hotWater || 0) + (amount || 0)));
-            return;
-        }
-        if (targetKey === "torii") {
+        } else if (targetKey === "torii") {
             const torii = data.progress.base.torii;
-            if (!torii) {
-                return;
+            if (torii) {
+                const cap = engine.getToriiWaterCapacity();
+                const room = Math.max(0, cap - (torii.water || 0));
+                accepted = Math.min(amt, room);
+                torii.water = round1((torii.water || 0) + accepted);
             }
-            const cap = engine.getToriiWaterCapacity();
-            torii.water = round1(Math.min(cap, (torii.water || 0) + (amount || 0)));
+        }
+        const leftover = amt - accepted;
+        if (leftover > 0) {
+            const cistern = data.progress.base && data.progress.base.cistern;
+            engine.addWaterToCistern(leftover, (cistern && cistern.temperature) || 0);
         }
     },
     trySpawnCisternWaterCarrier: function() {
@@ -9748,8 +9812,7 @@ let engine = {
             return false;
         }
         const target = targets[0];
-        const scheduled = target.scheduled !== undefined ? target.scheduled : (target.current || 0);
-        const rem = target.capacity - scheduled;
+        const rem = target.capacity - (target.current || 0);
         const carryCap = resortData.getCisternWaterCarryAmount();
         const amount = Math.min(carryCap, cistern.waterVolume || 0, rem);
         if (amount <= 0) {
@@ -10307,6 +10370,13 @@ let engine = {
                 return { mode: "none" };
             }
         }
+        if (assignKey === "market") {
+            const market = data.progress.base.market;
+            const okamiCarrier = ((market && market.creditCarriers) || []).some(function(c) { return c.isOkami; });
+            if (okamiCarrier) {
+                return { mode: "none" };
+            }
+        }
         return { mode: "site", siteKey: assignKey };
     },
     getMineStoneCount: function(depth) {
@@ -10684,7 +10754,10 @@ let engine = {
     },
     getNoodleBarHotWaterCapacity: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
-        return (bar && bar.hotWaterCapacity) || 500;
+        const base = (bar && bar.hotWaterCapacity) || 1000;
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const bonus = ((cistern && cistern.reinforceNoodleCapacityBought) || 0) * 1500;
+        return base + bonus;
     },
     isNoodleBarHotWaterFull: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
@@ -10715,7 +10788,7 @@ let engine = {
         const bar = data.progress.base && data.progress.base.noodleBar;
         const presses = (bar && bar.topicPresses) || 0;
         const div = Math.pow(2, engine.getNoodleTrophyDecorationsBought());
-        return round2(presses * 500 / div);
+        return round2(presses * 4000 / div);
     },
     canGuestEatNoodles: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
@@ -10782,16 +10855,25 @@ let engine = {
         const selected = bar.selectedTipSkillKey;
         engine.grantTipToSkill(selected, 1);
         let line = `${engine.getNoodleSkillDisplayName(selected)} gained a tip.`;
+        let extraName = "";
         const others = (bar.offeredSkillKeys || []).filter(function(key) {
             return key !== selected;
         });
         if (engine.getNoodleCrossTalkChance() > 0 && others.length && Math.random() < engine.getNoodleCrossTalkChance()) {
             const extra = others[Math.floor(Math.random() * others.length)];
             engine.grantTipToSkill(extra, 1);
-            line = `${engine.getNoodleSkillDisplayName(selected)} gained a tip. Cross-Talk also tipped ${engine.getNoodleSkillDisplayName(extra)}.`;
+            extraName = engine.getNoodleSkillDisplayName(extra);
+            line = `${engine.getNoodleSkillDisplayName(selected)} gained a tip. Cross-Talk also tipped ${extraName}.`;
         }
         bar.lastTipText = line;
         bar.tipProgress = 0;
+        const onResortTab = !data.battle || (data.battle.currentTab || "base") === "base";
+        if (onResortTab && typeof view !== "undefined" && view.spawnNoodleTipFloat) {
+            view.spawnNoodleTipFloat(engine.getNoodleSkillDisplayName(selected));
+            if (extraName) {
+                view.spawnNoodleTipFloat(extraName);
+            }
+        }
     },
     changeNoodleConversationTopics: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
@@ -10907,6 +10989,71 @@ let engine = {
     getMarketAdvertisingIntervalMultiplier: function() {
         return Math.pow(0.95, engine.getMarketBuyAdvertisingBought());
     },
+    canStartExchangeCredit: function() {
+        if (!engine.isMarketBuilt()) {
+            return false;
+        }
+        return (data.progress.coins || 0) >= 1000;
+    },
+    startExchangeCredit: function() {
+        if (!engine.canStartExchangeCredit()) {
+            return false;
+        }
+        data.progress.coins = Math.max(0, (data.progress.coins || 0) - 1000);
+        const up = engine.getUpgradeDef("market", "exchangeCredit");
+        const ok = engine.startWeaving("market", "exchangeCredit", up);
+        if (!ok) {
+            data.progress.coins = (data.progress.coins || 0) + 1000;
+            return false;
+        }
+        return true;
+    },
+    completeExchangeCredit: function() {
+        const market = data.progress.base && data.progress.base.market;
+        if (!market) {
+            return;
+        }
+        market.credit = (market.credit || 0) + 1000;
+        engine.grantMarketExp(1000);
+    },
+    getLiteracyLessonsBought: function() {
+        const market = data.progress.base && data.progress.base.market;
+        return (market && market.literacyLessonsBought) || 0;
+    },
+    getLiteracyLessonsMax: function() {
+        return 3 + 3 * Math.max(0, engine.getMarketLevel() - 2);
+    },
+    getLiteracyResearchMultiplier: function() {
+        return Math.pow(1.2, engine.getLiteracyLessonsBought());
+    },
+    isForgingInstructionsBought: function() {
+        const market = data.progress.base && data.progress.base.market;
+        return !!(market && market.forgingInstructionsBought);
+    },
+    getArsonistJournalsBought: function() {
+        const market = data.progress.base && data.progress.base.market;
+        return (market && market.arsonistJournalsBought) || 0;
+    },
+    getLostScrollsBought: function() {
+        const market = data.progress.base && data.progress.base.market;
+        return (market && market.lostScrollsBought) || 0;
+    },
+    getLostScrollsMax: function() {
+        return 1 + Math.max(0, engine.getMarketLevel() - 3);
+    },
+    getLargerForgeBought: function() {
+        const atelier = data.progress.base && data.progress.base.atelier;
+        return (atelier && atelier.largerForgeBought) || 0;
+    },
+    getForgeSmeltBatch: function(spirit) {
+        const power = engine.getEffectiveSpiritPower(spirit) || 1;
+        const root = Math.sqrt(power);
+        const n = engine.getLargerForgeBought();
+        if (n <= 0) {
+            return Math.floor(root);
+        }
+        return Math.ceil(root * (1 + 0.2 * n));
+    },
     getMarketGoodAmount: function(tradeKey) {
         const market = data.progress.base && data.progress.base.market;
         if (!market || !engine.isMarketBuilt()) {
@@ -10999,7 +11146,7 @@ let engine = {
         const units = engine.getOrbWorkerUnits();
         const walls = engine.getOrbBuildWallsBought();
         const stairs = engine.getOrbBuildStairsBought();
-        return base * Math.pow(1.1, units) * (1 + 0.1 * walls) * (1 + 0.2 * stairs);
+        return base * (1 + 0.2 * units) * (1 + 0.1 * walls) * (1 + 0.2 * stairs);
     },
     getOrbSpinCurrentsMultiplier: function() {
         const orb = data.progress.base && data.progress.base.mage_tower;
@@ -11526,7 +11673,8 @@ let engine = {
     },
     getScrollArchivesCompletedResearchCount: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
-        return onLoad.countUnlockedSkills(archives.unlockedSkills) + (archives.researchesToChoose || 0);
+        const raw = onLoad.countUnlockedSkills(archives.unlockedSkills) + (archives.researchesToChoose || 0);
+        return Math.max(0, raw - engine.getLostScrollsBought());
     },
     ensureResearchCoinCosts: function(lib) {
         const completed = engine.getScrollArchivesCompletedResearchCount(lib);
@@ -11733,7 +11881,7 @@ let engine = {
         const sec = tickMs / 1000;
         const cost = rate * sec;
         const beadCost = cost * 3;
-        const manaCost = cost * 5;
+        const manaCost = cost * 10;
         const coins = data.progress.coins || 0;
         const beads = data.progress.starBeads || 0;
         const manaAmt = (data.progress.mana && data.progress.mana.amount) || 0;
@@ -11755,7 +11903,7 @@ let engine = {
         data.progress.coins -= cost;
         data.progress.starBeads -= beadCost;
         data.progress.mana.amount = manaAmt - manaCost;
-        lib.researchTaskProgress = (lib.researchTaskProgress) + (rate * sec);
+        lib.researchTaskProgress = (lib.researchTaskProgress) + (rate * sec * engine.getLiteracyResearchMultiplier());
         while (true) {
             const required = lib.researchTaskRequired;
             if ((lib.researchTaskProgress) < required) {

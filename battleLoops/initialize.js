@@ -198,7 +198,7 @@ function debugGrantMarket(credit, level) {
     market.credit = credit !== undefined ? credit : 20000;
     market.level = lvl;
     market.exp = 0;
-    market.expToLevel = 5000 * Math.pow(3, lvl);
+    market.expToLevel = 30000 * Math.pow(3, lvl);
     market.fertilizer = 500;
     market.coal = 500;
     market.soap = 50;
@@ -282,7 +282,7 @@ let initials = {
                 reinforceJointsBought: 0,
                 onsenConverted: false,
                 hotWater: 0,
-                hotWaterCapacity: 200,
+                hotWaterCapacity: 500,
                 waterCarriers: [],
                 carrierIdCounter: 1,
                 assignedWorkers: 0,
@@ -484,6 +484,7 @@ let initials = {
                 paused: null
             },
             selectedSkillsTab: "combat",
+            skillListSort: "oldest",
             selectedSkillDetailKey: "",
             selectedStatsTab: "combat",
             compactViewPane: "menus",
@@ -566,7 +567,7 @@ let initials = {
             numbingCrowdsSecondAccMs: 0,
             combatSkillHalfSecondAccMs: 0,
             combatSkillSecondAccMs: 0,
-            combatSkillTenSecondAccMs: 0,
+            combatSkillFiveSecondAccMs: 0,
             secondWindRestoreUsed: false,
             classPowerA: 0,
             classPowerB: 0,
@@ -697,6 +698,9 @@ let initialize = {
         }
         if (!inn.waterCarriers) {
             inn.waterCarriers = [];
+        }
+        if ((inn.hotWaterCapacity || 0) === 200) {
+            inn.hotWaterCapacity = 500;
         }
         for (let gi = 0; gi < inn.guests.length; gi++) {
             initialize.migrateGuestItineraryStep(inn.guests[gi]);
@@ -1203,6 +1207,9 @@ let initialize = {
         if (base.noodleBar && base.noodleBar.allowCarriersBringWater === undefined && garden && garden.arrangementOfWaterOrdersUnlocked) {
             base.noodleBar.allowCarriersBringWater = true;
         }
+        if (base.noodleBar) {
+            base.noodleBar.hotWaterCapacity = 1000;
+        }
     },
     initializePond: function() {
         const base = data.progress.base;
@@ -1545,13 +1552,16 @@ let initialize = {
             if (maxRise > 0 && currentRise > 0) {
                 newAud = engine.applyNarcissismToMaxAudCurrentIncrease(newAud, currentRise, maxAud);
             }
+            if (maxRise > 0) {
+                engine.addSkillExp("narcissism", engine.positiveLog(maxRise, 2));
+            }
             if (maxRise > 0 && skills.isSkillUnlocked("borrowedGlory")) {
                 const bgEff = skills.getSkillEffect("borrowedGlory");
                 const clout = bgEff.borrowedGloryCloutPerLevel || 0;
                 if (clout > 0) {
                     engine.addCloutStacks(clout);
                 }
-                engine.addSkillExp("borrowedGlory", Math.sqrt(Math.max(0, maxRise)));
+                engine.addSkillExp("borrowedGlory", 1);
             }
             data.battle.player.aud = newAud;
             if (maxRise > 0) {

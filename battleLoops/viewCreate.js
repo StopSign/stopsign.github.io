@@ -169,7 +169,9 @@ let createView = {
                 const rowId = resortData.idRow(scopeKey, slug);
                 const btnId = resortData.idBtn(scopeKey, slug);
                 const extraId = resortData.idExtra(scopeKey, slug);
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${ud.name || ""}</div><div class="muted-text base-skill-short">${resortData.insertResourceIcons(ud.description || "")}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
+                const descId = `base_${scopeKey}_desc_${slug}`;
+                const descText = typeof ud.description === "function" ? ud.description() : (ud.description || "");
+                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${ud.name || ""}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
             }
             return h;
         };
@@ -215,7 +217,8 @@ let createView = {
                 </div>
                 <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power: <span id="bonfireFireSpiritPower">0</span></div>
                 <div id="bonfireFireSpiritHeat_row" class="base-row muted-text" style="display:none"></div>
-                <div id="bonfireWoodCarry_row" class="base-row" style="display:none">Wood carry: <span id="bonfireWoodCarry"></span> per trip</div>
+                <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Wood carry</span>: <span id="bonfireWoodCarry"></span> per trip</div>
+                <div id="bonfireHeatPerFuel_row" class="base-row" style="display:none">1 wood gives <span id="bonfireHeatPerWood"></span> heat<span id="bonfireHeatPerCoalPart" style="display:none"> | 1 coal gives <span id="bonfireHeatPerCoal"></span> heat</span></div>
                 <div id="bonfireCoal_row" class="base-row" style="display:none">Coal: <span id="bonfireCoalText">0</span> <span class="muted-text">Carriers bring coal from the Market before wood. Each coal gives 5x the heat of wood.</span></div>
                 ${resortUpgradeRowsHtml("bonfire")}
             `;
@@ -302,6 +305,20 @@ let createView = {
             }
             return h;
         };
+        const htmlMarketHaulToggles = function() {
+            const credit = resortData.resourceIconHtml("credit");
+            const order = resortData.marketHaulResourceOrder || [];
+            const rates = resortData.marketCreditPerResource || {};
+            const names = { stone: "Stone", wood: "Wood", bars: "Bars" };
+            let h = "";
+            for (let hi = 0; hi < order.length; hi++) {
+                const key = order[hi];
+                const idKey = key.charAt(0).toUpperCase() + key.slice(1);
+                const name = names[key] || key;
+                h += `<label><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (${rates[key] || 0} ${credit})</label> `;
+            }
+            return h;
+        };
         const htmlMarketPanel = function() {
             const credit = resortData.resourceIconHtml("credit");
             return `
@@ -309,19 +326,19 @@ let createView = {
                 <div class="base-row">${credit} Credit: <span id="marketCreditText"></span></div>
                 <div id="marketExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="marketExpFill" class="prog-fill prog-fill-market-exp"></div>
-                    <div class="game-progress-bar-label">Level <span id="marketLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span><span id="marketExpText" class="game-progress-bold">0</span> / <span id="marketExpToLevelText" class="game-progress-bold">5000</span></div>
+                    <div class="game-progress-bar-label">Level <span id="marketLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span><span id="marketExpText" class="game-progress-bold">0</span> / <span id="marketExpToLevelText" class="game-progress-bold">30000</span></div>
+                </div>
+                <div class="base-row">
+                    <button type="button" id="marketExchangeCredit_btn" class="tab-button" onclick="events.startExchangeCredit()">Exchange 1000 coins for 1000 credits</button>
                 </div>
                 <div class="base-row">Allow resources:
-                    <label><input type="checkbox" id="marketAllowStone_chk" onchange="events.toggleMarketHaulResource('stone', this.checked)"> Stone (2 ${credit})</label>
-                    <label><input type="checkbox" id="marketAllowWood_chk" onchange="events.toggleMarketHaulResource('wood', this.checked)"> Bamboo (1 ${credit})</label>
-                    <label><input type="checkbox" id="marketAllowBars_chk" onchange="events.toggleMarketHaulResource('bars', this.checked)"> Bars (5 ${credit})</label>
+                    ${htmlMarketHaulToggles()}
                 </div>
                 <div class="base-row muted-text">Haulers carry <span id="marketCarryAmountText"></span> per trip, alternate between the allowed resources, and only leave when the full amount is available.</div>
-                <div class="base-row"><label><input type="checkbox" id="marketCreditOnly_chk" onchange="events.toggleMarketCreditOnly(this.checked)"> Spend only Credit - never use Coins to cover a Credit cost</label></div>
                 ${resortUpgradeRowsHtml("market")}
                 <div class="base-upgrade-divider"></div>
                 <div class="base-info-title">Market Resources</div>
-                <div class="base-row muted-text">Traders buy these on their own; the Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time.</div>
+                <div class="base-row muted-text">Traders buy these on their own; the Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time. Traders rotate between selected trades.</div>
                 <div class="base-worker-assign-row">
                     <button id="base_market_traders_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'all_dec')"><<</button>
                     <button id="base_market_traders_unassign_ten_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'ten_dec')">--</button>
@@ -341,9 +358,11 @@ let createView = {
             for (let ni = 0; ni < 5; ni++) {
                 h += `
                     <div id="noodleTipSkill_${ni}" class="noodle-tip-skill" style="display:none">
-                        <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_name"></span></label>
+                        <div class="noodle-tip-skill-header">
+                            <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_name"></span></label>
+                            <span id="noodleTipSkill_${ni}_tips" class="muted-text noodle-tip-skill-meta"></span>
+                        </div>
                         <div id="noodleTipSkill_${ni}_desc" class="muted-text base-skill-short"></div>
-                        <div id="noodleTipSkill_${ni}_tips" class="muted-text"></div>
                     </div>`;
             }
             return h;
@@ -441,14 +460,14 @@ let createView = {
                     <div id="innHotWater_row" class="base-row" style="display:none">
                         <div class="prog-track game-progress-track water-prog-track">
                             <div id="innHotWaterFill" class="prog-fill prog-fill-water"></div>
-                            <div id="innHotWaterText" class="game-progress-bar-label">Hot Water: 0/200</div>
+                            <div id="innHotWaterText" class="game-progress-bar-label">Hot Water: 0/500</div>
                         </div>
                     </div>
                     <div id="innAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="innAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('inn', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span> <span class="muted-text">A hot bath uses one soap and doubles the Star Bead bonus from that soak (10% becomes 20%).</span></div>
                     <div id="innTowels_row" class="base-row" style="display:none">Towels: <span id="innTowelsText">0</span> <span class="muted-text">A hot bath uses one towel and grants +100 restfulness.</span></div>
-                    <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires 20L of water of at least 40C</div>
-                    <div id="innOnsenSoak_row" class="base-row muted-text" style="display:none">Soaking lasts 5s and adds +0.5 restfulness/s, and spends 20L.</div>
+                    <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires 50L of water of at least 40C</div>
+                    <div id="innOnsenSoak_row" class="base-row muted-text" style="display:none">Soaking lasts 5s and adds +0.5 restfulness/s, and spends 50L.</div>
                     <div id="innOnsenPondExplain_row" class="base-row muted-text" style="display:none">Pond visit lasts a number of seconds equal to the total level of water spirits assigned to the Pond; guests keep gaining restfulness at the inn rate during that time.</div>
                     <div class="base-row muted-text">Check the Guest tab for the itinerary.</div>
                     <div id="innGuestsVisitPond_row" class="base-row" style="display:none"><label><input type="checkbox" id="innGuestsVisitPond_chk" checked onchange="events.toggleInnGuestsVisitPond(this.checked)"> Allow guests to visit the pond</label></div>
@@ -463,22 +482,25 @@ let createView = {
                     <div id="noodleBarHotWater_row" class="base-row">
                         <div class="prog-track game-progress-track water-prog-track">
                             <div id="noodleBarHotWaterFill" class="prog-fill prog-fill-water"></div>
-                            <div id="noodleBarHotWaterText" class="game-progress-bar-label">Hot Water: 0/500</div>
+                            <div id="noodleBarHotWaterText" class="game-progress-bar-label">Hot Water: 0/1000</div>
                         </div>
                     </div>
                     <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
-                    <div id="noodleBarWaterReq_row" class="base-row muted-text">Water is only hauled from the Cistern while it is above 65C. <span id="noodleBarCisternTempText"></span></div>
+                    <div id="noodleBarWaterReq_row" class="base-row muted-text">Requires 100L of 65C</div>
+                    <div id="noodleBarEatExplain_row" class="base-row muted-text">If water is there, a guest will eat noodles for 10s, gaining +<span id="noodleBarEatRestBonusText">10</span>/s restfulness.</div>
                     <div id="noodleTipProgressWrap" class="prog-track orb-exp-prog-track">
                         <div id="noodleTipProgressFill" class="prog-fill prog-fill-noodle-tip"></div>
                         <div class="game-progress-bar-label">Tip Progress: <span id="noodleTipProgressText">0</span>/100%</div>
                     </div>
+                    <div id="noodleTipRateExplain_row" class="base-row muted-text">The more guests there are, and the more eating at the noodle bar, the more they will talk, giving higher tip progress %.</div>
                     <div id="noodleTipLast_row" class="base-row muted-text"></div>
                     <div class="base-info-title">Tip System</div>
                     <div id="noodleTipLocked_row" class="base-row muted-text">Tips require at least 5 skills researched</div>
                     <div id="noodleTipControls" style="display:none">
+                        <div id="noodleTipSystemExplain_row" class="base-row muted-text">Randomly select 5 skills for listening to tips, and when Tip Progress is complete, the selected skill gets 1 tip, increasing its skill exp by 1% per tip (additive).</div>
                         <button type="button" id="noodleTopicBtn" class="tab-button" onclick="events.changeNoodleConversationTopics()">Change Conversation Topics for 0 coins</button>
                         ${htmlNoodleTipRows()}
-                        <div id="noodleTipSelectHint" class="base-row muted-text" style="display:none">select which skill to apply the tip to</div>
+                        <div id="noodleTipSelectHint" class="base-row muted-text" style="display:none">Select which skill to apply the tip to</div>
                     </div>
                     ${resortUpgradeRowsHtml("noodleBar")}
                 </div>
@@ -521,7 +543,7 @@ let createView = {
                 </div>
                 <div id="resortInfo_mage_tower" class="resort-info-section">
                     <div class="base-info-title">The Orb</div>
-                    <div class="base-row muted-text">Gains exp each second equal to the total levels of all spirits. Each assigned Kitsune (and Okami) multiplies Orb exp gain by x1.1. Mana gain per second equals Orb level; Bonfire heat and Spin Currents multiply that rate. When Okami is assigned here, her inspiration bonus also multiplies mana generation (but not the worker exp bonus).</div>
+                    <div class="base-row muted-text">Gains exp each second equal to the total levels of all spirits. Each assigned Kitsune (and Okami) increases Orb exp gain by 20%. Mana gain per second equals Orb level; Bonfire heat and Spin Currents multiply that rate. When Okami is assigned here, her inspiration bonus also multiplies mana generation (but not the worker exp bonus).</div>
                     <div class="base-row">Mana generation: <span id="orbManaRateText"></span>/s</div>
                     <div class="base-row">Base Mana: <span id="orbBaseManaText"></span> <span id="orbBaseManaCloneBonusText" class="muted-text"></span></div>
                     <div class="base-row">Exp gain: <span id="orbExpRateText"></span>/s from spirit levels · ETA: <span id="orbExpEtaText"></span></div>
@@ -578,6 +600,7 @@ let createView = {
                     <div id="cisternWishingWell_row" class="base-row" style="display:none">Wishing well: +<span id="cisternWishingWellCoins"></span> coins/s</div>
                     <div class="base-row">Water carry: <span id="cisternWaterCarry"></span>L per trip</div>
                     <div id="cisternReplaceHotWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternReplaceHotWater_chk" onchange="events.toggleCisternReplaceWithHotterWater(this.checked)"> Replace with hotter water</label></div>
+                    <div id="cisternRefuseWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternRefuseWater_chk" onchange="events.toggleCisternRefuseIncomingWater(this.checked)"> Dump incoming water to the Pond</label></div>
                     <div id="cisternViscosity_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternViscosity_chk" checked onchange="events.toggleCisternWaterSpiritsUsePathSpeed(this.checked)"> Water spirits use path speed bonuses</label></div>
                     <div class="base-row"><button id="cisternEmptyHalf_btn" class="tab-button" style="display:none" onclick="events.emptyHalfCistern()">Empty Half to Pond</button></div>
                     ${resortUpgradeRowsHtml("cistern")}
@@ -820,10 +843,16 @@ let createView = {
             `;
         }
         col += `</div>`;
+        const sortRadios = `
+            <div id="skillSortRadios" class="skill-sort-radios">
+                <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
+                <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
+                <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
+            </div>`;
         const aside = `
             <aside id="skillInfoPanel" class="skill-info-aside">
                 <div id="skillInfo_title" class="skill-info-title"></div>
-                <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current muted-text"></div></div>
+                <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current"></div></div>
                 <div class="skill-reward" id="skillInfo_reward"></div>
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
                 <div class="skill-trigger" id="skillInfo_tips_rarity"${tipsHiddenStyle}></div>
@@ -841,9 +870,9 @@ let createView = {
             </aside>
         `;
         skillsList.className = "skills-tab-layout";
-        skillsList.innerHTML = col + aside;
+        skillsList.innerHTML = col + `<div class="skills-info-column">${sortRadios}${aside}</div>`;
         createView.queueCache(
-            "skillsListColumn", "skillsListEmpty", "skillInfoPanel",
+            "skillsListColumn", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillInfoPanel",
             "skillInfo_title", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_tips_rarity", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
@@ -1029,7 +1058,7 @@ let createView = {
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
             "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence_row", "cisternInfoEssence", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
-            "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
+            "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
@@ -1049,6 +1078,7 @@ let createView = {
             "foxDenManaOrders_row", "foxDenManaOrders_chk", "foxDenCarry_resource", "foxDenCarryMana_row", "foxDenCarry_mana",
             "mapInnManaProgressWrap", "mapInnManaProgressFill",
             "mapInnWaterProgressWrap", "mapInnWaterProgressFill",
+            "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill",
             "mapToriiManaProgressWrap", "mapToriiManaProgressFill",
             "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill",
             "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill",
@@ -1060,7 +1090,7 @@ let createView = {
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
             "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketCarryAmountText", "marketTradeStatus_row",
-            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketCreditOnly_chk",
+            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineDivinityRateText",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
@@ -1084,7 +1114,7 @@ let createView = {
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
             "bonfireAutoRetry_row", "bonfireAutoRetry_chk",
             "bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk",
-            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireFireSpiritHeat_row", "bonfireWoodCarry_row", "bonfireWoodCarry", "bonfireCoal_row", "bonfireCoalText",
+            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireFireSpiritHeat_row", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalText",
             "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
             "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
@@ -1127,9 +1157,9 @@ let createView = {
             );
         }
         createView.queueCache(
-            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk", "noodleBarWaterReq_row", "noodleBarCisternTempText",
-            "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipLast_row",
-            "noodleTipLocked_row", "noodleTipControls", "noodleTopicBtn", "noodleTipSelectHint"
+            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk", "noodleBarWaterReq_row", "noodleBarEatExplain_row", "noodleBarEatRestBonusText",
+            "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipRateExplain_row", "noodleTipLast_row",
+            "noodleTipLocked_row", "noodleTipControls", "noodleTipSystemExplain_row", "noodleTopicBtn", "noodleTipSelectHint"
         );
         for (let nti = 0; nti < 5; nti++) {
             createView.queueCache(
@@ -1230,7 +1260,8 @@ let createView = {
                 createView.queueCache(
                     resortData.idRow(rbk, rslug),
                     resortData.idExtra(rbk, rslug),
-                    resortData.idBtn(rbk, rslug)
+                    resortData.idBtn(rbk, rslug),
+                    `base_${rbk}_desc_${rslug}`
                 );
             }
         }

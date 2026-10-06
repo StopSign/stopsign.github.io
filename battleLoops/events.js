@@ -225,6 +225,13 @@ let events = {
         view.updateCompactLayout();
         createView.updateLayoutMeasurements();
     },
+    setSkillListSort: function(mode) {
+        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha") {
+            return;
+        }
+        data.progress.skillListSort = mode;
+        view.applySkillListSort();
+    },
     switchSkillsTab: function(tabKey) {
         const valid = ["combat", "foraging", "class"];
         let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
@@ -789,7 +796,7 @@ let events = {
             engine.pauseOkamiPathJob();
         }
         okami.assignedBuildingKey = buildingKey;
-        okami.lastAssignedBuildingKey = buildingKey;
+        engine.rememberOkamiWorkerSite(buildingKey);
         if (prevAssign === "bambooForest" && buildingKey !== "bambooForest") {
             engine.clearBambooCutIfNoWorkers();
         }
@@ -1112,11 +1119,17 @@ let events = {
             pile.allowUnduplicatedStone = !!checked;
         }
     },
-    toggleMarketCreditOnly: function(checked) {
-        const market = data.progress.base && data.progress.base.market;
-        if (market) {
-            market.creditOnlyPurchases = !!checked;
+    startExchangeCredit: function() {
+        const weaveUi = engine.getUpgradeWeaveUi("market", "exchangeCredit");
+        if (weaveUi) {
+            if (weaveUi.mode === "paused") {
+                engine.resumeWeaving("market", "exchangeCredit");
+            } else {
+                engine.pauseActiveWeaving("market", "exchangeCredit");
+            }
+            return;
         }
+        engine.startExchangeCredit();
     },
     toggleMarketHaulResource: function(resourceType, checked) {
         const market = data.progress.base && data.progress.base.market;
@@ -1210,6 +1223,12 @@ let events = {
         const cistern = data.progress.base && data.progress.base.cistern;
         if (cistern) {
             cistern.replaceWithHotterWater = !!checked;
+        }
+    },
+    toggleCisternRefuseIncomingWater: function(checked) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (cistern) {
+            cistern.refuseIncomingWater = !!checked;
         }
     },
     toggleCisternWaterSpiritsUsePathSpeed: function(checked) {
