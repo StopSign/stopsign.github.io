@@ -492,17 +492,36 @@ let events = {
         }
         return resortData.baseBuildingOrder.indexOf(buildingKey) >= 0;
     },
+    clearShrineMoveConfirm: function() {
+        const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
+        if (chk) {
+            chk.checked = false;
+        }
+        const btn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
+        if (btn) {
+            btn.disabled = true;
+        }
+    },
     clearBaseBuildingSelection: function() {
         events.finishSpiritRename();
+        const wasShrine = data.progress.selectedBaseBuilding === "shrine"
+            || data.progress.selectedResortInfoType === "shrine";
         data.progress.selectedBaseBuilding = "";
         data.progress.selectedPathSegmentIndex = null;
         data.progress.selectedResortInfoType = "";
         data.progress.selectedSpiritId = null;
         data.progress.selectedFireLauncherKey = null;
+        if (wasShrine) {
+            events.clearShrineMoveConfirm();
+        }
         events.refreshBaseBuildingPanels();
     },
     openBaseBuilding: function(buildingKey, pathSegmentIndex) {
         events.finishSpiritRename();
+        const prevBuilding = data.progress.selectedBaseBuilding || "";
+        if (prevBuilding === "shrine" && buildingKey !== "shrine") {
+            events.clearShrineMoveConfirm();
+        }
         if (buildingKey === "path") {
             const idx = pathSegmentIndex;
             if (idx === undefined || idx === null || isNaN(idx)) {
@@ -1035,15 +1054,6 @@ let events = {
             engine.syncPostBattleCloneCountdown();
         }
     },
-    toggleShrineLiftedBurdens: function(checked) {
-        const shrine = data.progress.base && data.progress.base.shrine;
-        if (shrine) {
-            shrine.allowClasslessWithoutDivinity = !!checked;
-        }
-        if (typeof view.updateCloneCostDisplays === "function") {
-            view.updateCloneCostDisplays();
-        }
-    },
     setBonfireFireTendingCap: function(value) {
         const bf = data.progress.base && data.progress.base.bonfire;
         if (!bf) {
@@ -1433,23 +1443,28 @@ let events = {
     selectTravelMap: function(mapKey) {
         data.progress.selectedTravelMapKey = mapKey;
     },
-    bonfireSelectClass: function(classKey) {
-        bonfire.selectClass(classKey);
-        view.updateBasePanelShrine();
-        view.updateCloneCostDisplays();
-    },
-    bonfireSelectModifier: function(modKey) {
-        bonfire.selectModifier(modKey);
-        view.updateBasePanelShrine();
-        view.updateCloneCostDisplays();
-    },
-    bonfireApplySelection: function(e) {
-        if (e && e.stopPropagation) {
-            e.stopPropagation();
+    selectShrineClass: function(classKey) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine) {
+            return;
         }
-        bonfire.applyCurrentSelection();
+        shrine.selectedClassKey = classKey || "none";
         view.updateBasePanelShrine();
-        view.updateCloneCostDisplays();
+    },
+    toggleShrineMoveConfirm: function(checked) {
+        const btn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
+        if (btn) {
+            btn.disabled = !checked;
+        }
+    },
+    moveToNewMountain: function() {
+        const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
+        if (!chk || !chk.checked) {
+            return;
+        }
+        chk.checked = false;
+        events.toggleShrineMoveConfirm(false);
+        // Placeholder: prestige does nothing for now.
     },
     adjustWorkers: function(kind, mode) {
         if (!mode) return;

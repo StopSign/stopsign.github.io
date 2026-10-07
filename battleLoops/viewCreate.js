@@ -223,36 +223,68 @@ let createView = {
                 ${resortUpgradeRowsHtml("bonfire")}
             `;
         };
+        const htmlShrineFixedMilestone = function(id, name, thresholds, packImgs) {
+            let markers = "";
+            const n = thresholds.length;
+            for (let i = 0; i < n; i++) {
+                const left = ((i + 1) / n) * 100;
+                markers += `<div class="shrine-milestone-marker" style="left:${left}%"><img id="shrineMs_${id}_icon_${i}" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImgs[i]}" alt="" draggable="false"></div>`;
+            }
+            return `<div class="shrine-milestone" id="shrineMs_${id}_wrap">
+                <div class="shrine-milestone-name">${name}</div>
+                <div class="shrine-milestone-markers">${markers}</div>
+                <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+            </div>`;
+        };
+        const htmlShrineEscalatingMilestone = function(id, name, packImg) {
+            return `<div class="shrine-milestone" id="shrineMs_${id}_wrap">
+                <div class="shrine-milestone-name">${name} <span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span></div>
+                <div class="shrine-milestone-markers"><div class="shrine-milestone-marker" style="left:100%"><img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false"></div></div>
+                <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+            </div>`;
+        };
         const htmlShrinePanel = function() {
             let classBtns = "";
             for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
                 const ck = bonfireClassOrder[ci];
-                const d = bonfireClassDefs[ck];
-                classBtns += `<button type="button" id="bonfire_class_btn_${ck}" class="bonfire-pick-btn" onclick="events.bonfireSelectClass('${ck}')"><img class="bonfire-pick-img" src="${d.image}" alt="" draggable="false"><span class="bonfire-pick-label">${d.shortLabel}</span></button>`;
+                const d = bonfire.getClassDef(ck);
+                classBtns += `<button type="button" id="shrine_class_btn_${ck}" class="shrine-class-btn" onclick="events.selectShrineClass('${ck}')"><img class="bonfire-pick-img" src="${d.image}" alt="" draggable="false"><span class="bonfire-pick-label">${d.shortLabel}</span></button>`;
             }
-            let modBtns = "";
-            for (let mi = 0; mi < bonfireModifierOrder.length; mi++) {
-                const mk = bonfireModifierOrder[mi];
-                const md = bonfireModifierDefs[mk];
-                modBtns += `<button type="button" id="bonfire_mod_btn_${mk}" class="bonfire-pick-btn" onclick="events.bonfireSelectModifier('${mk}')"><img class="bonfire-pick-img" src="${md.image}" alt="" draggable="false"><span class="bonfire-pick-label">${md.name}</span></button>`;
-            }
+            const commonImg = "img/common.svg";
+            const rareImg = "img/rare.svg";
+            const epicImg = "img/epic.svg";
+            const shrineLevelPacks = [commonImg, commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
+            const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             return `
-                <div class="base-row muted-text">Applied classes grant x1.5 skill exp and cost 5000 divinity to start a clone instead of doubling mana.</div>
-                <div class="base-row">Divinity generation: <span id="shrineDivinityRateText"></span>/s</div>
+                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
-                    <div id="shrineExpFill" class="prog-fill prog-fill-divinity"></div>
-                    <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span><span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">200</span></div>
+                    <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
+                    <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span></div>
                 </div>
-                <div id="base_shrine_current" class="base-row"></div>
-                <div id="shrineClassSelectRow" class="base-row">Select a class (optional):</div>
-                <div id="shrinePickerLayout" class="bonfire-picker-layout">
-                    <div class="bonfire-picker-col">
-                        <div class="bonfire-class-row">${classBtns}</div>
-                        <div class="bonfire-modifier-grid">${modBtns}</div>
+                <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
+                <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
+                <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
+                    <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
+                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
+                </div>
+                <div id="shrinePacksSection" class="shrine-packs-section">
+                    <div id="shrinePackStrip" class="shrine-pack-strip">
+                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${commonImg}" alt="" draggable="false"> Common Packs: <span id="shrinePackCommonCount">0</span></span>
+                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${rareImg}" alt="" draggable="false"> Rare Packs: <span id="shrinePackRareCount">0</span></span>
+                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${epicImg}" alt="" draggable="false"> Epic Packs: <span id="shrinePackEpicCount">0</span></span>
                     </div>
-                    <div id="base_shrine_info_panel" class="bonfire-info-panel"></div>
+                    <div id="shrineMilestonesList" class="shrine-milestones-list">
+                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", [1, 2, 4, 7, 11, 16, 22], shrineLevelPacks)}
+                        ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
+                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", rareImg)}
+                        ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", rareImg)}
+                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
+                        ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
+                        ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
+                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", epicImg)}
+                        ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", epicImg)}
+                    </div>
                 </div>
-                <div id="shrineLiftedBurdens_row" class="base-row" style="display:none"><label><input type="checkbox" id="shrineLiftedBurdens_chk" onchange="events.toggleShrineLiftedBurdens(this.checked)"> If divinity is short, create a clone for mana only with no applied class</label></div>
                 ${resortUpgradeRowsHtml("shrine")}
             `;
         };
@@ -1025,9 +1057,12 @@ let createView = {
         }
         for (let i = 0; i < allTabs.length; i++) {
             const key = allTabs[i];
-            const pane = document.getElementById(`tabPane_${key}`);
+            const paneId = `tabPane_${key}`;
+            if (!viewData.cached[paneId]) {
+                viewData.cached[paneId] = document.getElementById(paneId);
+            }
             const shouldShow = (tabs.indexOf(key) >= 0) && key === tab;
-            pane.style.display = shouldShow ? "block" : "none";
+            view.updateVal(paneId, shouldShow ? "block" : "none", "style.display");
         }
     },
 
@@ -1097,7 +1132,6 @@ let createView = {
             "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
-            "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineDivinityRateText",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
             "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoRange", "fireLauncherInfoRangeBonus", "fireLauncherInfoInterval",
             "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoHeatBonus", "fireLauncherInfoExp", "fireLauncherInfoSpirit",
@@ -1114,7 +1148,19 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "base_shrine_current", "base_shrine_info_panel", "shrineClassSelectRow", "shrinePickerLayout", "shrineLiftedBurdens_row", "shrineLiftedBurdens_chk",
+            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn",
+            "shrineKarmaRateText", "shrineDivinityRateText",
+            "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
+            "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
+            "shrineMilestonesList",
+            "shrineMs_shrineLevel_fill", "shrineMs_totalStars_fill",
+            "shrineMs_marketLevel_fill", "shrineMs_marketLevel_progress",
+            "shrineMs_depthReached_fill", "shrineMs_depthReached_progress",
+            "shrineMs_orbLevel_fill", "shrineMs_orbLevel_progress",
+            "shrineMs_essenceMade_fill", "shrineMs_essenceMade_progress",
+            "shrineMs_maxMana_fill", "shrineMs_maxMana_progress",
+            "shrineMs_divinityAmount_fill", "shrineMs_divinityAmount_progress",
+            "shrineMs_totalGoldStars_fill", "shrineMs_totalGoldStars_progress",
             "bonfireDenseClones_row", "bonfireDenseClones_value",
             "bonfireDenseClones_dec_all", "bonfireDenseClones_dec_ten", "bonfireDenseClones_dec_one",
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
@@ -1216,10 +1262,13 @@ let createView = {
             }
         }
         for (let bci = 0; bci < bonfireClassOrder.length; bci++) {
-            createView.queueCache(`bonfire_class_btn_${bonfireClassOrder[bci]}`);
+            createView.queueCache(`shrine_class_btn_${bonfireClassOrder[bci]}`);
         }
-        for (let bmi = 0; bmi < bonfireModifierOrder.length; bmi++) {
-            createView.queueCache(`bonfire_mod_btn_${bonfireModifierOrder[bmi]}`);
+        for (let sli = 0; sli < 7; sli++) {
+            createView.queueCache(`shrineMs_shrineLevel_icon_${sli}`);
+        }
+        for (let sti = 0; sti < 6; sti++) {
+            createView.queueCache(`shrineMs_totalStars_icon_${sti}`);
         }
         if (typeof engine.getResortPathSegmentSpecs === "function") {
             const pathSpecs = engine.getResortPathSegmentSpecs();

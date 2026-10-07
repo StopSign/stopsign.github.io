@@ -239,13 +239,12 @@ let view = {
                 const retryLabel = bonfire.cloneLiveSettingsDifferFromStored()
                     ? "Try Again with changed settings"
                     : "Try Again with the same settings";
-                view.updateVal("tryAgainButton", `${retryLabel} - ${bonfire.formatCloneCostText(livePlan.manaCost, livePlan.divinityCost)}`);
+                view.updateVal("tryAgainButton", `${retryLabel} - ${bonfire.formatCloneCostText(livePlan.manaCost)}`);
                 view.updateVal("tryAgainButton", !canRetry, "disabled");
             } else if (runSettings) {
-                const retryMana = runSettings.manaCost || bonfire.getCloneManaCostFromSnapshot(runSettings.classKey, runSettings.modifiers, runSettings.cloneDensity);
-                const retryDivinity = runSettings.divinityCost || 0;
+                const retryMana = runSettings.manaCost || bonfire.getCloneManaCostFromSnapshot(runSettings.cloneDensity);
                 const canRetry = bonfire.canAffordRetryWithStoredSettings();
-                view.updateVal("tryAgainButton", `Try Again with the same settings - ${bonfire.formatCloneCostText(retryMana, retryDivinity)}`);
+                view.updateVal("tryAgainButton", `Try Again with the same settings - ${bonfire.formatCloneCostText(retryMana)}`);
                 view.updateVal("tryAgainButton", !canRetry, "disabled");
             } else {
                 view.updateVal("tryAgainButton", "Try Again?");
@@ -337,13 +336,11 @@ let view = {
         const classDef = initialize.getCurrentClassDef();
         view.updateVal("currentClassText", classDef.name);
         view.updateVal("classPerLevelText", initialize.getClassPerLevelText(classDef.key));
-        view.updateVal("tabButton_leveling", growthUnlocked ? "" : "none", "style.display");
         if (!growthUnlocked && data.battle.currentTab === "leveling") {
             data.battle.currentTab = "base";
             createView.showCurrentTab();
         }
         const skillsUnlocked = events.skillsTabUnlocked();
-        view.updateVal("tabButton_skills", skillsUnlocked ? "" : "none", "style.display");
         if (!skillsUnlocked && data.battle.currentTab === "skills") {
             data.battle.currentTab = "base";
             createView.showCurrentTab();
@@ -606,14 +603,12 @@ let view = {
         view.updateVal("travelPane_maps", travelSub === "maps" || !hasClassForTravel ? "" : "none", "style.display");
         view.updateVal("travelPane_challenges", travelSub === "challenges" && hasClassForTravel ? "" : "none", "style.display");
 
-        const bfState = data.progress.base && data.progress.base.bonfire;
-        const appliedBonfireClass = (bfState && bfState.appliedClassKey) || "none";
         const mapDefs = data.progress.mapDefinitions || [];
         const current = data.progress.currentMapKey;
         for (let i = 0; i < mapDefs.length; i++) {
             const map = mapDefs[i];
             const reqClass = map.requiredClassKey || "";
-            const classAllowed = !reqClass || reqClass === appliedBonfireClass;
+            const classAllowed = !reqClass;
             const unlocked = mapData.isMapUnlocked(map, data.progress);
             const showCard = classAllowed && unlocked;
             view.updateVal(`travel_card_${map.key}`, showCard ? "" : "none", "style.display");
@@ -903,7 +898,7 @@ let view = {
     },
     updateCloneCostDisplays: function() {
         const plan = bonfire.getCreateClonePlan();
-        const costText = bonfire.formatCloneCostText(plan.manaCost, plan.divinityCost);
+        const costText = bonfire.formatCloneCostText(plan.manaCost);
         const canAfford = bonfire.canAffordCreateClone();
         view.updateVal("base_bonfire_mana_cost", costText);
         view.updateVal("travelBonfireManaCost", costText);
@@ -1014,67 +1009,77 @@ let view = {
     updateBasePanelShrine: function() {
         view.updateCloneCostDisplays();
         view.updateShrineProgressDisplays();
-        const bf = data.progress.base.bonfire;
-        const shrine = data.progress.base.shrine || {};
-        const garden = data.progress.base && data.progress.base.garden;
-        const shrineBuilt = engine.isShrineBuilt();
-        const currentClass = data.progress.currentClassKey || "none";
-        view.updateVal("base_shrine_current", `Current class: ${initialize.getClassDef(currentClass).name}`);
-        view.updateVal("shrineClassSelectRow", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrinePickerLayout", shrineBuilt ? "" : "none", "style.display");
-        const liftedUnlocked = !!(garden && garden.arrangementOfLiftedBurdensUnlocked);
-        view.updateVal("shrineLiftedBurdens_row", liftedUnlocked ? "" : "none", "style.display");
-        if (liftedUnlocked) {
-            const chk = viewData.cached.shrineLiftedBurdens_chk || document.getElementById("shrineLiftedBurdens_chk");
-            if (chk) {
-                chk.checked = !!shrine.allowClasslessWithoutDivinity;
-            }
+        if (typeof engine.updateShrineMilestones === "function") {
+            engine.updateShrineMilestones();
         }
+        const shrine = data.progress.base.shrine || {};
+        const shrineBuilt = engine.isShrineBuilt();
+        const selected = shrine.selectedClassKey || "none";
+        view.updateVal("shrineClassSelectRow", shrineBuilt ? "" : "none", "style.display");
+        view.updateVal("shrineClassRow", shrineBuilt ? "" : "none", "style.display");
+        view.updateVal("shrineMoveMountainRow", shrineBuilt ? "" : "none", "style.display");
+        view.updateVal("shrinePacksSection", shrineBuilt ? "" : "none", "style.display");
         for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
             const ck = bonfireClassOrder[ci];
-            const btnId = `bonfire_class_btn_${ck}`;
-            const selected = bf.selectedClassKey === ck;
-            const applied = bf.appliedClassKey === ck;
-            view.updateVal(btnId, selected, "classList.toggle", "bonfire-pick-btn--selected");
-            view.updateVal(btnId, applied, "classList.toggle", "bonfire-pick-btn--applied");
+            view.updateVal(`shrine_class_btn_${ck}`, selected === ck, "classList.toggle", "shrine-class-btn--selected");
         }
-        for (let mi = 0; mi < bonfireModifierOrder.length; mi++) {
-            const mk = bonfireModifierOrder[mi];
-            const btnId = `bonfire_mod_btn_${mk}`;
-            const selected = bf.selectedModifierKey === mk;
-            const applied = bonfire.isModifierApplied(mk);
-            view.updateVal(btnId, selected, "classList.toggle", "bonfire-pick-btn--selected");
-            view.updateVal(btnId, applied, "classList.toggle", "bonfire-pick-btn--applied");
+        const confirmChk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
+        const moveBtn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
+        if (moveBtn) {
+            moveBtn.disabled = !(confirmChk && confirmChk.checked);
         }
-        let infoHtml = "";
-        if (bf.selectedClassKey) {
-            const d = bonfire.getClassDef(bf.selectedClassKey);
-            const applied = bonfire.isClassApplied(bf.selectedClassKey);
-            const pl = d.perLevel || {};
-            const bonusParts = [];
-            if (pl.str) bonusParts.push(`+${pl.str} Bru`);
-            if (pl.con) bonusParts.push(`+${pl.con} Con`);
-            if (pl.spd) bonusParts.push(`+${pl.spd} Spd`);
-            const divinityCost = bonfire.getCloneDivinityCost();
-            infoHtml = `<div class="bonfire-info-name">${d.name}</div><div class="muted-text">${d.description || ""}</div><div class="muted-text">${bonusParts.join(", ")} per level</div><div class="muted-text">Clone divinity cost: ${intToStringRound(divinityCost)}</div><button type="button" class="tab-button" onclick="events.bonfireApplySelection(event)">${applied ? "Unapply" : "Apply"}</button>`;
-        } else if (bf.selectedModifierKey) {
-            const d = bonfire.getModifierDef(bf.selectedModifierKey);
-            const applied = bonfire.isModifierApplied(bf.selectedModifierKey);
-            const manaMult = d.manaCostMult || bonfireConfig.modifierManaMult;
-            infoHtml = `<div class="bonfire-info-name">${d.name}</div><div class="muted-text">${d.description || ""}</div><div class="muted-text">Clone mana cost: x${round2(manaMult)}</div><button type="button" class="tab-button" onclick="events.bonfireApplySelection(event)">${applied ? "Unapply" : "Apply"}</button>`;
-        }
-        const infoEl = viewData.cached.base_shrine_info_panel;
-        if (infoEl && viewData.prevValues.base_shrine_info_html !== infoHtml) {
-            viewData.prevValues.base_shrine_info_html = infoHtml;
-            const nextHtml = infoHtml;
-            queueMicrotask(function() {
-                if (infoEl && viewData.prevValues.base_shrine_info_html === nextHtml) {
-                    infoEl.innerHTML = resortData.insertResourceIcons(nextHtml);
-                }
-            });
-        }
+        view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         tShrine.refreshOrderedPurchasables("shrine", (resortData.buildings.shrine && resortData.buildings.shrine.upgradesOrder) || [], { hideMaxed: tShrine.hideMaxed });
+    },
+
+    updateShrinePackDisplays: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine || !engine.isShrineBuilt()) {
+            return;
+        }
+        const packs = shrine.packs || {};
+        view.updateVal("shrinePackCommonCount", packs.common || 0, "textContent", "floor");
+        view.updateVal("shrinePackRareCount", packs.rare || 0, "textContent", "floor");
+        view.updateVal("shrinePackEpicCount", packs.epic || 0, "textContent", "floor");
+
+        const ms = shrine.milestones || {};
+        const shrineLevelThresholds = [1, 2, 4, 7, 11, 16, 22];
+        const shrineProgress = engine.getShrineContinuousLevelProgress();
+        const shrineFill = engine.getFixedMilestoneFillPct(shrineProgress, shrineLevelThresholds);
+        view.updateVal("shrineMs_shrineLevel_fill", `${shrineFill}%`, "style.width");
+        const claimedLevels = ms.shrineLevelClaimed || {};
+        for (let i = 0; i < shrineLevelThresholds.length; i++) {
+            view.updateVal(`shrineMs_shrineLevel_icon_${i}`, !!claimedLevels[String(shrineLevelThresholds[i])], "classList.toggle", "shrine-pack-icon--claimed");
+        }
+
+        const starThresholds = [5, 10, 15, 20, 25, 30];
+        const starCount = engine.getTotalEarnedStarsCount();
+        const starFill = engine.getFixedMilestoneFillPct(starCount, starThresholds);
+        view.updateVal("shrineMs_totalStars_fill", `${starFill}%`, "style.width");
+        const claimedStars = ms.totalStarsClaimed || {};
+        for (let si = 0; si < starThresholds.length; si++) {
+            view.updateVal(`shrineMs_totalStars_icon_${si}`, !!claimedStars[String(starThresholds[si])], "classList.toggle", "shrine-pack-icon--claimed");
+        }
+
+        const setEscalating = function(id, current, req) {
+            const need = Math.max(1, req || 1);
+            const cur = Math.max(0, current || 0);
+            const pct = Math.max(0, Math.min(100, (cur / need) * 100));
+            view.updateVal(`shrineMs_${id}_fill`, `${pct}%`, "style.width");
+            view.updateVal(`shrineMs_${id}_progress`, `${intToStringRound(cur)} / ${intToStringRound(need)}`);
+        };
+
+        const market = data.progress.base && data.progress.base.market;
+        setEscalating("marketLevel", (market && market.level) || 0, ms.marketLevelReq || 4);
+        setEscalating("depthReached", engine.getMineHighestDepthReached(), ms.depthReachedReq || 12);
+        const orb = data.progress.base && data.progress.base.mage_tower;
+        setEscalating("orbLevel", (orb && orb.level) || 0, ms.orbLevelReq || 40);
+        setEscalating("essenceMade", data.progress.essenceMade || 0, ms.essenceMadeReq || 10000);
+        setEscalating("maxMana", engine.getManaCapacity(), ms.maxManaReq || 200000);
+        const divinity = data.progress.divinity;
+        setEscalating("divinityAmount", (divinity && divinity.amount) || 0, ms.divinityAmountReq || 100000);
+        setEscalating("totalGoldStars", engine.getTotalEarnedGoldStars(), ms.totalGoldStarsReq || 1);
     },
 
     updateBasePanelInn: function(base, t) {
@@ -1191,7 +1196,7 @@ let view = {
         view.updateVal(`base_${siteKey}_assign_okami_btn`, okamiHere, "classList.toggle", "assign-okami-btn-active");
         let required = 30;
         if (siteKey === "torii") {
-            required = slot.karmaCheckPowerRequired || 30;
+            required = slot.visitorDrawPowerRequired || 30;
         } else if (siteKey === "laundry") {
             required = slot.cleanPowerRequired || 30;
         } else if (siteKey === "bambooForest") {
@@ -1683,8 +1688,8 @@ let view = {
         if (!unlocked) {
             return;
         }
-        const divinity = data.progress.divinity || { amount: 0, capacity: 10000 };
-        const cap = divinity.capacity || 10000;
+        const divinity = data.progress.divinity || { amount: 0, capacity: 100000 };
+        const cap = divinity.capacity || 100000;
         const amount = Math.floor(divinity.amount || 0);
         const rate = engine.getShrineDivinityRate();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
@@ -1905,12 +1910,13 @@ let view = {
         }
         const level = shrine.level || 0;
         const exp = shrine.exp || 0;
-        const expToLevel = shrine.expToLevel || 200;
+        const expToLevel = shrine.expToLevel || 10000;
         const pct = expToLevel > 0 ? Math.max(0, Math.min(100, (exp / expToLevel) * 100)) : 0;
         view.updateVal("shrineLevelText", level, "textContent", "floor");
         view.updateVal("shrineExpText", Math.round(exp), "textContent");
         view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent");
         view.updateVal("shrineExpFill", `${pct}%`, "style.width");
+        view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
         view.updateVal("shrineMapDisplay", `Lvl ${level}`, "textContent");
         view.updateVal("mapShrineProgressWrap", "", "style.display");
@@ -4137,7 +4143,7 @@ let view = {
         view.updateVal("skillInfo_trigger", skills.getSkillTriggerDescription(skillKey), "innerHTML");
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
         view.updateVal("skillInfo_initial_exp_shards", `Initial exp from shards: ${intToStringRound(skill.shards || 0)}`);
-        view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}${(parts.classMult || 1) > 1 ? ` · Class ×${parts.classMult.toFixed(4)}` : ""}`);
+        view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}`);
         view.updateVal("skillInfo_exp_text", `${round1(skill.exp)} / ${round1(skill.expToLevel)}`);
         view.updateVal("skillInfo_exp_fill", `${expPct}%`, "style.width");
         view.updateVal("skillInfo_talent_text", `${round1(skill.talent)} / ${round1(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
@@ -4291,10 +4297,6 @@ let view = {
     updateTabButtons: function(activeTab) {
         const tabs = events.mainMenuTabOrder();
         const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "options"];
-        const tabLabels = {
-            base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
-            skills: "Skills", travel: "Travel", history: "History", options: "Options"
-        };
         const notify = data.progress.baseContentNotify;
         for (let i = 0; i < allTabs.length; i++) {
             const tabKey = allTabs[i];
@@ -4306,16 +4308,6 @@ let view = {
             if (isVisible && tabKey !== "base" && tabKey !== "options" && !notify.tabSeen[tabKey]) {
                 if (!notify.tab[tabKey]) {
                     events.markTabNotify(tabKey);
-                }
-            }
-            const btnEl = viewData.cached[id];
-            const label = tabLabels[tabKey] || tabKey;
-            if (btnEl) {
-                const textNode = Array.from(btnEl.childNodes).find(function(n) { return n.nodeType === Node.TEXT_NODE; });
-                if (textNode) {
-                    textNode.textContent = label;
-                } else if (!btnEl.querySelector(".tab-notify-badge")) {
-                    btnEl.insertBefore(document.createTextNode(label), btnEl.firstChild);
                 }
             }
             const badgeId = "tabNotifyBadge_" + tabKey;

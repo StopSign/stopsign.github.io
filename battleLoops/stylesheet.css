@@ -137,7 +137,7 @@ body {
     transform: translateX(-50%);
 }
 
-.resort-map-progress-shrine .prog-fill-divinity {
+.resort-map-progress-shrine .prog-fill-karma {
     height: 100%;
 }
 
@@ -199,6 +199,10 @@ body {
     background: #8a6a1a;
 }
 
+.prog-fill-karma {
+    background: #c45bb8;
+}
+
 .base-mini-progress-fill.prog-fill-mana {
     background: #3c0295;
 }
@@ -210,6 +214,10 @@ body {
 
 .base-mini-progress-fill.prog-fill-divinity {
     background: #8a6a1a;
+}
+
+.base-mini-progress-fill.prog-fill-karma {
+    background: #c45bb8;
 }
 
 @media (max-width: 1419px) {
@@ -1892,26 +1900,20 @@ button {
     min-width: 0;
 }
 
-.bonfire-class-row {
+.shrine-class-row {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
-    margin-bottom: 10px;
+    margin: 8px 0;
 }
 
-.bonfire-modifier-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-}
-
-.bonfire-pick-btn {
+.shrine-class-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     padding: 6px;
-    border: 2px solid #3a4f6a;
+    border: 4px solid #888888;
     background: #1a2433;
     color: #e8eef5;
     border-radius: 6px;
@@ -1920,16 +1922,92 @@ button {
     min-height: 72px;
 }
 
-.bonfire-pick-btn:hover {
-    border-color: #5a7aa8;
+.shrine-class-btn:hover {
+    border-color: #aaaaaa;
 }
 
-.bonfire-pick-btn--selected {
-    border-color: #7eb6ff;
+.shrine-class-btn--selected {
+    border-color: #3b82f6;
 }
 
-.bonfire-pick-btn--applied {
-    background: #2a4a6e;
+.shrine-move-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.shrine-move-confirm {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.shrine-packs-section {
+    margin: 12px 0 16px;
+}
+
+.shrine-pack-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.shrine-pack-strip-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.shrine-pack-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.shrine-pack-icon--claimed {
+    box-shadow: 0 0 6px 3px rgba(34, 197, 94, 0.85);
+    border-radius: 4px;
+}
+
+.shrine-milestones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.shrine-milestone-name {
+    margin-bottom: 4px;
+}
+
+.shrine-milestone-markers {
+    position: relative;
+    height: 26px;
+    margin: 0 4px;
+}
+
+.shrine-milestone-marker {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+}
+
+.shrine-milestone-pack-icon {
+    display: block;
+}
+
+.shrine-milestone-track {
+    height: 12px;
+    margin-top: 2px;
+}
+
+.prog-fill-milestone {
+    background: #e07030;
 }
 
 .bonfire-pick-img {

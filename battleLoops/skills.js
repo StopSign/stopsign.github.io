@@ -1762,15 +1762,12 @@ let skills = {
         if (stars.gold) starCount++;
         // Additive star scaling per design: 0 stars x1, 1 star x2, 2 stars x4, 3 stars x6.
         const starMult = starCount > 0 ? (starCount * 2) : 1;
-        const currentClass = data.progress.currentClassKey || "none";
-        const classMult = (currentClass && currentClass !== "none") ? 1.5 : 1;
         return {
             talentMult: talentMult,
             levelMult: levelMult,
             tipsMult: tipsMult,
             starMult: starMult,
-            classMult: classMult,
-            combinedMult: talentMult * levelMult * tipsMult * starMult * classMult
+            combinedMult: talentMult * levelMult * tipsMult * starMult
         };
     },
 

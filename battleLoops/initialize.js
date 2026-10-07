@@ -309,7 +309,7 @@ let initials = {
                 callForAllyBought: 0,
                 shinyServiceBought: 0,
                 plantSpiritsBought: 0,
-                karmaCheckPowerRequired: 30,
+                visitorDrawPowerRequired: 30,
                 mana: 0,
                 manaCapacity: 4000,
                 enticingLightsUnlocked: false,
@@ -480,8 +480,9 @@ let initials = {
             },
             divinity: {
                 amount: 0,
-                capacity: 10000
+                capacity: 100000
             },
+            essenceMade: 0,
             manaCapacityBonusPerCombatStart: resortData.manaCapacityBonusPerCloneDispersal,
             stars: {
                 bronze: 0,
@@ -772,6 +773,15 @@ let initialize = {
             }
             if (torii.water === undefined) {
                 torii.water = 0;
+            }
+            if (torii.karmaCheckPowerRequired !== undefined) {
+                if (torii.visitorDrawPowerRequired === undefined || torii.visitorDrawPowerRequired === null) {
+                    torii.visitorDrawPowerRequired = torii.karmaCheckPowerRequired;
+                }
+                delete torii.karmaCheckPowerRequired;
+            }
+            if (torii.visitorDrawPowerRequired === undefined || torii.visitorDrawPowerRequired === null) {
+                torii.visitorDrawPowerRequired = 30;
             }
         }
         const pile = base.stonePile;
@@ -1145,6 +1155,7 @@ let initialize = {
             base.shrine = JSON.parse(JSON.stringify(def));
         }
         const shrine = base.shrine;
+        const needsKarmaMigrate = !shrine.karmaMechanicMigrated;
         const keys = Object.keys(def);
         for (let i = 0; i < keys.length; i++) {
             const k = keys[i];
@@ -1152,14 +1163,61 @@ let initialize = {
                 shrine[k] = def[k];
             }
         }
+        if (needsKarmaMigrate) {
+            shrine.level = 0;
+            shrine.exp = 0;
+            shrine.expToLevel = 10000;
+            shrine.selectedClassKey = "none";
+            shrine.karmaMechanicMigrated = true;
+        }
+        if (shrine.selectedClassKey === undefined || shrine.selectedClassKey === null) {
+            shrine.selectedClassKey = "none";
+        }
+        if (shrine.allowClasslessWithoutDivinity !== undefined) {
+            delete shrine.allowClasslessWithoutDivinity;
+        }
+        if (!shrine.packs) {
+            shrine.packs = { common: 0, rare: 0, epic: 0 };
+        }
+        ["common", "rare", "epic"].forEach(function(r) {
+            if (shrine.packs[r] === undefined || shrine.packs[r] === null) {
+                shrine.packs[r] = 0;
+            }
+        });
+        const msDef = (def && def.milestones) || {};
+        if (!shrine.milestones) {
+            shrine.milestones = JSON.parse(JSON.stringify(msDef));
+        } else {
+            const msKeys = Object.keys(msDef);
+            for (let mi = 0; mi < msKeys.length; mi++) {
+                const mk = msKeys[mi];
+                if (shrine.milestones[mk] === undefined || shrine.milestones[mk] === null) {
+                    shrine.milestones[mk] = typeof msDef[mk] === "object"
+                        ? JSON.parse(JSON.stringify(msDef[mk]))
+                        : msDef[mk];
+                }
+            }
+            if (!shrine.milestones.shrineLevelClaimed) {
+                shrine.milestones.shrineLevelClaimed = {};
+            }
+            if (!shrine.milestones.totalStarsClaimed) {
+                shrine.milestones.totalStarsClaimed = {};
+            }
+        }
+        if (data.progress.essenceMade === undefined || data.progress.essenceMade === null) {
+            data.progress.essenceMade = 0;
+        }
         if (!data.progress.divinity) {
-            data.progress.divinity = { amount: 0, capacity: 10000 };
+            data.progress.divinity = { amount: 0, capacity: 100000 };
         }
         if (data.progress.divinity.amount === undefined || data.progress.divinity.amount === null) {
             data.progress.divinity.amount = 0;
         }
-        if (data.progress.divinity.capacity === undefined || data.progress.divinity.capacity === null) {
-            data.progress.divinity.capacity = 10000;
+        if (data.progress.divinity.capacity === undefined || data.progress.divinity.capacity === null || data.progress.divinity.capacity === 10000) {
+            data.progress.divinity.capacity = 100000;
+        }
+        if (typeof engine !== "undefined" && engine.updateShrineMilestones) {
+            engine.updateShrineMilestones();
         }
         const weaving = data.progress.weaving;
         if (weaving && weaving.active && weaving.active.scopeKey === "atelier" && weaving.active.upgradeKey === "spareSandals") {

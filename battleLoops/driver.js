@@ -71,6 +71,12 @@ let driver = {
         if (typeof engine.updateManaPerSecond === "function") {
             engine.updateManaPerSecond();
         }
+        if (typeof engine.updateShrineKarmaPerSecond === "function") {
+            engine.updateShrineKarmaPerSecond();
+        }
+        if (typeof engine.updateShrineMilestones === "function") {
+            engine.updateShrineMilestones();
+        }
         if (typeof engine.updateDivinityPerSecond === "function") {
             engine.updateDivinityPerSecond();
         }

@@ -16,7 +16,7 @@ var resortData = {
 
     /** Class buy costs + per-level growth (saved class lives in `data.progress`). */
     bonfireClassDefs: {
-        none: { key: "none", name: "None", perLevel: { str: 1, con: 1, spd: 0 } }
+        none: { key: "none", name: "Classless", shortLabel: "Classless", image: "img/default.svg", perLevel: { str: 1, con: 1, spd: 0 } }
     },
 
     defaultMapRevealedState: {
@@ -1135,10 +1135,6 @@ var resortData = {
                 woodCarriers: [],
                 carrierIdCounter: 1,
                 assignedWorkers: 0,
-                selectedClassKey: null,
-                selectedModifierKey: null,
-                appliedClassKey: null,
-                appliedModifiers: {},
                 autoRetryEnabled: false,
                 autoRetryUnlocked: false,
                 growthBlessingUnlocked: false,
@@ -2935,7 +2931,6 @@ var resortData = {
                 arrangementOfWaterOrdersUnlocked: false,
                 arrangementOfManaOrdersUnlocked: false,
                 arrangementOfDoubledStoneUnlocked: false,
-                arrangementOfLiftedBurdensUnlocked: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
                 autoWeaveIncludePausedWeaves: false,
@@ -2946,7 +2941,7 @@ var resortData = {
                 "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
                 "arrangementOfTargetPriority", "arrangementOfHeatTargeting", "arrangementOfManaOrders", "arrangementOfDoubledStone",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
-                "arrangementOfPaperMoney", "arrangementOfLiftedBurdens", "smartHarvest"],
+                "arrangementOfPaperMoney", "smartHarvest"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3454,38 +3449,6 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfDoubledStoneUnlocked);
-                    },
-                    soldOutButtonLabel: "Arranged"
-                },
-                arrangementOfLiftedBurdens: {
-                    key: "arrangement_of_lifted_burdens",
-                    name: "Arrangement of Lifted Burdens",
-                    description: "Reveal a Shrine checkbox: if a class is applied but you cannot pay divinity, still create a clone for mana only (no class, no divinity).",
-                    cost: { stone: 600 },
-                    weavingTime: 600,
-                    canBuy: function() {
-                        const g = data.progress.base.garden;
-                        const rh = data.progress.base.foxDen;
-                        return !!(rh && rh.unlocks && rh.unlocks.shrine)
-                            && !(g && g.arrangementOfLiftedBurdensUnlocked);
-                    },
-                    onBuy: function() {
-                        const g = data.progress.base.garden;
-                        const shrine = data.progress.base.shrine;
-                        g.arrangementOfLiftedBurdensUnlocked = true;
-                        if (shrine) {
-                            shrine.allowClasslessWithoutDivinity = true;
-                        }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const rh = data.progress.base.foxDen;
-                        return !!(rh && rh.unlocks && rh.unlocks.shrine)
-                            && !(g && g.arrangementOfLiftedBurdensUnlocked);
-                    },
-                    upgradeSoldOut: function() {
-                        const g = data.progress.base.garden;
-                        return !!(g && g.arrangementOfLiftedBurdensUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 },
@@ -4710,14 +4673,26 @@ var resortData = {
 
         shrine: {
             label: "Shrine",
-            description: "Honor applied classes with divinity. Gains exp when a clone ends; each level grants +1 divinity/s.",
+            description: "Gain Karma from talents, stars, and spirits. Each shrine level grants +0.1 divinity/s (stockpile). Select a class (cosmetic for now).",
             mapSlot: { left: 220, top: 662 },
             constructionCost: { wood: 1000, stone: 1000, bars: 2000, starBeads: 50000 },
             progressDefaults: {
                 level: 0,
                 exp: 0,
-                expToLevel: 200,
-                allowClasslessWithoutDivinity: false
+                expToLevel: 10000,
+                selectedClassKey: "none",
+                packs: { common: 0, rare: 0, epic: 0 },
+                milestones: {
+                    shrineLevelClaimed: {},
+                    totalStarsClaimed: {},
+                    marketLevelReq: 4,
+                    depthReachedReq: 12,
+                    orbLevelReq: 40,
+                    essenceMadeReq: 10000,
+                    maxManaReq: 200000,
+                    divinityAmountReq: 100000,
+                    totalGoldStarsReq: 1
+                }
             },
             upgradesOrder: ["spareSandals"],
             upgrades: {
