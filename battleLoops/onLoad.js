@@ -158,14 +158,6 @@ let onLoad = {
         if (data.progress.selectedSkillDetailKey === oldKey) {
             data.progress.selectedSkillDetailKey = newKey;
         }
-        const inn = data.progress.base && data.progress.base.inn;
-        if (inn && inn.guests) {
-            for (let gi = 0; gi < inn.guests.length; gi++) {
-                if (inn.guests[gi].skillKey === oldKey) {
-                    inn.guests[gi].skillKey = newKey;
-                }
-            }
-        }
         if (data.battle && data.battle.runSkillTalentStart && data.battle.runSkillTalentStart[oldKey] !== undefined) {
             if (data.battle.runSkillTalentStart[newKey] === undefined) {
                 data.battle.runSkillTalentStart[newKey] = data.battle.runSkillTalentStart[oldKey];

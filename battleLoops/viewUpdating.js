@@ -199,7 +199,7 @@ let view = {
         view.updateVal("playerStatAudLine", audLineText);
         view.updatePlayerStatDmgLine();
         const twEff = skills.getSkillEffect("toughness_condescend");
-        const armorFlat = twEff.toughnessArmorFlat !== undefined ? round2(twEff.toughnessArmorFlat) : 0;
+        const armorFlat = twEff.armorFlat !== undefined ? round2(twEff.armorFlat) : 0;
         const secondaryParts = [];
         if (regenPerSec > 0) {
             secondaryParts.push(`Regen ${roundNearestDecimals(regenPerSec, 2).toFixed(2)}/s`);
@@ -367,28 +367,28 @@ let view = {
         const savageLessonsEffUi = skills.getSkillEffect("savageLessons");
         let strDisplay = (ls.levelStr || 0) + (ls.skillStrBonus || 0);
         if (skills.isSkillUnlocked("shockValue")) {
-            strDisplay += shockEffUi.shockValueBonusStr || 0;
+            strDisplay += shockEffUi.bonusStr || 0;
         }
         let conDisplay = (ls.levelCon || 0) + (ls.skillConBonus || 0);
         if (skills.isSkillUnlocked("windfallSwagger")) {
-            conDisplay += windfallEffUi.windfallBonusCon || 0;
+            conDisplay += windfallEffUi.bonusCon || 0;
         }
         view.updateVal("strText", strDisplay, "textContent", 1);
         view.updateVal("conText", conDisplay, "textContent", 1);
         let strStatTip = "Brutality - +10% damage per point.<br>Damage is always rounded up.";
         if (skills.isSkillUnlocked("savageLessons")) {
-            strStatTip += `<br>Savage Lessons: +${savageLessonsEffUi.savageLessonsBonusStr || 0} Bru from skill levels`;
+            strStatTip += `<br>Savage Lessons: +${savageLessonsEffUi.bonusStr || 0} Bru from skill levels`;
         }
         if (skills.isSkillUnlocked("shockValue")) {
-            strStatTip += `<br>Shock Value: +${shockEffUi.shockValueBonusStr || 0} Bru from skill level`;
+            strStatTip += `<br>Shock Value: +${shockEffUi.bonusStr || 0} Bru from skill level`;
         }
         view.updateVal("strStatTip", strStatTip, "innerHTML");
         let conStatTip = "Confidence - +10% current and max Aud per point";
         if (skills.isSkillUnlocked("adaptation")) {
-            conStatTip += `<br>Adaptation: +${adaptationEffUi.adaptationBonusCon || 0} Con from skill levels`;
+            conStatTip += `<br>Adaptation: +${adaptationEffUi.bonusCon || 0} Con from skill levels`;
         }
         if (skills.isSkillUnlocked("windfallSwagger")) {
-            conStatTip += `<br>Windfall Swagger: +${windfallEffUi.windfallBonusCon || 0} Con from skill level`;
+            conStatTip += `<br>Windfall Swagger: +${windfallEffUi.bonusCon || 0} Con from skill level`;
         }
         view.updateVal("conStatTip", conStatTip, "innerHTML");
         view.updateVal("spdText", ls.levelSpd || 0, "textContent", 1);
@@ -434,18 +434,18 @@ let view = {
         const windfallEffStats = skills.getSkillEffect("windfallSwagger");
         const validationEffStats = skills.getSkillEffect("validation");
         if (skills.isSkillUnlocked("shockValue")) {
-            strTotal += shockEffStats.shockValueBonusStr || 0;
+            strTotal += shockEffStats.bonusStr || 0;
         }
         if (skills.isSkillUnlocked("windfallSwagger")) {
-            conTotal += windfallEffStats.windfallBonusCon || 0;
+            conTotal += windfallEffStats.bonusCon || 0;
         }
         const gc = gameData.battle.combat;
         const cdCfg = gameData.battle.cooldowns;
-        const fortInner = skills.getSkillEffect("shameless").enduranceBaseAudInnerBonus || 0;
-        const tenB = skills.getSkillEffect("corneredEgo").tenacityAudInnerBonus || 0;
-        const forceFlatStats = roundNearestDecimals(skills.getSkillEffect("force").slapFlatBeforeStr || 0, 2);
-        const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").wisdomCharacterExpMultiplier || 1, 2);
-        const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").greedKillCoinsMultiplier || 1, 2);
+        const fortInner = skills.getSkillEffect("shameless").baseAudBonus || 0;
+        const tenB = skills.getSkillEffect("corneredEgo").audInnerBonus || 0;
+        const forceFlatStats = roundNearestDecimals(skills.getSkillEffect("force").baseDamage || 0, 2);
+        const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").characterExpMultiplier || 1, 2);
+        const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").killCoinsMultiplier || 1, 2);
         const shamelessResearched = skills.isSkillResearchComplete("shameless");
         const corneredResearched = skills.isSkillResearchComplete("corneredEgo");
         const forceResearched = skills.isSkillResearchComplete("force");
@@ -462,19 +462,19 @@ let view = {
             audTip += `<br>Cornered Ego: +${tenB}`;
         }
         if (skills.isSkillUnlocked("adaptation")) {
-            audTip += `<br>Adaptation: +${skills.getSkillEffect("adaptation").adaptationBonusCon || 0} Con from skill levels`;
+            audTip += `<br>Adaptation: +${skills.getSkillEffect("adaptation").bonusCon || 0} Con from skill levels`;
         }
         if (skills.isSkillUnlocked("windfallSwagger")) {
-            audTip += `<br>Windfall Swagger: +${windfallEffStats.windfallBonusCon || 0} Con from skill level`;
+            audTip += `<br>Windfall Swagger: +${windfallEffStats.bonusCon || 0} Con from skill level`;
         }
         if (skills.isSkillUnlocked("validation")) {
             const valAud = engine.getValidationAudFromKills();
-            const valCap = validationEffStats.validationAudCap || 0;
+            const valCap = validationEffStats.audCap || 0;
             audTip += `<br>Validation: +${valAud} current and max Aud from kills (cap ${valCap})`;
         }
         if (skills.isSkillUnlocked("paddingResume")) {
             const padEffUi = skills.getSkillEffect("paddingResume");
-            audTip += `<br>Padding the Resume: +${padEffUi.paddingResumeAudBonus || 0} Aud (${padEffUi.paddingResumeAudPerCharLevel || 0} per character level)`;
+            audTip += `<br>Padding the Resume: +${padEffUi.audBonus || 0} Aud (${padEffUi.audPerCharLevel || 0} per character level)`;
         }
         if (growthUnlocked) {
             audTip += `<br>Confidence multiplier: +${Math.round(conTotal * (100 / gc.conStrStatDivisor))}%`;
@@ -498,13 +498,13 @@ let view = {
             attackTip += `<br>Main Character: +${roundNearestDecimals(mcFlat, 2)} from ${vis} visible ${vis === 1 ? "enemy" : "enemies"}`;
         }
         if (skills.isSkillUnlocked("savageLessons")) {
-            attackTip += `<br>Savage Lessons: +${skills.getSkillEffect("savageLessons").savageLessonsBonusStr || 0} Bru from skill levels`;
+            attackTip += `<br>Savage Lessons: +${skills.getSkillEffect("savageLessons").bonusStr || 0} Bru from skill levels`;
         }
         if (skills.isSkillUnlocked("shockValue")) {
-            attackTip += `<br>Shock Value: +${shockEffStats.shockValueBonusStr || 0} Bru from skill level`;
+            attackTip += `<br>Shock Value: +${shockEffStats.bonusStr || 0} Bru from skill level`;
         }
         if (skills.isSkillUnlocked("bitterRivalry")) {
-            const brPct = skills.getSkillEffect("bitterRivalry").bitterRivalryDamagePercentPerSecond || 0;
+            const brPct = skills.getSkillEffect("bitterRivalry").damagePercentPerSecond || 0;
             let brLine = `<br>Bitter Rivalry: +${round2(brPct)}% damage per second an enemy is in slap range`;
             const brTarget = typeof engine.findIntruderById === "function"
                 ? engine.findIntruderById(data.battle.activeTargetId)
@@ -521,22 +521,22 @@ let view = {
             attackTip += `<br>Peer Pressure: +${roundNearestDecimals(ppFlat, 2)} from ${inSlap} in slap range`;
         }
         if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAboveHalfAud === "function" && engine.isPlayerAboveHalfAud()) {
-            const hhFrac = skills.getSkillEffect("highHorse").highHorseDamageBonusFraction || 0;
+            const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
             attackTip += `<br>High Horse: +${roundNearestDecimals(hhFrac * 100, 1)}% while above half Aud`;
         }
         if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtOrBelowAudFraction === "function" && engine.isPlayerAtOrBelowAudFraction(0.5)) {
-            const udFrac = skills.getSkillEffect("underdog").underdogDamageBonusFraction || 0;
+            const udFrac = skills.getSkillEffect("underdog").damageBonusFraction || 0;
             attackTip += `<br>Underdog: +${roundNearestDecimals(udFrac * 100, 1)}% at or below half Aud`;
         }
         if (skills.isSkillUnlocked("crowdWork")) {
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             if (visNow >= 4) {
-                const cwFrac = skills.getSkillEffect("crowdWork").crowdWorkDamageBonusFraction || 0;
+                const cwFrac = skills.getSkillEffect("crowdWork").damageBonusFraction || 0;
                 attackTip += `<br>Crowd Work: +${roundNearestDecimals(cwFrac * 100, 1)}% with ${visNow} visible`;
             }
         }
         if (skills.isSkillUnlocked("marathonEgo")) {
-            const mePct = skills.getSkillEffect("marathonEgo").marathonEgoDamagePercentPerTenSec || 0;
+            const mePct = skills.getSkillEffect("marathonEgo").damagePercentPerTenSec || 0;
             const tens = Math.floor((data.battle.cloneAliveMs || 0) / 10000);
             attackTip += `<br>Marathon Ego: +${round2(mePct * tens)}% from ${tens * 10}s`;
         }
@@ -547,8 +547,8 @@ let view = {
         view.updateVal("statsAttackTip", attackTip, "innerHTML");
         const twEff = skills.getSkillEffect("toughness_condescend");
         const tsEff = skills.getSkillEffect("thickSkin");
-        const toughnessArmor = twEff.toughnessArmorFlat !== undefined ? twEff.toughnessArmorFlat : 0;
-        const thickSkinArmor = tsEff.thickSkinArmorFlat || 0;
+        const toughnessArmor = twEff.armorFlat !== undefined ? twEff.armorFlat : 0;
+        const thickSkinArmor = tsEff.armorFlat || 0;
         const armorFlat = toughnessArmor + thickSkinArmor;
         view.updateVal("statsArmorText", `${round2(armorFlat)} flat`);
         let armorTip = "";
@@ -568,7 +568,7 @@ let view = {
         view.updateVal("statsArmorCard", armorFlat > 0 ? "" : "none", "style.display");
         view.updateVal("statsSlapText", `${round2((p.attackCooldownMs || 0) / 1000)}s`);
         const alaEff = skills.getSkillEffect("alacrity");
-        const alaLv = alaEff.alacrityEffectiveLevel || 0;
+        const alaLv = alaEff.effectiveLevel || 0;
         let slapTip = `Base: ${round2(cdCfg.slapBaseMs / 1000)}s`;
         if (alacrityResearched) {
             slapTip += `<br>Alacrity reduction: ${alaLv * cdCfg.alacritySlapReductionPerLevelMs} ms`;
@@ -2246,6 +2246,12 @@ let view = {
         setChk("marketAllowStone_chk", market.allowStone);
         setChk("marketAllowWood_chk", market.allowWood);
         setChk("marketAllowBars_chk", market.allowBars);
+        const garden = data.progress.base.garden || {};
+        const repeatUnlocked = !!garden.arrangementOfPaperMoneyUnlocked;
+        view.updateVal("marketRepeatExchange_row", repeatUnlocked ? "" : "none", "style.display");
+        if (repeatUnlocked) {
+            setChk("marketRepeatExchange_chk", market.repeatExchangeWhenReady);
+        }
         view.updateMarketExchangeButton();
         this.updateResortWorkerControls("market", engine.getMarketCarrierCapacity() > 0);
         t.refreshOrderedPurchasables("market", resortData.buildings.market.upgradesOrder, { hideMaxed: t.hideMaxed });
@@ -2263,7 +2269,6 @@ let view = {
         }
         view.updateVal("marketTradeStatus_row", engine.getMarketTradeStatusText(), "innerHTML");
 
-        const garden = data.progress.base.garden || {};
         const thresholdsUnlocked = !!garden.arrangementOfTraderResponsibilityUnlocked;
         const active = market.activeTrade;
         const order = resortData.marketTradesOrder || [];
@@ -2598,10 +2603,10 @@ let view = {
             view.updateSpiritSlotAppearance(slotId, spirit, selectedSpiritId);
             const state = engine.getFireLauncherPlatformState(lk);
             const embers = state ? (state.embers || 0) : 0;
-            const maxEmbers = engine.getFireLauncherMaxEmbers(def);
+            const maxEmbers = engine.getFireLauncherMaxEmbers(lk);
             const emberPct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
             view.updateVal(emberFillId, `${emberPct}%`, "style.width");
-            const rangePx = def.rangePx || 0;
+            const rangePx = Math.round(engine.getFireLauncherRangePx(lk));
             const diam = rangePx * 2;
             view.updateVal(rangeId, `${diam}px`, "style.width");
             view.updateVal(rangeId, `${diam}px`, "style.height");
@@ -2665,17 +2670,24 @@ let view = {
         const attackLabel = def.attackType === "aoe" ? "Burst (AOE)" : "Projectile";
         const intervalSec = def.intervalMs / 1000;
         const intervalStr = intervalSec >= 1 ? intervalSec.toFixed(1) : intervalSec.toFixed(2);
+        const rangePx = Math.round(engine.getFireLauncherRangePx(key));
+        const heatPerStrike = engine.getFireLauncherHeatPerStrike(key);
+        const rangeBonusPct = engine.getFireLauncherRangeBonusPct(key);
+        const heatBonusPct = engine.getFireLauncherHeatBonusPct(key);
         view.updateVal("fireLauncherInfoTitle", def.name);
         view.updateVal("fireLauncherInfoType", attackLabel);
         view.updateVal("fireLauncherInfoEmbers", round1(state ? state.embers || 0 : 0));
-        view.updateVal("fireLauncherInfoEmbersCap", engine.getFireLauncherMaxEmbers(def));
-        view.updateVal("fireLauncherInfoRange", def.rangePx);
+        view.updateVal("fireLauncherInfoEmbersCap", engine.getFireLauncherMaxEmbers(key));
+        view.updateVal("fireLauncherInfoRange", rangePx);
+        view.updateVal("fireLauncherInfoRangeBonus", rangeBonusPct > 0 ? ` (+${rangeBonusPct}%)` : "");
         view.updateVal("fireLauncherInfoInterval", intervalStr);
         view.updateVal("fireLauncherInfoEmberCost", def.emberCost);
-        view.updateVal("fireLauncherInfoHeat", def.attackType === "aoe"
-            ? `${def.heatPerStrike}C (all in range)`
-            : `${def.heatPerStrike}C`);
-        view.updateVal("fireLauncherInfoExp", round2((def.heatPerStrike || 0) / 5));
+        const heatText = def.attackType === "aoe"
+            ? `${round2(heatPerStrike)}C (all in range)`
+            : `${round2(heatPerStrike)}C`;
+        view.updateVal("fireLauncherInfoHeat", heatText);
+        view.updateVal("fireLauncherInfoHeatBonus", heatBonusPct > 0 ? ` (+${heatBonusPct}%)` : "");
+        view.updateVal("fireLauncherInfoExp", round2(heatPerStrike / 5));
         view.updateVal("fireLauncherInfoSpirit", spirit
             ? `${engine.getSpiritDisplayName(spirit)} (Lv ${spirit.level || 1})`
             : "Unassigned");
@@ -2694,6 +2706,18 @@ let view = {
                     radioEl.checked = mode === radioIds[ri];
                 }
             }
+        }
+        const t = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
+        const launcherScopes = ["fireLauncher_pathMid", "fireLauncher_pathLower", "fireLauncher_bendTop"];
+        for (let si = 0; si < launcherScopes.length; si++) {
+            const scopeKey = launcherScopes[si];
+            const bcfg = resortData.buildings[scopeKey];
+            if (!bcfg || !bcfg.upgradesOrder) {
+                continue;
+            }
+            t.refreshOrderedPurchasables(scopeKey, bcfg.upgradesOrder, { hideMaxed: t.hideMaxed });
+            const platformKey = engine.parseFireLauncherScopeKey(scopeKey);
+            view.updateVal(`fireLauncherUpgrades_${platformKey}`, platformKey === key ? "" : "none", "style.display");
         }
     },
     updateGuestLog: function() {
@@ -2973,8 +2997,10 @@ let view = {
                 const launcherKey = engine.getFireLauncherKeyForSpirit(spirit);
                 const def = engine.getFireLauncherPlatformDef(launcherKey);
                 const state = engine.getFireLauncherPlatformState(launcherKey);
-                const maxEmbers = engine.getFireLauncherMaxEmbers(def);
+                const maxEmbers = engine.getFireLauncherMaxEmbers(launcherKey);
                 const embers = state ? (state.embers || 0) : 0;
+                const regenRate = (engine.getEffectiveSpiritPower(spirit) || 1)
+                    * engine.getFireLauncherEmberRegenMult(launcherKey);
                 data.progress.selectedFireLauncherKey = launcherKey;
                 view.updateVal("spiritInfoFireLauncherExtras", "", "style.display");
                 view.updateVal("spiritInfoFireLauncherName", def ? def.name : "Fire Launcher");
@@ -2984,13 +3010,15 @@ let view = {
                     const intervalSec = def.intervalMs / 1000;
                     const intervalStr = intervalSec >= 1 ? intervalSec.toFixed(1) : intervalSec.toFixed(2);
                     const attackLabel = def.attackType === "aoe" ? "burst" : "projectile";
+                    const rangePx = Math.round(engine.getFireLauncherRangePx(launcherKey));
+                    const heatPerStrike = engine.getFireLauncherHeatPerStrike(launcherKey);
                     view.updateVal("spiritInfoFireLauncherStats",
-                        `Range ${def.rangePx}px · ${intervalStr}s ${attackLabel} · ${def.emberCost} embers · ${def.heatPerStrike}C heat`);
+                        `Range ${rangePx}px · ${intervalStr}s ${attackLabel} · ${def.emberCost} embers · ${round2(heatPerStrike)}C heat`);
                 } else {
                     view.updateVal("spiritInfoFireLauncherStats", "");
                 }
                 view.updateVal("spiritInfoFireNote", def
-                    ? `Powering ${def.name} (+${round2(engine.getEffectiveSpiritPower(spirit) || 1)} embers/s).`
+                    ? `Powering ${def.name} (+${round2(regenRate)} embers/s).`
                     : "Assigned to fire launcher.");
                 view.updateVal("spiritInfoTaskText", `charging embers (${round1(embers)}/${maxEmbers})`);
                 const pct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
@@ -4054,7 +4082,6 @@ let view = {
             view.updateVal("skillInfo_current_wrap", "none", "style.display");
             view.updateVal("skillInfo_reward", "", "innerHTML");
             view.updateVal("skillInfo_trigger", "");
-            view.updateVal("skillInfo_tips_rarity", "none", "style.display");
             view.updateVal("skillInfo_exp_on_trigger", "");
             view.updateVal("skillInfo_initial_exp_shards", "");
             view.updateVal("skillInfo_exp_mults", "");
@@ -4097,7 +4124,6 @@ let view = {
         const expPct = Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100));
         const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
         const tipsVal = skill.tips || 0;
-        const tipsUnlocked = engine.isSkillTipsUnlocked();
         view.updateVal("skillInfo_title", skill.name);
         const sum = skills.skillEffectUiSummary(skillKey, skill);
         if (sum) {
@@ -4109,14 +4135,6 @@ let view = {
         }
         view.updateVal("skillInfo_reward", skills.getSkillRewardText(skillKey, skill), "innerHTML");
         view.updateVal("skillInfo_trigger", skills.getSkillTriggerDescription(skillKey), "innerHTML");
-        if (tipsUnlocked) {
-            const g = skills.getSkillGuestInfo(skillKey);
-            view.updateVal("skillInfo_tips_rarity", `Tips rarity: ${g && g.rarity ? g.rarity : 1}`);
-            view.updateVal("skillInfo_tips_rarity", "", "style.display");
-        } else {
-            view.updateVal("skillInfo_tips_rarity", "", "textContent");
-            view.updateVal("skillInfo_tips_rarity", "none", "style.display");
-        }
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
         view.updateVal("skillInfo_initial_exp_shards", `Initial exp from shards: ${intToStringRound(skill.shards || 0)}`);
         view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}${(parts.classMult || 1) > 1 ? ` · Class ×${parts.classMult.toFixed(4)}` : ""}`);

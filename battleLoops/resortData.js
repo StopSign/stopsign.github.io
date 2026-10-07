@@ -2924,6 +2924,7 @@ var resortData = {
                 arrangementOfShoppingUnlocked: false,
                 arrangementOfFireTendingUnlocked: false,
                 arrangementOfTraderResponsibilityUnlocked: false,
+                arrangementOfPaperMoneyUnlocked: false,
                 arrangementOfHotWaterUnlocked: false,
                 arrangementOfThirstUnlocked: false,
                 arrangementOfViscosityUnlocked: false,
@@ -2944,7 +2945,8 @@ var resortData = {
             upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfAppraisal", "arrangementOfReview",
                 "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
                 "arrangementOfTargetPriority", "arrangementOfHeatTargeting", "arrangementOfManaOrders", "arrangementOfDoubledStone",
-                "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility", "arrangementOfLiftedBurdens", "smartHarvest"],
+                "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
+                "arrangementOfPaperMoney", "arrangementOfLiftedBurdens", "smartHarvest"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3228,6 +3230,38 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfTraderResponsibilityUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfPaperMoney: {
+                    key: "arrangement_of_paper_money",
+                    name: "Arrangement of Paper Money",
+                    description: "Adds a Market checkbox next to Exchange. When checked, Exchange restarts automatically when its weave finishes, until coins run out; then the Okami returns via Arrangement of Remembrance.",
+                    cost: { stone: 3000 },
+                    weavingTime: 1000,
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isMarketBuilt()
+                            && engine.getMarketLevel() >= 2
+                            && !(g && g.arrangementOfPaperMoneyUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfPaperMoneyUnlocked = true;
+                        const market = data.progress.base.market;
+                        if (market && market.repeatExchangeWhenReady === undefined) {
+                            market.repeatExchangeWhenReady = false;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isMarketBuilt()
+                            && engine.getMarketLevel() >= 2
+                            && !(g && g.arrangementOfPaperMoneyUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfPaperMoneyUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 },
@@ -3690,9 +3724,11 @@ var resortData = {
                 literacyLessonsBought: 0,
                 forgingInstructionsBought: 0,
                 arsonistJournalsBought: 0,
-                lostScrollsBought: 0
+                lostScrollsBought: 0,
+                launcherDesignsBought: 0,
+                repeatExchangeWhenReady: false
             },
-            upgradesOrder: ["anchoringRing", "mysticalGloves", "cookingEquipment", "improveStoneDuplicator", "tradingExperience", "buyAdvertising", "literacyLessons", "forgingInstructions", "arsonistJournals", "lostScrolls"],
+            upgradesOrder: ["anchoringRing", "mysticalGloves", "cookingEquipment", "improveStoneDuplicator", "tradingExperience", "buyAdvertising", "literacyLessons", "forgingInstructions", "arsonistJournals", "lostScrolls", "launcherDesigns"],
             upgrades: {
                 mysticalGloves: {
                     key: "mystical_gloves",
@@ -4043,6 +4079,312 @@ var resortData = {
                     soldOutButtonLabel: "Max scrolls",
                     lockedLabel: function() {
                         return engine.getMarketLevel() >= 3 ? "" : "Unlocks at Market level 3";
+                    }
+                },
+                launcherDesigns: {
+                    key: "launcher_designs",
+                    name: "Launcher Designs",
+                    description: "Unlocks launcher upgrades on each Metal Fire Launcher platform",
+                    cost: { credit: 150000 },
+                    weavingTime: 1200,
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return engine.getMarketLevel() >= 3 && !engine.isLauncherDesignsBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.market.launcherDesignsBought = 1;
+                    },
+                    rowVisible: function(hideMaxed) {
+                        return engine.getMarketLevel() >= 2
+                            && !(hideMaxed && engine.isLauncherDesignsBought());
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isLauncherDesignsBought();
+                    },
+                    lockedLabel: function() {
+                        return engine.getMarketLevel() >= 3 ? "" : "Unlocks at Market level 3";
+                    }
+                }
+            }
+        },
+
+        fireLauncher_pathMid: {
+            label: "Long-Range Launcher",
+            upgradesOrder: ["ironSights", "longRangeFirePit", "longRangeWoodPit"],
+            upgrades: {
+                ironSights: {
+                    key: "iron_sights",
+                    name: "Iron Sights",
+                    description: "Sharper aiming for the Long-Range Launcher. Each purchase increases range by +20% and heat damage per strike by +10%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought");
+                        return { bars: Math.round(500 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 800,
+                    weavingTimeIncreaseAdd: 800,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought");
+                    },
+                    maxPurchases: 3,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathMid")
+                            && engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought") < 3;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathMid", "ironSightsBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought") >= 3;
+                    }
+                },
+                longRangeFirePit: {
+                    key: "long_range_fire_pit",
+                    name: "Long Range Fire Pit",
+                    description: "A stone fire pit beside the Long-Range Launcher. Each purchase increases ember capacity by +1000.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathMid", "firePitBought");
+                        return { stone: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "firePitBought");
+                    },
+                    maxPurchases: 2,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathMid")
+                            && engine.getFireLauncherUpgradeBought("pathMid", "firePitBought") < 2;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathMid", "firePitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "firePitBought") >= 2;
+                    }
+                },
+                longRangeWoodPit: {
+                    key: "long_range_wood_pit",
+                    name: "Long Range Wood Pit",
+                    description: "A wood store for the Long-Range Launcher. Each purchase increases the spirit value of the assigned fire spirit by +25%, raising ember regeneration.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought");
+                        return { wood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathMid")
+                            && engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathMid", "woodPitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought") >= 4;
+                    }
+                }
+            }
+        },
+
+        fireLauncher_pathLower: {
+            label: "Ember Launcher",
+            upgradesOrder: ["fireFlingers", "emberFirePit", "emberWoodPit"],
+            upgrades: {
+                fireFlingers: {
+                    key: "fire_flingers",
+                    name: "Fire Flingers",
+                    description: "Hotter throws from the Ember Launcher. Each purchase increases heat damage per strike by +25%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought");
+                        return { bars: Math.round(500 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 800,
+                    weavingTimeIncreaseAdd: 800,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought");
+                    },
+                    maxPurchases: 3,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathLower")
+                            && engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought") < 3;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathLower", "fireFlingersBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought") >= 3;
+                    }
+                },
+                emberFirePit: {
+                    key: "ember_fire_pit",
+                    name: "Ember Fire Pit",
+                    description: "A stone fire pit beside the Ember Launcher. Each purchase increases ember capacity by +1000.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathLower", "firePitBought");
+                        return { stone: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "firePitBought");
+                    },
+                    maxPurchases: 2,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathLower")
+                            && engine.getFireLauncherUpgradeBought("pathLower", "firePitBought") < 2;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathLower", "firePitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "firePitBought") >= 2;
+                    }
+                },
+                emberWoodPit: {
+                    key: "ember_wood_pit",
+                    name: "Ember Wood Pit",
+                    description: "A wood store for the Ember Launcher. Each purchase increases the spirit value of the assigned fire spirit by +25%, raising ember regeneration.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought");
+                        return { wood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathLower")
+                            && engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathLower", "woodPitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought") >= 4;
+                    }
+                }
+            }
+        },
+
+        fireLauncher_bendTop: {
+            label: "Burst Launcher",
+            upgradesOrder: ["hotIrons", "burstFirePit", "burstWoodPit"],
+            upgrades: {
+                hotIrons: {
+                    key: "hot_irons",
+                    name: "Hot Irons",
+                    description: "Hotter burst irons for the Burst Launcher. Each purchase increases range by +10% and heat damage per strike by +20%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought");
+                        return { bars: Math.round(500 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 800,
+                    weavingTimeIncreaseAdd: 800,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought");
+                    },
+                    maxPurchases: 3,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("bendTop")
+                            && engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought") < 3;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("bendTop", "hotIronsBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought") >= 3;
+                    }
+                },
+                burstFirePit: {
+                    key: "burst_fire_pit",
+                    name: "Burst Fire Pit",
+                    description: "A stone fire pit beside the Burst Launcher. Each purchase increases ember capacity by +1000.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("bendTop", "firePitBought");
+                        return { stone: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "firePitBought");
+                    },
+                    maxPurchases: 2,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("bendTop")
+                            && engine.getFireLauncherUpgradeBought("bendTop", "firePitBought") < 2;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("bendTop", "firePitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "firePitBought") >= 2;
+                    }
+                },
+                burstWoodPit: {
+                    key: "burst_wood_pit",
+                    name: "Burst Wood Pit",
+                    description: "A wood store for the Burst Launcher. Each purchase increases the spirit value of the assigned fire spirit by +25%, raising ember regeneration.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought");
+                        return { wood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncreaseAdd: 1000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("bendTop")
+                            && engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("bendTop", "woodPitBought");
+                    },
+                    rowVisible: function() {
+                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought") >= 4;
                     }
                 }
             }
@@ -4397,7 +4739,8 @@ var resortData = {
                         return "";
                     },
                     rowVisible: function(hideMaxed) {
-                        return !(hideMaxed && data.progress.base.atelier.sandalBuilt);
+                        return false;
+                        // return !(hideMaxed && data.progress.base.atelier.sandalBuilt);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.atelier.sandalBuilt;
@@ -4469,6 +4812,13 @@ resortData.getScopeDisplayName = function(scopeKey) {
     }
     if (scopeKey === "inn") {
         return engine.getInnDisplayName();
+    }
+    if (scopeKey && scopeKey.indexOf("fireLauncher_") === 0) {
+        const platformKey = scopeKey.slice("fireLauncher_".length);
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        if (def && def.name) {
+            return def.name;
+        }
     }
     const bdef = resortData.buildings[scopeKey];
     if (bdef && bdef.label) {

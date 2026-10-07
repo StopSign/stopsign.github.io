@@ -524,7 +524,7 @@ let engine = {
     },
     getAlacrityCooldownReductionMs: function() {
         const e = skills.getSkillEffect("alacrity");
-        return e.alacrityEffectiveLevel || 0;
+        return e.effectiveLevel || 0;
     },
     getEffectiveSlapCooldownMs: function() {
         const cd = gameData.battle.cooldowns;
@@ -538,7 +538,7 @@ let engine = {
     },
     getSlapRechargeMultiplier: function() {
         const pEff = skills.getSkillEffect("preparation");
-        const prepBonus = pEff.preparationIdleRechargeFraction || 0;
+        const prepBonus = pEff.idleRechargeFraction || 0;
         let mult = engine.getOutrageRechargeMultiplier();
         if (engine.anyIntruderInSlapRange()) {
             return mult;
@@ -601,7 +601,7 @@ let engine = {
         while (data.battle.seetheSecondAccMs >= 500) {
             data.battle.seetheSecondAccMs -= 500;
             const eff = skills.getSkillEffect("seethe");
-            const stacks = eff.seetheFuryPerLevel || 0;
+            const stacks = eff.furyPerLevel || 0;
             if (stacks > 0) {
                 engine.addFuryStacks(stacks);
             }
@@ -621,7 +621,7 @@ let engine = {
         while (data.battle.applyTearDropsAccMs >= 500) {
             data.battle.applyTearDropsAccMs -= 500;
             const eff = skills.getSkillEffect("applyTearDrops");
-            const ms = eff.applyTearDropsMs || 0;
+            const ms = eff.fakeTearsMs || 0;
             if (ms > 0) {
                 engine.addFakeTearsMs(ms);
             }
@@ -660,7 +660,7 @@ let engine = {
         while (data.battle.numbingCrowdsSecondAccMs >= 1000) {
             data.battle.numbingCrowdsSecondAccMs -= 1000;
             const eff = skills.getSkillEffect("numbingCrowds");
-            const ms = eff.numbingCrowdsFakeTearsMsPerLevel || 0;
+            const ms = eff.fakeTearsMsPerLevel || 0;
             if (ms > 0) {
                 engine.addFakeTearsMs(ms);
             }
@@ -688,7 +688,7 @@ let engine = {
         engine.advanceBattleAccMs("combatSkillHalfSecondAccMs", tickMs, 500, function() {
             if (belowHalf && skills.isSkillUnlocked("thinIce")) {
                 const iceEff = skills.getSkillEffect("thinIce");
-                const fury = iceEff.thinIceFuryPerLevel || 0;
+                const fury = iceEff.furyPerLevel || 0;
                 if (fury > 0) {
                     engine.addFuryStacks(fury);
                 }
@@ -696,7 +696,7 @@ let engine = {
             }
             if (atMax && skills.isSkillUnlocked("simmer")) {
                 const simEff = skills.getSkillEffect("simmer");
-                const maliceAmt = simEff.simmerMalicePerLevel || 0;
+                const maliceAmt = simEff.malicePerLevel || 0;
                 if (maliceAmt > 0) {
                     engine.addMalice(maliceAmt);
                 }
@@ -704,7 +704,7 @@ let engine = {
             }
             if (moving && skills.isSkillUnlocked("righteousRant")) {
                 const rantEff = skills.getSkillEffect("righteousRant");
-                const ms = rantEff.righteousRantOutrageMs || 0;
+                const ms = rantEff.outrageMs || 0;
                 if (ms > 0) {
                     engine.addOutrageMs(ms);
                 }
@@ -719,7 +719,7 @@ let engine = {
             }
             if (moving && skills.isSkillUnlocked("walkingItOff")) {
                 const walkEff = skills.getSkillEffect("walkingItOff");
-                const regen = walkEff.walkingItOffAudPerSec || 0;
+                const regen = walkEff.audPerSec || 0;
                 if (regen > 0) {
                     engine.grantPlayerCurrentAudGain(regen);
                 }
@@ -729,7 +729,7 @@ let engine = {
                 engine.addSkillExp("peerPressure", 1);
                 if (skills.isSkillUnlocked("slowBurn")) {
                     const burnEff = skills.getSkillEffect("slowBurn");
-                    const fury = burnEff.slowBurnFuryPerLevel || 0;
+                    const fury = burnEff.furyPerLevel || 0;
                     if (fury > 0) {
                         engine.addFuryStacks(fury);
                     }
@@ -738,7 +738,7 @@ let engine = {
             }
             if (atMax && skills.isSkillUnlocked("stoic")) {
                 const stoEff = skills.getSkillEffect("stoic");
-                const ms = stoEff.stoicDesensitizedMsPerLevel || 0;
+                const ms = stoEff.desensitizedMsPerLevel || 0;
                 if (ms > 0) {
                     engine.addDesensitizedStack(ms);
                 }
@@ -746,7 +746,7 @@ let engine = {
             }
             if (atMax && skills.isSkillUnlocked("brandRecognition")) {
                 const brEff = skills.getSkillEffect("brandRecognition");
-                const clout = brEff.brandRecognitionCloutPerSec || 0;
+                const clout = brEff.cloutPerSec || 0;
                 if (clout > 0) {
                     engine.addCloutStacks(clout);
                 }
@@ -755,7 +755,7 @@ let engine = {
             if (slapCount >= 3) {
                 if (skills.isSkillUnlocked("heckled")) {
                     const heckEff = skills.getSkillEffect("heckled");
-                    const ms = heckEff.heckledOutrageMsPerLevel || 0;
+                    const ms = heckEff.outrageMsPerLevel || 0;
                     if (ms > 0) {
                         engine.addOutrageMs(ms);
                     }
@@ -763,7 +763,7 @@ let engine = {
                 }
                 if (skills.isSkillUnlocked("socialArmor")) {
                     const saEff = skills.getSkillEffect("socialArmor");
-                    const clout = saEff.socialArmorCloutPerLevel || 0;
+                    const clout = saEff.cloutPerLevel || 0;
                     if (clout > 0) {
                         engine.addCloutStacks(clout);
                     }
@@ -774,7 +774,7 @@ let engine = {
                 engine.addSkillExp("crowdWork", 1);
                 if (skills.isSkillUnlocked("stageSob")) {
                     const sobEff = skills.getSkillEffect("stageSob");
-                    const ms = sobEff.stageSobFakeTearsMsPerLevel || 0;
+                    const ms = sobEff.fakeTearsMsPerLevel || 0;
                     if (ms > 0) {
                         engine.addFakeTearsMs(ms);
                     }
@@ -795,7 +795,7 @@ let engine = {
             return;
         }
         const swEff = skills.getSkillEffect("secondWind");
-        const heal = swEff.secondWindRestoreAud || 0;
+        const heal = swEff.restoreAud || 0;
         if (heal <= 0) {
             return;
         }
@@ -811,7 +811,7 @@ let engine = {
             data.battle.selfAffirmationsSecondAccMs -= 1000;
             const p = data.battle.player;
             const rEff = skills.getSkillEffect("selfAffirmations");
-            const regen = rEff.recoveryAudPerSec || 0;
+            const regen = rEff.audPerSec || 0;
             if (regen > 0) {
                 engine.grantPlayerCurrentAudGain(regen);
             }
@@ -921,10 +921,10 @@ let engine = {
             data.battle.player.aud = Math.max(0, data.battle.player.aud - staminaCost);
             let harvestDamage = data.battle.player.attackDamage;
             const tch = skills.getSkillEffect("technique");
-            harvestDamage += tch.techniqueHarvestDamageFlat || 0;
+            harvestDamage += tch.harvestDamageFlat || 0;
             if (!target.firstHitTaken) {
                 const pln = skills.getSkillEffect("planning");
-                const planFrac = pln.planningFirstHitDamageBonusFraction || 0;
+                const planFrac = pln.firstHitDamageBonusFraction || 0;
                 harvestDamage *= (1 + planFrac);
                 target.firstHitTaken = true;
             }
@@ -944,19 +944,19 @@ let engine = {
         }
         let slapDamage = data.battle.player.attackDamage;
         const exEff = skills.getSkillEffect("execute");
-        const executeFrac = exEff.executeLowAudBonusFraction || 0;
+        const executeFrac = exEff.lowAudBonusFraction || 0;
         if (executeFrac > 0 && target.aud <= (target.maxAud * 0.5)) {
             slapDamage *= 1 + executeFrac;
             engine.addSkillExp("execute", 1);
         }
         const snEff = skills.getSkillEffect("sneak_attack");
-        const sneakFrac = snEff.sneakFirstHitDamageBonusFraction || 0;
+        const sneakFrac = snEff.firstHitDamageBonusFraction || 0;
         const priorHits = target.timesHitByPlayer || 0;
         if (sneakFrac > 0 && priorHits === 0) {
             slapDamage *= 1 + sneakFrac;
         }
         const xpEff = skills.getSkillEffect("exploit");
-        const exploitStep = xpEff.exploitFlatDamagePerConsecutiveStep || 0;
+        const exploitStep = xpEff.flatDamagePerConsecutiveStep || 0;
         const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === target.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
         if (exploitStep > 0 && streak >= 2) {
@@ -1101,19 +1101,19 @@ let engine = {
                     engine.spawnWinkGfx(intruder);
                 }
                 const endEff = skills.getSkillEffect("aboveItAll");
-                const dmgMultiplier = endEff.fortitudeIncomingDamageMultiplier !== undefined ? endEff.fortitudeIncomingDamageMultiplier : 1;
+                const dmgMultiplier = endEff.incomingDamageMultiplier !== undefined ? endEff.incomingDamageMultiplier : 1;
                 let incoming = intruder.attackDamage * dmgMultiplier;
                 const atOrBelowHalfBeforeHit = engine.isPlayerAtOrBelowAudFraction(0.5);
                 if (atOrBelowHalfBeforeHit) {
                     const sulEff = skills.getSkillEffect("stiffUpperLip");
-                    const sulMult = sulEff.stiffUpperLipIncomingDamageMultiplier;
+                    const sulMult = sulEff.incomingDamageMultiplier;
                     if (sulMult !== undefined) {
                         incoming *= sulMult;
                     }
                 }
                 incoming = engine.applyInsultFatigueFlat(intruder, incoming);
                 const tEff = skills.getSkillEffect("toughness_condescend");
-                const armorFlat = (tEff.toughnessArmorFlat || 0) + (skills.getSkillEffect("thickSkin").thickSkinArmorFlat || 0);
+                const armorFlat = (tEff.armorFlat || 0) + (skills.getSkillEffect("thickSkin").armorFlat || 0);
                 incoming = Math.max(0, incoming - armorFlat);
                 incoming *= bonfire.getCombatDamageMultiplier();
                 if ((data.progress.currentClassKey || "none") === "condescend" && (data.battle.classPowerB || 0) >= 1000) {
@@ -1121,7 +1121,7 @@ let engine = {
                     incoming *= 0.5;
                     engine.addSkillExp("second_wind", 1);
                     const swEff = skills.getSkillEffect("second_wind");
-                    const secondWindHeal = swEff.secondWindBlockHeal || 0;
+                    const secondWindHeal = swEff.blockHeal || 0;
                     if (secondWindHeal > 0) {
                         engine.grantPlayerCurrentAudGain(secondWindHeal);
                     }
@@ -1129,7 +1129,7 @@ let engine = {
                 if (incoming > 0 && (data.progress.currentClassKey || "none") === "condescend" && intruder.intruderType !== "lecher") {
                     engine.addClassBarProgress("B", 200);
                     const thEff = skills.getSkillEffect("thorns");
-                    const thorns = thEff.thornsRetaliationDamage || 0;
+                    const thorns = thEff.retaliationDamage || 0;
                     if (thorns > 0) {
                         intruder.aud -= thorns;
                     }
@@ -1146,7 +1146,7 @@ let engine = {
                 }
                 if (skills.isSkillUnlocked("brokenRecord")) {
                     const brEff = skills.getSkillEffect("brokenRecord");
-                    const ms = brEff.brokenRecordDesensitizedMsPerLevel || 0;
+                    const ms = brEff.desensitizedMsPerLevel || 0;
                     if (ms > 0) {
                         engine.addDesensitizedStack(ms);
                     }
@@ -1160,7 +1160,7 @@ let engine = {
                     const maxAud = Math.max(1, p.maxAud || 1);
                     if ((p.aud / maxAud) < 0.5) {
                         const isEff = skills.getSkillEffect("imposterSyndrome");
-                        const furyStacks = isEff.imposterSyndromeFuryPerLevel || 0;
+                        const furyStacks = isEff.furyPerLevel || 0;
                         if (furyStacks > 0) {
                             engine.addFuryStacks(furyStacks);
                         }
@@ -1168,7 +1168,7 @@ let engine = {
                 }
                 if (damageApplied && aboveHalfAudBeforeHit && skills.isSkillUnlocked("temper")) {
                     const tEff = skills.getSkillEffect("temper");
-                    const maliceAmt = tEff.temperMalicePerLevel || 0;
+                    const maliceAmt = tEff.malicePerLevel || 0;
                     if (maliceAmt > 0) {
                         engine.addMalice(maliceAmt);
                     }
@@ -1184,7 +1184,7 @@ let engine = {
                     engine.addSkillExp("thickSkin", 1);
                     if (skills.isSkillUnlocked("hotTake")) {
                         const htEff = skills.getSkillEffect("hotTake");
-                        const outrageMs = htEff.hotTakeOutrageMsPerLevel || 0;
+                        const outrageMs = htEff.outrageMsPerLevel || 0;
                         if (outrageMs > 0) {
                             engine.addOutrageMs(outrageMs);
                         }
@@ -1192,7 +1192,7 @@ let engine = {
                     }
                     if (skills.isSkillUnlocked("sobStory")) {
                         const ssEff = skills.getSkillEffect("sobStory");
-                        const tearsMs = ssEff.sobStoryFakeTearsMsPerLevel || 0;
+                        const tearsMs = ssEff.fakeTearsMsPerLevel || 0;
                         if (tearsMs > 0) {
                             engine.addFakeTearsMs(tearsMs);
                         }
@@ -1301,19 +1301,14 @@ let engine = {
         if ((data.progress.currentClassKey || "none") !== "condescend") {
             return;
         }
-        if (!skills.isSkillUnlocked("overkill")) {
-            return;
-        }
-        const sk = data.progress.skills.overkill;
-        const lv = sk ? (sk.level || 0) : 0;
-        if (lv <= 0) {
+        const want = skills.getSkillEffect("overkill").barBonusPerLevelMs || 0;
+        if (want <= 0) {
             return;
         }
         const p = data.battle.player;
         const cd = kind === "sandal" ? engine.getEffectiveSandalCooldownMs() : engine.getEffectiveSlapCooldownMs();
         const floorMs = kind === "sandal" ? gameData.battle.cooldowns.sandalFloorMs : gameData.battle.cooldowns.slapFloorMs;
         const maxSkip = Math.max(0, cd - floorMs);
-        const want = 50 * lv;
         const applied = Math.min(want, maxSkip);
         if (applied <= 0) {
             return;
@@ -1343,15 +1338,15 @@ let engine = {
     getCharacterExpMultiplier: function() {
         const e = skills.getSkillEffect("hindsight");
         const hog = skills.getSkillEffect("experienceHog");
-        const hindsight = e.wisdomCharacterExpMultiplier !== undefined ? e.wisdomCharacterExpMultiplier : 1;
-        const hogAdd = hog.experienceHogCharacterExpAdd || 0;
+        const hindsight = e.characterExpMultiplier !== undefined ? e.characterExpMultiplier : 1;
+        const hogAdd = hog.characterExpAdd || 0;
         return hindsight + hogAdd + 0.10 * engine.getCloneSoulLevel();
     },
     getValidationAudFromKills: function() {
         if (!skills.isSkillUnlocked("validation")) {
             return 0;
         }
-        const cap = (skills.getSkillEffect("validation").validationAudCap || 0);
+        const cap = (skills.getSkillEffect("validation").audCap || 0);
         return Math.min(data.battle.enemiesKilled || 0, cap);
     },
     onIntruderKilled: function(intruder, opts) {
@@ -1374,7 +1369,7 @@ let engine = {
             data.battle.enemiesKilled++;
             engine.addSkillExp("quick_rest", 1);
             const qrEff = skills.getSkillEffect("quick_rest");
-            const qr = qrEff.quickRestStaminaPerGather || 0;
+            const qr = qrEff.staminaPerGather || 0;
             if (qr > 0) {
                 engine.grantPlayerCurrentAudGain(qr);
             }
@@ -1404,7 +1399,7 @@ let engine = {
         engine.addSkillExp("windfallSwagger", engine.positiveLog(coinsGain, 10));
         if (skills.isSkillUnlocked("publicApology")) {
             const paEff = skills.getSkillEffect("publicApology");
-            const heal = paEff.publicApologyAudPerKill || 0;
+            const heal = paEff.audPerKill || 0;
             if (heal > 0) {
                 engine.grantPlayerCurrentAudGain(heal);
             }
@@ -1412,7 +1407,7 @@ let engine = {
         }
         if (skills.isSkillUnlocked("retailTherapy")) {
             const rtEff = skills.getSkillEffect("retailTherapy");
-            const desMs = rtEff.retailTherapyDesensitizedMsPerLevel || 0;
+            const desMs = rtEff.desensitizedMsPerLevel || 0;
             if (desMs > 0) {
                 engine.addDesensitizedStack(desMs);
             }
@@ -1420,7 +1415,7 @@ let engine = {
         }
         if (skills.isSkillUnlocked("bloodRush") && engine.isPlayerAboveHalfAud()) {
             const brEff = skills.getSkillEffect("bloodRush");
-            const maliceAmt = brEff.bloodRushMalicePerLevel || 0;
+            const maliceAmt = brEff.malicePerLevel || 0;
             if (maliceAmt > 0) {
                 engine.addMalice(maliceAmt);
             }
@@ -1429,7 +1424,7 @@ let engine = {
         const overkillDamage = (opts && opts.overkillDamage) ? opts.overkillDamage : 0;
         if (skills.isSkillUnlocked("sadism")) {
             const sadEff = skills.getSkillEffect("sadism");
-            const maliceAmt = sadEff.sadismMalicePerLevel || 0;
+            const maliceAmt = sadEff.malicePerLevel || 0;
             if (maliceAmt > 0) {
                 engine.addMalice(maliceAmt);
             }
@@ -1477,9 +1472,9 @@ let engine = {
         const gain = storedGain !== undefined ? storedGain : 1;
         const sEff = skills.getSkillEffect("nickelAndDime");
         const gEff = skills.getSkillEffect("extortion");
-        const scavFlat = sEff.scavengerKillCoinsFlatPerKill || 0;
+        const scavFlat = sEff.killCoinsFlat || 0;
         const baseCoinsPart = gain + scavFlat;
-        const greedMult = gEff.greedKillCoinsMultiplier !== undefined ? gEff.greedKillCoinsMultiplier : 1;
+        const greedMult = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
         return baseCoinsPart * greedMult;
     },
     initZoneShardRunCounts: function() {
@@ -1665,7 +1660,7 @@ let engine = {
             engine.addSkillExp("paddingResume", 1);
             if (skills.isSkillUnlocked("levelHeaded")) {
                 const lhEff = skills.getSkillEffect("levelHeaded");
-                const desMs = lhEff.levelHeadedDesensitizedMsPerLevel || 0;
+                const desMs = lhEff.desensitizedMsPerLevel || 0;
                 if (desMs > 0) {
                     for (let lh = 0; lh < 5; lh++) {
                         engine.addDesensitizedStack(desMs);
@@ -1972,7 +1967,7 @@ let engine = {
             return 0;
         }
         const eff = skills.getSkillEffect("mainCharacter");
-        const per = eff.mainCharacterFlatPerEnemy || 0;
+        const per = eff.flatDamagePerEnemy || 0;
         return per * engine.countVisibleIntruders();
     },
     getPeerPressureFlatDamage: function() {
@@ -1980,7 +1975,7 @@ let engine = {
             return 0;
         }
         const eff = skills.getSkillEffect("peerPressure");
-        const per = eff.peerPressureFlatPerInRange || 0;
+        const per = eff.flatDamagePerInRange || 0;
         return per * engine.countIntrudersInSlapRange();
     },
     getRepeatOffenderFlatDamage: function(target) {
@@ -1992,7 +1987,7 @@ let engine = {
             return 0;
         }
         const eff = skills.getSkillEffect("repeatOffender");
-        return priorHits * (eff.repeatOffenderFlatPerPriorHit || 0);
+        return priorHits * (eff.flatDamagePerPriorHit || 0);
     },
     applyPercentOutgoingBonus: function(damage, fraction) {
         if (!fraction) {
@@ -2005,28 +2000,28 @@ let engine = {
             return damage;
         }
         const eff = skills.getSkillEffect("highHorse");
-        return engine.applyPercentOutgoingBonus(damage, eff.highHorseDamageBonusFraction || 0);
+        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
     },
     applyUnderdogOutgoingMultiplier: function(damage) {
         if (!engine.isPlayerAtOrBelowAudFraction(0.5) || !skills.isSkillUnlocked("underdog")) {
             return damage;
         }
         const eff = skills.getSkillEffect("underdog");
-        return engine.applyPercentOutgoingBonus(damage, eff.underdogDamageBonusFraction || 0);
+        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction);
     },
     applyCrowdWorkOutgoingMultiplier: function(damage) {
         if (engine.countVisibleIntruders() < 4 || !skills.isSkillUnlocked("crowdWork")) {
             return damage;
         }
         const eff = skills.getSkillEffect("crowdWork");
-        return engine.applyPercentOutgoingBonus(damage, eff.crowdWorkDamageBonusFraction || 0);
+        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
     },
     applyMarathonEgoOutgoingMultiplier: function(damage) {
         if (!skills.isSkillUnlocked("marathonEgo")) {
             return damage;
         }
         const eff = skills.getSkillEffect("marathonEgo");
-        const pct = eff.marathonEgoDamagePercentPerTenSec || 0;
+        const pct = eff.damagePercentPerTenSec || 0;
         if (pct <= 0) {
             return damage;
         }
@@ -2044,7 +2039,7 @@ let engine = {
             return damage;
         }
         const eff = skills.getSkillEffect("closingArgument");
-        return engine.applyPercentOutgoingBonus(damage, eff.closingArgumentDamageBonusFraction || 0);
+        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
     },
     addCombatOutgoingHitSkillExp: function(target, priorHits) {
         if (priorHits > 0) {
@@ -2065,7 +2060,7 @@ let engine = {
             return damage;
         }
         const eff = skills.getSkillEffect("grudge");
-        const mult = eff.grudgeDamageMultPerLevel || 0;
+        const mult = eff.damageMultPerLevel || 0;
         return damage * (1 + mult);
     },
     applyBitterRivalryOutgoingMultiplier: function(damage, target) {
@@ -2077,7 +2072,7 @@ let engine = {
             return damage;
         }
         const eff = skills.getSkillEffect("bitterRivalry");
-        const pct = eff.bitterRivalryDamagePercentPerSecond || 0;
+        const pct = eff.damagePercentPerSecond || 0;
         if (pct <= 0) {
             return damage;
         }
@@ -2092,7 +2087,7 @@ let engine = {
             return incoming;
         }
         const eff = skills.getSkillEffect("insultFatigue");
-        const flat = stacks * (eff.insultFatigueFlatPerStack || 0);
+        const flat = stacks * (eff.flatReductionPerStack || 0);
         const reduction = Math.min(flat, Math.max(0, incoming) * 0.5);
         return Math.max(0, incoming - reduction);
     },
@@ -2114,7 +2109,7 @@ let engine = {
             return currentAud;
         }
         const eff = skills.getSkillEffect("narcissism");
-        const bonusMult = eff.narcissismAudGainMultPerLevel || 0;
+        const bonusMult = eff.audGainMultPerLevel || 0;
         if (bonusMult > 0) {
             currentAud = Math.min(maxAud, currentAud + currentRise * bonusMult);
         }
@@ -2986,13 +2981,13 @@ let engine = {
         const cls = data.progress.currentClassKey || "none";
         let sandalDamage = p.sandalAttackDamage;
         const snEffR = skills.getSkillEffect("sneak_attack");
-        const sneakFracR = snEffR.sneakFirstHitDamageBonusFraction || 0;
+        const sneakFracR = snEffR.firstHitDamageBonusFraction || 0;
         const priorHits = rt.timesHitByPlayer || 0;
         if (sneakFracR > 0 && priorHits === 0) {
             sandalDamage *= 1 + sneakFracR;
         }
         const xpEffR = skills.getSkillEffect("exploit");
-        const exploitStepR = xpEffR.exploitFlatDamagePerConsecutiveStep || 0;
+        const exploitStepR = xpEffR.flatDamagePerConsecutiveStep || 0;
         const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === rt.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
         if (exploitStepR > 0 && streak >= 2) {
@@ -3023,7 +3018,7 @@ let engine = {
             engine.addSkillExp("exploit", 1);
         }
         const imEff = skills.getSkillEffect("impact");
-        const impactTravel = imEff.impactKnockbackTravelSeconds || 0;
+        const impactTravel = imEff.knockbackTravelSeconds || 0;
         if (impactTravel > 0) {
             const battleHeight = viewData.layout.battlefieldHeightPx || 500;
             const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
@@ -3087,7 +3082,7 @@ let engine = {
     },
     applyCondescendCleave: function(primaryTarget, dealtDamage) {
         const clEff = skills.getSkillEffect("cleave");
-        const splashFrac = clEff.cleaveSplashFraction || 0;
+        const splashFrac = clEff.splashFraction || 0;
         if (splashFrac <= 0 || dealtDamage <= 0) {
             return;
         }
@@ -3215,7 +3210,7 @@ let engine = {
         }
         if (skills.isSkillUnlocked("recognition")) {
             const recEff = skills.getSkillEffect("recognition");
-            const cloutGain = recEff.recognitionCloutPerLevel || 0;
+            const cloutGain = recEff.cloutPerLevel || 0;
             if (cloutGain > 0) {
                 engine.addCloutStacks(cloutGain);
             }
@@ -3225,7 +3220,7 @@ let engine = {
         }
         if (skill.key !== "studyGroup" && cat === "combat" && skills.isSkillUnlocked("studyGroup")) {
             const sgEff = skills.getSkillEffect("studyGroup");
-            const charExp = sgEff.studyGroupCharacterExpPerLevel || 0;
+            const charExp = sgEff.characterExpPerLevel || 0;
             if (charExp > 0) {
                 engine.grantCloneCharacterExp(charExp);
             }
@@ -4842,9 +4837,78 @@ let engine = {
         }
         return null;
     },
+    getFireLauncherUpgradeBought: function(platformKey, field) {
+        const state = engine.getFireLauncherPlatformState(platformKey);
+        if (!state || !field) {
+            return 0;
+        }
+        return state[field] || 0;
+    },
+    incrementFireLauncherUpgrade: function(platformKey, field) {
+        const state = engine.getFireLauncherPlatformState(platformKey);
+        if (!state || !field) {
+            return;
+        }
+        state[field] = (state[field] || 0) + 1;
+    },
+    getFireLauncherScopeKey: function(platformKey) {
+        return "fireLauncher_" + platformKey;
+    },
+    parseFireLauncherScopeKey: function(scopeKey) {
+        if (!scopeKey || scopeKey.indexOf("fireLauncher_") !== 0) {
+            return null;
+        }
+        return scopeKey.slice("fireLauncher_".length);
+    },
+    getFireLauncherRangeBonusPct: function(platformKey) {
+        if (platformKey === "pathMid") {
+            return 20 * engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought");
+        }
+        if (platformKey === "bendTop") {
+            return 10 * engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought");
+        }
+        return 0;
+    },
+    getFireLauncherHeatBonusPct: function(platformKey) {
+        if (platformKey === "pathMid") {
+            return 10 * engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought");
+        }
+        if (platformKey === "pathLower") {
+            return 25 * engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought");
+        }
+        if (platformKey === "bendTop") {
+            return 20 * engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought");
+        }
+        return 0;
+    },
+    getFireLauncherRangePx: function(platformKey) {
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        const base = (def && def.rangePx) || 0;
+        return base * (1 + engine.getFireLauncherRangeBonusPct(platformKey) / 100);
+    },
+    getFireLauncherHeatPerStrike: function(platformKey) {
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        const base = (def && def.heatPerStrike) || 0;
+        return base * (1 + engine.getFireLauncherHeatBonusPct(platformKey) / 100);
+    },
     getFireLauncherMaxEmbers: function(defOrKey) {
+        const key = typeof defOrKey === "string" ? defOrKey
+            : (defOrKey && defOrKey.key ? defOrKey.key : null);
         const def = typeof defOrKey === "string" ? engine.getFireLauncherPlatformDef(defOrKey) : defOrKey;
-        return (def && def.maxEmbers) ? def.maxEmbers : 1000;
+        const base = (def && def.maxEmbers) ? def.maxEmbers : 1000;
+        if (!key) {
+            return base;
+        }
+        return base + 1000 * engine.getFireLauncherUpgradeBought(key, "firePitBought");
+    },
+    getFireLauncherEmberRegenMult: function(platformKey) {
+        return 1 + 0.25 * engine.getFireLauncherUpgradeBought(platformKey, "woodPitBought");
+    },
+    getUpgradeGatherDeliverMapKey: function(scopeKey) {
+        if (engine.parseFireLauncherScopeKey(scopeKey)) {
+            return "atelier";
+        }
+        return scopeKey;
     },
     getFireLauncherProjectileDurationMs: function(def) {
         return (def && def.projectileDurationMs) ? def.projectileDurationMs : 1050;
@@ -5026,7 +5090,7 @@ let engine = {
             return { droplet: null, wasted: false };
         }
         const mode = engine.getFireLauncherTargetMode(state);
-        const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, def.rangePx || 0);
+        const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, engine.getFireLauncherRangePx(platformKey));
         if (mode === "default") {
             const lockId = state.lockedDropletId;
             if (lockId !== undefined && lockId !== null) {
@@ -5156,10 +5220,13 @@ let engine = {
             if (!state) {
                 continue;
             }
-            const maxEmbers = engine.getFireLauncherMaxEmbers(def);
+            const maxEmbers = engine.getFireLauncherMaxEmbers(pk);
             const spirit = engine.getFireLauncherAssignedSpirit(pk);
+            const rangePx = engine.getFireLauncherRangePx(pk);
+            const heatPerStrike = engine.getFireLauncherHeatPerStrike(pk);
             if (spirit) {
-                state.embers = Math.min(maxEmbers, (state.embers || 0) + (engine.getEffectiveSpiritPower(spirit) || 1) * dtSec);
+                const regen = (engine.getEffectiveSpiritPower(spirit) || 1) * engine.getFireLauncherEmberRegenMult(pk);
+                state.embers = Math.min(maxEmbers, (state.embers || 0) + regen * dtSec);
             }
             state.attackTimerMs = (state.attackTimerMs || 0) + tickMs;
             if (!spirit || (state.embers || 0) < (def.emberCost || 0)) {
@@ -5170,18 +5237,17 @@ let engine = {
             }
             const pos = engine.getFireLauncherPlatformMapPos(pk);
             if (def.attackType === "aoe") {
-                const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, def.rangePx || 0);
+                const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, rangePx);
                 if (!inRange.length) {
                     continue;
                 }
                 state.embers -= def.emberCost || 0;
                 state.attackTimerMs = 0;
                 for (let ri = 0; ri < inRange.length; ri++) {
-                    const strikeHeat = def.heatPerStrike || 0;
-                    engine.applyFireLauncherHeat(inRange[ri], strikeHeat);
-                    engine.grantFireLauncherStrikeExp(pk, strikeHeat);
+                    engine.applyFireLauncherHeat(inRange[ri], heatPerStrike);
+                    engine.grantFireLauncherStrikeExp(pk, heatPerStrike);
                 }
-                engine.spawnFireLauncherAoePulse(pk, def.rangePx || 0);
+                engine.spawnFireLauncherAoePulse(pk, rangePx);
             } else {
                 const durationMs = engine.getFireLauncherProjectileDurationMs(def);
                 const pick = engine.pickFireLauncherTarget(pk, def, pos, durationMs);
@@ -5189,7 +5255,7 @@ let engine = {
                     state.embers -= def.emberCost || 0;
                     state.attackTimerMs = 0;
                     if (pick.droplet) {
-                        engine.spawnFireLauncherProjectile(pk, pick.droplet, def.heatPerStrike || 0, durationMs);
+                        engine.spawnFireLauncherProjectile(pk, pick.droplet, heatPerStrike, durationMs);
                     }
                     continue;
                 }
@@ -5198,7 +5264,7 @@ let engine = {
                 }
                 state.embers -= def.emberCost || 0;
                 state.attackTimerMs = 0;
-                engine.spawnFireLauncherProjectile(pk, pick.droplet, def.heatPerStrike || 0, durationMs);
+                engine.spawnFireLauncherProjectile(pk, pick.droplet, heatPerStrike, durationMs);
             }
         }
         engine.updateFireLauncherProjectiles(tickMs);
@@ -8397,7 +8463,7 @@ let engine = {
             if (priority) {
                 return {
                     jobKey: jobKey,
-                    mapKey: job.scopeKey,
+                    mapKey: engine.getUpgradeGatherDeliverMapKey(job.scopeKey),
                     site: job,
                     resourceType: priority.resourceType,
                     stillNeeded: priority.stillNeeded,
@@ -10323,6 +10389,9 @@ let engine = {
         if (scopeKey === "foxDen" || scopeKey === "foxDenUnlock") {
             return "foxDen";
         }
+        if (engine.parseFireLauncherScopeKey(scopeKey)) {
+            return "atelier";
+        }
         return scopeKey;
     },
     getOkamiMapVisual: function() {
@@ -10620,44 +10689,6 @@ let engine = {
         if (typeof events !== "undefined" && events.markNewBaseContent) {
             events.markNewBaseContent("mine");
         }
-    },
-    updateInnGuests: function(tickMs) {
-        const inn = data.progress.base && data.progress.base.inn;
-        if (!inn) {
-            return;
-        }
-        const maxGuests = engine.getInnGuestCapacity();
-        if (inn.openForGuests && inn.guests.length < maxGuests) {
-            inn.nextGuestTimerMs -= tickMs;
-            while (inn.nextGuestTimerMs <= 0 && inn.guests.length < maxGuests) {
-                inn.nextGuestTimerMs += 60000;
-                inn.guests.push(engine.rollBarGuest());
-            }
-        }
-        const chatSpeed = engine.getBarChatSpeedMultiplier();
-        const nextGuests = [];
-        for (let i = 0; i < inn.guests.length; i++) {
-            const g = inn.guests[i];
-            if (g.isChatting) {
-                g.chatProgress = (g.chatProgress || 0) + ((tickMs / 10000) * chatSpeed);
-                if (g.chatProgress >= 1) {
-                    if (g.skillKey) {
-                        engine.grantTipToSkill(g.skillKey, 1);
-                    }
-                    continue;
-                }
-            }
-            nextGuests.push(g);
-        }
-        inn.guests = nextGuests;
-    },
-    getBarChatSpeedMultiplier: function() {
-        return 1;
-    },
-    getInnGuestCapacity: function() {
-        const w = data.progress.base && data.progress.base.atelier;
-        const extra = w ? (w.barRoomUpgradesBought || 0) : 0;
-        return 3 + extra;
     },
     getBuildingManaCapacityFallback: function(buildingKey) {
         return buildingKey === "hiddenSpring" ? 40000 : 4000;
@@ -10995,6 +11026,17 @@ let engine = {
         }
         return (data.progress.coins || 0) >= 1000;
     },
+    isExchangeRepeatWhenReadyEnabled: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        const market = data.progress.base && data.progress.base.market;
+        return !!(garden && garden.arrangementOfPaperMoneyUnlocked && market && market.repeatExchangeWhenReady);
+    },
+    tryAutoRepeatExchangeCredit: function() {
+        if (!engine.isExchangeRepeatWhenReadyEnabled() || !engine.canStartExchangeCredit()) {
+            return false;
+        }
+        return engine.startExchangeCredit();
+    },
     startExchangeCredit: function() {
         if (!engine.canStartExchangeCredit()) {
             return false;
@@ -11029,6 +11071,10 @@ let engine = {
     isForgingInstructionsBought: function() {
         const market = data.progress.base && data.progress.base.market;
         return !!(market && market.forgingInstructionsBought);
+    },
+    isLauncherDesignsBought: function() {
+        const market = data.progress.base && data.progress.base.market;
+        return !!(market && market.launcherDesignsBought);
     },
     getArsonistJournalsBought: function() {
         const market = data.progress.base && data.progress.base.market;
@@ -11476,6 +11522,7 @@ let engine = {
         if (!active) {
             return;
         }
+        const wasExchangeCredit = active.scopeKey === "market" && active.upgradeKey === "exchangeCredit";
         if (active.scopeKey === "foxDenUnlock") {
             const slot = resortData.foxDenUnlockGetDef(active.upgradeKey);
             if (slot && slot.onBuy) {
@@ -11488,6 +11535,9 @@ let engine = {
             }
         }
         weaving.active = null;
+        if (wasExchangeCredit && engine.tryAutoRepeatExchangeCredit()) {
+            return;
+        }
         engine.restoreOkamiAfterWeaveOrPath();
     },
     updateWeaving: function(tickMs) {
@@ -11912,59 +11962,5 @@ let engine = {
             lib.researchTaskProgress -= required;
             engine.onScrollArchivesResearchTaskComplete(lib);
         }
-    },
-    rollBarGuest: function() {
-        const baseGuests = [
-            { archetype: "Traveling Merchant", rarity: 0, skillKey: null },
-            { archetype: "Wandering Bard", rarity: 0, skillKey: null },
-            { archetype: "Quiet Pilgrim", rarity: 0, skillKey: null }
-        ];
-        const unlocked = [];
-        let rarityTotal = 0;
-        for (let i = 0; i < skills.keysInOrder.length; i++) {
-            const k = skills.keysInOrder[i];
-            if (!skills.isSkillUnlocked(k)) {
-                continue;
-            }
-            const gi = skills.getSkillGuestInfo(k);
-            const r = Math.max(1, gi.rarity);
-            unlocked.push({ skillKey: k, archetype: gi.archetype, rarity: r });
-            rarityTotal += r;
-        }
-        const inn = data.progress.base.inn;
-        const roll = Math.floor(Math.random() * 100) + 1;
-        const cap = Math.min(100, rarityTotal);
-        let picked = null;
-        if (roll <= cap) {
-            const weightedRoll = Math.floor(Math.random() * Math.max(1, rarityTotal)) + 1;
-            let cursor = 0;
-            for (let i = 0; i < unlocked.length; i++) {
-                cursor += unlocked[i].rarity;
-                if (weightedRoll <= cursor) {
-                    picked = unlocked[i];
-                    break;
-                }
-            }
-        }
-        const id = inn.guestIdCounter++;
-        if (!picked) {
-            const basePick = baseGuests[Math.floor(Math.random() * baseGuests.length)];
-            return {
-                id: id,
-                archetype: basePick.archetype,
-                rarity: 0,
-                skillKey: null,
-                isChatting: false,
-                chatProgress: 0
-            };
-        }
-        return {
-            id: id,
-            archetype: picked.archetype,
-            rarity: picked.rarity,
-            skillKey: picked.skillKey,
-            isChatting: false,
-            chatProgress: 0
-        };
     }
 }

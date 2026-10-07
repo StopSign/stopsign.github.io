@@ -956,6 +956,14 @@ let events = {
         view.updateFireLauncherInfo();
         view.updateResortMapTokens();
     },
+    selectAssignedFireLauncher: function() {
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        const platformKey = engine.getFireLauncherKeyForSpirit(spirit);
+        if (!platformKey) {
+            return;
+        }
+        events.clickFireLauncher(platformKey);
+    },
     clickFireLauncherSlot: function(platformKey) {
         if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
             return;
@@ -1130,6 +1138,12 @@ let events = {
             return;
         }
         engine.startExchangeCredit();
+    },
+    toggleMarketRepeatExchange: function(checked) {
+        const market = data.progress.base && data.progress.base.market;
+        if (market) {
+            market.repeatExchangeWhenReady = !!checked;
+        }
     },
     toggleMarketHaulResource: function(resourceType, checked) {
         const market = data.progress.base && data.progress.base.market;
@@ -1378,19 +1392,6 @@ let events = {
         }
         data.progress.coins -= cost;
         return true;
-    },
-    chatInnGuest: function(guestId) {
-        const inn = data.progress.base.inn;
-        const guests = inn.guests || [];
-        for (let i = 0; i < guests.length; i++) {
-            if (guests[i].id === guestId) {
-                if (!guests[i].isChatting) {
-                    guests[i].isChatting = true;
-                    guests[i].chatProgress = 0;
-                }
-                return;
-            }
-        }
     },
     startBonfireClone: function() {
         if (bonfire.startNextClone(data.progress.selectedTravelMapKey || data.progress.currentMapKey)) {

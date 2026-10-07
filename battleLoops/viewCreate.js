@@ -330,6 +330,7 @@ let createView = {
                 </div>
                 <div class="base-row">
                     <button type="button" id="marketExchangeCredit_btn" class="tab-button" onclick="events.startExchangeCredit()">Exchange 1000 coins for 1000 credits</button>
+                    <label id="marketRepeatExchange_row" style="display:none"><input type="checkbox" id="marketRepeatExchange_chk" onchange="events.toggleMarketRepeatExchange(this.checked)"> Repeat when ready</label>
                 </div>
                 <div class="base-row">Allow resources:
                     ${htmlMarketHaulToggles()}
@@ -420,6 +421,7 @@ let createView = {
                             <div class="base-row">Launcher: <span id="spiritInfoFireLauncherName"></span></div>
                             <div class="base-row">Embers: <span id="spiritInfoFireLauncherEmbers"></span>/<span id="spiritInfoFireLauncherEmbersCap"></span></div>
                             <div class="base-row muted-text" id="spiritInfoFireLauncherStats"></div>
+                            <div class="base-row"><button type="button" id="spiritInfoSelectLauncher_btn" class="tab-button" onclick="events.selectAssignedFireLauncher()">Select Launcher</button></div>
                         </div>
                     </div>
                     <div id="spiritInfoPlantExtras" style="display:none">
@@ -621,10 +623,10 @@ let createView = {
                     <div id="fireLauncherInfoTitle" class="base-info-title">Fire Launcher</div>
                     <div class="base-row">Type: <span id="fireLauncherInfoType"></span></div>
                     <div class="base-row">Embers: <span id="fireLauncherInfoEmbers"></span>/<span id="fireLauncherInfoEmbersCap"></span></div>
-                    <div class="base-row">Range: <span id="fireLauncherInfoRange"></span>px</div>
+                    <div class="base-row">Range: <span id="fireLauncherInfoRange"></span>px<span id="fireLauncherInfoRangeBonus" class="muted-text"></span></div>
                     <div class="base-row">Attack interval: <span id="fireLauncherInfoInterval"></span>s</div>
                     <div class="base-row">Ember cost: <span id="fireLauncherInfoEmberCost"></span></div>
-                    <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span></div>
+                    <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span><span id="fireLauncherInfoHeatBonus" class="muted-text"></span></div>
                     <div class="base-row">Exp per droplet: <span id="fireLauncherInfoExp"></span></div>
                     <div class="base-row">Assigned: <span id="fireLauncherInfoSpirit"></span></div>
                     <div id="fireLauncherTargetPriority_row" class="base-row fire-launcher-target-radios" style="display:none">
@@ -635,6 +637,9 @@ let createView = {
                         <label id="fireLauncherTarget_coldest_label" style="display:none"><input type="radio" name="fireLauncherTargetMode" id="fireLauncherTarget_coldest" value="coldest" onclick="events.setFireLauncherTargetMode('coldest')"> Coldest</label>
                         <label id="fireLauncherTarget_hottest_label" style="display:none"><input type="radio" name="fireLauncherTargetMode" id="fireLauncherTarget_hottest" value="hottest" onclick="events.setFireLauncherTargetMode('hottest')"> Hottest</label>
                     </div>
+                    <div id="fireLauncherUpgrades_pathMid" style="display:none">${resortUpgradeRowsHtml("fireLauncher_pathMid")}</div>
+                    <div id="fireLauncherUpgrades_pathLower" style="display:none">${resortUpgradeRowsHtml("fireLauncher_pathLower")}</div>
+                    <div id="fireLauncherUpgrades_bendTop" style="display:none">${resortUpgradeRowsHtml("fireLauncher_bendTop")}</div>
                 </div>
                 <div id="resortInfo_mine" class="resort-info-section">
                     <div class="mine-info-header">
@@ -855,7 +860,6 @@ let createView = {
                 <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current"></div></div>
                 <div class="skill-reward" id="skillInfo_reward"></div>
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
-                <div class="skill-trigger" id="skillInfo_tips_rarity"${tipsHiddenStyle}></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_exp_on_trigger"></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_initial_exp_shards"></div>
                 <div class="prog-label-row skill-exp-row">Skill exp: <span id="skillInfo_exp_text"></span> <span class="skill-exp-mults" id="skillInfo_exp_mults"></span></div>
@@ -873,7 +877,7 @@ let createView = {
         skillsList.innerHTML = col + `<div class="skills-info-column">${sortRadios}${aside}</div>`;
         createView.queueCache(
             "skillsListColumn", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillInfoPanel",
-            "skillInfo_title", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_tips_rarity", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
+            "skillInfo_title", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
             "skillInfo_star_effect_row", "skillInfo_star_effect",
@@ -1055,7 +1059,7 @@ let createView = {
             "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingNote", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoFireNote",
-            "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
+            "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
             "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence_row", "cisternInfoEssence", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
             "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
@@ -1091,11 +1095,13 @@ let createView = {
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
             "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketCarryAmountText", "marketTradeStatus_row",
             "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
+            "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineDivinityRateText",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
-            "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoRange", "fireLauncherInfoInterval",
-            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoExp", "fireLauncherInfoSpirit",
+            "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoRange", "fireLauncherInfoRangeBonus", "fireLauncherInfoInterval",
+            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoHeatBonus", "fireLauncherInfoExp", "fireLauncherInfoSpirit",
+            "fireLauncherUpgrades_pathMid", "fireLauncherUpgrades_pathLower", "fireLauncherUpgrades_bendTop",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",
             "fireLauncherTarget_coldest", "fireLauncherTarget_hottest", "fireLauncherTarget_coldest_label", "fireLauncherTarget_hottest_label",
             "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",

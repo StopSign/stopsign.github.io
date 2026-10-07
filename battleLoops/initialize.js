@@ -355,9 +355,18 @@ let initials = {
             fireLaunchers: {
                 builtCount: 0,
                 platforms: {
-                    pathMid: { embers: 0, attackTimerMs: 0, targetMode: "default" },
-                    bendTop: { embers: 0, attackTimerMs: 0, targetMode: "default" },
-                    pathLower: { embers: 0, attackTimerMs: 0, targetMode: "default" }
+                    pathMid: {
+                        embers: 0, attackTimerMs: 0, targetMode: "default",
+                        ironSightsBought: 0, firePitBought: 0, woodPitBought: 0
+                    },
+                    bendTop: {
+                        embers: 0, attackTimerMs: 0, targetMode: "default",
+                        hotIronsBought: 0, firePitBought: 0, woodPitBought: 0
+                    },
+                    pathLower: {
+                        embers: 0, attackTimerMs: 0, targetMode: "default",
+                        fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0
+                    }
                 },
                 projectiles: [],
                 aoePulses: []
@@ -876,9 +885,18 @@ let initialize = {
         const def = {
             builtCount: 0,
             platforms: {
-                pathMid: { embers: 0, attackTimerMs: 0, targetMode: "default" },
-                bendTop: { embers: 0, attackTimerMs: 0, targetMode: "default" },
-                pathLower: { embers: 0, attackTimerMs: 0, targetMode: "default" }
+                pathMid: {
+                    embers: 0, attackTimerMs: 0, targetMode: "default",
+                    ironSightsBought: 0, firePitBought: 0, woodPitBought: 0
+                },
+                bendTop: {
+                    embers: 0, attackTimerMs: 0, targetMode: "default",
+                    hotIronsBought: 0, firePitBought: 0, woodPitBought: 0
+                },
+                pathLower: {
+                    embers: 0, attackTimerMs: 0, targetMode: "default",
+                    fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0
+                }
             },
             projectiles: [],
             aoePulses: []
@@ -894,6 +912,11 @@ let initialize = {
         if (!fl.platforms) {
             fl.platforms = {};
         }
+        const upgradeDefaults = {
+            pathMid: ["ironSightsBought", "firePitBought", "woodPitBought"],
+            bendTop: ["hotIronsBought", "firePitBought", "woodPitBought"],
+            pathLower: ["fireFlingersBought", "firePitBought", "woodPitBought"]
+        };
         const defs = resortData.fireLauncherPlatformDefs || [];
         for (let i = 0; i < defs.length; i++) {
             const pk = defs[i].key;
@@ -908,6 +931,13 @@ let initialize = {
             }
             if (!fl.platforms[pk].targetMode) {
                 fl.platforms[pk].targetMode = "default";
+            }
+            const fields = upgradeDefaults[pk] || ["firePitBought", "woodPitBought"];
+            for (let fi = 0; fi < fields.length; fi++) {
+                const field = fields[fi];
+                if (fl.platforms[pk][field] === undefined || fl.platforms[pk][field] === null) {
+                    fl.platforms[pk][field] = 0;
+                }
             }
         }
         if (!fl.projectiles) {
@@ -1202,6 +1232,9 @@ let initialize = {
         const market = base.market;
         if (market && (market.driedNoodles === undefined || market.driedNoodles === null)) {
             market.driedNoodles = 0;
+        }
+        if (market && (market.launcherDesignsBought === undefined || market.launcherDesignsBought === null)) {
+            market.launcherDesignsBought = 0;
         }
         const garden = base.garden;
         if (base.noodleBar && base.noodleBar.allowCarriersBringWater === undefined && garden && garden.arrangementOfWaterOrdersUnlocked) {
@@ -1499,7 +1532,7 @@ let initialize = {
             const totalCon = (ls.levelCon || 0);
             const totalStr = (ls.levelStr || 0);
             const brEff = skills.getSkillEffect("breathing");
-            const breathingBonus = brEff.breathingStaminaCapacityBonus || 0;
+            const breathingBonus = brEff.staminaCapacityBonus || 0;
             const maxStamina = Math.max(1, Math.ceil((gc.foragingBaseStaminaInner + breathingBonus) * (1 + (totalCon / div))));
             data.battle.player.maxAud = maxStamina;
             if (fullHeal) {
@@ -1522,15 +1555,15 @@ let initialize = {
         let totalCon = data.battle.levelState.levelCon + data.battle.levelState.skillConBonus;
         let totalStr = data.battle.levelState.levelStr + data.battle.levelState.skillStrBonus;
         const shockEff = skills.getSkillEffect("shockValue");
-        totalStr += shockEff.shockValueBonusStr || 0;
+        totalStr += shockEff.bonusStr || 0;
         const windfallEff = skills.getSkillEffect("windfallSwagger");
-        totalCon += windfallEff.windfallBonusCon || 0;
+        totalCon += windfallEff.bonusCon || 0;
         const fEff = skills.getSkillEffect("force");
-        const forceFlat = fEff.slapFlatBeforeStr || 0;
+        const forceFlat = fEff.baseDamage || 0;
         const fortEff = skills.getSkillEffect("shameless");
-        const fortLvl = fortEff.enduranceBaseAudInnerBonus || 0;
+        const fortLvl = fortEff.baseAudBonus || 0;
         const tenEff = skills.getSkillEffect("corneredEgo");
-        const tenInner = tenEff.tenacityAudInnerBonus || 0;
+        const tenInner = tenEff.audInnerBonus || 0;
         const dens = data.battle.cloneDensity || 0;
         const densMult = bonfire.getCloneDensityStatMult(dens);
         const denseAud = gc.baseAudInner * densMult;
@@ -1541,7 +1574,7 @@ let initialize = {
         let maxAud = Math.max(1, Math.ceil(baseInner * conMult) + tenacityAudExtra);
         maxAud += engine.getValidationAudFromKills();
         const padEff = skills.getSkillEffect("paddingResume");
-        maxAud += padEff.paddingResumeAudBonus || 0;
+        maxAud += padEff.audBonus || 0;
         data.battle.player.maxAud = maxAud;
         if (fullHeal) {
             data.battle.player.aud = data.battle.player.maxAud;
@@ -1557,7 +1590,7 @@ let initialize = {
             }
             if (maxRise > 0 && skills.isSkillUnlocked("borrowedGlory")) {
                 const bgEff = skills.getSkillEffect("borrowedGlory");
-                const clout = bgEff.borrowedGloryCloutPerLevel || 0;
+                const clout = bgEff.cloutPerLevel || 0;
                 if (clout > 0) {
                     engine.addCloutStacks(clout);
                 }
@@ -1572,11 +1605,11 @@ let initialize = {
         atk = Math.max(1, roundNearestDecimals(atk, 1));
         data.battle.player.attackDamage = atk;
         const lsEff = skills.getSkillEffect("longshot");
-        const longshotFlat = lsEff.longshotSandalFlatDamage || 0;
+        const longshotFlat = lsEff.sandalFlatDamage || 0;
         const sandalRaw = data.battle.player.attackDamage * gc.sandalDamageSlapMultiplier + longshotFlat;
         data.battle.player.sandalAttackDamage = Math.max(1, roundNearestDecimals(sandalRaw, 1));
         const rEff = skills.getSkillEffect("selfAffirmations");
-        data.battle.player.regenPerSecond = rEff.recoveryAudPerSec || 0;
+        data.battle.player.regenPerSecond = rEff.audPerSec || 0;
         engine.syncPlayerCooldownFields();
     }
 }
