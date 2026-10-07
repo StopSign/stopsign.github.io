@@ -1185,10 +1185,10 @@ let initialize = {
                 shrine.packs[r] = 0;
             }
         });
-        if (typeof shrineCards !== "undefined" && shrineCards.ensureCardsState) {
-            shrineCards.ensureCardsState(shrine);
-        } else if (!shrine.cards) {
-            shrine.cards = {};
+        if (!shrine.cards) {
+            shrine.cards = (typeof shrineCards !== "undefined" && shrineCards.createFreshCardsState)
+                ? shrineCards.createFreshCardsState()
+                : {};
         }
         if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
             data.progress.hasMovedToNewMountain = false;

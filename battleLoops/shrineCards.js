@@ -706,41 +706,8 @@ var shrineCards = {
         return o;
     },
 
-    ensureCardsState: function(shrine) {
-        if (!shrine) {
-            return;
-        }
-        if (!shrine.cards || typeof shrine.cards !== "object") {
-            shrine.cards = shrineCards.createFreshCardsState();
-            return;
-        }
-        for (let i = 0; i < shrineCards.keysInOrder.length; i++) {
-            const k = shrineCards.keysInOrder[i];
-            const def = shrineCards._byKey[k];
-            if (!shrine.cards[k] || typeof shrine.cards[k] !== "object") {
-                shrine.cards[k] = shrineCards.createFreshCardOwned(k);
-                continue;
-            }
-            const owned = shrine.cards[k];
-            const rarities = Object.keys(def.rarity || {});
-            for (let ri = 0; ri < rarities.length; ri++) {
-                const r = rarities[ri];
-                if (owned[r] === undefined || owned[r] === null || isNaN(owned[r])) {
-                    owned[r] = 0;
-                } else {
-                    owned[r] = Math.max(0, Math.floor(owned[r]));
-                }
-            }
-        }
-    },
-
     getCardsState: function() {
-        const shrine = data.progress && data.progress.base && data.progress.base.shrine;
-        if (!shrine) {
-            return null;
-        }
-        shrineCards.ensureCardsState(shrine);
-        return shrine.cards;
+        return data.progress.base.shrine.cards;
     },
 
     getOwned: function(key, rarity) {
@@ -862,12 +829,6 @@ var shrineCards = {
             return false;
         }
         const cards = shrineCards.getCardsState();
-        if (!cards) {
-            return false;
-        }
-        if (!cards[key]) {
-            cards[key] = shrineCards.createFreshCardOwned(key);
-        }
         cards[key][rarity] = (cards[key][rarity] || 0) + amount;
         if (key === "bambooBaseChips" && typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
             engine.refreshBambooForestBaseChips();
