@@ -116,6 +116,9 @@ let events = {
         createView.showCurrentTab();
         view.updateCompactLayout();
         createView.updateLayoutMeasurements();
+        if (typeof view !== "undefined" && view.updateMenuNumbers) {
+            view.updateMenuNumbers();
+        }
     },
     markNewBaseContent: function(buildingKey, optionalFoxDenSubtab) {
         const notify = data.progress.baseContentNotify;

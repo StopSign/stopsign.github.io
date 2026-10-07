@@ -1190,6 +1190,9 @@ let initialize = {
                 ? shrineCards.createFreshCardsState()
                 : {};
         }
+        if (typeof shrineCards !== "undefined" && shrineCards.invalidateAggregatedEffects) {
+            shrineCards.invalidateAggregatedEffects();
+        }
         if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
             data.progress.hasMovedToNewMountain = false;
         }

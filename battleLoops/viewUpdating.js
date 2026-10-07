@@ -31,21 +31,28 @@ let viewData = {
         innerFlip: null
     },
     slapDmgRender: [],
-    playerFloatRender: []
+    playerFloatRender: [],
+    deathOverlayFilled: false
 };
 
 
 let view = {
     updateViewAtFrame: function() { //This is the main view update function that is run once per frame
-        view.renderBattlefield();
-        view.updateActiveWeavingButtons();
+        if (data.progress && data.progress.showBattle) {
+            view.renderBattlefield();
+        }
+        // Global progress bars (okami/mana/divinity) — always on
         view.updateOkamiPanel();
-        view.updateOkamiMapVisuals();
-        view.updateFoxDenCarriers();
-        view.updateBonfireCarriers();
-        view.updateCisternCarriers();
-        view.updateInnCarriers();
-        view.updateMarketCarriers();
+        // Map-only DOM (baseResortMap carriers / okami sprites / weaving) — skip when base map not visible
+        if (view.isResortMapVisible()) {
+            view.updateActiveWeavingButtons();
+            view.updateOkamiMapVisuals();
+            view.updateFoxDenCarriers();
+            view.updateBonfireCarriers();
+            view.updateCisternCarriers();
+            view.updateInnCarriers();
+            view.updateMarketCarriers();
+        }
         view.updateBuyableUpgradesOverlay(false);
 
         view.updateScheduled(); //Updates UI things that were scheduled from data code
@@ -188,37 +195,41 @@ let view = {
             : `Slap ${fmtDmg1(slapDmg)}`);
     },
     updateGlobals: function() { //updates user-facing UI
-        const regenPerSec = data.battle.player.regenPerSecond || 0;
-        const maxAudInt = Math.round(data.battle.player.maxAud || 0);
-        const p = data.battle.player;
-        const audCur = p.aud;
-        const lowAud = maxAudInt < 100;
-        const audLineText = lowAud
-            ? `${Math.max(0, roundNearestDecimals(audCur, 1)).toFixed(1)}/${maxAudInt} Aud`
-            : `${Math.round(audCur)}/${maxAudInt} Aud`;
-        view.updateVal("playerStatAudLine", audLineText);
-        view.updatePlayerStatDmgLine();
-        const twEff = skills.getSkillEffect("toughness_condescend");
-        const armorFlat = twEff.armorFlat !== undefined ? round2(twEff.armorFlat) : 0;
-        const secondaryParts = [];
-        if (regenPerSec > 0) {
-            secondaryParts.push(`Regen ${roundNearestDecimals(regenPerSec, 2).toFixed(2)}/s`);
-        }
-        if (armorFlat > 0) {
-            secondaryParts.push(`Armor ${armorFlat} flat`);
-        }
-        view.updateVal("playerBattleHudSecondary", secondaryParts.length ? secondaryParts.join(" · ") : "-");
-        const audPct = Math.max(0, Math.min(100, (data.battle.player.aud / data.battle.player.maxAud) * 100));
-        view.updateVal("playerTokenAudLayer", `linear-gradient(to top, #2ad15f ${audPct}%, #0f3a1d ${audPct}%)`, "style.background");
+        const showBattle = !!(data.progress && data.progress.showBattle);
+        const battleState = data.battle.state;
+        const isDone = battleState === "dead" || battleState === "completed";
         const runClock = (data.battle.cloneAliveMs !== undefined ? data.battle.cloneAliveMs : (data.battle.elapsedMs || 0)) / 1000;
-        const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
-        view.updateWaveInfoPanel(runClock, growthUnlocked);
-        const showOverlay = (data.battle.state === "dead" || data.battle.state === "completed") ? "flex" : "none";
-        view.updateVal("deathOverlay", showOverlay, "style.display");
-        const killCoins = Math.max(0, data.battle.runCoinsFromKills || 0);
-        const manaBonus = engine.getManaCapacityBonusPerCloneDispersal();
-        if (data.battle.state === "completed" || data.battle.state === "dead") {
-            if (data.battle.state === "completed") {
+        if (showBattle) {
+            const regenPerSec = data.battle.player.regenPerSecond || 0;
+            const maxAudInt = Math.round(data.battle.player.maxAud || 0);
+            const p = data.battle.player;
+            const audCur = p.aud;
+            const lowAud = maxAudInt < 100;
+            const audLineText = lowAud
+                ? `${Math.max(0, roundNearestDecimals(audCur, 1)).toFixed(1)}/${maxAudInt} Aud`
+                : `${Math.round(audCur)}/${maxAudInt} Aud`;
+            view.updateVal("playerStatAudLine", audLineText);
+            view.updatePlayerStatDmgLine();
+            const twEff = skills.getSkillEffect("toughness_condescend");
+            const armorFlat = twEff.armorFlat !== undefined ? round2(twEff.armorFlat) : 0;
+            const secondaryParts = [];
+            if (regenPerSec > 0) {
+                secondaryParts.push(`Regen ${roundNearestDecimals(regenPerSec, 2).toFixed(2)}/s`);
+            }
+            if (armorFlat > 0) {
+                secondaryParts.push(`Armor ${armorFlat} flat`);
+            }
+            view.updateVal("playerBattleHudSecondary", secondaryParts.length ? secondaryParts.join(" · ") : "-");
+            const audPct = Math.max(0, Math.min(100, (data.battle.player.aud / data.battle.player.maxAud) * 100));
+            view.updateVal("playerTokenAudLayer", `linear-gradient(to top, #2ad15f ${audPct}%, #0f3a1d ${audPct}%)`, "style.background");
+            const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
+            view.updateWaveInfoPanel(runClock, growthUnlocked);
+        }
+        view.updateVal("deathOverlay", isDone ? "flex" : "none", "style.display");
+        if (isDone) {
+            const killCoins = Math.max(0, data.battle.runCoinsFromKills || 0);
+            const manaBonus = engine.getManaCapacityBonusPerCloneDispersal();
+            if (battleState === "completed") {
                 view.updateVal("deathTitle", "Map completed!");
             } else {
                 view.updateVal("deathTitle", "The clone has dispersed in embarrasment (no Aud)");
@@ -226,7 +237,7 @@ let view = {
             const retryTxt = (data.progress.autoRetryCountdownSec || 0) > 0
                 ? ` | Retry in ${Math.max(0, data.progress.autoRetryCountdownSec || 0)}s`
                 : "";
-            if (data.battle.state === "completed") {
+            if (battleState === "completed") {
                 view.updateVal("deathSummary", `Bonus coins: ${intToStringRound(data.battle.completionBonusCoins || 0)} | Time ${round1(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
             } else {
                 view.updateVal("deathSummary", `Time ${round1(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
@@ -251,13 +262,14 @@ let view = {
                 view.updateVal("tryAgainButton", false, "disabled");
             }
             view.updateVal("deathTalentDetails", view.buildDeathTalentSummaryHtml(), "innerHTML");
-        } else {
+            viewData.deathOverlayFilled = true;
+        } else if (viewData.deathOverlayFilled) {
             view.updateVal("deathSummary", "");
             view.updateVal("deathManaBonus", "");
             view.updateVal("deathTalentDetails", "", "innerHTML");
+            viewData.deathOverlayFilled = false;
         }
         view.updateDebugSpeedButtons();
-        createView.updateLayoutMeasurements();
     },
     updateDebugSpeedButtons: function() {
         const panel = viewData.cached.debugSpeedPanel;
@@ -300,9 +312,56 @@ let view = {
         return `<div class="death-talent-title">Talent this run</div>${rows.join("")}`;
     },
     updateMenuNumbers: function() {
+        if (!bonfire.isGrowthBlessingUnlocked() && data.battle.currentTab === "leveling") {
+            data.battle.currentTab = "base";
+            createView.showCurrentTab();
+        }
+        if (!events.skillsTabUnlocked() && data.battle.currentTab === "skills") {
+            data.battle.currentTab = "base";
+            createView.showCurrentTab();
+        }
         const activeTab = data.battle.currentTab || "base";
         view.updateTabButtons(activeTab);
+
+        // Battle HUD chrome (outside tab panes)
+        const isForaging = (data.battle.mode || "combat") === "foraging";
+        const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
+        const classSandalLocked = (data.progress.currentClassKey || "none") === "scold";
+        const sandalToggle = viewData.cached.sandalAttackToggle;
+        if (sandalToggle) {
+            const want = !!(data.progress.sandalAttackEnabled && hasSandal && !classSandalLocked);
+            if (sandalToggle.checked !== want) {
+                sandalToggle.checked = want;
+            }
+            sandalToggle.disabled = classSandalLocked;
+        }
+        view.updateVal("sandalAttackLockText", classSandalLocked ? "Scold cannot use sandal attacks." : "");
+        view.updateVal("sandalAttackWrap", (hasSandal && !isForaging) ? "" : "none", "style.display");
+
+        if (activeTab === "base") {
+            view.updateBaseTab();
+        } else if (activeTab === "skills") {
+            view.updateSkillsTab();
+        } else if (activeTab === "leveling") {
+            view.updateLevelingTab();
+        } else if (activeTab === "stats") {
+            view.updateStatsTab();
+        } else if (activeTab === "travel") {
+            view.updateTravelTab();
+        } else if (activeTab === "history") {
+            view.updateHistoryTab();
+        } else if (activeTab === "guests") {
+            view.updateGuestsTab();
+        } else if (activeTab === "cardBonuses") {
+            view.updateCardBonusesTab();
+        } else if (activeTab === "options") {
+            view.updateOptionsTab();
+        }
+    },
+    updateBaseTab: function() {
         view.updateBasePanel();
+    },
+    updateSkillsTab: function() {
         const currentClsMenu = data.progress.currentClassKey || "none";
         const hasActiveClassMenu = ["condescend", "scold", "mock"].indexOf(currentClsMenu) >= 0;
         let skillsTabNow = data.progress.selectedSkillsTab || "combat";
@@ -320,38 +379,31 @@ let view = {
             data.progress.selectedSkillDetailKey = "";
         }
         view.updateSkillSubTabs();
-        const disableCompactToggle = viewData.cached.disableCompactLayoutToggle;
-        if (disableCompactToggle) {
-            const wantOff = !!(data.progress.options && data.progress.options.disableCompactLayout);
-            if (disableCompactToggle.checked !== wantOff) {
-                disableCompactToggle.checked = wantOff;
-            }
+        view.updateSkillsListVisibility(skillsTabNow);
+        view.syncSelectedSkillDetailKey(skillsTabNow);
+        view.applySkillDetailSelectionHighlight();
+        const skillKeys = skills.getSkillKeysByCategory(data.progress.skills, skillsTabNow);
+        for (let i = 0; i < skillKeys.length; i++) {
+            view.updateSkillRowCompact(skillKeys[i]);
         }
-
-        view.updateVal("baseCoinsText", data.progress.coins, "textContent", 1);
-
+        view.updateSkillInfoPanel();
+        view.updateVal("skillSubTab_class", hasActiveClassMenu ? "" : "none", "style.display");
+        const showStarInventory = skillsTabNow === "combat" || skillsTabNow === "class";
+        const starPool = data.progress.stars;
+        const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
+        view.updateVal("combatStarsInventory", showStarInventory ? "" : "none", "style.display");
+        if (showStarInventory) {
+            view.updateVal("combatStarsCounts", starLine, "innerHTML");
+        }
+    },
+    updateLevelingTab: function() {
         const ls = data.battle.levelState;
-        const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
         const plannedGrowthUnlocked = bonfire.isPlannedGrowthUnlocked();
         const classDef = initialize.getCurrentClassDef();
         view.updateVal("currentClassText", classDef.name);
         view.updateVal("classPerLevelText", initialize.getClassPerLevelText(classDef.key));
-        if (!growthUnlocked && data.battle.currentTab === "leveling") {
-            data.battle.currentTab = "base";
-            createView.showCurrentTab();
-        }
-        const skillsUnlocked = events.skillsTabUnlocked();
-        if (!skillsUnlocked && data.battle.currentTab === "skills") {
-            data.battle.currentTab = "base";
-            createView.showCurrentTab();
-        }
         view.updateVal("levelText", ls.level, "textContent", 1);
         view.updateVal("levelExpText", `${intToString(ls.exp, 3)} / ${intToString(ls.expToLevel, 3)}`);
-        const playSec = (data.currentGameState && data.currentGameState.secondsPassed) || 0;
-        view.updateVal("playTimeClock", playSec, "textContent", "time");
-        if (activeTab === "cardBonuses") {
-            view.updateCardBonusesTab();
-        }
         const levelPct = ls.expToLevel > 0 ? Math.max(0, Math.min(100, (ls.exp / ls.expToLevel) * 100)) : 0;
         view.updateVal("levelTabExpFill", `${levelPct}%`, "style.width");
         view.updateVal("attributePointsText", ls.unassignedPoints, "textContent", 1);
@@ -396,36 +448,8 @@ let view = {
         const soulLv = engine.getCloneSoulLevel();
         view.updateVal("soulStatTip", `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`, "innerHTML");
         view.renderAttributePlanList();
-
-        view.updateSkillsListVisibility(skillsTabNow);
-        view.syncSelectedSkillDetailKey(skillsTabNow);
-        view.applySkillDetailSelectionHighlight();
-        const skillKeys = skills.getSkillKeysByCategory(data.progress.skills, skillsTabNow);
-        for (let i = 0; i < skillKeys.length; i++) {
-            view.updateSkillRowCompact(skillKeys[i]);
-        }
-        view.updateSkillInfoPanel();
-        view.updateVal("skillSubTab_class", hasActiveClassMenu ? "" : "none", "style.display");
-        const showStarInventory = skillsTabNow === "combat" || skillsTabNow === "class";
-        const starPool = data.progress.stars;
-        const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
-        view.updateVal("combatStarsInventory", showStarInventory ? "" : "none", "style.display");
-        if (showStarInventory) {
-            view.updateVal("combatStarsCounts", starLine, "innerHTML");
-        }
-
-        const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
-        const classSandalLocked = (data.progress.currentClassKey || "none") === "scold";
-        const sandalToggle = viewData.cached.sandalAttackToggle;
-        if (sandalToggle) {
-            const want = !!(data.progress.sandalAttackEnabled && hasSandal && !classSandalLocked);
-            if (sandalToggle.checked !== want) {
-                sandalToggle.checked = want;
-            }
-            sandalToggle.disabled = classSandalLocked;
-        }
-        view.updateVal("sandalAttackLockText", classSandalLocked ? "Scold cannot use sandal attacks." : "");
-        view.updateVal("sandalAttackWrap", (hasSandal && !isForaging) ? "" : "none", "style.display");
+    },
+    updateStatsTab: function() {
         const p = data.battle.player;
         const lsMult = data.battle.levelState || {};
         let conTotal = (lsMult.levelCon || 0) + (lsMult.skillConBonus || 0);
@@ -450,6 +474,8 @@ let view = {
         const corneredResearched = skills.isSkillResearchComplete("corneredEgo");
         const forceResearched = skills.isSkillResearchComplete("force");
         const alacrityResearched = skills.isSkillResearchComplete("alacrity");
+        const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
+        const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
         let audTip = `Base inner Aud: +${gc.baseAudInner}`;
         const runDensity = (data.battle && data.battle.cloneDensity) || 0;
         if (runDensity > 0) {
@@ -578,7 +604,8 @@ let view = {
         view.updateVal("statsSandalText", hasSandal ? `${round2((p.sandalAttackCooldownMs || 0) / 1000)}s` : "Locked");
         view.updateVal("statsSandalTip", hasSandal ? `Base: ${round2(cdCfg.sandalBaseMs / 1000)}s<br>Alacrity reduction: ${alaLv * cdCfg.alacritySandalReductionPerLevelMs} ms<br>Floor: ${round2(cdCfg.sandalFloorMs / 1000)}s` : "Requires Spare sandal upgrade", "innerHTML");
         view.updateVal("statsSandalCard", hasSandal ? "" : "none", "style.display");
-
+    },
+    updateTravelTab: function() {
         const harvestForageOn = events.harvestForageUnlocked();
         const smartHarvestOn = !!(data.progress.base && data.progress.base.garden && data.progress.base.garden.smartHarvestUnlocked);
         const clsMenu = data.progress.currentClassKey || "none";
@@ -670,9 +697,23 @@ let view = {
             view.updateVal(`mapStar_${map.key}_silver`, !!stars.silver, "classList.toggle", "skill-star-filled");
             view.updateVal(`mapStar_${map.key}_gold`, !!stars.gold, "classList.toggle", "skill-star-filled");
         }
-
+    },
+    updateHistoryTab: function() {
         view.updateHistoryList();
-        view.updateCompactLayout();
+    },
+    updateGuestsTab: function() {
+        view.updateGuestsList();
+    },
+    updateOptionsTab: function() {
+        const disableCompactToggle = viewData.cached.disableCompactLayoutToggle;
+        if (disableCompactToggle) {
+            const wantOff = !!(data.progress.options && data.progress.options.disableCompactLayout);
+            if (disableCompactToggle.checked !== wantOff) {
+                disableCompactToggle.checked = wantOff;
+            }
+        }
+        const playSec = (data.currentGameState && data.currentGameState.secondsPassed) || 0;
+        view.updateVal("playTimeClock", playSec, "textContent", "time");
     },
 
     /** Shared upgrade-row helpers for updateBasePanel. */
@@ -3527,13 +3568,6 @@ let view = {
         this.updateResortMapTokens();
         this.updatePathSegmentHighlight();
         this.updateFoxDenConstructionMap();
-        this.updateFoxDenCarriers();
-        this.updateCisternCarriers();
-        this.updateInnCarriers();
-        this.updateMarketCarriers();
-        this.updateGuestsList();
-        this.updateOkamiPanel();
-        this.updateActiveWeavingButtons();
     },
     updatePathSegmentHighlight: function(hoverIndex) {
         if (hoverIndex !== undefined) {
@@ -4472,6 +4506,28 @@ let view = {
             infoPanel.style.display = selected ? "flex" : "none";
         }
         view.updateWorkerDockVisibility();
+    },
+    /** True when baseResortMap (carriers/okami/weaving) is on-screen. Matches updateCompactLayout menuColumn rules. */
+    isResortMapVisible: function() {
+        if ((data.battle.currentTab || "base") !== "base") {
+            return false;
+        }
+        const compactBreakpointPx = 1420;
+        const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
+        const compactOn = !forceWide && window.innerWidth < compactBreakpointPx;
+        if (!compactOn) {
+            return true;
+        }
+        const selected = !!(data.progress && data.progress.selectedBaseBuilding);
+        if (selected) {
+            return true;
+        }
+        const showBattle = !!(data.progress && data.progress.showBattle);
+        if (!showBattle) {
+            return true;
+        }
+        const pane = data.progress.compactViewPane || "menus";
+        return pane === "menus";
     },
     updateCompactLayout: function() {
         view.updateBattleVisibility();

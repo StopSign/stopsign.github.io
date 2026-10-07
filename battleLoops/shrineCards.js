@@ -669,6 +669,13 @@ var SHRINE_CARD_DEFINITION_ROWS = [
     }
 ];
 
+(function initShrineCardRarityKeys() {
+    for (let i = 0; i < SHRINE_CARD_DEFINITION_ROWS.length; i++) {
+        const r = SHRINE_CARD_DEFINITION_ROWS[i];
+        r.rarityKeys = Object.keys(r.rarity || {});
+    }
+})();
+
 var shrineCards = {
     keysInOrder: SHRINE_CARD_DEFINITION_ROWS.map(function(r) {
         return r.key;
@@ -684,13 +691,19 @@ var shrineCards = {
 
     rarityOrder: SHRINE_CARD_RARITY_ORDER.slice(),
 
+    _aggregatedCache: null,
+
+    invalidateAggregatedEffects: function() {
+        shrineCards._aggregatedCache = null;
+    },
+
     createFreshCardOwned: function(key) {
         const d = shrineCards._byKey[key];
         const o = {};
-        if (!d || !d.rarity) {
+        if (!d) {
             return o;
         }
-        const rarities = Object.keys(d.rarity);
+        const rarities = d.rarityKeys || [];
         for (let i = 0; i < rarities.length; i++) {
             o[rarities[i]] = 0;
         }
@@ -711,19 +724,16 @@ var shrineCards = {
     },
 
     getOwned: function(key, rarity) {
-        const cards = shrineCards.getCardsState();
-        if (!cards || !cards[key]) {
-            return 0;
-        }
-        return cards[key][rarity] || 0;
+        const card = shrineCards.getCardsState()[key];
+        return (card && card[rarity]) || 0;
     },
 
     hasAnyOwnedForKey: function(key) {
         const def = shrineCards._byKey[key];
-        if (!def || !def.rarity) {
+        if (!def) {
             return false;
         }
-        const rarities = Object.keys(def.rarity);
+        const rarities = def.rarityKeys || [];
         for (let i = 0; i < rarities.length; i++) {
             if (shrineCards.getOwned(key, rarities[i]) > 0) {
                 return true;
@@ -762,10 +772,10 @@ var shrineCards = {
     getTotalEffect: function(key) {
         const def = shrineCards._byKey[key];
         const out = {};
-        if (!def || !def.rarity || !def.getEffect) {
+        if (!def || !def.getEffect) {
             return out;
         }
-        const rarities = Object.keys(def.rarity);
+        const rarities = def.rarityKeys || [];
         for (let i = 0; i < rarities.length; i++) {
             const r = rarities[i];
             const n = shrineCards.getOwned(key, r);
@@ -788,6 +798,9 @@ var shrineCards = {
     },
 
     getAggregatedEffects: function() {
+        if (shrineCards._aggregatedCache) {
+            return shrineCards._aggregatedCache;
+        }
         const out = {};
         for (let i = 0; i < shrineCards.keysInOrder.length; i++) {
             const e = shrineCards.getTotalEffect(shrineCards.keysInOrder[i]);
@@ -797,6 +810,7 @@ var shrineCards = {
                 out[f] = (out[f] || 0) + (e[f] || 0);
             }
         }
+        shrineCards._aggregatedCache = out;
         return out;
     },
 
@@ -830,6 +844,7 @@ var shrineCards = {
         }
         const cards = shrineCards.getCardsState();
         cards[key][rarity] = (cards[key][rarity] || 0) + amount;
+        shrineCards.invalidateAggregatedEffects();
         if (key === "bambooBaseChips" && typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
             engine.refreshBambooForestBaseChips();
         }

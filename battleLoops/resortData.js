@@ -4673,7 +4673,7 @@ var resortData = {
 
         shrine: {
             label: "Shrine",
-            description: "Gain Karma from talents, stars, and spirits. Each shrine level grants +0.1 divinity/s (stockpile). Select a class (cosmetic for now).",
+            description: "Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Each shrine level grants +0.1 divinity/s.",
             mapSlot: { left: 220, top: 662 },
             constructionCost: { wood: 1000, stone: 1000, bars: 2000, starBeads: 50000 },
             progressDefaults: {

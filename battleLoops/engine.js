@@ -11434,7 +11434,7 @@ let engine = {
         const okami = engine.getOkami();
         const okamiLevel = (okami && okami.level) || 0;
         const tails = engine.getOkamiTails(okamiLevel);
-        return (engine.getTotalTalentLevels() * engine.getShrineStarScore() * engine.getSpiritTotalLevels() * okamiLevel * tails) / 10000;
+        return (engine.getTotalTalentLevels() * engine.getShrineStarScore() * engine.getSpiritTotalLevels() * okamiLevel * tails) / 10000000;
     },
     updateShrineMilestones: function() {
         if (!engine.isShrineBuilt()) {

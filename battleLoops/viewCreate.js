@@ -256,6 +256,7 @@ let createView = {
             const shrineLevelPacks = [commonImg, commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             return `
+                <div class="base-row muted-text">Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Okami tails = 1 + floor(Okami level / 10). Each shrine level grants +0.1 divinity/s (stockpile). Select a class (cosmetic for now).</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
