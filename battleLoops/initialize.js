@@ -461,6 +461,7 @@ let initials = {
             selectedFireLauncherKey: null,
             battleUnlocked: false,
             showBattle: false,
+            hasMovedToNewMountain: false,
             kitsune: {
                 total: 2
             },
@@ -1184,6 +1185,14 @@ let initialize = {
                 shrine.packs[r] = 0;
             }
         });
+        if (typeof shrineCards !== "undefined" && shrineCards.ensureCardsState) {
+            shrineCards.ensureCardsState(shrine);
+        } else if (!shrine.cards) {
+            shrine.cards = {};
+        }
+        if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
+            data.progress.hasMovedToNewMountain = false;
+        }
         const msDef = (def && def.milestones) || {};
         if (!shrine.milestones) {
             shrine.milestones = JSON.parse(JSON.stringify(msDef));
@@ -1624,8 +1633,10 @@ let initialize = {
         const tenInner = tenEff.audInnerBonus || 0;
         const dens = data.battle.cloneDensity || 0;
         const densMult = bonfire.getCloneDensityStatMult(dens);
-        const denseAud = gc.baseAudInner * densMult;
-        const denseSlap = gc.baseSlapDamage * densMult;
+        const cardEff = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? shrineCards.getAggregatedEffects() : {};
+        const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0)) * densMult;
+        const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0)) * densMult;
         const baseInner = denseAud + fortLvl + tenInner;
         const conMult = 1 + totalCon / div;
         const tenacityAudExtra = Math.ceil((2 * tenInner) * conMult);

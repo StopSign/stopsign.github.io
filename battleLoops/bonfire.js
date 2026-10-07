@@ -79,7 +79,10 @@ var bonfire = {
 
     getCloneManaCostFromSnapshot: function(density) {
         const dens = Math.max(0, density || 0);
-        return Math.round(bonfireConfig.baseCloneManaCost + dens * (bonfireConfig.densityManaPerLevel || 500));
+        const reduction = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().cloneBaseCostReduction || 0) : 0;
+        const raw = (bonfireConfig.baseCloneManaCost - reduction) + dens * (bonfireConfig.densityManaPerLevel || 500);
+        return Math.max(0, Math.round(raw));
     },
 
     getCloneDensity: function() {

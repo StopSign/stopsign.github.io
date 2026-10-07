@@ -159,7 +159,7 @@ var resortData = {
             creditCost: 100,
             seconds: 30,
             yieldAmount: 10,
-            note: "A hot bath uses one soap to double its Star Bead bonus."
+            note: "A hot bath uses one soap to double its Star Bead bonus (30% becomes 60%)."
         },
         towels: {
             key: "towels",
@@ -4682,6 +4682,7 @@ var resortData = {
                 expToLevel: 10000,
                 selectedClassKey: "none",
                 packs: { common: 0, rare: 0, epic: 0 },
+                cards: {},
                 milestones: {
                     shrineLevelClaimed: {},
                     totalStarsClaimed: {},

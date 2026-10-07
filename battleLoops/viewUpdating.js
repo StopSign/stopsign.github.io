@@ -349,6 +349,9 @@ let view = {
         view.updateVal("levelExpText", `${intToString(ls.exp, 3)} / ${intToString(ls.expToLevel, 3)}`);
         const playSec = (data.currentGameState && data.currentGameState.secondsPassed) || 0;
         view.updateVal("playTimeClock", playSec, "textContent", "time");
+        if (activeTab === "cardBonuses") {
+            view.updateCardBonusesTab();
+        }
         const levelPct = ls.expToLevel > 0 ? Math.max(0, Math.min(100, (ls.exp / ls.expToLevel) * 100)) : 0;
         view.updateVal("levelTabExpFill", `${levelPct}%`, "style.width");
         view.updateVal("attributePointsText", ls.unassignedPoints, "textContent", 1);
@@ -980,10 +983,12 @@ let view = {
         }
         view.updateVal("bonfireHeatPerFuel_row", flameTended ? "" : "none", "style.display");
         if (flameTended) {
-            view.updateVal("bonfireHeatPerWood", bonfireConfig.heatPerWood);
+            const heatMult = engine.getBonfireHeatCardMultiplier ? engine.getBonfireHeatCardMultiplier() : 1;
+            const heatWood = bonfireConfig.heatPerWood * heatMult;
+            view.updateVal("bonfireHeatPerWood", roundNearestDecimals(heatWood, 2));
             view.updateVal("bonfireHeatPerCoalPart", marketBuilt ? "" : "none", "style.display");
             if (marketBuilt) {
-                view.updateVal("bonfireHeatPerCoal", bonfireConfig.heatPerWood * bonfireConfig.heatPerCoalMult);
+                view.updateVal("bonfireHeatPerCoal", roundNearestDecimals(heatWood * bonfireConfig.heatPerCoalMult, 2));
             }
         }
         view.updateVal("bonfireCoal_row", marketBuilt ? "" : "none", "style.display");
@@ -1340,9 +1345,11 @@ let view = {
         let prodText;
         if (siteKey === "torii") {
             const canReduce = workRate > 0;
-            const reducingPerSec = required > 0 && canReduce ? (5 * workRate) / required : 0;
+            const reduceSec = engine.getToriiWorkerTimerReduceSeconds();
+            const reducingPerSec = required > 0 && canReduce ? (reduceSec * workRate) / required : 0;
+            const reduceSecStr = (Math.abs(reduceSec - Math.round(reduceSec)) < 1e-9) ? String(Math.round(reduceSec)) : round1(reduceSec);
             prodText = required > 0
-                ? `Worker Power: ${rateStr} |  On complete, reduce next visitor by 5s<br>${power}/${required} to complete | Reducing ${round2(reducingPerSec)}/s`
+                ? `Worker Power: ${rateStr} |  On complete, reduce next visitor by ${reduceSecStr}s<br>${power}/${required} to complete | Reducing ${round2(reducingPerSec)}/s`
                 : `Worker Power: ${rateStr}`;
         } else if (siteKey === "bambooForest") {
             const bambooRate = engine.getBambooCutWorkerRate();
@@ -2755,7 +2762,9 @@ let view = {
                 rowRef.row.style.display = "";
             }
             const guestType = entry.type || "wanderer";
-            let nextSnap = `A ${guestType} stayed at Room ${entry.room} and left after ${entry.staySeconds} seconds, giving ${entry.starBeads} star beads for resting well.`;
+            let nextSnap = entry.isRepeat
+                ? `A ${guestType} at Room ${entry.room}`
+                : `A ${guestType} stayed at Room ${entry.room} and left after ${entry.staySeconds} seconds, giving ${entry.starBeads} star beads for resting well.`;
             if (entry.extraText) {
                 nextSnap += entry.extraText;
             }
@@ -2925,6 +2934,14 @@ let view = {
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1(spirit.training || 0));
         view.updateVal("spiritInfoTrainingNote", atTraining ? "" : "none", "style.display");
+        if (atTraining && engine.getSpiritTrainingCardEffects) {
+            const trainFx = engine.getSpiritTrainingCardEffects();
+            view.updateVal("spiritTrainingMinManaText", roundNearestDecimals(trainFx.cost, 2));
+            view.updateVal("spiritTrainingCostText", roundNearestDecimals(trainFx.cost, 2));
+            view.updateVal("spiritTrainingDurationText", roundNearestDecimals(trainFx.durationMs / 1000, 2));
+            view.updateVal("spiritTrainingExpText", roundNearestDecimals(trainFx.exp, 2));
+            view.updateVal("spiritTrainingGainText", roundNearestDecimals(trainFx.training, 2));
+        }
         view.updateVal("spiritInfoExp", round2(spirit.exp || 0));
         view.updateVal("spiritInfoExpReq", round2(spirit.expToLevel || 15));
         view.updateVal("spiritInfoExpNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? "(×1.8/lvl)" : "", "textContent");
@@ -4294,9 +4311,74 @@ let view = {
             }
         }
     },
+    updateCardBonusesTab: function() {
+        const list = viewData.cached.cardBonusesList || document.getElementById("cardBonusesList");
+        const emptyEl = viewData.cached.cardBonusesEmpty || document.getElementById("cardBonusesEmpty");
+        if (!list) {
+            return;
+        }
+        if (typeof shrineCards === "undefined") {
+            if (emptyEl) {
+                emptyEl.style.display = "";
+            }
+            list.innerHTML = "";
+            return;
+        }
+        const keys = shrineCards.getReceivedKeys();
+        if (!keys.length) {
+            if (emptyEl) {
+                emptyEl.style.display = "";
+            }
+            list.innerHTML = "";
+            return;
+        }
+        if (emptyEl) {
+            emptyEl.style.display = "none";
+        }
+        const rarityImgs = {
+            common: "img/common.svg",
+            rare: "img/rare.svg",
+            epic: "img/epic.svg"
+        };
+        const rarityLabels = {
+            common: "C",
+            rare: "R",
+            epic: "E"
+        };
+        let html = "";
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            const def = shrineCards._byKey[key];
+            if (!def) {
+                continue;
+            }
+            html += `<div class="card-bonuses-row" data-card-key="${key}">`;
+            html += `<div class="card-bonuses-rarities">`;
+            for (let ri = 0; ri < shrineCards.rarityOrder.length; ri++) {
+                const rarity = shrineCards.rarityOrder[ri];
+                if (def.rarity[rarity] === undefined) {
+                    html += `<span class="card-bonuses-rarity card-bonuses-rarity--empty"></span>`;
+                    continue;
+                }
+                const owned = shrineCards.getOwned(key, rarity);
+                const max = def.rarity[rarity];
+                const maxText = shrineCards.formatMax(max);
+                html += `<span class="card-bonuses-rarity card-bonuses-rarity--${rarity}">`;
+                html += `<img class="shrine-pack-icon" src="${rarityImgs[rarity]}" alt="${rarity}" draggable="false">`;
+                html += `<span class="card-bonuses-rarity-count">${rarityLabels[rarity]} ${owned}/${maxText}</span>`;
+                html += `</span>`;
+            }
+            html += `</div>`;
+            html += `<div class="card-bonuses-bonus-text">${shrineCards.getRowBonusText(key)}</div>`;
+            html += `</div>`;
+        }
+        if (list.innerHTML !== html) {
+            list.innerHTML = html;
+        }
+    },
     updateTabButtons: function(activeTab) {
         const tabs = events.mainMenuTabOrder();
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "options"];
         const notify = data.progress.baseContentNotify;
         for (let i = 0; i < allTabs.length; i++) {
             const tabKey = allTabs[i];

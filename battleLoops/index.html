@@ -58,6 +58,7 @@
             <button id="tabButton_skills" class="tab-button" onclick="events.switchTab('skills')">Skills</button>
             <button id="tabButton_travel" class="tab-button" onclick="events.switchTab('travel')">Travel</button>
             <button id="tabButton_history" class="tab-button" onclick="events.switchTab('history')">History</button>
+            <button id="tabButton_cardBonuses" class="tab-button" onclick="events.switchTab('cardBonuses')" style="display:none">Card Bonuses</button>
             <button id="tabButton_options" class="tab-button" onclick="events.switchTab('options')">Options</button>
         </div>
         <div id="menuContent">
@@ -314,6 +315,11 @@
                 <div class="pane-title">History</div>
                 <div id="historyList"></div>
             </div>
+            <div id="tabPane_cardBonuses" class="tab-pane" style="display:none">
+                <div class="pane-title">Card Bonuses</div>
+                <div id="cardBonusesEmpty" class="muted-text">No cards received yet.</div>
+                <div id="cardBonusesList" class="card-bonuses-list"></div>
+            </div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
                 <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
@@ -442,6 +448,7 @@
 <script src="maps.js"></script>
 <script src="mapData.js"></script>
 <script src="skills.js"></script>
+<script src="shrineCards.js"></script>
 <script src="helpers.js"></script>
 <script src="resortData.js"></script>
 <script src="bonfire.js"></script>

@@ -81,6 +81,12 @@ let events = {
             if (events.guestsTabUnlocked()) {
                 preTabs.splice(2, 0, "guests");
             }
+            if (data.progress.hasMovedToNewMountain) {
+                const optIx = preTabs.indexOf("options");
+                if (optIx >= 0) {
+                    preTabs.splice(optIx, 0, "cardBonuses");
+                }
+            }
             return preTabs;
         }
         const tabs = ["base", "stats", "skills", "travel", "history", "options"];
@@ -94,6 +100,12 @@ let events = {
         if (!events.skillsTabUnlocked()) {
             const ix = tabs.indexOf("skills");
             if (ix >= 0) tabs.splice(ix, 1);
+        }
+        if (data.progress.hasMovedToNewMountain) {
+            const optIx = tabs.indexOf("options");
+            if (optIx >= 0) {
+                tabs.splice(optIx, 0, "cardBonuses");
+            }
         }
         return tabs;
     },
@@ -1464,7 +1476,14 @@ let events = {
         }
         chk.checked = false;
         events.toggleShrineMoveConfirm(false);
-        // Placeholder: prestige does nothing for now.
+        data.progress.hasMovedToNewMountain = true;
+        // Placeholder: prestige reset/rewards come later; unlock Card Bonuses tab.
+        if (typeof createView !== "undefined" && createView.showCurrentTab) {
+            createView.showCurrentTab();
+        }
+        if (typeof view !== "undefined" && view.updateTabButtons) {
+            view.updateTabButtons(data.battle.currentTab || "base");
+        }
     },
     adjustWorkers: function(kind, mode) {
         if (!mode) return;

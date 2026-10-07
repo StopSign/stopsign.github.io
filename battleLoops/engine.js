@@ -1322,7 +1322,9 @@ let engine = {
         if (!expGain) {
             return;
         }
-        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().okamiExpAdd || 0) : 0;
+        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01 * (1 + cardAdd);
     },
     getCloneSoulLevel: function() {
         const assigned = (data.battle && data.battle.levelState && data.battle.levelState.levelSoul) || 0;
@@ -1474,7 +1476,9 @@ let engine = {
         const scavFlat = sEff.killCoinsFlat || 0;
         const baseCoinsPart = gain + scavFlat;
         const greedMult = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
-        return baseCoinsPart * greedMult;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
+        return baseCoinsPart * greedMult * (1 + cardAdd);
     },
     initZoneShardRunCounts: function() {
         const map = initialize.getCurrentMapDefinition();
@@ -3184,8 +3188,12 @@ let engine = {
         const intMult = skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1;
         const soulMult = engine.getSoulSkillExpMultiplier();
         const gain = gainBase * intMult * soulMult;
-        skill.exp += gain;
-        skill.talent += gain * 0.1;
+        const cardEff = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? shrineCards.getAggregatedEffects() : {};
+        const skillCardAdd = cardEff.skillExpAdd || 0;
+        const talentCardAdd = cardEff.talentExpAdd || 0;
+        skill.exp += gain * (1 + skillCardAdd);
+        skill.talent += gain * 0.1 * (1 + talentCardAdd);
         skill.triggerCount += amount;
         const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
         const initTal = d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10;
@@ -3371,7 +3379,9 @@ let engine = {
     getInnRestDurationSeconds: function() {
         const inn = data.progress.base && data.progress.base.inn;
         const furniture = inn && inn.furnitureBought ? inn.furnitureBought : 0;
-        return 5 + furniture * 3;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().innRestDurationFlat || 0) : 0;
+        return 5 + furniture * 3 + cardAdd;
     },
     getInnReinforceJointsMaxPurchases: function() {
         return 3;
@@ -3632,7 +3642,9 @@ let engine = {
         const inn = data.progress.base && data.progress.base.inn;
         const base = inn ? (inn.restfulnessPerSecond || 1) : 1;
         const decoration = inn && inn.decorationBought ? inn.decorationBought : 0;
-        return base + decoration * 0.5;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().innRestfulnessPerSecFlat || 0) : 0;
+        return base + decoration * 0.5 + cardAdd;
     },
     isInnGentleLightsUnlocked: function() {
         const inn = data.progress.base && data.progress.base.inn;
@@ -3965,15 +3977,30 @@ let engine = {
     getInnTowelRestfulnessBonus: function() {
         return 100;
     },
-    /** A soak pays +10%, doubled to +20% when a soap is used. */
+    /** Additive Star Bead bonus from one soak: +30%, or +60% with soap. */
+    getInnSoakBeadBonusAdd: function(usedSoap) {
+        return usedSoap ? 0.60 : 0.30;
+    },
+    /** Multiplier form of soak bonus (1.30 / 1.60). */
     getInnSoakBeadMultiplier: function(usedSoap) {
-        return usedSoap ? 1.20 : 1.10;
+        return 1 + engine.getInnSoakBeadBonusAdd(usedSoap);
+    },
+    getStarBeadCardMultiplier: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().starBeadAdd || 0) : 0;
+        return 1 + cardAdd;
+    },
+    getVisitorRepetitionChance: function() {
+        if (typeof shrineCards === "undefined" || !shrineCards.getAggregatedEffects) {
+            return 0;
+        }
+        return shrineCards.getAggregatedEffects().visitorRepetitionChance || 0;
     },
     getExpectedGuestStarBeadsRange: function() {
         const R = engine.getInnRestfulnessPerSecond();
         const settleSec = engine.getGuestItineraryStepDuration("settleIn");
         const restSec = engine.getGuestItineraryStepDuration("rest");
-        const minBeads = (settleSec + restSec) * R;
+        let minBeads = (settleSec + restSec) * R;
         let maxSec = settleSec + restSec;
         let maxBeads = minBeads;
         if (engine.isPondBuiltFromFoxDen() && engine.getPondAssignedWaterSpiritLevelSum() > 0) {
@@ -3994,12 +4021,35 @@ let engine = {
         if (engine.isInnGentleLightsUnlocked() && ((data.progress.base.inn && data.progress.base.inn.mana) || 0) >= 1) {
             maxBeads += engine.getInnGentleLightsRestfulnessBonus() * maxSec;
         }
+        let maxSoakBonusAdd = 0;
         if (canSoak) {
             if (engine.getMarketGoodAmount("towels") >= 1) {
                 maxBeads += engine.getInnTowelRestfulnessBonus();
             }
-            maxBeads *= engine.getInnSoakBeadMultiplier(engine.getMarketGoodAmount("soap") >= 1);
+            const hasSoap = engine.getMarketGoodAmount("soap") >= 1;
+            maxSoakBonusAdd = engine.getInnSoakBeadBonusAdd(hasSoap);
+            if (engine.getVisitorRepetitionChance() > 0) {
+                maxSec += settleSec + restSec;
+                maxBeads += (settleSec + restSec) * R;
+                if (engine.isPondBuiltFromFoxDen() && engine.getPondAssignedWaterSpiritLevelSum() > 0) {
+                    const pondSec2 = engine.getGuestItineraryStepDuration("watchWaterSpirits");
+                    maxBeads += pondSec2 * R;
+                }
+                maxBeads += 5 * (R + 0.5);
+                if (engine.getMarketGoodAmount("towels") >= 2) {
+                    maxBeads += engine.getInnTowelRestfulnessBonus();
+                }
+                if (engine.getMarketGoodAmount("soap") >= 2) {
+                    maxSoakBonusAdd += engine.getInnSoakBeadBonusAdd(true);
+                } else if (hasSoap) {
+                    maxSoakBonusAdd += engine.getInnSoakBeadBonusAdd(false);
+                }
+            }
+            maxBeads *= (1 + maxSoakBonusAdd);
         }
+        const starMult = engine.getStarBeadCardMultiplier();
+        minBeads *= starMult;
+        maxBeads *= starMult;
         return { min: minBeads, max: maxBeads };
     },
     getNextAvailableInnRoom: function() {
@@ -4151,13 +4201,18 @@ let engine = {
     getWishingWellWaterRate: function() {
         const pond = data.progress.base && data.progress.base.pond;
         const bought = pond && pond.wishingWellBought ? pond.wishingWellBought : 0;
+        let rate = 0;
         if (bought >= 2) {
-            return 10;
+            rate = 10;
+        } else if (bought >= 1) {
+            rate = 1;
         }
-        if (bought >= 1) {
-            return 1;
+        if (rate <= 0) {
+            return 0;
         }
-        return 0;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().waterPumpAdd || 0) : 0;
+        return rate * (1 + cardAdd);
     },
     updateWishingWellWater: function(tickMs) {
         if (!engine.isPondBuiltFromFoxDen()) {
@@ -4179,7 +4234,10 @@ let engine = {
         if (bought >= 2) {
             rate += 1;
         }
-        return Math.round(rate * 10) / 10;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().wishingWellCoinAdd || 0) : 0;
+        rate *= (1 + cardAdd);
+        return Math.round(rate * 100) / 100;
     },
     updateWishingWellCoins: function(tickMs) {
         if (!engine.isCisternBuiltFromFoxDen() || tickMs <= 0) {
@@ -4364,9 +4422,14 @@ let engine = {
                 guest.completedHotSoak = true;
                 guest.usedSoap = engine.tryConsumeMarketGood("soap", 1);
                 guest.usedTowel = engine.tryConsumeMarketGood("towels", 1);
+                if (guest.usedSoap) {
+                    guest.everUsedSoap = true;
+                }
                 if (guest.usedTowel) {
+                    guest.everUsedTowel = true;
                     guest.restfulness = (guest.restfulness || 0) + engine.getInnTowelRestfulnessBonus();
                 }
+                guest.soakBeadBonusAdd = (guest.soakBeadBonusAdd || 0) + engine.getInnSoakBeadBonusAdd(guest.usedSoap);
             }
         }
         if (nextStep === "eatNoodles") {
@@ -4374,6 +4437,7 @@ let engine = {
                 nextStep = "rest";
             } else {
                 guest.ateNoodles = true;
+                guest.everAteNoodles = true;
             }
         }
         guest.itineraryStep = nextStep;
@@ -4499,9 +4563,16 @@ let engine = {
         const required = torii.visitorDrawPowerRequired || 30;
         while (torii.workerPower >= required) {
             torii.workerPower -= required;
-            torii.nextVisitorTimerMs = (torii.nextVisitorTimerMs || 0) - 5000;
+            const reduceMs = 5000 + ((typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+                ? (shrineCards.getAggregatedEffects().toriiWorkerTimerReduceMs || 0) : 0);
+            torii.nextVisitorTimerMs = (torii.nextVisitorTimerMs || 0) - reduceMs;
             engine.processToriiVisitorTimerRollover();
         }
+    },
+    getToriiWorkerTimerReduceSeconds: function() {
+        const cardMs = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().toriiWorkerTimerReduceMs || 0) : 0;
+        return 5 + cardMs / 1000;
     },
     createZenkoGuest: function() {
         if (!engine.isInnBuiltFromFoxDen()) {
@@ -4531,7 +4602,7 @@ let engine = {
         engine.syncInnRoomCounts();
         return guest;
     },
-    pushInnGuestLogEntry: function(room, starBeads, staySeconds, guestType, usedSoap, usedTowel, ateNoodles) {
+    pushInnGuestLogEntry: function(room, starBeads, staySeconds, guestType, usedSoap, usedTowel, ateNoodles, extraPrefix) {
         const inn = data.progress.base && data.progress.base.inn;
         if (!inn) {
             return;
@@ -4543,7 +4614,7 @@ let engine = {
         if (usedTowel) {
             used.push("a towel");
         }
-        let extraText = "";
+        let extraText = extraPrefix || "";
         if (used.length) {
             extraText += ` They used ${used.join(" and ")}.`;
         }
@@ -4563,6 +4634,38 @@ let engine = {
         if (inn.guestLog.length > 5) {
             inn.guestLog.length = 5;
         }
+    },
+    pushInnGuestRepeatLogEntry: function(guest) {
+        const inn = data.progress.base && data.progress.base.inn;
+        if (!inn || !guest) {
+            return;
+        }
+        const guestType = guest.type || "wanderer";
+        const room = guest.room;
+        inn.guestLog.unshift({
+            room: room,
+            starBeads: 0,
+            staySeconds: Math.max(0, Math.round(guest.staySeconds || 0)),
+            type: guestType,
+            usedSoap: !!(guest.everUsedSoap || guest.usedSoap),
+            usedTowel: !!(guest.everUsedTowel || guest.usedTowel),
+            ateNoodles: !!(guest.everAteNoodles || guest.ateNoodles),
+            isRepeat: true,
+            extraText: " They decided they weren't ready to leave and started their visit over."
+        });
+        if (inn.guestLog.length > 5) {
+            inn.guestLog.length = 5;
+        }
+    },
+    restartGuestItineraryForRepetition: function(guest) {
+        guest.hasRepeatedStay = true;
+        guest.completedHotSoak = false;
+        guest.usedSoap = false;
+        guest.usedTowel = false;
+        guest.ateNoodles = false;
+        guest.itineraryStep = "settleIn";
+        guest.timeToNext = engine.getGuestItineraryStepDuration("settleIn");
+        engine.pushInnGuestRepeatLogEntry(guest);
     },
     updateZenkoGuests: function(tickMs) {
         if (!engine.isInnBuiltFromFoxDen()) {
@@ -4605,18 +4708,36 @@ let engine = {
                 engine.transitionGuestItineraryStep(guest, "eatNoodles");
                 nextGuests.push(guest);
             } else if (guest.timeToNext <= 0 && step === "rest") {
-                let restfulness = Math.max(0, guest.restfulness || 0);
-                if (guest.completedHotSoak) {
-                    restfulness *= engine.getInnSoakBeadMultiplier(guest.usedSoap);
-                }
-                const beads = round2(restfulness);
-                if (beads > 0) {
-                    data.progress.starBeads = round2((data.progress.starBeads || 0) + beads);
-                }
-                engine.pushInnGuestLogEntry(guest.room, beads, guest.staySeconds, guest.type, guest.usedSoap, guest.usedTowel, guest.ateNoodles);
-                const onResortTab = !data.battle || (data.battle.currentTab || "base") === "base";
-                if (onResortTab && typeof view !== "undefined" && view.spawnInnBeadFloat) {
-                    view.spawnInnBeadFloat(beads);
+                const canRepeat = !guest.hasRepeatedStay && Math.random() < engine.getVisitorRepetitionChance();
+                if (canRepeat) {
+                    engine.restartGuestItineraryForRepetition(guest);
+                    nextGuests.push(guest);
+                } else {
+                    let restfulness = Math.max(0, guest.restfulness || 0);
+                    const soakAdd = guest.soakBeadBonusAdd || 0;
+                    if (soakAdd > 0) {
+                        restfulness *= (1 + soakAdd);
+                    } else if (guest.completedHotSoak) {
+                        restfulness *= engine.getInnSoakBeadMultiplier(guest.usedSoap);
+                    }
+                    restfulness *= engine.getStarBeadCardMultiplier();
+                    const beads = round2(restfulness);
+                    if (beads > 0) {
+                        data.progress.starBeads = round2((data.progress.starBeads || 0) + beads);
+                    }
+                    engine.pushInnGuestLogEntry(
+                        guest.room,
+                        beads,
+                        guest.staySeconds,
+                        guest.type,
+                        !!(guest.everUsedSoap || guest.usedSoap),
+                        !!(guest.everUsedTowel || guest.usedTowel),
+                        !!(guest.everAteNoodles || guest.ateNoodles)
+                    );
+                    const onResortTab = !data.battle || (data.battle.currentTab || "base") === "base";
+                    if (onResortTab && typeof view !== "undefined" && view.spawnInnBeadFloat) {
+                        view.spawnInnBeadFloat(beads);
+                    }
                 }
             } else {
                 nextGuests.push(guest);
@@ -4791,7 +4912,10 @@ let engine = {
     },
     getBambooForestBaseChips: function() {
         const cfg = resortData.bambooForestConfig;
-        return cfg.defaultBaseWood || 10;
+        const base = cfg.defaultBaseWood || 10;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().bambooBaseChipsFlat || 0) : 0;
+        return base + cardAdd;
     },
     getBambooInfuseSoilMultiplier: function() {
         const bf = data.progress.base.bambooForest;
@@ -5648,12 +5772,38 @@ let engine = {
             spirit.trainingTimerMs = 0;
         }
     },
+    getSpiritTrainingCardEffects: function() {
+        if (typeof shrineCards === "undefined" || !shrineCards.getAggregatedEffects) {
+            return {
+                cost: 500,
+                durationMs: 60000,
+                exp: 60,
+                training: 0.1
+            };
+        }
+        const card = shrineCards.getAggregatedEffects();
+        const baseCost = 500 + (card.hiddenSpringPowerCostFlat || 0);
+        const reduction = card.hiddenSpringManaCostReductionAdd || 0;
+        return {
+            cost: baseCost * (1 - reduction),
+            durationMs: 60000 - (card.hiddenSpringDurationReduceMs || 0),
+            exp: 60 + (card.hiddenSpringPowerExpFlat || 0),
+            training: 0.1 + (card.hiddenSpringPowerTrainingFlat || 0)
+        };
+    },
+    getSpiritTrainingManaCost: function() {
+        return engine.getSpiritTrainingCardEffects().cost;
+    },
+    getSpiritTrainingDurationMs: function() {
+        return engine.getSpiritTrainingCardEffects().durationMs;
+    },
     canSpiritTrain: function(spirit) {
         if (!engine.isSpiritAtTrainingSpot(spirit) || !engine.isSpiritTrainingSpotBought()) {
             return false;
         }
         const hs = data.progress.base.hiddenSpring;
-        if (!hs || (hs.mana || 0) < 500) {
+        const need = engine.getSpiritTrainingManaCost();
+        if (!hs || (hs.mana || 0) < need) {
             return false;
         }
         return (spirit.training || 0) < (spirit.spiritPower || 0);
@@ -5669,16 +5819,17 @@ let engine = {
         if (!engine.canSpiritTrain(spirit)) {
             return;
         }
+        const trainFx = engine.getSpiritTrainingCardEffects();
         spirit.trainingTimerMs = (spirit.trainingTimerMs || 0) + tickMs;
-        const durationMs = 60000;
+        const durationMs = trainFx.durationMs;
         if (spirit.trainingTimerMs < durationMs) {
             return;
         }
         spirit.trainingTimerMs = 0;
         const hs = data.progress.base.hiddenSpring;
-        hs.mana = Math.max(0, (hs.mana || 0) - 500);
-        engine.grantSpiritExp(spirit, 60);
-        spirit.training = round1((spirit.training || 0) + 0.1);
+        hs.mana = Math.max(0, (hs.mana || 0) - trainFx.cost);
+        engine.grantSpiritExp(spirit, trainFx.exp);
+        spirit.training = round1((spirit.training || 0) + trainFx.training);
         const power = spirit.spiritPower || 0;
         if (spirit.training > power) {
             spirit.training = power;
@@ -6777,7 +6928,10 @@ let engine = {
     },
     getOkamiTravelSpeed: function() {
         const cfg = resortData.pathConfig || {};
-        return cfg.okamiTravelSpeed !== undefined ? cfg.okamiTravelSpeed : 35;
+        let speed = cfg.okamiTravelSpeed !== undefined ? cfg.okamiTravelSpeed : 35;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().okamiPathSpeedAdd || 0) : 0;
+        return speed * (1 + cardAdd);
     },
     getOkamiPathJob: function() {
         const okami = engine.getOkami();
@@ -6945,7 +7099,9 @@ let engine = {
         if (hs && hs.learnTheBestStonesUnlocked) {
             amt += engine.getTotalEarthSpiritLevel();
         }
-        return amt;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().okamiStoneFlat || 0) : 0;
+        return amt + cardAdd;
     },
     getTotalEarthSpiritLevel: function() {
         const spirits = (data.progress.base && data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.spirits) || [];
@@ -7450,7 +7606,10 @@ let engine = {
         if (seg) {
             seg.state = "Clear";
         }
-        const storeAmt = (resortData.pathConfig && resortData.pathConfig.storeRockAmount) || 5;
+        let storeAmt = (resortData.pathConfig && resortData.pathConfig.storeRockAmount) || 5;
+        const stoneCardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().okamiStoneFlat || 0) : 0;
+        storeAmt += stoneCardAdd;
         if (base && base.stonePile) {
             base.stonePile.stone = (base.stonePile.stone || 0) + storeAmt;
         }
@@ -7535,7 +7694,9 @@ let engine = {
     getFoxDenQueueMax: function() {
         const w = data.progress.base && data.progress.base.atelier;
         const level = w.organizeOrdersBought || 0;
-        return 2 + level;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().foxDenQueueFlat || 0) : 0;
+        return 2 + level + cardAdd;
     },
     getFoxDenQueuedJobCount: function() {
         const rh = data.progress.base.foxDen;
@@ -8710,6 +8871,16 @@ let engine = {
         }
         return engine.getMapBuildingPosition("foxDen");
     },
+    getCarrierSpeedCardMultiplier: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().carrierSpeedAdd || 0) : 0;
+        return 1 + cardAdd;
+    },
+    getBonfireHeatCardMultiplier: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().bonfireHeatAdd || 0) : 0;
+        return 1 + cardAdd;
+    },
     getFoxDenCarrierSpeed: function(carrier) {
         const okami = engine.getOkami();
         const okamiHere = okami.assignedBuildingKey === "foxDen";
@@ -8719,13 +8890,13 @@ let engine = {
             if (okamiHere) {
                 speed *= engine.getOkamiInspirationBonus();
             }
-            return speed * engine.getCarrierRoadSpeedMult(carrier);
+            return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
         }
         let speed = workerSpeed;
         if (okamiHere) {
             speed *= engine.getOkamiInspirationBonus();
         }
-        return speed * engine.getCarrierRoadSpeedMult(carrier);
+        return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
     },
     cancelFoxDenCarriers: function() {
         const rh = data.progress.base.foxDen;
@@ -8884,13 +9055,13 @@ let engine = {
             if (okamiHere) {
                 speed *= engine.getOkamiInspirationBonus();
             }
-            return speed * engine.getCarrierRoadSpeedMult(carrier);
+            return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
         }
         let speed = workerSpeed;
         if (okamiHere) {
             speed *= engine.getOkamiInspirationBonus();
         }
-        return speed * engine.getCarrierRoadSpeedMult(carrier);
+        return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
     },
     getInnCarrierSpeed: function(carrier) {
         const okami = engine.getOkami();
@@ -9112,7 +9283,7 @@ let engine = {
             c.progress = (c.progress || 0) + (speed * (tickMs / 1000)) / (c.totalDist || 1);
             if (c.progress >= 1) {
                 engine.addDirtRoadProgress(c.fromKey, c.toKey);
-                const heatPer = bonfireConfig.heatPerWood * (c.resourceType === "coal" ? bonfireConfig.heatPerCoalMult : 1);
+                const heatPer = bonfireConfig.heatPerWood * (c.resourceType === "coal" ? bonfireConfig.heatPerCoalMult : 1) * engine.getBonfireHeatCardMultiplier();
                 bf.heat = (bf.heat || 0) + (c.amount || 0) * heatPer;
             } else {
                 next.push(c);
@@ -9135,7 +9306,7 @@ let engine = {
         if (okamiHere) {
             speed *= engine.getOkamiInspirationBonus();
         }
-        return speed * engine.getCarrierRoadSpeedMult(carrier);
+        return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
     },
     getFreeMarketCarrierDisplaySlot: function(market) {
         const used = {};
@@ -9770,13 +9941,13 @@ let engine = {
             if (okamiHere) {
                 speed *= engine.getOkamiInspirationBonus();
             }
-            return speed * engine.getCarrierRoadSpeedMult(carrier);
+            return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
         }
         let speed = workerSpeed;
         if (okamiHere) {
             speed *= engine.getOkamiInspirationBonus();
         }
-        return speed * engine.getCarrierRoadSpeedMult(carrier);
+        return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
     },
     cancelCisternCarriers: function() {
         const cistern = data.progress.base.cistern;
@@ -10037,7 +10208,9 @@ let engine = {
         const okami = engine.getOkami();
         const okamiHere = okami.assignedBuildingKey === "bambooForest";
         const cutters = kitsune + (okamiHere ? 1 : 0);
-        return cutters * (1 + axeBonus) * (1 + 0.5 * sharperBonus);
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().chopPowerAdd || 0) : 0;
+        return cutters * (1 + axeBonus) * (1 + 0.5 * sharperBonus) * (1 + cardAdd);
     },
     getBambooCutWorkerRate: function() {
         const bf = data.progress.base.bambooForest;
@@ -10698,7 +10871,22 @@ let engine = {
     },
     getBuildingManaCapacity: function(buildingKey) {
         const b = data.progress.base && data.progress.base[buildingKey];
-        return (b && b.manaCapacity) || engine.getBuildingManaCapacityFallback(buildingKey);
+        let cap = (b && b.manaCapacity) || engine.getBuildingManaCapacityFallback(buildingKey);
+        if (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects) {
+            const card = shrineCards.getAggregatedEffects();
+            let add = 0;
+            if (buildingKey === "torii") {
+                add = card.toriiManaCapacityAdd || 0;
+            } else if (buildingKey === "stonePile") {
+                add = card.stonePileManaCapacityAdd || 0;
+            } else if (buildingKey === "inn") {
+                add = card.innManaCapacityAdd || 0;
+            } else if (buildingKey === "hiddenSpring") {
+                add = card.hiddenSpringManaCapacityAdd || 0;
+            }
+            cap *= (1 + add);
+        }
+        return cap;
     },
     hasManaCapacityForCost: function(cost) {
         const need = (cost && cost.mana) || 0;
@@ -10735,18 +10923,21 @@ let engine = {
         const base = (resortData.manaCapacityBonusPerCloneDispersal !== undefined)
             ? resortData.manaCapacityBonusPerCloneDispersal : 10;
         const bf = data.progress.base && data.progress.base.bonfire;
-        if (!bf || !bf.lingeringDensityUnlocked) {
-            return base;
+        let amount = base;
+        if (bf && bf.lingeringDensityUnlocked) {
+            let dens = 0;
+            if (data.battle && (data.battle.state === "running" || data.battle.state === "dead" || data.battle.state === "completed")) {
+                dens = data.battle.cloneDensity || 0;
+            } else if (typeof bonfire !== "undefined" && bonfire.getCloneDensity) {
+                dens = bonfire.getCloneDensity();
+            } else {
+                dens = bf.cloneDensity || 0;
+            }
+            amount = base + dens;
         }
-        let dens = 0;
-        if (data.battle && (data.battle.state === "running" || data.battle.state === "dead" || data.battle.state === "completed")) {
-            dens = data.battle.cloneDensity || 0;
-        } else if (typeof bonfire !== "undefined" && bonfire.getCloneDensity) {
-            dens = bonfire.getCloneDensity();
-        } else {
-            dens = bf.cloneDensity || 0;
-        }
-        return base + dens;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().manaPerDeadCloneAdd || 0) : 0;
+        return amount * (1 + cardAdd);
     },
     getManaBaseCapacity: function() {
         const mana = data.progress.mana;
@@ -10756,7 +10947,9 @@ let engine = {
     getManaCapacity: function() {
         const orb = data.progress.base && data.progress.base.mage_tower;
         const expandBought = (orb && orb.expandOrbBought) || 0;
-        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * engine.getOrbFloorBonusMultiplier();
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().manaCapacityAdd || 0) : 0;
+        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * engine.getOrbFloorBonusMultiplier() * (1 + cardAdd);
     },
     isManaUnlocked: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -11408,7 +11601,9 @@ let engine = {
         const units = engine.getOrbWorkerUnits();
         const walls = engine.getOrbBuildWallsBought();
         const stairs = engine.getOrbBuildStairsBought();
-        return base * (1 + 0.2 * units) * (1 + 0.1 * walls) * (1 + 0.2 * stairs);
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().orbExpAdd || 0) : 0;
+        return base * (1 + 0.2 * units) * (1 + 0.1 * walls) * (1 + 0.2 * stairs) * (1 + cardAdd);
     },
     getOrbSpinCurrentsMultiplier: function() {
         const orb = data.progress.base && data.progress.base.mage_tower;
@@ -11431,6 +11626,9 @@ let engine = {
             rate *= engine.getOkamiInspirationBonus();
         }
         rate *= engine.getOrbFloorBonusMultiplier();
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().manaRegenAdd || 0) : 0;
+        rate *= (1 + cardAdd);
         return rate;
     },
     updateOrbExpPerSecond: function() {
@@ -11504,7 +11702,9 @@ let engine = {
         const tailMult = (tails * (tails + 1)) / 2;
         const lvl = level !== undefined && level !== null ? level : engine.getOkami().level;
         const levelMult = 1 + 0.2 * (lvl || 0);
-        return tailMult * levelMult * engine.getMagicLoomSpiritStrandMultiplier();
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().spiritStrandsAdd || 0) : 0;
+        return tailMult * levelMult * engine.getMagicLoomSpiritStrandMultiplier() * (1 + cardAdd);
     },
     getOkamiExpToLevel: function(level) {
         const cfg = resortData.okamiConfig;
@@ -11911,7 +12111,9 @@ let engine = {
         if (okamiHere) {
             rate *= engine.getOkamiInspirationBonus();
         }
-        return rate;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().researchSpeedAdd || 0) : 0;
+        return rate * (1 + cardAdd);
     },
     getNextSkillResearchTargetKey: function() {
         return "";

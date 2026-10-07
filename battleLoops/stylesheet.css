@@ -1944,6 +1944,43 @@ button {
     cursor: pointer;
 }
 
+.card-bonuses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.card-bonuses-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-bonuses-rarities {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(88px, 1fr));
+    gap: 8px;
+    align-items: center;
+    min-width: 280px;
+}
+
+.card-bonuses-rarity {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.card-bonuses-bonus-text {
+    flex: 1 1 180px;
+    min-width: 160px;
+}
+
 .shrine-packs-section {
     margin: 12px 0 16px;
 }

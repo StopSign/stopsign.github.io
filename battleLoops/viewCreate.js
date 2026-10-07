@@ -433,7 +433,7 @@ let createView = {
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
                     <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span></div>
-                    <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least 500 mana and Spirit Training is below Spirit Power, trains for 60s, then spends 500 Hidden Spring mana to gain 60 exp and +0.1 training. Training cannot exceed Spirit Power. Training adds to Spirit Power for all effects.</div>
+                    <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least <span id="spiritTrainingMinManaText">500</span> mana and Spirit Training is below Spirit Power, trains for <span id="spiritTrainingDurationText">60</span>s, then spends <span id="spiritTrainingCostText">500</span> Hidden Spring mana to gain <span id="spiritTrainingExpText">60</span> exp and +<span id="spiritTrainingGainText">0.1</span> training. Training cannot exceed Spirit Power. Training adds to Spirit Power for all effects.</div>
                     <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(×1.8/lvl)</span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
@@ -498,7 +498,7 @@ let createView = {
                         </div>
                     </div>
                     <div id="innAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="innAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('inn', this.checked)"> Allow carriers to bring water</label></div>
-                    <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span> <span class="muted-text">A hot bath uses one soap and doubles the Star Bead bonus from that soak (10% becomes 20%).</span></div>
+                    <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span> <span class="muted-text">A hot bath uses one soap and doubles the Star Bead bonus from that soak (30% becomes 60%).</span></div>
                     <div id="innTowels_row" class="base-row" style="display:none">Towels: <span id="innTowelsText">0</span> <span class="muted-text">A hot bath uses one towel and grants +100 restfulness.</span></div>
                     <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires 50L of water of at least 40C</div>
                     <div id="innOnsenSoak_row" class="base-row muted-text" style="display:none">Soaking lasts 5s and adds +0.5 restfulness/s, and spends 50L.</div>
@@ -1048,7 +1048,7 @@ let createView = {
         battlefield.style.height = `${innerH + 2}px`;
     },
     showCurrentTab: function() {
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "options"];
         const tabs = events.mainMenuTabOrder();
         const requestedTab = data.battle.currentTab || "base";
         const tab = tabs.indexOf(requestedTab) >= 0 ? requestedTab : "base";
@@ -1076,7 +1076,7 @@ let createView = {
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
-            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_options",
+            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
@@ -1091,7 +1091,7 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingNote", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
+            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingNote", "spiritTrainingMinManaText", "spiritTrainingDurationText", "spiritTrainingCostText", "spiritTrainingExpText", "spiritTrainingGainText", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
@@ -1505,7 +1505,7 @@ let createView = {
     ensureTabNotifyBadges: function() {
         const tabLabels = {
             base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
-            skills: "Skills", travel: "Travel", history: "History", options: "Options"
+            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Card Bonuses", options: "Options"
         };
         for (const tabKey in tabLabels) {
             const btnId = "tabButton_" + tabKey;
