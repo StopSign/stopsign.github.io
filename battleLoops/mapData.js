@@ -33,10 +33,10 @@ mapData.getDefaultMaps = function() {
             unlocksAfterMapKey: "map_1",
             zones: [
                 mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1, 8),
-                mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25, 10),
-                mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1, 12),
-                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 14),
-                mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 16),
+                mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25, 9),
+                mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1, 10),
+                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 13),
+                mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 15),
             ],
             zoneShards: [
                 { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 },
@@ -127,11 +127,11 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 3,
             unlocksAfterMapKey: "map_5",
             zones: [
-                mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 20),
-                mapData.createZone(6, "scoundrel", 12000, 100, 1.3, 1, 24),
-                mapData.createZone(7, "scoundrel", 24000, 100, 1.6, 0.75, 28),
-                mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 32),
-                mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 36),
+                mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 30),
+                mapData.createZone(6, "scoundrel", 12000, 100, 1.3, 1, 36),
+                mapData.createZone(7, "scoundrel", 24000, 100, 1.6, 0.75, 42),
+                mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 46),
+                mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 54),
             ],
             zoneShards: [
                 { key: "adaptation", gain: 1, chance: 0.00125, cap: 10 },
@@ -143,16 +143,19 @@ mapData.getDefaultMaps = function() {
             version: 0,
             key: "map_7",
             name: "The Gawk Squad",
-            description: "A gang known for how they catcall everyone walking by has found a new target. The Okami will stand in their way.",
+            description: "A gang known for forming small groups and catcalling everyone walking by has found a new target. The Okami will stand in their way.",
             seed: 15003,
-            baseDifficulty: 3,
+            baseDifficulty: 3.5,
             unlocksAfterMapKey: "map_6",
             zones: [
-                mapData.createZone(4, "lecher", 0, 300, 1, 1, 45),
-                mapData.createZone(3, "scoundrel", 500, 780, 1.2, 1.25, 40),
-                mapData.createZone(4, "lecher", 22000, 250, 1.5, 1, 55),
-                mapData.createZone(3, "scoundrel", 38000, 500, 1.8, 1.25, 50),
-                mapData.createZone(5, "lecher", 41000, 300, 2, 1, 65),
+                mapData.createZone(4, "scoundrel", 0, 150, 1, 1, 40),
+                mapData.createZone(2, "lecher", 2000, 300, 1, 1, 40),
+                mapData.createZone(5, "scoundrel", 22000, 125, 1.3, 1, 55),
+                mapData.createZone(1, "lecher", 23000, 50, 1.3, 1, 55),
+                mapData.createZone(4, "scoundrel", 42000, 150, 1.6, 1, 70),
+                mapData.createZone(3, "lecher", 44000, 150, 1.6, 1, 70),
+                mapData.createZone(4, "scoundrel", 60000, 150, 2, 1, 85),
+                mapData.createZone(2, "lecher", 62000, 300, 2, 1, 85),
             ],
             zoneShards: [
                 { key: "echoChamber", gain: 1, chance: 0.000625, cap: 10 },
@@ -166,19 +169,19 @@ mapData.getDefaultMaps = function() {
             name: "Sketch Artists",
             description: "They don't want to touch, only look; their gazes still make the guests uncomfortable. The Okami will show them the error of their ways.",
             seed: 21888,
-            baseDifficulty: 3.2,
+            baseDifficulty: 4,
             unlocksAfterMapKey: "map_7",
             zones: [
-                mapData.createZone(4, "lecher", 0, 100, 1, 1, 40),
-                mapData.createZone(5, "lecher", 12000, 100, 1.3, 1, 45),
-                mapData.createZone(6, "lecher", 24000, 100, 1.6, 0.75, 50),
-                mapData.createZone(3, "lecher", 40000, 75, 1.9, 1.25, 55),
-                mapData.createZone(6, "lecher", 50000, 100, 2.2, 1, 60),
+                mapData.createZone(4, "lecher", 0, 200, 1, 1, 45),
+                mapData.createZone(5, "lecher", 10000, 200, 1.3, 1, 60),
+                mapData.createZone(6, "lecher", 20000, 200, 1.6, 1, 75),
+                mapData.createZone(5, "lecher", 34000, 200, 1.9, 1, 90),
+                mapData.createZone(6, "lecher", 48000, 200, 2.2, 1, 105),
             ],
             zoneShards: [
-                { key: "applyTearDrops", gain: 1, chance: 0.02, cap: 10 },
-                { key: "crowdWork", gain: 1, chance: 0.02, cap: 10 },
-                { key: "walkingItOff", gain: 1, chance: 0.02, cap: 10 }
+                { key: "applyTearDrops", gain: 1, chance: 0.0005, cap: 10 },
+                { key: "crowdWork", gain: 1, chance: 0.0005, cap: 10 },
+                { key: "walkingItOff", gain: 1, chance: 0.0005, cap: 10 }
             ]
         })
         // mapData.createMap({

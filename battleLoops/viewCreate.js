@@ -256,7 +256,7 @@ let createView = {
             const shrineLevelPacks = [commonImg, commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             return `
-                <div class="base-row muted-text">Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Okami tails = 1 + floor(Okami level / 10). Each shrine level grants +0.1 divinity/s (stockpile). Select a class (cosmetic for now).</div>
+                <div class="base-row muted-text">Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
@@ -299,6 +299,8 @@ let createView = {
         };
         const htmlScrollArchivesPanel = function() {
             return `
+                <div class="base-row">Research: <span id="scrollArchivesResearchProgressText">0</span> / <span id="scrollArchivesResearchRequiredText">10</span><span class="game-progress-sep">|</span>ETA: <span id="scrollArchivesResearchEtaText">—</span></div>
+                <div id="scrollArchivesResearchPaused_row" class="base-row muted-text" style="display:none">Paused - need more coins, star beads, or mana</div>
                 <div class="base-row">Choose Research: <span id="scrollArchivesResearchesToChoose">0</span></div>
                 <div id="scrollArchivesChoicesWrap" style="display:none">
                     <div class="scroll-archives-choices-grid">${scrollArchivesChoicesHtml()}</div>
@@ -372,7 +374,7 @@ let createView = {
                 ${resortUpgradeRowsHtml("market")}
                 <div class="base-upgrade-divider"></div>
                 <div class="base-info-title">Market Resources</div>
-                <div class="base-row muted-text">Traders buy these on their own; the Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time. Traders rotate between selected trades.</div>
+                <div class="base-row muted-text">Traders buy these on their own; the Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time. Traders rotate between selected trades. Unchecking a trade in progress pauses it (credit stays spent) and the trader moves to the next checked trade.</div>
                 <div class="base-worker-assign-row">
                     <button id="base_market_traders_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'all_dec')"><<</button>
                     <button id="base_market_traders_unassign_ten_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'ten_dec')">--</button>
@@ -523,6 +525,7 @@ let createView = {
                     <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="noodleBarWaterReq_row" class="base-row muted-text">Requires 100L of 65C</div>
                     <div id="noodleBarEatExplain_row" class="base-row muted-text">If water is there, a guest will eat noodles for 10s, gaining +<span id="noodleBarEatRestBonusText">10</span>/s restfulness.</div>
+                    <div id="noodleBarGuestsEating_row" class="base-row">Guests Eating: <span id="noodleBarGuestsEatingText">0</span></div>
                     <div id="noodleTipProgressWrap" class="prog-track orb-exp-prog-track">
                         <div id="noodleTipProgressFill" class="prog-fill prog-fill-noodle-tip"></div>
                         <div class="game-progress-bar-label">Tip Progress: <span id="noodleTipProgressText">0</span>/100%</div>
@@ -901,8 +904,8 @@ let createView = {
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="skillInfo_talent_fill" class="prog-fill prog-fill-talent"></div></div>
                 <div id="skillInfo_star_effect_row" class="prog-label-row">Star effect: <span id="skillInfo_star_effect"></span></div>
                 <div id="skillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsHiddenStyle}>Tips: <span id="skillInfo_tips_text"></span> <span class="skill-exp-mults" id="skillInfo_tips_mults"></span></div>
-                <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
                 <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Echo Chamber mult: <span id="skillInfo_integration_mult"></span></div>
+                <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
                 <div id="skillInfo_flavor" class="skill-info-flavor"></div>
             </aside>
         `;
@@ -1119,6 +1122,7 @@ let createView = {
             "mapInnManaProgressWrap", "mapInnManaProgressFill",
             "mapInnWaterProgressWrap", "mapInnWaterProgressFill",
             "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill",
+            "mapNoodleWaterProgressWrap", "mapNoodleWaterProgressFill",
             "mapToriiManaProgressWrap", "mapToriiManaProgressFill",
             "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill",
             "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill",
@@ -1173,6 +1177,7 @@ let createView = {
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
             "base_bonfire_planned_row", "base_bonfire_planned_btn", "base_bonfire_planned_extra",
             "base_bonfire_assign_one_btn", "base_bonfire_assign_ten_btn", "base_bonfire_assign_all_btn", "base_bonfire_unassign_one_btn", "base_bonfire_unassign_ten_btn", "base_bonfire_unassign_all_btn", "base_bonfire_workers_label", "base_bonfire_worker_prod_text", "base_bonfire_worker_prod_wrap", "base_bonfire_worker_prog_fill", "base_bonfire_assign_okami_btn",
+            "scrollArchivesResearchProgressText", "scrollArchivesResearchRequiredText", "scrollArchivesResearchEtaText", "scrollArchivesResearchPaused_row",
             "scrollArchivesResearchesToChoose", "scrollArchivesChoicesWrap",
             "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
             "base_garden_smartHarvest_row", "base_garden_smartHarvest_btn", "base_garden_smartHarvest_extra", "base_garden_empty",
@@ -1211,6 +1216,7 @@ let createView = {
         }
         createView.queueCache(
             "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk", "noodleBarWaterReq_row", "noodleBarEatExplain_row", "noodleBarEatRestBonusText",
+            "noodleBarGuestsEating_row", "noodleBarGuestsEatingText",
             "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipRateExplain_row", "noodleTipLast_row",
             "noodleTipLocked_row", "noodleTipControls", "noodleTipSystemExplain_row", "noodleTopicBtn", "noodleTipSelectHint"
         );

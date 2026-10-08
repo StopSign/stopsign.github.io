@@ -1594,7 +1594,7 @@ let initialize = {
         }
         data.battle.levelState.unassignedPoints = Math.max(0, maxLevelAssignable - assignedCount);
     },
-    calcPlayerStats: function(fullHeal) {
+    calcPlayerStats: function(fullHeal, opts) {
         if (data.battle && data.battle.mode === "foraging") {
             const gc = gameData.battle.combat;
             const div = gc.conStrStatDivisor;
@@ -1653,12 +1653,18 @@ let initialize = {
         } else {
             let newAud = Math.max(1, maxAud - missingAud);
             const maxRise = maxAud - oldMax;
+            // Extra current Aud tied to this max increase (e.g. Validation beyond the +1 from preserving missing).
+            const extraOnMaxRise = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
+                ? opts.extraCurrentOnMaxRise : 0;
+            if (extraOnMaxRise > 0) {
+                newAud = Math.min(maxAud, newAud + extraOnMaxRise);
+            }
             const currentRise = newAud - oldAud;
             if (maxRise > 0 && currentRise > 0) {
                 newAud = engine.applyNarcissismToMaxAudCurrentIncrease(newAud, currentRise, maxAud);
             }
             if (maxRise > 0) {
-                engine.addSkillExp("narcissism", engine.positiveLog(maxRise, 2));
+                engine.addSkillExp("narcissism", 1);
             }
             if (maxRise > 0 && skills.isSkillUnlocked("borrowedGlory")) {
                 const bgEff = skills.getSkillEffect("borrowedGlory");
@@ -1669,8 +1675,10 @@ let initialize = {
                 engine.addSkillExp("borrowedGlory", 1);
             }
             data.battle.player.aud = newAud;
-            if (maxRise > 0) {
-                engine.spawnAudGainFloat(newAud - oldAud, "left");
+            const healed = newAud - oldAud;
+            // Left float = current Aud healed from a max increase (incl. Narcissism); none if no heal.
+            if (maxRise > 0 && healed > 0) {
+                engine.spawnAudGainFloat(healed, "left");
             }
         }
         let atk = (denseSlap + forceFlat) * (1 + (totalStr / div));

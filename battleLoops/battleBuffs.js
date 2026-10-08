@@ -268,7 +268,10 @@ var battleBuffs = {
         if (!state.byKey.clout) {
             state.byKey.clout = { stacks: 0, lastNegation: 0 };
         }
-        state.byKey.clout.stacks = (state.byKey.clout.stacks || 0) + amount;
+        const maxAud = (data.battle && data.battle.player && data.battle.player.maxAud) || 0;
+        const cap = Math.max(0, maxAud);
+        const next = (state.byKey.clout.stacks || 0) + amount;
+        state.byKey.clout.stacks = cap > 0 ? Math.min(next, cap) : next;
         battleBuffs.ensureInQueue(state, "clout");
     },
     consumeFuryOnAttack: function() {

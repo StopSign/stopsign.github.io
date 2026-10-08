@@ -1350,6 +1350,24 @@ let engine = {
         const cap = (skills.getSkillEffect("validation").audCap || 0);
         return Math.min(data.battle.enemiesKilled || 0, cap);
     },
+    /** True when the latest kill raised Validation's max-Aud contribution (still under the per-level cap). */
+    didValidationMaxAudIncreaseOnLastKill: function() {
+        if (!skills.isSkillUnlocked("validation")) {
+            return false;
+        }
+        const cap = (skills.getSkillEffect("validation").audCap || 0);
+        const kills = data.battle.enemiesKilled || 0;
+        if (kills <= 0 || cap <= 0) {
+            return false;
+        }
+        return Math.min(kills, cap) > Math.min(kills - 1, cap);
+    },
+    getValidationCurrentAudOnMaxIncrease: function() {
+        if (!skills.isSkillUnlocked("validation")) {
+            return 0;
+        }
+        return skills.getSkillEffect("validation").currentAudOnMaxIncrease || 0;
+    },
     onIntruderKilled: function(intruder, opts) {
         const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
         if ((data.battle.mode || "combat") === "foraging") {
@@ -1392,10 +1410,9 @@ let engine = {
         data.battle.enemiesKilled++;
         const shardDrop = engine.trySkillShardDropOnKill(intruder);
         engine.addMapClearProgressForKill(data.progress.currentMapKey);
-        engine.addSkillExp("hindsight", 1);
         engine.addSkillExp("experienceHog", 1);
         engine.addSkillExp("extortion", 1);
-        engine.addSkillExp("nickelAndDime", Math.sqrt(Math.max(0, coinsGain)));
+        engine.addSkillExp("nickelAndDime", engine.positiveLog(coinsGain, 10));
         engine.addSkillExp("validation", 1);
         engine.addSkillExp("windfallSwagger", engine.positiveLog(coinsGain, 10));
         if (skills.isSkillUnlocked("publicApology")) {
@@ -1431,7 +1448,17 @@ let engine = {
             }
             engine.addSkillExp("sadism", engine.positiveLog(overkillDamage, 2));
         }
-        initialize.calcPlayerStats(false);
+        // Validation: +1 max Aud per kill (via calcPlayerStats). When that max rises, also gain
+        // +Validation level current Aud. missingAud already grants +1 current for the +1 max, so pass the rest
+        // as extraCurrentOnMaxRise (Narcissism + left float apply to the full heal).
+        let validationExtraCurrent = 0;
+        if (engine.didValidationMaxAudIncreaseOnLastKill()) {
+            const curGain = engine.getValidationCurrentAudOnMaxIncrease();
+            if (curGain > 1) {
+                validationExtraCurrent = curGain - 1;
+            }
+        }
+        initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: validationExtraCurrent });
         if (data.battle.state === "running") {
             engine.updateCurrentZoneInfo();
         }
@@ -1522,7 +1549,7 @@ let engine = {
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
             skill.exp -= skill.expToLevel;
             skill.level++;
-            skill.expToLevel = initExp * Math.pow(skill.level, 1.2);
+            skill.expToLevel = initExp * Math.pow(1.3, skill.level);
             engine.onSkillLevelUp(skill);
         }
     },
@@ -1661,6 +1688,7 @@ let engine = {
             engine.addSkillExp("adaptation", 1);
             engine.addSkillExp("savageLessons", 1);
             engine.addSkillExp("paddingResume", 1);
+            engine.addSkillExp("hindsight", 1);
             if (skills.isSkillUnlocked("levelHeaded")) {
                 const lhEff = skills.getSkillEffect("levelHeaded");
                 const desMs = lhEff.desensitizedMsPerLevel || 0;
@@ -2373,6 +2401,7 @@ let engine = {
             phase: "idle",
             dir: 1,
             targetId: null,
+            windupAtPlayer: false,
             x: 0,
             y: 0,
             prevX: 0,
@@ -2406,13 +2435,15 @@ let engine = {
         }
         fx.phase = "idle";
         fx.windupPending = false;
+        fx.windupAtPlayer = false;
         fx.targetId = null;
         fx.vx = 0;
         fx.phaseElapsedMs = 0;
     },
     cancelSlapWindupIfNeeded: function() {
         const fx = engine.ensureSlapFx();
-        if (fx && fx.phase === "windup") {
+        // Keep player-anchored windup running when slap is ready but no target yet.
+        if (fx && fx.phase === "windup" && !fx.windupAtPlayer) {
             engine.idleSlapHand();
         }
     },
@@ -2427,6 +2458,83 @@ let engine = {
             right: left + (intruder.sizePx || 0),
             handY: intruder.yPx + half - (handSize / 2) + 4
         };
+    },
+    getSlapPlayerBox: function(dir) {
+        const handSize = engine.SLAP_HAND_SIZE_PX;
+        const gap = 6;
+        // dir 1 = slap travels right (hand on player's left); dir -1 = travels left (hand on right).
+        const d = dir === -1 ? -1 : 1;
+        const anchor = engine.getPlayerAvatarFloatAnchor();
+        if (anchor) {
+            const left = d === 1
+                ? (anchor.left - gap - handSize)
+                : (anchor.left + anchor.width + gap);
+            return {
+                left: left,
+                right: left + handSize,
+                handY: anchor.top + (anchor.height / 2) - (handSize / 2)
+            };
+        }
+        const bw = (typeof viewData !== "undefined" && viewData.layout && viewData.layout.battlefieldWidthPx)
+            || (gameData.battle && gameData.battle.battlefieldWidthPx)
+            || 690;
+        const playerTop = (typeof viewData !== "undefined" && viewData.layout && viewData.layout.playerTopPx) || 0;
+        const tokenSize = 58;
+        const centerX = bw / 2;
+        const left = d === 1
+            ? (centerX - (tokenSize / 2) - gap - handSize)
+            : (centerX + (tokenSize / 2) + gap);
+        return {
+            left: left,
+            right: left + handSize,
+            handY: playerTop + (tokenSize / 2) - (handSize / 2)
+        };
+    },
+    getClosestIntruderToPlayer: function() {
+        const enemies = data.battle && data.battle.enemies;
+        if (!enemies || !enemies.length) {
+            return null;
+        }
+        const battleHeight = (typeof viewData !== "undefined" && viewData.layout && viewData.layout.battlefieldHeightPx)
+            || (gameData.battle && gameData.battle.battlefieldHeightPx)
+            || 500;
+        const playerTopY = (typeof viewData !== "undefined" && viewData.layout && viewData.layout.playerTopPx)
+            || (battleHeight - 65);
+        let best = null;
+        let bestDist = Infinity;
+        for (let i = 0; i < enemies.length; i++) {
+            const e = enemies[i];
+            if (!e || !e.alive) {
+                continue;
+            }
+            // Distance from enemy bottom edge to the player slap line (smaller = closer).
+            const dist = playerTopY - (e.yPx + (e.sizePx || 0));
+            if (!best || dist < bestDist || (dist === bestDist && e.id < best.id)) {
+                best = e;
+                bestDist = dist;
+            }
+        }
+        return best;
+    },
+    /** Next slap dir for a lane without consuming the middle-lane toggle. */
+    peekSlapDirForLane: function(lane) {
+        const fx = engine.ensureSlapFx();
+        if (lane <= 2) {
+            return -1;
+        }
+        if (lane >= 4) {
+            return 1;
+        }
+        // Matches what the next resolveSlapDir(middle) call will return.
+        return (fx && fx.middleFromLeft) ? -1 : 1;
+    },
+    resolvePlayerSlapHoldDir: function() {
+        const closest = engine.getClosestIntruderToPlayer();
+        if (closest) {
+            return engine.peekSlapDirForLane(closest.lane);
+        }
+        const fx = engine.ensureSlapFx();
+        return (fx && fx.dir === -1) ? -1 : 1;
     },
     getSlapWindupXs: function(box, dir) {
         const travel = engine.SLAP_WINDUP_TRAVEL_PX;
@@ -2474,56 +2582,105 @@ let engine = {
     },
     startSlapWindup: function(target) {
         const fx = engine.ensureSlapFx();
-        if (!fx || !target) {
+        if (!fx) {
             return;
         }
-        const box = engine.getSlapTargetBox(target);
-        const dir = engine.resolveSlapDir(target.lane);
+        let box;
+        let dir;
+        if (target) {
+            box = engine.getSlapTargetBox(target);
+            dir = engine.resolveSlapDir(target.lane);
+            fx.targetId = target.id;
+            fx.windupAtPlayer = false;
+        } else {
+            dir = engine.resolvePlayerSlapHoldDir();
+            box = engine.getSlapPlayerBox(dir);
+            if (!box) {
+                return;
+            }
+            fx.targetId = null;
+            fx.windupAtPlayer = true;
+        }
         const xs = engine.getSlapWindupXs(box, dir);
         const startX = xs.startX;
         const hitX = xs.hitX;
         fx.phase = "windup";
         fx.dir = dir;
-        fx.targetId = target.id;
         fx.startX = startX;
         fx.hitX = hitX;
         fx.travelPx = xs.travel;
-        fx.x = startX;
-        fx.prevX = startX;
+        // Player hold: park still at the contact pose. Enemy windup: travel from start.
+        if (fx.windupAtPlayer) {
+            fx.x = hitX;
+            fx.prevX = hitX;
+            fx.vx = 0;
+        } else {
+            fx.x = startX;
+            fx.prevX = startX;
+            fx.vx = dir * engine.slapWindupPeakSpeed(xs.travel) * 0.5;
+        }
         fx.y = box.handY;
         fx.prevY = box.handY;
-        fx.vx = dir * engine.slapWindupPeakSpeed(xs.travel) * 0.5;
         fx.phaseElapsedMs = 0;
         fx.windupPending = true;
         fx.vxInner0 = 0;
-        fx.innerStartX = startX;
+        fx.innerStartX = fx.x;
+    },
+    getSlapWindupTarget: function() {
+        if (data.battle.activeTargetId === null) {
+            return null;
+        }
+        const target = engine.findIntruderById(data.battle.activeTargetId);
+        if (!target || !target.alive || !target.inRange) {
+            return null;
+        }
+        return target;
     },
     maybeStartSlapWindup: function(tickMs) {
         const fx = engine.ensureSlapFx();
         if (!fx) {
             return;
         }
+        const p = data.battle.player;
         if (fx.phase === "windup") {
-            const windupTarget = engine.findIntruderById(fx.targetId);
-            if (!windupTarget || !windupTarget.alive || !windupTarget.inRange) {
-                engine.idleSlapHand();
+            const liveTarget = engine.getSlapWindupTarget();
+            if (fx.windupAtPlayer) {
+                // Only shift into an enemy windup while the slap is still charging.
+                // If already ready, keep the held pose; impact will snap to the enemy.
+                if (liveTarget && (p.attackTimerMs || 0) > 0) {
+                    engine.startSlapWindup(liveTarget);
+                }
+            } else {
+                const windupTarget = engine.findIntruderById(fx.targetId);
+                if (!windupTarget || !windupTarget.alive || !windupTarget.inRange) {
+                    if (liveTarget) {
+                        engine.startSlapWindup(liveTarget);
+                    } else {
+                        engine.startSlapWindup(null);
+                    }
+                }
             }
         }
-        const p = data.battle.player;
-        if (data.battle.activeTargetId === null) {
+        if (fx.windupPending) {
             return;
         }
-        const target = engine.findIntruderById(data.battle.activeTargetId);
-        if (!target || !target.alive || !target.inRange) {
-            return;
-        }
+        const target = engine.getSlapWindupTarget();
         const recharge = Math.max(1e-9, engine.getSlapRechargeMultiplier());
         const remainReal = (p.attackTimerMs || 0) / recharge;
         const willLandThisTick = (p.attackTimerMs || 0) - tickMs * recharge <= 0;
-        if (willLandThisTick || remainReal > engine.SLAP_WINDUP_MS || fx.windupPending) {
+        if (target) {
+            if (willLandThisTick || remainReal > engine.SLAP_WINDUP_MS) {
+                return;
+            }
+            engine.startSlapWindup(target);
             return;
         }
-        engine.startSlapWindup(target);
+        // No enemy in range: show a still hand beside the player once within the windup window
+        // (including while slap is ready and waiting).
+        if (remainReal > engine.SLAP_WINDUP_MS && (p.attackTimerMs || 0) > 0) {
+            return;
+        }
+        engine.startSlapWindup(null);
     },
     spawnSlapDamageFx: function(x, y, damage) {
         const fx = engine.ensureSlapFx();
@@ -2689,7 +2846,8 @@ let engine = {
         const box = engine.getSlapTargetBox(target);
         const travel = engine.SLAP_WINDUP_TRAVEL_PX;
         const impactSpeed = engine.slapWindupPeakSpeed(travel);
-        if (fx.phase !== "windup") {
+        // Player-anchored windup must snap to the enemy on impact; side/inner stay as usual.
+        if (fx.phase !== "windup" || fx.windupAtPlayer) {
             const dir = engine.resolveSlapDir(target.lane);
             const xs = engine.getSlapWindupXs(box, dir);
             fx.dir = dir;
@@ -2708,6 +2866,7 @@ let engine = {
         fx.phase = "side";
         fx.phaseElapsedMs = 0;
         fx.windupPending = false;
+        fx.windupAtPlayer = false;
         const contactX = fx.dir === 1 ? box.left : box.right;
         engine.spawnSlapDamageFx(contactX, fx.y, damage);
     },
@@ -2718,16 +2877,39 @@ let engine = {
         }
         const dt = tickMs / 1000;
         if (fx.phase === "windup") {
-            const windupTarget = engine.findIntruderById(fx.targetId);
-            if (!windupTarget || !windupTarget.alive || !windupTarget.inRange) {
-                engine.idleSlapHand();
+            if (fx.windupAtPlayer) {
+                const dir = engine.resolvePlayerSlapHoldDir();
+                fx.dir = dir;
+                const box = engine.getSlapPlayerBox(dir);
+                if (!box) {
+                    engine.idleSlapHand();
+                } else {
+                    const xs = engine.getSlapWindupXs(box, dir);
+                    fx.prevX = fx.x;
+                    fx.prevY = fx.y;
+                    fx.hitX = xs.hitX;
+                    fx.startX = xs.startX;
+                    fx.x = xs.hitX;
+                    fx.y = box.handY;
+                    fx.vx = 0;
+                }
             } else {
-                fx.prevX = fx.x;
-                fx.prevY = fx.y;
-                fx.phaseElapsedMs += tickMs;
-                fx.x = engine.slapWindupX(fx, fx.phaseElapsedMs);
-                fx.vx = engine.slapWindupVelocity(fx, fx.phaseElapsedMs);
-                fx.y = engine.getSlapTargetBox(windupTarget).handY;
+                const windupTarget = engine.findIntruderById(fx.targetId);
+                if (!windupTarget || !windupTarget.alive || !windupTarget.inRange) {
+                    const liveTarget = engine.getSlapWindupTarget();
+                    if (liveTarget) {
+                        engine.startSlapWindup(liveTarget);
+                    } else {
+                        engine.startSlapWindup(null);
+                    }
+                } else {
+                    fx.prevX = fx.x;
+                    fx.prevY = fx.y;
+                    fx.phaseElapsedMs += tickMs;
+                    fx.x = engine.slapWindupX(fx, fx.phaseElapsedMs);
+                    fx.vx = engine.slapWindupVelocity(fx, fx.phaseElapsedMs);
+                    fx.y = engine.getSlapTargetBox(windupTarget).handY;
+                }
             }
         } else if (fx.phase === "side") {
             fx.prevX = fx.x;
@@ -3200,7 +3382,7 @@ let engine = {
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
             skill.exp -= skill.expToLevel;
             skill.level++;
-            skill.expToLevel = initExp * Math.pow(skill.level, 1.2);
+            skill.expToLevel = initExp * Math.pow(1.3, skill.level);
             engine.onSkillLevelUp(skill);
         }
         while (skill.talent >= skill.talentToLevel) {
@@ -4203,7 +4385,7 @@ let engine = {
         const bought = pond && pond.wishingWellBought ? pond.wishingWellBought : 0;
         let rate = 0;
         if (bought >= 2) {
-            rate = 10;
+            rate = 5;
         } else if (bought >= 1) {
             rate = 1;
         }
@@ -5540,7 +5722,7 @@ let engine = {
     getWaterDropletCapacityMultiplier: function() {
         const hs = data.progress.base && data.progress.base.hiddenSpring;
         const bought = hs ? (hs.carryingCapacityBought || 0) : 0;
-        return Math.pow(2, bought);
+        return Math.pow(1.5, bought);
     },
     getWaterDropletVolumeForSpirit: function(spirit) {
         return Math.ceil((engine.getEffectiveSpiritPower(spirit) || 1) * engine.getWaterDropletCapacityMultiplier() / 2);
@@ -8328,8 +8510,8 @@ let engine = {
                 continue;
             }
             road.decayAccMs = (road.decayAccMs || 0) + step;
-            while ((road.progress || 0) > 0 && road.decayAccMs >= 60000) {
-                road.decayAccMs -= 60000;
+            while ((road.progress || 0) > 0 && road.decayAccMs >= 30000) {
+                road.decayAccMs -= 30000;
                 road.progress = (road.progress || 0) - 1;
             }
             if ((road.progress || 0) <= 0) {
@@ -9586,7 +9768,31 @@ let engine = {
         }
         return engine.getMarketLevel() >= (td.minMarketLevel || 0);
     },
-    /** A trade can start when enabled, unlocked, affordable, and under its stock threshold. */
+    ensureMarketPausedTrades: function() {
+        const market = data.progress.base && data.progress.base.market;
+        if (!market) {
+            return null;
+        }
+        if (!market.pausedTrades || typeof market.pausedTrades !== "object") {
+            market.pausedTrades = {};
+        }
+        // Migrate legacy in-place paused activeTrade into pausedTrades.
+        const active = market.activeTrade;
+        if (active && active.paused) {
+            market.pausedTrades[active.key] = {
+                key: active.key,
+                totalMs: active.totalMs || 0,
+                remainMs: Math.max(0, active.remainMs || 0)
+            };
+            market.activeTrade = null;
+        }
+        return market.pausedTrades;
+    },
+    getPausedMarketTrade: function(tradeKey) {
+        const paused = engine.ensureMarketPausedTrades();
+        return (paused && paused[tradeKey]) || null;
+    },
+    /** A trade can start/resume when enabled, unlocked, under stock threshold, and affordable (or already paid). */
     isMarketTradeAvailable: function(tradeKey) {
         const market = data.progress.base && data.progress.base.market;
         const td = resortData.marketTrades[tradeKey];
@@ -9602,6 +9808,9 @@ let engine = {
             if (threshold > 0 && (market[tradeKey] || 0) >= threshold) {
                 return false;
             }
+        }
+        if (engine.getPausedMarketTrade(tradeKey)) {
+            return true;
         }
         return resortData.canAffordCost({ credit: td.creditCost });
     },
@@ -9631,15 +9840,22 @@ let engine = {
             return "No Traders assigned.";
         }
         const active = market.activeTrade;
-        if (!active) {
-            return "Traders are idle - enable a trade they can afford.";
+        if (active) {
+            const td = resortData.marketTrades[active.key];
+            const name = td ? td.name : active.key;
+            return `Buying ${name}: ${round1(Math.max(0, active.remainMs) / 1000)}s left.`;
         }
-        const td = resortData.marketTrades[active.key];
-        const name = td ? td.name : active.key;
-        if (active.paused) {
-            return `${name} is paused. Its Credit is already spent and the trade resumes where it left off.`;
+        const paused = engine.ensureMarketPausedTrades();
+        const pausedKeys = paused ? Object.keys(paused) : [];
+        if (pausedKeys.length) {
+            const names = [];
+            for (let i = 0; i < pausedKeys.length; i++) {
+                const td = resortData.marketTrades[pausedKeys[i]];
+                names.push(td ? td.name : pausedKeys[i]);
+            }
+            return `Paused: ${names.join(", ")} (credit paid; resumes when re-enabled). Traders are idle or on another trade.`;
         }
-        return `Buying ${name}: ${round1(Math.max(0, active.remainMs) / 1000)}s left.`;
+        return "Traders are idle - enable a trade they can afford.";
     },
     /** A started trade keeps its paid Credit; it pauses rather than refunds when disabled. */
     canMarketTradeContinue: function(tradeKey) {
@@ -9652,11 +9868,50 @@ let engine = {
         }
         return !!(market.tradeEnabled && market.tradeEnabled[tradeKey]);
     },
+    pauseActiveMarketTrade: function() {
+        const market = data.progress.base && data.progress.base.market;
+        const active = market && market.activeTrade;
+        if (!active) {
+            return;
+        }
+        const paused = engine.ensureMarketPausedTrades();
+        paused[active.key] = {
+            key: active.key,
+            totalMs: active.totalMs || 0,
+            remainMs: Math.max(0, active.remainMs || 0)
+        };
+        market.activeTrade = null;
+    },
+    resumeMarketTrade: function(tradeKey) {
+        const market = data.progress.base && data.progress.base.market;
+        const paused = engine.getPausedMarketTrade(tradeKey);
+        if (!market || !paused) {
+            return false;
+        }
+        let totalMs = paused.totalMs || 0;
+        let remainMs = Math.max(0, paused.remainMs || 0);
+        const retimedTotal = engine.getMarketTradeDurationMs(tradeKey);
+        if (retimedTotal > 0 && totalMs > 0 && retimedTotal !== totalMs) {
+            remainMs = remainMs * (retimedTotal / totalMs);
+            totalMs = retimedTotal;
+        }
+        market.activeTrade = {
+            key: tradeKey,
+            totalMs: totalMs,
+            remainMs: remainMs,
+            paused: false
+        };
+        delete market.pausedTrades[tradeKey];
+        return true;
+    },
     startMarketTrade: function(tradeKey) {
         const market = data.progress.base && data.progress.base.market;
         const td = resortData.marketTrades[tradeKey];
         if (!market || !td) {
             return false;
+        }
+        if (engine.resumeMarketTrade(tradeKey)) {
+            return true;
         }
         const cost = { credit: td.creditCost };
         if (!resortData.canAffordCost(cost)) {
@@ -9686,6 +9941,10 @@ let engine = {
             market[active.key] = (market[active.key] || 0) + td.yieldAmount;
         }
         market.activeTrade = null;
+        const paused = engine.ensureMarketPausedTrades();
+        if (paused && paused[active.key]) {
+            delete paused[active.key];
+        }
     },
     updateMarketTrades: function(tickMs) {
         const market = data.progress.base && data.progress.base.market;
@@ -9695,24 +9954,25 @@ let engine = {
         if (!market.tradeEnabled) {
             market.tradeEnabled = {};
         }
+        engine.ensureMarketPausedTrades();
         const active = market.activeTrade;
         if (active) {
             if (!engine.canMarketTradeContinue(active.key)) {
-                active.paused = true;
-                return;
-            }
-            active.paused = false;
-            /* Re-time the remainder when the Trader count changes mid-trade. */
-            const totalMs = engine.getMarketTradeDurationMs(active.key);
-            if (totalMs > 0 && active.totalMs > 0 && totalMs !== active.totalMs) {
-                active.remainMs = active.remainMs * (totalMs / active.totalMs);
-                active.totalMs = totalMs;
-            }
-            active.remainMs -= tickMs;
-            if (active.remainMs <= 0) {
-                engine.completeMarketTrade();
+                engine.pauseActiveMarketTrade();
             } else {
-                return;
+                /* Re-time the remainder when the Trader count changes mid-trade. */
+                const totalMs = engine.getMarketTradeDurationMs(active.key);
+                if (totalMs > 0 && active.totalMs > 0 && totalMs !== active.totalMs) {
+                    active.remainMs = active.remainMs * (totalMs / active.totalMs);
+                    active.totalMs = totalMs;
+                }
+                active.paused = false;
+                active.remainMs -= tickMs;
+                if (active.remainMs <= 0) {
+                    engine.completeMarketTrade();
+                } else {
+                    return;
+                }
             }
         }
         if (engine.getMarketTraderCount() <= 0) {
@@ -11153,7 +11413,7 @@ let engine = {
         if (eating > 0) {
             const inn = data.progress.base.inn;
             const innCount = (inn && inn.guests) ? inn.guests.length : 0;
-            const rate = 0.3 + innCount * 0.2 + eating * 0.5;
+            const rate = (0.3 + innCount * 0.2 + eating * 0.5) / 3;
             bar.tipProgress = (bar.tipProgress || 0) + rate * (tickMs / 1000);
         }
         if (bar.selectedTipSkillKey) {
@@ -11294,7 +11554,7 @@ let engine = {
         if (n <= 0) {
             return Math.floor(root);
         }
-        return Math.ceil(root * (1 + 0.2 * n));
+        return Math.ceil(root * (1 + 0.5 * n));
     },
     getMarketGoodAmount: function(tradeKey) {
         const market = data.progress.base && data.progress.base.market;
@@ -11699,7 +11959,7 @@ let engine = {
     },
     getOkamiSpiritStrands: function(level) {
         const tails = engine.getOkamiTails(level);
-        const tailMult = (tails * (tails + 1)) / 2;
+        const tailMult = Math.pow(1.5, Math.max(0, tails - 1));
         const lvl = level !== undefined && level !== null ? level : engine.getOkami().level;
         const levelMult = 1 + 0.2 * (lvl || 0);
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)

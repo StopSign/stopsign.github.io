@@ -357,6 +357,10 @@ let view = {
         } else if (activeTab === "options") {
             view.updateOptionsTab();
         }
+        // Keep the open building info panel live even when another menu tab is selected.
+        if (activeTab !== "base" && data.progress && data.progress.selectedBaseBuilding) {
+            view.updateBasePanel();
+        }
     },
     updateBaseTab: function() {
         view.updateBasePanel();
@@ -496,7 +500,8 @@ let view = {
         if (skills.isSkillUnlocked("validation")) {
             const valAud = engine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
-            audTip += `<br>Validation: +${valAud} current and max Aud from kills (cap ${valCap})`;
+            const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
+            audTip += `<br>Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`;
         }
         if (skills.isSkillUnlocked("paddingResume")) {
             const padEffUi = skills.getSkillEffect("paddingResume");
@@ -793,8 +798,10 @@ let view = {
                     if (weaveUi) {
                         btnText = weaveUi.label;
                         btnDisabled = weaveUi.disabled;
+                        // Keep the ::before progress fill visible while paused (same as other buildings).
                         weaveMode = true;
                         weavePct = weaveUi.pct;
+                        pausedMode = weaveUi.mode === "paused";
                     }
                 }
                 view.updateVal(btnEl, btnText, "innerHTML");
@@ -1140,6 +1147,20 @@ let view = {
     updateBasePanelScrollArchives: function(base, t) {
         const lib = base.scrollArchives;
         this.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
+        const researchRate = engine.getScrollArchivesResearchRate();
+        const literacyBought = engine.getLiteracyLessonsBought();
+        const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
+        const progress = lib.researchTaskProgress || 0;
+        const required = lib.researchTaskRequired || 10;
+        const remain = Math.max(0, required - progress);
+        view.updateVal("scrollArchivesResearchProgressText", round1(progress));
+        view.updateVal("scrollArchivesResearchRequiredText", round1(required));
+        view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
+        if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
+            view.updateEtaText("scrollArchivesResearchEtaText", remain, gainedRate);
+        } else {
+            view.updateVal("scrollArchivesResearchEtaText", "—");
+        }
         const toChoose = lib.researchesToChoose || 0;
         view.updateVal("scrollArchivesResearchesToChoose", toChoose);
         view.updateVal("scrollArchivesChoicesWrap", toChoose > 0 ? "" : "none", "style.display");
@@ -1173,7 +1194,7 @@ let view = {
             view.updateVal("base_scrollArchives_finish_research_btn", purchaseUi.label, "innerHTML");
             view.updateVal("base_scrollArchives_finish_research_btn", purchaseUi.disabled, "disabled");
             btnEl.classList.toggle("upgrade-btn-paused", purchaseUi.mode === "weavePaused");
-            btnEl.classList.toggle("upgrade-btn-weaving", purchaseUi.mode === "weaving");
+            btnEl.classList.toggle("upgrade-btn-weaving", purchaseUi.mode === "weaving" || purchaseUi.mode === "weavePaused");
             if (purchaseUi.mode === "weaving" || purchaseUi.mode === "weavePaused") {
                 if (purchaseUi.pct !== null && purchaseUi.pct !== undefined) {
                     btnEl.style.setProperty("--weave-pct", `${purchaseUi.pct}%`);
@@ -1288,12 +1309,16 @@ let view = {
             const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
             const progress = lib.researchTaskProgress || 0;
             const required = lib.researchTaskRequired || 10;
+            const remain = Math.max(0, required - progress);
             const pct = required > 0 ? Math.max(0, Math.min(100, (progress / required) * 100)) : 0;
             let prodText = `Researchers: ${researcherCount} | Research speed: ${round1(gainedRate)}/s`;
             if (okamiHere) {
                 prodText += ` (${round1(engine.getOkamiInspirationBonus())}× from inspiration)`;
             }
-            prodText += `<br>Research: ${round1(progress)} / ${round1(required)} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
+            const etaText = (!lib.researchPaused && gainedRate > 0 && remain > 0)
+                ? secondsToTime(remain / gainedRate)
+                : "—";
+            prodText += `<br>Research: ${round1(progress)} / ${round1(required)} · ETA: ${etaText} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
             if (lib.researchPaused) {
                 prodText += "<br>Paused - need more coins, star beads, or mana";
             }
@@ -2085,7 +2110,7 @@ let view = {
                 const showTip = progress > 0;
                 hotspot.style.display = showTip ? "" : "none";
                 if (showTip) {
-                    const remainMs = Math.max(0, 60000 - (road.decayAccMs || 0));
+                    const remainMs = Math.max(0, 30000 - (road.decayAccMs || 0));
                     hotspot._dirtRoadTipHtml = `${progress} / ${roadCap}<br>+${round1(progress * 0.5)}% speed<br>${Math.ceil(remainMs / 1000)}s to next decrease`;
                 }
             }
@@ -2273,6 +2298,7 @@ let view = {
         view.updateMapWaterBar(engine.isToriiDrinkingBowlUnlocked(), torii.water || 0, engine.getToriiWaterCapacity(), "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill");
         view.updateMapWaterBar(engine.isInnOnsenConverted(), inn.hotWater || 0, engine.getInnHotWaterCapacity(), "mapInnWaterProgressWrap", "mapInnWaterProgressFill");
         const noodleBar = base.noodleBar || {};
+        view.updateMapWaterBar(engine.isNoodleBarBuilt(), noodleBar.hotWater || 0, engine.getNoodleBarHotWaterCapacity(), "mapNoodleWaterProgressWrap", "mapNoodleWaterProgressFill");
         view.updateMapWaterBar(engine.isNoodleBarBuilt(), Math.min(100, noodleBar.tipProgress || 0), 100, "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill");
         view.updateMapBuildingManaBar("stonePile", "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill");
         view.updateMapBuildingManaBar("hiddenSpring", "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill");
@@ -2325,6 +2351,9 @@ let view = {
 
         const thresholdsUnlocked = !!garden.arrangementOfTraderResponsibilityUnlocked;
         const active = market.activeTrade;
+        const pausedTrades = (typeof engine.ensureMarketPausedTrades === "function")
+            ? engine.ensureMarketPausedTrades()
+            : (market.pausedTrades || {});
         const order = resortData.marketTradesOrder || [];
         for (let ti = 0; ti < order.length; ti++) {
             const tk = order[ti];
@@ -2346,6 +2375,7 @@ let view = {
             setChk(`marketTrade_${tk}_chk`, levelOk && market.tradeEnabled[tk]);
             view.updateVal(`marketTrade_${tk}_chk`, !levelOk, "disabled");
             view.updateVal(`marketTrade_${tk}_stock`, `${intToStringRound(market[tk] || 0)} ${td.name.toLowerCase()}`);
+            const paused = pausedTrades && pausedTrades[tk];
             if (!levelOk) {
                 view.updateVal(`marketTrade_${tk}_extra`, `Unlocks at Market level ${requiredLevel}`);
             } else {
@@ -2354,7 +2384,7 @@ let view = {
                 if (traders > 0) {
                     extra += ` (${round1(engine.getMarketTradeDurationMs(tk) / 1000)}s with ${traders})`;
                 }
-                if (active && active.key === tk && active.paused) {
+                if (paused) {
                     extra += " &middot; paused, credit already paid";
                 }
                 view.updateVal(`marketTrade_${tk}_extra`, extra, "innerHTML");
@@ -2366,10 +2396,11 @@ let view = {
                     thrEl.value = (market.tradeThresholds && market.tradeThresholds[tk]) || 0;
                 }
             }
-            const isActive = !!(active && active.key === tk && active.totalMs > 0);
-            view.updateVal(`marketTrade_${tk}_prog_wrap`, isActive ? "" : "none", "style.display");
-            if (isActive) {
-                const pct = Math.max(0, Math.min(100, (1 - (active.remainMs / active.totalMs)) * 100));
+            const progTrade = (active && active.key === tk) ? active : paused;
+            const showProg = !!(progTrade && progTrade.totalMs > 0);
+            view.updateVal(`marketTrade_${tk}_prog_wrap`, showProg ? "" : "none", "style.display");
+            if (showProg) {
+                const pct = Math.max(0, Math.min(100, (1 - (progTrade.remainMs / progTrade.totalMs)) * 100));
                 view.updateVal(`marketTrade_${tk}_prog_fill`, `${pct}%`, "style.width");
             }
         }
@@ -2387,6 +2418,7 @@ let view = {
         view.updateVal("noodleBarHotWaterFill", noodleCap > 0 ? `${Math.max(0, Math.min(100, (noodleWater / noodleCap) * 100))}%` : "0%", "style.width");
         view.syncAllowCarriersWaterCheckbox("noodleBar", engine.isNoodleBarBuilt());
         view.updateVal("noodleBarEatRestBonusText", engine.getNoodleEatRestBonus());
+        view.updateVal("noodleBarGuestsEatingText", engine.countGuestsEatingNoodles(), "textContent", "floor");
         const shown = Math.min(100, Math.max(0, bar.tipProgress || 0));
         view.updateVal("noodleTipProgressText", round1(shown));
         view.updateVal("noodleTipProgressFill", `${shown}%`, "style.width");
@@ -3092,7 +3124,7 @@ let view = {
                 const forgeLevel = engine.getLargerForgeBought();
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
                 const forgeNote = forgeLevel > 0
-                    ? `Smelting ceil(√spirit power × ${round2(1 + 0.2 * forgeLevel)}) = ${batchSize} ore into bars every 60s. +20% per Larger Forge, rounded up. Exp = bars × 3.`
+                    ? `Smelting ceil(√spirit power × ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s. +50% per Larger Forge, rounded up. Exp = bars × 3.`
                     : `Smelting floor(√spirit power) = ${batchSize} ore into bars every 60s. Exp = bars × 3.`;
                 view.updateVal("spiritInfoFireNote", forgeNote);
                 view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s)`);
@@ -3735,10 +3767,11 @@ let view = {
                 if (weaveUi) {
                     view.updateVal(btnEl, weaveUi.label, "innerHTML");
                     view.updateVal(btnEl, weaveUi.disabled, "disabled");
-                    btnNode.classList.toggle("upgrade-btn-weaving", weaveUi.mode === "weaving" || weaveUi.mode === "travel" || weaveUi.mode === "store" || weaveUi.mode === "return");
+                    btnNode.classList.toggle("upgrade-btn-weaving", true);
+                    btnNode.classList.toggle("upgrade-btn-paused", weaveUi.mode === "paused");
                     btnNode.style.setProperty("--weave-pct", `${weaveUi.pct}%`);
                 } else {
-                    btnNode.classList.remove("upgrade-btn-weaving");
+                    btnNode.classList.remove("upgrade-btn-weaving", "upgrade-btn-paused");
                     btnNode.style.removeProperty("--weave-pct");
                 }
             }
@@ -3776,7 +3809,8 @@ let view = {
             const btnNode = viewData.cached[btnEl];
             if (btnNode) {
                 const isPaused = weaveUi.mode === "paused";
-                btnNode.classList.toggle("upgrade-btn-weaving", !isPaused);
+                // Keep upgrade-btn-weaving on while paused so the ::before progress fill stays visible.
+                btnNode.classList.toggle("upgrade-btn-weaving", true);
                 btnNode.classList.toggle("upgrade-btn-paused", isPaused);
                 btnNode.classList.toggle("upgrade-btn-ready", false);
                 btnNode.style.setProperty("--weave-pct", `${weaveUi.pct}%`);
@@ -4205,13 +4239,15 @@ let view = {
         view.updateVal("skillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("skillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
         view.updateVal("skillInfo_tips_mults", "");
-        view.updateVal("skillInfo_combined_mults", `×${parts.combinedMult.toFixed(4)}`);
-        if (skills.isSkillUnlocked("echoChamber")) {
-            view.updateVal("skillInfo_integration_mult", `×${skills.getEchoChamberExpMultiplierForOthers().toFixed(4)}`);
+        const showEchoChamberMult = skills.isSkillUnlocked("echoChamber") && skillKey !== "echoChamber";
+        if (showEchoChamberMult) {
+            view.updateVal("skillInfo_integration_mult", `×${intMultOthers.toFixed(4)}`);
             view.updateVal("skillInfo_integration_row", "", "style.display");
         } else {
             view.updateVal("skillInfo_integration_row", "none", "style.display");
         }
+        // Combined includes Echo Chamber for other skills; Echo Chamber itself is excluded from its own bonus.
+        view.updateVal("skillInfo_combined_mults", `×${(parts.combinedMult * intMultOthers).toFixed(4)}`);
         view.updateVal("skillInfo_flavor", skills.getSkillFlavorText(skillKey), "innerHTML");
     },
     updateSkillSubTabs: function() {

@@ -135,6 +135,7 @@
                         <span class="resort-building-label-text">Noodle Bar</span>
                     </button>
                     <div id="mapNoodleTipProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-noodle-tip" style="display:none"><div id="mapNoodleTipProgressFill" class="base-mini-progress-fill prog-fill-noodle-tip"></div></div>
+                    <div id="mapNoodleWaterProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-noodle-water" style="display:none"><div id="mapNoodleWaterProgressFill" class="base-mini-progress-fill prog-fill-water"></div></div>
                     <button id="baseBuilding_market" class="base-building-label resort-building-label resort-building-map-btn resort-building-market" onclick="events.selectBaseBuilding('market')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
                         <img class="resort-building-art" src="img/market.svg" alt="" draggable="false">
@@ -280,7 +281,7 @@
                 </div>
                 <div id="combatStarsInventory" class="base-row" style="display:none">
                     <div id="combatStarsCounts"></div>
-                    <div class="muted-text">Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill gives x2 exp gain to that skill.</div>
+                    <div class="muted-text">Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</div>
                 </div>
                 <div id="skillsList"></div>
             </div>
@@ -408,7 +409,7 @@
             <div class="prog-track game-progress-track okami-progress-track">
                 <div id="okamiExpFill" class="prog-fill prog-fill-okami-exp"></div>
                 <div class="game-progress-bar-label">
-                    <span id="okamiTailLabel" class="game-progress-bold">One Tail</span> - Level <span id="okamiLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Exp: <span id="okamiExpText" class="game-progress-bold">0 / 200</span><span class="game-progress-sep">|</span>Spirit Strands: <span id="okamiSpiritStrands" class="game-progress-bold">1</span><span id="okamiSpiritStrandsNext" class="muted-text"></span><span class="game-progress-sep">|</span>Inspiration Bonus: <span id="okamiInspirationBonus" class="game-progress-bold">x1.2</span> <span id="okamiInspirationHint" class="muted-text">(+.02/level)</span><span class="game-progress-sep">|</span>Currently: <span id="okamiStateDisplay" class="okami-state-display game-progress-bold" onclick="events.goToOkamiAssignment()">Idling</span>
+                    <span id="okamiTailLabel" class="game-progress-bold">One Tail</span> - Level <span id="okamiLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Exp: <span id="okamiExpText" class="game-progress-bold">0 / 200</span><span class="game-progress-sep">|</span>Spirit Strands: <span id="okamiSpiritStrands" class="game-progress-bold">1</span><span id="okamiSpiritStrandsNext" class="muted-text"></span><span class="game-progress-sep">|</span>Inspiration Bonus: <span id="okamiInspirationBonus" class="game-progress-bold">x1.2</span> <span id="okamiInspirationHint" class="muted-text">(+.02/level)</span><span class="game-progress-sep">|</span>Currently: <span id="okamiStateDisplay" class="okami-state-display game-progress-bold" onclick="events.goToOkamiAssignment(event)">Idling</span>
                 </div>
             </div>
         </div>

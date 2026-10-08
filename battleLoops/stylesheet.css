@@ -25,7 +25,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 6px;
     min-height: calc(100vh - 30px);
     justify-content: flex-start;
 }
@@ -45,7 +45,7 @@ body {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .game-progress-bar {
@@ -155,6 +155,10 @@ body {
 }
 
 .prog-fill-noodle-tip {
+    background: #c46a6a;
+}
+
+.base-mini-progress-fill.prog-fill-noodle-tip {
     background: #c46a6a;
 }
 
@@ -662,7 +666,7 @@ button {
 }
 
 .prog-track.game-progress-track {
-    height: 28px;
+    height: 24px;
 }
 
 .prog-fill {
@@ -1105,7 +1109,7 @@ button {
     gap: 3px;
     min-width: 0;
     overflow-y:auto;
-    max-height: 615px;
+    max-height: 590px;
 }
 
 .skills-info-column {
@@ -2805,6 +2809,11 @@ button {
 .resort-map-progress-noodle-tip {
     left: 230px;
     bottom: 217px;
+}
+
+.resort-map-progress-noodle-water {
+    left: 230px;
+    bottom: 207px;
 }
 
 .resort-map-progress-hidden-spring-mana {

@@ -332,6 +332,10 @@ let events = {
             if (events.clickEventHitsElement(e, panel)) {
                 return;
             }
+            // Opening assignment via the Okami status link must not count as an outside click.
+            if (e.target && e.target.closest && e.target.closest("#okamiStateDisplay")) {
+                return;
+            }
             const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
             const compactOn = !forceWide && window.innerWidth < 1420;
             if (compactOn) {
@@ -850,7 +854,10 @@ let events = {
             engine.syncMarketCarriersToWorkforce();
         }
     },
-    goToOkamiAssignment: function() {
+    goToOkamiAssignment: function(e) {
+        if (e && typeof e.stopPropagation === "function") {
+            e.stopPropagation();
+        }
         const okami = engine.getOkami();
         if (!okami.assignedBuildingKey) {
             return;
