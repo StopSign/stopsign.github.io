@@ -59,6 +59,48 @@ let saving = {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     },
+    /** Debug: pick a plaintext save (same format as Save to file) and load it. */
+    importFromFile: function() {
+        const input = document.getElementById("importFromFileInput");
+        if (!input) return;
+        input.value = "";
+        input.click();
+    },
+    onImportFromFileSelected: function(input) {
+        const file = input.files && input.files[0];
+        input.value = "";
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function() {
+            let text = typeof reader.result === "string" ? reader.result : "";
+            text = text.replace(/^\uFEFF/, "").trim();
+            if (!saving.isValidSaveText(text)) {
+                alert("That file is not a valid save.");
+                return;
+            }
+            try {
+                window.localStorage[saveName] = text;
+            } catch (e) {
+                alert("Could not store that save.");
+                return;
+            }
+            location.reload();
+        };
+        reader.readAsText(file);
+    },
+    isValidSaveText: function(text) {
+        if (!text) return false;
+        let parsed;
+        try {
+            parsed = JSON.parse(text);
+        } catch (e) {
+            return false;
+        }
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
+        if (!parsed.progress || typeof parsed.progress !== "object" || Array.isArray(parsed.progress)) return false;
+        if (!parsed.battle || typeof parsed.battle !== "object" || Array.isArray(parsed.battle)) return false;
+        return true;
+    },
     exportSave: function() {
         saving.save();
         document.getElementById("exportImportSave").value = window.localStorage[saveName];

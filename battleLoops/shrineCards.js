@@ -843,6 +843,9 @@ var shrineCards = {
             return false;
         }
         const cards = shrineCards.getCardsState();
+        if (!cards[key] || typeof cards[key] !== "object") {
+            cards[key] = shrineCards.createFreshCardOwned(key);
+        }
         cards[key][rarity] = (cards[key][rarity] || 0) + amount;
         shrineCards.invalidateAggregatedEffects();
         if (key === "bambooBaseChips" && typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
@@ -858,5 +861,259 @@ var shrineCards = {
 
     debugGrant: function(key, rarity, n) {
         return shrineCards.grant(key, rarity, n);
+    },
+
+    rarityLabel: function(rarity) {
+        if (rarity === "common") return "Common";
+        if (rarity === "rare") return "Rare";
+        if (rarity === "epic") return "Epic";
+        return "";
+    },
+
+    rarityBorder: {
+        common: "#9fb6d5",
+        rare: "#5d4ae8",
+        epic: "#bc07ed"
+    },
+
+    rarityBackground: {
+        common: "rgba(159, 182, 213, 0.5)",
+        rare: "rgba(93, 74, 232, 0.5)",
+        epic: "rgba(188, 7, 237, 0.5)"
+    },
+
+    packDefs: {
+        common: {
+            slots: 6,
+            choose: 2,
+            weights: { common: 85, rare: 14, epic: 1 },
+            minRare: 0,
+            minEpic: 0,
+            oddsHtml: "6 cards with their own rolls for rarity:<br>85% Common Cards<br>14% Rare Cards<br>1% Epic Cards<br>Open and choose two!"
+        },
+        rare: {
+            slots: 6,
+            choose: 2,
+            weights: { common: 70, rare: 27, epic: 3 },
+            minRare: 2,
+            minEpic: 0,
+            oddsHtml: "6 cards with their own rolls for rarity:<br>70% Common Cards<br>27% Rare Cards<br>3% Epic Cards<br>At least 2 cards will be rare<br>Open and choose two!"
+        },
+        epic: {
+            slots: 9,
+            choose: 3,
+            weights: { common: 40, rare: 50, epic: 10 },
+            minRare: 0,
+            minEpic: 1,
+            oddsHtml: "9 cards with their own rolls for rarity:<br>40% Common Cards<br>50% Rare Cards<br>10% Epic Cards<br>At least 1 card will be epic<br>Open and choose three!"
+        }
+    },
+
+    totalPacks: function(shrine) {
+        const packs = (shrine && shrine.packs) || {};
+        return (packs.common || 0) + (packs.rare || 0) + (packs.epic || 0);
+    },
+
+    nextUnopenedPackRarity: function(shrine) {
+        const packs = (shrine && shrine.packs) || {};
+        if ((packs.common || 0) > 0) return "common";
+        if ((packs.rare || 0) > 0) return "rare";
+        if ((packs.epic || 0) > 0) return "epic";
+        return null;
+    },
+
+    actionButtonLabel: function(session, shrine) {
+        const next = shrineCards.nextUnopenedPackRarity(shrine);
+        if (!session || !session.openPack) {
+            return "Open " + shrineCards.rarityLabel(next || (session && session.previewRarity)) + " Pack";
+        }
+        if (!next) {
+            return "Choose Selected Cards";
+        }
+        return "Choose Selected Cards and Open " + shrineCards.rarityLabel(next) + " Pack";
+    },
+
+    createPrestigeSession: function(shrine) {
+        return {
+            active: true,
+            phase: "choose",
+            openPack: null,
+            gained: [],
+            previewRarity: shrineCards.nextUnopenedPackRarity(shrine)
+        };
+    },
+
+    rollOneRarity: function(weights) {
+        let roll = Math.random() * 100;
+        const order = ["common", "rare", "epic"];
+        let acc = 0;
+        for (let i = 0; i < order.length; i++) {
+            acc += weights[order[i]] || 0;
+            if (roll < acc) {
+                return order[i];
+            }
+        }
+        return "epic";
+    },
+
+    countRarity: function(slots, rarity) {
+        let n = 0;
+        for (let i = 0; i < slots.length; i++) {
+            if (slots[i] === rarity) n++;
+        }
+        return n;
+    },
+
+    raritiesMeetMinimum: function(slots, def) {
+        const rare = shrineCards.countRarity(slots, "rare");
+        const epic = shrineCards.countRarity(slots, "epic");
+        return rare >= (def.minRare || 0) && epic >= (def.minEpic || 0);
+    },
+
+    forcePackMinimum: function(slots, def) {
+        let rare = shrineCards.countRarity(slots, "rare");
+        while (rare < (def.minRare || 0)) {
+            let ix = slots.indexOf("common");
+            if (ix < 0) {
+                ix = slots.indexOf("epic");
+                if (ix < 0) break;
+                if (shrineCards.countRarity(slots, "epic") - 1 < (def.minEpic || 0)) break;
+            }
+            slots[ix] = "rare";
+            rare++;
+        }
+        let epic = shrineCards.countRarity(slots, "epic");
+        while (epic < (def.minEpic || 0)) {
+            let ix = slots.indexOf("common");
+            if (ix < 0) ix = slots.indexOf("rare");
+            if (ix < 0) break;
+            if (slots[ix] === "rare") rare--;
+            slots[ix] = "epic";
+            epic++;
+        }
+        while (rare < (def.minRare || 0)) {
+            const ix = slots.indexOf("common");
+            if (ix < 0) break;
+            slots[ix] = "rare";
+            rare++;
+        }
+        return slots;
+    },
+
+    rollPackRarities: function(packRarity) {
+        const def = shrineCards.packDefs[packRarity];
+        const maxAttempts = 40;
+        let slots = [];
+        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+            slots = [];
+            for (let i = 0; i < def.slots; i++) {
+                slots.push(shrineCards.rollOneRarity(def.weights));
+            }
+            if (shrineCards.raritiesMeetMinimum(slots, def)) {
+                return slots;
+            }
+        }
+        return shrineCards.forcePackMinimum(slots, def);
+    },
+
+    copiesRemaining: function(key, rarity, reserved) {
+        const def = shrineCards._byKey[key];
+        if (!def || !def.rarity || def.rarity[rarity] === undefined) {
+            return 0;
+        }
+        const max = def.rarity[rarity];
+        if (max === -1) {
+            return Infinity;
+        }
+        const owned = shrineCards.getOwned(key, rarity);
+        const held = (reserved[key] && reserved[key][rarity]) || 0;
+        return Math.max(0, max - owned - held);
+    },
+
+    eligibleKeys: function(rarity, reserved) {
+        const keys = [];
+        for (let i = 0; i < shrineCards.keysInOrder.length; i++) {
+            const key = shrineCards.keysInOrder[i];
+            if (shrineCards.copiesRemaining(key, rarity, reserved) > 0) {
+                keys.push(key);
+            }
+        }
+        return keys;
+    },
+
+    cardsForRarityRolls: function(rolls) {
+        const reserved = {};
+        const cards = [];
+        for (let i = 0; i < rolls.length; i++) {
+            let rarity = rolls[i];
+            if (rarity === "epic" && shrineCards.eligibleKeys("epic", reserved).length === 0) {
+                rarity = "rare";
+            }
+            if (rarity === "rare" && shrineCards.eligibleKeys("rare", reserved).length === 0) {
+                rarity = "common";
+            }
+            let pool = shrineCards.eligibleKeys(rarity, reserved);
+            if (!pool.length && rarity !== "common") {
+                rarity = "common";
+                pool = shrineCards.eligibleKeys("common", reserved);
+            }
+            if (!pool.length) {
+                for (let k = 0; k < shrineCards.keysInOrder.length; k++) {
+                    const key = shrineCards.keysInOrder[k];
+                    const def = shrineCards._byKey[key];
+                    if (def && def.rarity && def.rarity.common === -1) {
+                        pool = [key];
+                        rarity = "common";
+                        break;
+                    }
+                }
+            }
+            if (!pool.length) {
+                continue;
+            }
+            const key = pool[Math.floor(Math.random() * pool.length)];
+            if (!reserved[key]) reserved[key] = {};
+            reserved[key][rarity] = (reserved[key][rarity] || 0) + 1;
+            cards.push({ key: key, rarity: rarity });
+        }
+        return cards;
+    },
+
+    rollPackCards: function(packRarity) {
+        return shrineCards.cardsForRarityRolls(shrineCards.rollPackRarities(packRarity));
+    },
+
+    sessionBonusLines: function(gained) {
+        const totals = {};
+        const list = gained || [];
+        for (let i = 0; i < list.length; i++) {
+            const g = list[i];
+            const def = shrineCards._byKey[g.key];
+            if (!def || !def.getEffect) continue;
+            let effect = {};
+            try {
+                effect = def.getEffect(g.rarity) || {};
+            } catch (err) {
+                effect = {};
+            }
+            if (!totals[g.key]) totals[g.key] = {};
+            const fields = Object.keys(effect);
+            for (let fi = 0; fi < fields.length; fi++) {
+                const f = fields[fi];
+                totals[g.key][f] = (totals[g.key][f] || 0) + (effect[f] || 0);
+            }
+        }
+        const lines = [];
+        for (let i = 0; i < shrineCards.keysInOrder.length; i++) {
+            const key = shrineCards.keysInOrder[i];
+            if (!totals[key]) continue;
+            const def = shrineCards._byKey[key];
+            if (!def || !def.totalBonusText) continue;
+            try {
+                const text = def.totalBonusText(totals[key]) || "";
+                if (text) lines.push(text);
+            } catch (err) {}
+        }
+        return lines;
     }
 };

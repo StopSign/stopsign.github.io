@@ -269,6 +269,9 @@ let onLoad = {
             data.currentGameState.offlineShardBank = {};
         }
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
+        if (data.gameSettings.prestigePackOpen === undefined || data.gameSettings.prestigePackOpen === null) {
+            data.gameSettings.prestigePackOpen = false;
+        }
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
         onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
@@ -318,6 +321,9 @@ let onLoad = {
         view.updateView();
         if (typeof events !== "undefined" && events.syncHideMaxedToggleFromSave) {
             events.syncHideMaxedToggleFromSave();
+        }
+        if (typeof events !== "undefined" && events.restorePrestigePackOverlay) {
+            events.restorePrestigePackOverlay();
         }
         debug();
     }

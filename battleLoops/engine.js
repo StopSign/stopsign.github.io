@@ -13,6 +13,9 @@ let engine = {
         return { battleWidth: bw, playableWidth: playable, laneWidth, inset, laneCount: n };
     },
     runResortTick: function(elapsedMs) {
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            return;
+        }
         engine.updateResortTimers(elapsedMs);
         engine.updateMapClearProgressTimers(elapsedMs);
         engine.updateBaseProduction(elapsedMs);
@@ -26,7 +29,7 @@ let engine = {
         data.progress.classSwitchCooldownMs = Math.max(0, (data.progress.classSwitchCooldownMs || 0) - elapsedMs);
     },
     gameTick: function() {
-        if(data.gameSettings.stop) {
+        if(data.gameSettings.stop || data.gameSettings.prestigePackOpen) {
             return;
         }
         data.gameSettings.ticksForSeconds++;
@@ -36,6 +39,9 @@ let engine = {
         engine.runBattleTick(tickMs);
     },
     runBattleTick: function(tickMs) {
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            return;
+        }
         if (data.battle.state !== "running") {
             return;
         }

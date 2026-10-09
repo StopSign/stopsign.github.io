@@ -15,6 +15,9 @@ document.addEventListener("keydown", function(e) {
     // }
 
     if (code === 'Space') {
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            return;
+        }
         data.gameSettings.stop = !data.gameSettings.stop;
         saving.save();
     }

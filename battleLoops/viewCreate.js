@@ -289,6 +289,7 @@ let createView = {
                     <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
                     <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
                 </div>
+                <div id="shrineMovePackError" class="shrine-move-pack-error" style="display:none">At least 1 pack is required.</div>
                 <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 <div id="shrinePacksSection" class="shrine-packs-section">
                     <div id="shrinePackStrip" class="shrine-pack-strip">
@@ -1182,10 +1183,11 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
+            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
+            "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackSummary", "prestigeFinishBtn",
             "shrineMilestonesList",
             "shrineMs_shrineLevel_fill", "shrineMs_shrineLevel_check", "shrineMs_totalStars_fill", "shrineMs_totalStars_check",
             "shrineMs_okamiLevel_fill", "shrineMs_okamiLevel_check",
@@ -1216,7 +1218,7 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_combat", "skillSubTab_foraging", "skillSubTab_class",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_combat", "skillSubTab_foraging", "skillSubTab_class",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
         const maps = data.progress.mapDefinitions;

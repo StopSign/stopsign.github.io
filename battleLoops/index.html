@@ -325,7 +325,7 @@
                 <div class="pane-title">Options</div>
                 <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
                 <div class="options-row"><button type="button" id="manualSaveButton" class="tab-button" onclick="saving.save()">Save now</button></div>
-                <div class="options-row" id="saveToFileRow" style="display:none"><button type="button" id="saveToFileButton" class="tab-button" onclick="saving.saveToFile()">Save to file</button></div>
+                <div class="options-row" id="saveToFileRow" style="display:none"><button type="button" id="saveToFileButton" class="tab-button" onclick="saving.saveToFile()">Save to file</button><button type="button" id="importFromFileButton" class="tab-button" onclick="saving.importFromFile()">Import from file</button><input type="file" id="importFromFileInput" style="display:none" onchange="saving.onImportFromFileSelected(this)"></div>
                 <label class="options-row"><input type="checkbox" id="hideMaxedUpgradesToggle" onchange="events.setHideMaxedUpgrades(this.checked)"> Hide maxed upgrades</label>
                 <label class="options-row"><input type="checkbox" id="disableCompactLayoutToggle" onchange="events.setDisableCompactLayout(this.checked)"> Always use side-by-side layout</label>
                 <div class="options-row">Number format:</div>
@@ -431,6 +431,22 @@
 <div id="debugSpeedPanel" class="debug-speed-panel" style="display:none">
     <button id="debugSpeed_x3" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(3)">x3</button>
     <button id="debugSpeed_x10" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(10)">x10</button>
+</div>
+
+<div id="prestigePackOverlay" style="display:none;">
+    <div id="prestigePackPanel">
+        <div id="prestigePackTitle" class="prestige-pack-title">Open Your Packs!</div>
+        <div id="prestigePackColumns" class="prestige-pack-columns">
+            <div id="prestigePackCounts" class="prestige-pack-counts"></div>
+            <div id="prestigePackPreview" class="prestige-pack-preview"></div>
+            <div id="prestigePackOdds" class="prestige-pack-odds"></div>
+        </div>
+        <div id="prestigePackCards" class="prestige-pack-cards"></div>
+        <div id="prestigePackError" class="prestige-pack-error"></div>
+        <button type="button" id="prestigePackActionBtn" class="tab-button" onclick="events.prestigePackAction()"></button>
+        <div id="prestigePackSummary" class="prestige-pack-summary" style="display:none;"></div>
+        <button type="button" id="prestigeFinishBtn" class="tab-button" style="display:none;" onclick="events.finishPrestige()">Finish Prestige</button>
+    </div>
 </div>
 
 <div id="offlineProcessingOverlay" style="display:none;">

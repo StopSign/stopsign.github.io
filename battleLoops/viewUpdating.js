@@ -32,7 +32,9 @@ let viewData = {
     },
     slapDmgRender: [],
     playerFloatRender: [],
-    deathOverlayFilled: false
+    deathOverlayFilled: false,
+    prestigeSelection: [],
+    prestigePackError: ""
 };
 
 
@@ -1080,16 +1082,8 @@ let view = {
         }
         view.updateVal("shrineMoveMountainRow", classLocked, "classList.toggle", "shrine-move-row--locked");
         view.updateVal("shrineClassDemoNote", shrineBuilt && classLocked ? "" : "none", "style.display");
-        const confirmChk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
-        const moveBtn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
-        if (confirmChk) {
-            confirmChk.disabled = classLocked;
-            if (classLocked) {
-                confirmChk.checked = false;
-            }
-        }
-        if (moveBtn) {
-            moveBtn.disabled = classLocked || !(confirmChk && confirmChk.checked);
+        if (typeof events !== "undefined" && events.syncShrineMoveControls) {
+            events.syncShrineMoveControls();
         }
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
@@ -5326,6 +5320,107 @@ let view = {
                 delete pv[id].lastValue_innerHTML;
             }
         }
+    },
+    renderPrestigePackPanel: function() {
+        const overlay = viewData.cached.prestigePackOverlay || document.getElementById("prestigePackOverlay");
+        if (!overlay) {
+            return;
+        }
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const session = shrine && shrine.prestigeSession;
+        const open = !!(data.gameSettings && data.gameSettings.prestigePackOpen && session && session.active);
+        overlay.style.display = open ? "flex" : "none";
+        if (!open) {
+            return;
+        }
+        const summary = session.phase === "summary";
+        view.updateVal("prestigePackColumns", summary ? "none" : "", "style.display");
+        view.updateVal("prestigePackCards", summary ? "none" : "", "style.display");
+        view.updateVal("prestigePackError", summary ? "none" : "", "style.display");
+        view.updateVal("prestigePackActionBtn", summary ? "none" : "", "style.display");
+        view.updateVal("prestigePackSummary", summary ? "flex" : "none", "style.display");
+        view.updateVal("prestigeFinishBtn", summary ? "" : "none", "style.display");
+        const summaryEl = viewData.cached.prestigePackSummary || document.getElementById("prestigePackSummary");
+        if (summary) {
+            const lines = shrineCards.sessionBonusLines(session.gained || []);
+            let html = "";
+            for (let i = 0; i < lines.length; i++) {
+                html += `<div>${view.escapeHtml(lines[i])}</div>`;
+            }
+            if (summaryEl && summaryEl.innerHTML !== html) {
+                summaryEl.innerHTML = html;
+            }
+            return;
+        }
+        const packs = shrine.packs || {};
+        const rarities = ["common", "rare", "epic"];
+        let countsHtml = "";
+        for (let i = 0; i < rarities.length; i++) {
+            const rarity = rarities[i];
+            const n = packs[rarity] || 0;
+            countsHtml += `<div class="prestige-pack-count-row"><img class="shrine-pack-icon" src="img/${rarity}.svg" alt="" draggable="false"><span>x${n}</span></div>`;
+        }
+        const countsEl = viewData.cached.prestigePackCounts || document.getElementById("prestigePackCounts");
+        if (countsEl && countsEl.innerHTML !== countsHtml) {
+            countsEl.innerHTML = countsHtml;
+        }
+        const previewRarity = (session.openPack && session.openPack.rarity) || session.previewRarity;
+        const previewEl = viewData.cached.prestigePackPreview || document.getElementById("prestigePackPreview");
+        const oddsEl = viewData.cached.prestigePackOdds || document.getElementById("prestigePackOdds");
+        const packDef = previewRarity && shrineCards.packDefs[previewRarity];
+        if (previewEl) {
+            const imgHtml = packDef ? `<img src="img/${previewRarity}.svg" alt="" draggable="false">` : "";
+            if (previewEl.innerHTML !== imgHtml) {
+                previewEl.innerHTML = imgHtml;
+            }
+        }
+        if (oddsEl) {
+            const oddsHtml = packDef ? packDef.oddsHtml : "";
+            if (oddsEl.innerHTML !== oddsHtml) {
+                oddsEl.innerHTML = oddsHtml;
+            }
+        }
+        const cardsEl = viewData.cached.prestigePackCards || document.getElementById("prestigePackCards");
+        let cardsHtml = "";
+        const openPack = session.openPack;
+        const selected = viewData.prestigeSelection || [];
+        if (openPack && openPack.cards) {
+            for (let i = 0; i < openPack.cards.length; i++) {
+                const card = openPack.cards[i];
+                const def = shrineCards._byKey[card.key];
+                const name = def ? def.name : card.key;
+                let effect = "";
+                if (def && def.effectText) {
+                    try {
+                        effect = def.effectText(card.rarity) || "";
+                    } catch (err) {
+                        effect = "";
+                    }
+                }
+                const border = shrineCards.rarityBorder[card.rarity] || "#9fb6d5";
+                const bg = shrineCards.rarityBackground[card.rarity] || "rgba(159, 182, 213, 0.5)";
+                const selClass = selected.indexOf(i) >= 0 ? " prestige-pack-card--selected" : "";
+                cardsHtml += `<button type="button" class="prestige-pack-card${selClass}" style="border-color:${border};background:${bg}" onclick="events.selectPrestigeCard(${i})"><div class="prestige-pack-card-name">${view.escapeHtml(name)}</div><div class="prestige-pack-card-effect">${view.escapeHtml(effect)}</div></button>`;
+            }
+        }
+        if (cardsEl && cardsEl.innerHTML !== cardsHtml) {
+            cardsEl.innerHTML = cardsHtml;
+        }
+        const errEl = viewData.cached.prestigePackError || document.getElementById("prestigePackError");
+        if (errEl) {
+            errEl.textContent = viewData.prestigePackError || "";
+        }
+        const btn = viewData.cached.prestigePackActionBtn || document.getElementById("prestigePackActionBtn");
+        if (btn) {
+            btn.textContent = shrineCards.actionButtonLabel(session, shrine);
+        }
+    },
+    escapeHtml: function(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
     },
     updateVal: function(id, newVal, type="textContent", sigFigs) {
         const el = viewData.cached[id];

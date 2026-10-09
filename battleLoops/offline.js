@@ -719,6 +719,10 @@ let offline = {
         if (isProcessingOffline) {
             return false;
         }
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            data.currentGameState.pendingOfflineMs = 0;
+            return false;
+        }
 
         isProcessingOffline = true;
         data.gameSettings.stopAll = true;

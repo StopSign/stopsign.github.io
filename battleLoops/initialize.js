@@ -406,6 +406,7 @@ let initials = {
             bonusSpeed: 1,
             stop: false,
             stopAll: false,
+            prestigePackOpen: false,
             ticksPerSecond: 20,
             ticksForSeconds: 0,
             renderAlpha: 1,
@@ -1193,16 +1194,53 @@ let initialize = {
                 shrine.packs[r] = 0;
             }
         });
-        if (!shrine.cards) {
+        if (!shrine.cards || typeof shrine.cards !== "object") {
             shrine.cards = (typeof shrineCards !== "undefined" && shrineCards.createFreshCardsState)
                 ? shrineCards.createFreshCardsState()
                 : {};
+        } else if (typeof shrineCards !== "undefined" && shrineCards.createFreshCardsState) {
+            const freshCards = shrineCards.createFreshCardsState();
+            const cardKeys = Object.keys(freshCards);
+            for (let ci = 0; ci < cardKeys.length; ci++) {
+                const cardKey = cardKeys[ci];
+                if (!shrine.cards[cardKey] || typeof shrine.cards[cardKey] !== "object") {
+                    shrine.cards[cardKey] = freshCards[cardKey];
+                    continue;
+                }
+                const rarityKeys = Object.keys(freshCards[cardKey]);
+                for (let ri = 0; ri < rarityKeys.length; ri++) {
+                    const rarityKey = rarityKeys[ri];
+                    if (shrine.cards[cardKey][rarityKey] === undefined || shrine.cards[cardKey][rarityKey] === null) {
+                        shrine.cards[cardKey][rarityKey] = 0;
+                    }
+                }
+            }
         }
         if (typeof shrineCards !== "undefined" && shrineCards.invalidateAggregatedEffects) {
             shrineCards.invalidateAggregatedEffects();
         }
         if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
             data.progress.hasMovedToNewMountain = false;
+        }
+        const prestigeSession = shrine.prestigeSession;
+        if (!prestigeSession || typeof prestigeSession !== "object" || !prestigeSession.active) {
+            shrine.prestigeSession = null;
+            if (data.gameSettings) {
+                data.gameSettings.prestigePackOpen = false;
+            }
+        } else {
+            if (prestigeSession.phase !== "summary") {
+                prestigeSession.phase = "choose";
+            }
+            if (!Array.isArray(prestigeSession.gained)) {
+                prestigeSession.gained = [];
+            }
+            if (!prestigeSession.openPack || !Array.isArray(prestigeSession.openPack.cards)) {
+                prestigeSession.openPack = null;
+            }
+            if (data.gameSettings) {
+                data.gameSettings.prestigePackOpen = true;
+            }
         }
         const msDef = (def && def.milestones) || {};
         if (!shrine.milestones) {

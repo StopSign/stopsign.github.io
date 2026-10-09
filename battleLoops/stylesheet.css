@@ -2044,6 +2044,11 @@ button {
     margin: 4px 0 8px;
 }
 
+.shrine-move-pack-error {
+    color: #ef4444;
+    margin: 0 0 8px;
+}
+
 .shrine-move-confirm {
     display: inline-flex;
     align-items: center;
@@ -3806,3 +3811,117 @@ button {
 .star-bronze { color: #cd7f32; }
 .star-silver { color: #c0c0c0; }
 .star-gold { color: #ffd700; }
+
+#prestigePackOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(5, 8, 12, 0.88);
+    display: none;
+    justify-content: center;
+    align-items: flex-start;
+    overflow: auto;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+#prestigePackPanel {
+    width: 690px;
+    height: 810px;
+    min-width: 690px;
+    min-height: 810px;
+    max-width: 690px;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    background: #101621;
+    color: var(--text-primary);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: auto;
+}
+
+.prestige-pack-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.prestige-pack-columns {
+    display: grid;
+    grid-template-columns: 150px minmax(96px, 140px) 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.prestige-pack-count-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.prestige-pack-preview img {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+}
+
+.prestige-pack-odds {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.prestige-pack-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.prestige-pack-card {
+    border: 3px solid #9fb6d5;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    min-height: 72px;
+    text-align: left;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.prestige-pack-card--selected {
+    outline: 3px solid #ffe14a;
+    outline-offset: 3px;
+}
+
+.prestige-pack-card-name {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.prestige-pack-card-effect {
+    font-size: 12px;
+    line-height: 1.3;
+}
+
+.prestige-pack-error {
+    color: #ef4444;
+    min-height: 1.2em;
+}
+
+.prestige-pack-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#prestigePackActionBtn,
+#prestigeFinishBtn {
+    align-self: center;
+}

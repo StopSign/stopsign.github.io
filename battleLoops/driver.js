@@ -14,6 +14,11 @@ let driver = {
         if (!data.currentGameState) {
             return;
         }
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            data.currentGameState.pendingOfflineMs = 0;
+            data.lastVisit = Date.now();
+            return;
+        }
         if (typeof offline !== "undefined" && offline.ensureState) {
             offline.ensureState();
         } else if (data.currentGameState.pendingOfflineMs === undefined) {
@@ -46,12 +51,15 @@ let driver = {
         const delta = currentTime - lastAnimationTime;
         lastAnimationTime = currentTime;
 
-        timeAccumulators.view10 += delta;
+        const prestigePaused = !!(data.gameSettings && data.gameSettings.prestigePackOpen);
+        if (!prestigePaused) {
+            timeAccumulators.view10 += delta;
+            view.updateViewAtFrame();
+        }
         timeAccumulators.view1 += delta;
-        view.updateViewAtFrame();
 
         const interval10 = 100;
-        if (timeAccumulators.view10 >= interval10) {
+        if (!prestigePaused && timeAccumulators.view10 >= interval10) {
             timeAccumulators.view10 %= interval10;
             view.updateView();
         }
@@ -63,7 +71,9 @@ let driver = {
                 timeSinceLastSave = 0;
                 saving.save();
             }
-            view.updateViewOnSecond();
+            if (!prestigePaused) {
+                view.updateViewOnSecond();
+            }
         }
 
         requestAnimationFrame(driver.animationTick);
