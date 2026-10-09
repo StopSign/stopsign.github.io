@@ -1505,6 +1505,9 @@ let initialize = {
         data.currentGameState = initials.currentGameState();
         data.progress = initials.progress();
         data.battle = initials.battle();
+        initialize.rebuildFreshRun();
+    },
+    rebuildFreshRun: function() {
         initialize.initializeBaseContentNotify();
         initialize.initializeBambooForest();
         initialize.initializeScrollArchives();

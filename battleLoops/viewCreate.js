@@ -283,14 +283,6 @@ let createView = {
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span></div>
                 </div>
-                <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
-                <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
-                <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
-                    <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
-                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
-                </div>
-                <div id="shrineMovePackError" class="shrine-move-pack-error" style="display:none">At least 1 pack is required.</div>
-                <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 <div id="shrinePacksSection" class="shrine-packs-section">
                     <div id="shrinePackStrip" class="shrine-pack-strip">
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${commonImg}" alt="" draggable="false"> Common Packs: <span id="shrinePackCommonCount">0</span></span>
@@ -314,6 +306,15 @@ let createView = {
                         ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
+                <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
+                <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
+                <div id="shrinePrestigeNote" class="base-row muted-text">Moving to a new mountain resets the resort to a fresh start. Divinity max increases by the total talent levels of unlocked skills. Card bonuses, noodle bar tips, and that Divinity max are kept.</div>
+                <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
+                    <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
+                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
+                </div>
+                <div id="shrineMovePackError" class="shrine-move-pack-error" style="display:none">At least 1 pack is required.</div>
+                <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 ${resortUpgradeRowsHtml("shrine")}
             `;
         };
@@ -321,7 +322,7 @@ let createView = {
             let choiceCols = "";
             const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards, and only start to drop when this research is woven. Each shard increases the base exp of the skill when creating a new clone.";
             for (let ci = 0; ci < 3; ci++) {
-                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
+                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><div id="scrollArchivesChoiceTips_${ci}" class="muted-text scroll-archives-choice-tips" style="display:none"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
             }
             return choiceCols;
         };
@@ -1183,7 +1184,7 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
+            "shrineClassSelectRow", "shrineClassRow", "shrinePrestigeNote", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
@@ -1373,7 +1374,7 @@ let createView = {
             createView.queueCache(`waveInfoZoneShard_${wsi}`);
         }
         for (let ci = 0; ci < 3; ci++) {
-            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
+            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceTips_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
         }
         createView.queueCache("base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn");
         for (let tui = 0; tui < resortData.getFoxDenUnlockOrder().length; tui++) {

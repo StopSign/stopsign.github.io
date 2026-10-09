@@ -1619,7 +1619,85 @@ let events = {
         view.renderPrestigePackPanel();
     },
     finishPrestige: function() {
-        // Placeholder until the next patch describes the prestige reset.
+        const progress = data.progress;
+        const shrine = progress.base && progress.base.shrine;
+        const cards = shrine && shrine.cards ? structuredClone(shrine.cards) : null;
+        const tipsBySkill = {};
+        const oldSkills = progress.skills || {};
+        const skillKeys = Object.keys(oldSkills);
+        for (let i = 0; i < skillKeys.length; i++) {
+            const tips = oldSkills[skillKeys[i]] && oldSkills[skillKeys[i]].tips || 0;
+            if (tips > 0) {
+                tipsBySkill[skillKeys[i]] = tips;
+            }
+        }
+        const talentAdd = skills.unlockedTalentLevelTotal();
+        const oldCap = (progress.divinity && progress.divinity.capacity) || 100000;
+        const newCap = oldCap + talentAdd;
+        const prevOptions = progress.options || {};
+        const hideMaxed = prevOptions.hideMaxedUpgrades;
+        const disableCompact = prevOptions.disableCompactLayout;
+
+        data.progress = initials.progress();
+        data.battle = initials.battle();
+        data.currentGameState = initials.currentGameState();
+        data.battle.currentTab = "base";
+        initialize.rebuildFreshRun();
+
+        if (hideMaxed !== undefined) {
+            data.progress.options.hideMaxedUpgrades = !!hideMaxed;
+        }
+        if (disableCompact !== undefined) {
+            data.progress.options.disableCompactLayout = !!disableCompact;
+        }
+        data.progress.hasMovedToNewMountain = true;
+        const newShrine = data.progress.base.shrine;
+        if (cards) {
+            newShrine.cards = cards;
+        }
+        newShrine.prestigeSession = null;
+        initialize.initializeShrine();
+        const newSkills = data.progress.skills || {};
+        const tipKeys = Object.keys(tipsBySkill);
+        for (let ti = 0; ti < tipKeys.length; ti++) {
+            const key = tipKeys[ti];
+            if (newSkills[key]) {
+                newSkills[key].tips = tipsBySkill[key];
+            }
+        }
+        data.progress.divinity.amount = 0;
+        data.progress.divinity.capacity = newCap;
+        if (typeof shrineCards !== "undefined" && shrineCards.invalidateAggregatedEffects) {
+            shrineCards.invalidateAggregatedEffects();
+        }
+        initialize.calcPlayerStats(false);
+
+        data.gameSettings.prestigePackOpen = false;
+        data.gameSettings.stop = false;
+        data.battle.currentTab = "base";
+        events.clearShrineMoveConfirm();
+        events.closeBaseBuildingInfo();
+        if (typeof createView !== "undefined" && createView.showCurrentTab) {
+            createView.showCurrentTab();
+        }
+        if (typeof view !== "undefined") {
+            if (view.updateTabButtons) {
+                view.updateTabButtons("base");
+            }
+            if (view.updateView) {
+                view.updateView();
+            }
+            if (view.updateViewAtFrame) {
+                view.updateViewAtFrame();
+            }
+            if (view.renderBattlefield) {
+                view.renderBattlefield();
+            }
+            if (view.renderPrestigePackPanel) {
+                view.renderPrestigePackPanel();
+            }
+        }
+        saving.save();
     },
     restorePrestigePackOverlay: function() {
         const shrine = data.progress.base && data.progress.base.shrine;

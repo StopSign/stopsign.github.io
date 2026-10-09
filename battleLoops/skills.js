@@ -1701,6 +1701,23 @@ let skills = {
     isSkillUnlocked: function(skillKey) {
         return !!data.progress.base.scrollArchives.unlockedSkills[skillKey];
     },
+    unlockedTalentLevelTotal: function() {
+        const archives = data.progress && data.progress.base && data.progress.base.scrollArchives;
+        const unlocked = archives && archives.unlockedSkills;
+        if (!unlocked) {
+            return 0;
+        }
+        const sks = (data.progress && data.progress.skills) || {};
+        const keys = Object.keys(sks);
+        let sum = 0;
+        for (let i = 0; i < keys.length; i++) {
+            if (!unlocked[keys[i]]) {
+                continue;
+            }
+            sum += Math.floor((sks[keys[i]] && sks[keys[i]].talentLevel) || 0);
+        }
+        return sum;
+    },
     isSkillResearchComplete: function(skillKey) {
         return skills.isSkillUnlocked(skillKey);
     },

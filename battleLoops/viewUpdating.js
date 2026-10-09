@@ -1073,6 +1073,7 @@ let view = {
         view.updateVal("shrineClassSelectRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineClassRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineMoveMountainRow", shrineBuilt ? "" : "none", "style.display");
+        view.updateVal("shrinePrestigeNote", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrinePacksSection", shrineBuilt ? "" : "none", "style.display");
         const classLocked = selected !== "none";
         for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
@@ -1181,6 +1182,7 @@ let view = {
             if (!skillKey) {
                 view.updateVal(colId, "none", "style.display");
                 view.updateVal(`scrollArchivesChoiceShard_${ci}`, "none", "style.display");
+                view.updateVal(`scrollArchivesChoiceTips_${ci}`, "none", "style.display");
                 continue;
             }
             const sk = data.progress.skills[skillKey];
@@ -1188,6 +1190,9 @@ let view = {
             view.updateVal(`scrollArchivesChoiceType_${ci}`, sk ? sk.name : skillKey);
             view.updateVal(`scrollArchivesChoiceDesc_${ci}`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(skillKey)), "innerHTML");
             view.updateVal(`scrollArchivesChoiceShard_${ci}`, engine.skillHasShardOnTravelableMap(skillKey) ? "" : "none", "style.display");
+            const choiceTips = sk ? (sk.tips || 0) : 0;
+            view.updateVal(`scrollArchivesChoiceTips_${ci}`, choiceTips > 0 ? "" : "none", "style.display");
+            view.updateVal(`scrollArchivesChoiceTips_${ci}`, choiceTips > 0 ? `${choiceTips} tips` : "");
             const radio = document.getElementById(`scrollArchivesChoiceRadio_${ci}`);
             if (radio) {
                 radio.checked = lib.selectedResearchChoice === skillKey;
@@ -5347,6 +5352,10 @@ let view = {
             for (let i = 0; i < lines.length; i++) {
                 html += `<div>${view.escapeHtml(lines[i])}</div>`;
             }
+            const talentAdd = (typeof skills !== "undefined" && skills.unlockedTalentLevelTotal)
+                ? skills.unlockedTalentLevelTotal() : 0;
+            html += `<div>Divinity max: +${talentAdd}</div>`;
+            html += `<div class="muted-text">From the total talent levels of unlocked skills.</div>`;
             if (summaryEl && summaryEl.innerHTML !== html) {
                 summaryEl.innerHTML = html;
             }
