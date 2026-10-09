@@ -605,6 +605,7 @@ let engine = {
             if (stacks > 0) {
                 engine.addFuryStacks(stacks);
             }
+            engine.addSkillExp("seethe", 1);
         }
     },
     updateApplyTearDropsEachHalfSecond: function(tickMs) {
@@ -694,13 +695,12 @@ let engine = {
                 }
                 engine.addSkillExp("thinIce", 1);
             }
-            if (atMax && skills.isSkillUnlocked("simmer")) {
-                const simEff = skills.getSkillEffect("simmer");
-                const maliceAmt = simEff.malicePerLevel || 0;
-                if (maliceAmt > 0) {
-                    engine.addMalice(maliceAmt);
-                }
-                engine.addSkillExp("simmer", 1);
+        });
+
+        engine.advanceBattleAccMs("combatSkillSecondAccMs", tickMs, 1000, function() {
+            if (belowHalf) {
+                engine.addSkillExp("secondWind", 1);
+                engine.trySecondWindRestore();
             }
             if (moving && skills.isSkillUnlocked("righteousRant")) {
                 const rantEff = skills.getSkillEffect("righteousRant");
@@ -709,13 +709,6 @@ let engine = {
                     engine.addOutrageMs(ms);
                 }
                 engine.addSkillExp("righteousRant", 1);
-            }
-        });
-
-        engine.advanceBattleAccMs("combatSkillSecondAccMs", tickMs, 1000, function() {
-            if (belowHalf) {
-                engine.addSkillExp("secondWind", 1);
-                engine.trySecondWindRestore();
             }
             if (moving && skills.isSkillUnlocked("walkingItOff")) {
                 const walkEff = skills.getSkillEffect("walkingItOff");
@@ -780,6 +773,17 @@ let engine = {
                     }
                     engine.addSkillExp("stageSob", 1);
                 }
+            }
+        });
+
+        engine.advanceBattleAccMs("combatSkillTwoSecondAccMs", tickMs, 2000, function() {
+            if (atMax && skills.isSkillUnlocked("simmer")) {
+                const simEff = skills.getSkillEffect("simmer");
+                const maliceAmt = simEff.malicePerLevel || 0;
+                if (maliceAmt > 0) {
+                    engine.addMalice(maliceAmt);
+                }
+                engine.addSkillExp("simmer", 1);
             }
         });
 
@@ -1275,6 +1279,10 @@ let engine = {
     },
     beginPostBattleCloneCountdown: function() {
         if (!data.battle || (data.battle.state !== "dead" && data.battle.state !== "completed")) {
+            data.progress.autoRetryCountdownSec = 0;
+            return;
+        }
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
             data.progress.autoRetryCountdownSec = 0;
             return;
         }
@@ -6765,26 +6773,57 @@ let engine = {
         return jobType === "collectStone";
     },
     syncResortPathDom: function() {
-        const globalTrack = document.querySelector(".resort-path-track");
-        const globalHollow = document.querySelector(".resort-path-hollow");
-        if (globalTrack) {
-            globalTrack.setAttribute("d", "");
-        }
-        if (globalHollow) {
-            globalHollow.setAttribute("d", "");
-        }
         const specs = engine.getResortPathSegmentSpecs();
+        if (!engine._pathDomSig) {
+            engine._pathDomSig = [];
+        }
+        const prev = engine._pathDomSig;
+        const next = [];
+        let changed = prev.length !== specs.length || !engine._pathDomGlobalsApplied;
         for (let i = 0; i < specs.length; i++) {
+            const sig = (engine.isPathSegmentRevealed(i) ? "1" : "0") + "|" + engine.getPathSegmentVisualTier(i);
+            next.push(sig);
+            if (prev[i] !== sig) {
+                changed = true;
+            }
+        }
+        if (!changed) {
+            return;
+        }
+        if (!engine._pathDomGlobalsApplied) {
+            const globalTrack = document.querySelector(".resort-path-track");
+            const globalHollow = document.querySelector(".resort-path-hollow");
+            if (globalTrack) {
+                globalTrack.setAttribute("d", "");
+            }
+            if (globalHollow) {
+                globalHollow.setAttribute("d", "");
+            }
+            const end = engine.getResortPathEnd();
+            viewData.layout.pathEndX = end.x;
+            viewData.layout.pathEndY = end.y;
+            const map = document.getElementById("baseResortMap");
+            if (map && end) {
+                map.style.setProperty("--path-end-x", `${Math.round(end.x)}px`);
+                map.style.setProperty("--path-end-y", `${Math.round(end.y)}px`);
+                engine._pathDomGlobalsApplied = true;
+            }
+        }
+        for (let i = 0; i < specs.length; i++) {
+            if (prev[i] === next[i]) {
+                continue;
+            }
             const trackEl = document.getElementById(`pathSegmentTrack_${i}`);
             const hollowEl = document.getElementById(`pathSegmentHollow_${i}`);
             if (!trackEl || !hollowEl) {
+                next[i] = "";
                 continue;
             }
-            const revealed = engine.isPathSegmentRevealed(i);
+            const revealed = next[i].charAt(0) === "1";
+            const tier = next[i].slice(2);
             const d = engine.getPathSegmentSvgSubpath(i);
             trackEl.setAttribute("d", d);
             hollowEl.setAttribute("d", d);
-            const tier = engine.getPathSegmentVisualTier(i);
             const dashedTier = tier === "rocks";
             const showTrack = revealed ? "" : "none";
             const showHollow = revealed && !dashedTier ? "" : "none";
@@ -6802,14 +6841,7 @@ let engine = {
             hollowEl.removeAttribute("pathLength");
             hollowEl.removeAttribute("stroke-dasharray");
         }
-        const end = engine.getResortPathEnd();
-        viewData.layout.pathEndX = end.x;
-        viewData.layout.pathEndY = end.y;
-        const map = document.getElementById("baseResortMap");
-        if (map && end) {
-            map.style.setProperty("--path-end-x", `${Math.round(end.x)}px`);
-            map.style.setProperty("--path-end-y", `${Math.round(end.y)}px`);
-        }
+        engine._pathDomSig = next;
     },
     getResortPathTotalDistance: function() {
         const segs = engine.getResortPathPoints();
@@ -7807,6 +7839,9 @@ let engine = {
         engine.restoreOkamiAfterWeaveOrPath();
         engine.checkMapRevealTriggers();
         engine.syncResortPathDom();
+        if (typeof view !== "undefined" && view.updatePathSegmentHighlight) {
+            view.updatePathSegmentHighlight();
+        }
     },
     completePathReturnJob: function(segmentIndex, jobType) {
         const seg = engine.getPathSegmentData(segmentIndex);
@@ -11696,6 +11731,30 @@ let engine = {
         const tails = engine.getOkamiTails(okamiLevel);
         return (engine.getTotalTalentLevels() * engine.getShrineStarScore() * engine.getSpiritTotalLevels() * okamiLevel * tails) / 10000000;
     },
+    getShrineEscalatingRarity: function(id, req) {
+        if (id === "marketLevel") {
+            return req === 4 ? "common" : "rare";
+        }
+        if (id === "depthReached") {
+            return (req === 10 || req === 12) ? "common" : "rare";
+        }
+        if (id === "orbLevel") {
+            return req === 35 ? "common" : "rare";
+        }
+        if (id === "divinityAmount") {
+            if (req === 30000) {
+                return "common";
+            }
+            if (req === 60000) {
+                return "rare";
+            }
+            return "epic";
+        }
+        if (id === "totalGoldStars") {
+            return req <= 3 ? "rare" : "epic";
+        }
+        return "rare";
+    },
     updateShrineMilestones: function() {
         if (!engine.isShrineBuilt()) {
             return;
@@ -11714,30 +11773,71 @@ let engine = {
         if (!ms.totalStarsClaimed) {
             ms.totalStarsClaimed = {};
         }
-
-        const shrineLevelThresholds = [1, 2, 4, 7, 11, 16, 22];
-        const shrineLevelPacks = ["common", "common", "common", "common", "rare", "rare", "epic"];
-        const shrineProgress = engine.getShrineContinuousLevelProgress();
-        for (let i = 0; i < shrineLevelThresholds.length; i++) {
-            const t = shrineLevelThresholds[i];
-            const key = String(t);
-            if (!ms.shrineLevelClaimed[key] && shrineProgress >= t) {
-                ms.shrineLevelClaimed[key] = true;
-                engine.grantShrinePack(shrineLevelPacks[i]);
+        if (!ms.okamiLevelClaimed) {
+            ms.okamiLevelClaimed = {};
+        }
+        if (ms.marketLevelReq === undefined || ms.marketLevelReq === null) {
+            ms.marketLevelReq = 4;
+        }
+        if (ms.depthReachedReq === undefined || ms.depthReachedReq === null) {
+            ms.depthReachedReq = 10;
+        }
+        if (ms.orbLevelReq === undefined || ms.orbLevelReq === null) {
+            ms.orbLevelReq = 35;
+        }
+        if (ms.essenceMadeReq === undefined || ms.essenceMadeReq === null) {
+            ms.essenceMadeReq = 10000;
+        }
+        if (ms.maxManaReq === undefined || ms.maxManaReq === null) {
+            ms.maxManaReq = 200000;
+        }
+        if (ms.divinityAmountReq === undefined || ms.divinityAmountReq === null) {
+            ms.divinityAmountReq = 30000;
+        }
+        if (ms.totalGoldStarsReq === undefined || ms.totalGoldStarsReq === null) {
+            ms.totalGoldStarsReq = 1;
+        }
+        if (!ms.milestoneCurveMigrated) {
+            if (ms.depthReachedReq === 12) {
+                ms.depthReachedReq = 10;
             }
+            if (ms.orbLevelReq === 40) {
+                ms.orbLevelReq = 35;
+            }
+            if (ms.divinityAmountReq === 100000) {
+                ms.divinityAmountReq = 30000;
+            }
+            const goldReq = ms.totalGoldStarsReq;
+            if (typeof goldReq === "number" && goldReq !== 1 && (goldReq - 1) % 3 === 0) {
+                const lastClaimed = goldReq - 3;
+                let next = 1;
+                while (next <= lastClaimed) {
+                    next += 2;
+                }
+                ms.totalGoldStarsReq = next;
+            }
+            ms.milestoneCurveMigrated = true;
         }
 
-        const starThresholds = [5, 10, 15, 20, 25, 30];
-        const starPacks = ["common", "common", "common", "rare", "rare", "epic"];
-        const starCount = engine.getTotalEarnedStarsCount();
-        for (let si = 0; si < starThresholds.length; si++) {
-            const st = starThresholds[si];
-            const skey = String(st);
-            if (!ms.totalStarsClaimed[skey] && starCount >= st) {
-                ms.totalStarsClaimed[skey] = true;
-                engine.grantShrinePack(starPacks[si]);
+        const claimFixed = function(claimedKey, progress, thresholds, packs) {
+            if (!ms[claimedKey]) {
+                ms[claimedKey] = {};
             }
-        }
+            const claimed = ms[claimedKey];
+            for (let i = 0; i < thresholds.length; i++) {
+                const t = thresholds[i];
+                const key = String(t);
+                if (!claimed[key] && progress >= t) {
+                    claimed[key] = true;
+                    engine.grantShrinePack(packs[i]);
+                }
+            }
+        };
+
+        claimFixed("shrineLevelClaimed", engine.getShrineContinuousLevelProgress(), [1, 2, 4, 7, 11, 16, 22], ["common", "common", "common", "common", "rare", "rare", "epic"]);
+        claimFixed("totalStarsClaimed", engine.getTotalEarnedStarsCount(), [5, 10, 15, 20, 25, 30], ["common", "common", "common", "rare", "rare", "epic"]);
+        const okami = engine.getOkami();
+        claimFixed("okamiLevelClaimed", (okami && okami.level) || 0, [10, 20, 30, 40, 50, 60, 70, 80], ["common", "common", "rare", "rare", "epic", "epic", "epic", "epic"]);
 
         const claimEscalating = function(cur, reqKey, bumpFn, rarity) {
             if (ms[reqKey] === undefined || ms[reqKey] === null) {
@@ -11745,49 +11845,38 @@ let engine = {
             }
             let guard = 0;
             while (cur >= ms[reqKey] && guard < 100) {
-                engine.grantShrinePack(rarity);
+                const rarityNow = typeof rarity === "function" ? rarity(ms[reqKey]) : rarity;
+                engine.grantShrinePack(rarityNow);
                 ms[reqKey] = bumpFn(ms[reqKey]);
                 guard++;
             }
         };
 
         const market = data.progress.base && data.progress.base.market;
-        if (ms.marketLevelReq === undefined || ms.marketLevelReq === null) {
-            ms.marketLevelReq = 4;
-        }
-        claimEscalating((market && market.level) || 0, "marketLevelReq", function(r) { return r + 1; }, "rare");
-
-        if (ms.depthReachedReq === undefined || ms.depthReachedReq === null) {
-            ms.depthReachedReq = 12;
-        }
-        claimEscalating(engine.getMineHighestDepthReached(), "depthReachedReq", function(r) { return r + 3; }, "rare");
+        claimEscalating((market && market.level) || 0, "marketLevelReq", function(r) { return r + 1; }, function(r) { return engine.getShrineEscalatingRarity("marketLevel", r); });
+        claimEscalating(engine.getMineHighestDepthReached(), "depthReachedReq", function(r) { return r === 10 ? 12 : r + 3; }, function(r) { return engine.getShrineEscalatingRarity("depthReached", r); });
 
         const orb = data.progress.base && data.progress.base.mage_tower;
-        if (ms.orbLevelReq === undefined || ms.orbLevelReq === null) {
-            ms.orbLevelReq = 40;
-        }
-        claimEscalating((orb && orb.level) || 0, "orbLevelReq", function(r) { return r + 5; }, "rare");
-
-        if (ms.essenceMadeReq === undefined || ms.essenceMadeReq === null) {
-            ms.essenceMadeReq = 10000;
-        }
+        claimEscalating((orb && orb.level) || 0, "orbLevelReq", function(r) { return r + 5; }, function(r) { return engine.getShrineEscalatingRarity("orbLevel", r); });
         claimEscalating(data.progress.essenceMade || 0, "essenceMadeReq", function(r) { return r * 10; }, "rare");
-
-        if (ms.maxManaReq === undefined || ms.maxManaReq === null) {
-            ms.maxManaReq = 200000;
-        }
         claimEscalating(engine.getManaCapacity(), "maxManaReq", function(r) { return Math.round(r * 1.5); }, "rare");
 
         const divinity = data.progress.divinity;
-        if (ms.divinityAmountReq === undefined || ms.divinityAmountReq === null) {
-            ms.divinityAmountReq = 100000;
-        }
-        claimEscalating((divinity && divinity.amount) || 0, "divinityAmountReq", function(r) { return Math.round(r * 1.3); }, "epic");
+        claimEscalating((divinity && divinity.amount) || 0, "divinityAmountReq", function(r) {
+            if (r === 30000) {
+                return 60000;
+            }
+            if (r === 60000) {
+                return 100000;
+            }
+            return Math.round(r * 1.3);
+        }, function(r) { return engine.getShrineEscalatingRarity("divinityAmount", r); });
+        claimEscalating(engine.getTotalEarnedGoldStars(), "totalGoldStarsReq", function(r) { return r + 2; }, function(r) { return engine.getShrineEscalatingRarity("totalGoldStars", r); });
 
-        if (ms.totalGoldStarsReq === undefined || ms.totalGoldStarsReq === null) {
-            ms.totalGoldStarsReq = 1;
+        if (!ms.buildShrineClaimed) {
+            ms.buildShrineClaimed = true;
+            engine.grantShrinePack("epic");
         }
-        claimEscalating(engine.getTotalEarnedGoldStars(), "totalGoldStarsReq", function(r) { return r + 3; }, "epic");
     },
     getShrineDivinityRate: function() {
         if (!engine.isShrineBuilt()) {
@@ -11916,6 +12005,9 @@ let engine = {
         engine.tryStartWhenFullMana();
     },
     tryStartWhenFullMana: function() {
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+            return;
+        }
         const bf = data.progress.base && data.progress.base.bonfire;
         if (!bf || !bonfire.isStartWithFullManaEnabled()) {
             return;

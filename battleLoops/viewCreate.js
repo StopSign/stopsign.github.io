@@ -223,17 +223,28 @@ let createView = {
                 ${resortUpgradeRowsHtml("bonfire")}
             `;
         };
+        const htmlShrineMilestoneHeading = function(text, split) {
+            return `<div class="shrine-milestone-heading${split ? " shrine-milestone-heading--split" : ""}">${text}</div>`;
+        };
         const htmlShrineFixedMilestone = function(id, name, thresholds, packImgs) {
             let markers = "";
+            let ticks = "";
+            let values = "";
             const n = thresholds.length;
             for (let i = 0; i < n; i++) {
                 const left = ((i + 1) / n) * 100;
                 markers += `<div class="shrine-milestone-marker" style="left:${left}%"><img id="shrineMs_${id}_icon_${i}" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImgs[i]}" alt="" draggable="false"></div>`;
+                ticks += `<div class="shrine-milestone-tick" style="left:${left}%"><span class="shrine-milestone-tick-line"></span></div>`;
+                values += `<div class="shrine-milestone-value" style="left:${left}%">${thresholds[i]}</div>`;
             }
-            return `<div class="shrine-milestone" id="shrineMs_${id}_wrap">
-                <div class="shrine-milestone-name">${name}</div>
+            return `<div class="shrine-milestone shrine-milestone-capped" id="shrineMs_${id}_wrap">
+                <div class="shrine-milestone-name">${name} <span id="shrineMs_${id}_check" class="shrine-milestone-check" style="visibility:hidden">&#10003;</span></div>
                 <div class="shrine-milestone-markers">${markers}</div>
-                <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+                <div class="shrine-milestone-bar">
+                    <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+                    <div class="shrine-milestone-ticks">${ticks}</div>
+                </div>
+                <div class="shrine-milestone-values">${values}</div>
             </div>`;
         };
         const htmlShrineEscalatingMilestone = function(id, name, packImg) {
@@ -241,6 +252,15 @@ let createView = {
                 <div class="shrine-milestone-name">${name} <span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span></div>
                 <div class="shrine-milestone-markers"><div class="shrine-milestone-marker" style="left:100%"><img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false"></div></div>
                 <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+            </div>`;
+        };
+        const htmlShrineOnceMilestone = function(id, name, packImg) {
+            return `<div class="shrine-milestone shrine-milestone-once" id="shrineMs_${id}_wrap">
+                <div class="shrine-milestone-name">${name}</div>
+                <div class="shrine-milestone-once-reward">
+                    <img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false">
+                    <span id="shrineMs_${id}_check" class="shrine-milestone-check" style="visibility:hidden">&#10003;</span>
+                </div>
             </div>`;
         };
         const htmlShrinePanel = function() {
@@ -255,6 +275,7 @@ let createView = {
             const epicImg = "img/epic.svg";
             const shrineLevelPacks = [commonImg, commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
+            const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
             return `
                 <div class="base-row muted-text">Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
@@ -268,6 +289,7 @@ let createView = {
                     <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
                     <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
                 </div>
+                <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 <div id="shrinePacksSection" class="shrine-packs-section">
                     <div id="shrinePackStrip" class="shrine-pack-strip">
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${commonImg}" alt="" draggable="false"> Common Packs: <span id="shrinePackCommonCount">0</span></span>
@@ -275,15 +297,20 @@ let createView = {
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${epicImg}" alt="" draggable="false"> Epic Packs: <span id="shrinePackEpicCount">0</span></span>
                     </div>
                     <div id="shrineMilestonesList" class="shrine-milestones-list">
+                        ${htmlShrineMilestoneHeading("Capped Milestones", false)}
                         ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", [1, 2, 4, 7, 11, 16, 22], shrineLevelPacks)}
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
-                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", rareImg)}
-                        ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", rareImg)}
-                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
+                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
+                        ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
+                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
+                        ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
+                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", commonImg)}
                         ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
                         ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
-                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", epicImg)}
-                        ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", epicImg)}
+                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
+                        ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
+                        ${htmlShrineMilestoneHeading("One Time Milestones", true)}
+                        ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
                 ${resortUpgradeRowsHtml("shrine")}
@@ -391,11 +418,12 @@ let createView = {
         };
         const htmlNoodleTipRows = function() {
             let h = "";
+            const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards. Each shard increases the base exp of the skill when creating a new clone.";
             for (let ni = 0; ni < 5; ni++) {
                 h += `
                     <div id="noodleTipSkill_${ni}" class="noodle-tip-skill" style="display:none">
                         <div class="noodle-tip-skill-header">
-                            <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_name"></span></label>
+                            <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_shard" class="noodle-tip-skill-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="noodle-tip-skill-shard-img" draggable="false"><div class="showthis">${shardTip}</div></span><span id="noodleTipSkill_${ni}_name"></span></label>
                             <span id="noodleTipSkill_${ni}_tips" class="muted-text noodle-tip-skill-meta"></span>
                         </div>
                         <div id="noodleTipSkill_${ni}_desc" class="muted-text base-skill-short"></div>
@@ -1107,6 +1135,7 @@ let createView = {
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
             "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "toriiWaterReq_row", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10",
+            "offlineProcessingOverlay", "offlineProcessingLabel", "offlineProcessingFill", "offlineProcessingEta", "offlineProcessingSummary", "offlineProcessingDismiss",
             "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenTempReq_row", "innOnsenSoak_row", "innOnsenPondExplain_row", "innMapLabelText", "innGuestsVisitPond_row",
             "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap", "innManaExplain_row",
             "innAllowCarriersMana_row", "innAllowCarriersMana_chk",
@@ -1153,19 +1182,21 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn",
+            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
             "shrineMilestonesList",
-            "shrineMs_shrineLevel_fill", "shrineMs_totalStars_fill",
-            "shrineMs_marketLevel_fill", "shrineMs_marketLevel_progress",
-            "shrineMs_depthReached_fill", "shrineMs_depthReached_progress",
-            "shrineMs_orbLevel_fill", "shrineMs_orbLevel_progress",
-            "shrineMs_essenceMade_fill", "shrineMs_essenceMade_progress",
-            "shrineMs_maxMana_fill", "shrineMs_maxMana_progress",
-            "shrineMs_divinityAmount_fill", "shrineMs_divinityAmount_progress",
-            "shrineMs_totalGoldStars_fill", "shrineMs_totalGoldStars_progress",
+            "shrineMs_shrineLevel_fill", "shrineMs_shrineLevel_check", "shrineMs_totalStars_fill", "shrineMs_totalStars_check",
+            "shrineMs_okamiLevel_fill", "shrineMs_okamiLevel_check",
+            "shrineMs_marketLevel_fill", "shrineMs_marketLevel_progress", "shrineMs_marketLevel_icon",
+            "shrineMs_depthReached_fill", "shrineMs_depthReached_progress", "shrineMs_depthReached_icon",
+            "shrineMs_orbLevel_fill", "shrineMs_orbLevel_progress", "shrineMs_orbLevel_icon",
+            "shrineMs_essenceMade_fill", "shrineMs_essenceMade_progress", "shrineMs_essenceMade_icon",
+            "shrineMs_maxMana_fill", "shrineMs_maxMana_progress", "shrineMs_maxMana_icon",
+            "shrineMs_divinityAmount_fill", "shrineMs_divinityAmount_progress", "shrineMs_divinityAmount_icon",
+            "shrineMs_totalGoldStars_fill", "shrineMs_totalGoldStars_progress", "shrineMs_totalGoldStars_icon",
+            "shrineMs_buildShrine_icon", "shrineMs_buildShrine_check",
             "bonfireDenseClones_row", "bonfireDenseClones_value",
             "bonfireDenseClones_dec_all", "bonfireDenseClones_dec_ten", "bonfireDenseClones_dec_one",
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
@@ -1222,7 +1253,7 @@ let createView = {
         );
         for (let nti = 0; nti < 5; nti++) {
             createView.queueCache(
-                `noodleTipSkill_${nti}`, `noodleTipSkill_${nti}_radio`, `noodleTipSkill_${nti}_name`,
+                `noodleTipSkill_${nti}`, `noodleTipSkill_${nti}_radio`, `noodleTipSkill_${nti}_shard`, `noodleTipSkill_${nti}_name`,
                 `noodleTipSkill_${nti}_desc`, `noodleTipSkill_${nti}_tips`
             );
         }
@@ -1276,6 +1307,9 @@ let createView = {
         }
         for (let sti = 0; sti < 6; sti++) {
             createView.queueCache(`shrineMs_totalStars_icon_${sti}`);
+        }
+        for (let oli = 0; oli < 8; oli++) {
+            createView.queueCache(`shrineMs_okamiLevel_icon_${oli}`);
         }
         if (typeof engine.getResortPathSegmentSpecs === "function") {
             const pathSpecs = engine.getResortPathSegmentSpecs();
@@ -1427,6 +1461,11 @@ let createView = {
         if (!hitLayer || !highlightLayer || !trackLayer || !hollowLayer || typeof engine.getResortPathSegmentSpecs !== "function") {
             return;
         }
+        viewData.pathSegHighlightEls = [];
+        viewData.pathSegHitEls = [];
+        viewData.pathHighlightSig = null;
+        engine._pathDomSig = null;
+        engine._pathDomGlobalsApplied = false;
         const specs = engine.getResortPathSegmentSpecs();
         const svgNs = "http://www.w3.org/2000/svg";
         hitLayer.innerHTML = "";
@@ -1458,6 +1497,7 @@ let createView = {
             hitPath.setAttribute("stroke-width", "18");
             hitPath.setAttribute("pointer-events", "stroke");
             hitLayer.appendChild(hitPath);
+            viewData.pathSegHitEls[i] = hitPath;
             const hiPath = document.createElementNS(svgNs, "path");
             hiPath.id = `pathSegmentHighlight_${i}`;
             hiPath.setAttribute("d", d);
@@ -1466,6 +1506,7 @@ let createView = {
             hiPath.setAttribute("stroke-width", "6");
             hiPath.setAttribute("pointer-events", "none");
             highlightLayer.appendChild(hiPath);
+            viewData.pathSegHighlightEls[i] = hiPath;
         }
         events.bindPathSegmentSvgHandlers();
         events.bindBaseMapRightClick();

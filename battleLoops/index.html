@@ -433,6 +433,16 @@
     <button id="debugSpeed_x10" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(10)">x10</button>
 </div>
 
+<div id="offlineProcessingOverlay" style="display:none;">
+    <div id="offlineProcessingLabel">Processing...</div>
+    <div class="prog-track offline-processing-track">
+        <div id="offlineProcessingFill" class="prog-fill prog-fill-skill"></div>
+    </div>
+    <div id="offlineProcessingEta" class="muted-text">Estimating...</div>
+    <div id="offlineProcessingSummary" class="offline-processing-summary" style="display:none;"></div>
+    <button id="offlineProcessingDismiss" class="button" type="button" style="display:none;" onclick="offline.dismissSummary()">Continue</button>
+</div>
+
 </body>
 
 
@@ -454,6 +464,7 @@
 <script src="resortData.js"></script>
 <script src="bonfire.js"></script>
 <script src="initialize.js"></script>
+<script src="offline.js"></script>
 <script src="viewCreate.js"></script>
 <script src="viewUpdating.js"></script>
 <script src="hotkeys.js"></script>

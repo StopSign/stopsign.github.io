@@ -1072,14 +1072,24 @@ let view = {
         view.updateVal("shrineClassRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineMoveMountainRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrinePacksSection", shrineBuilt ? "" : "none", "style.display");
+        const classLocked = selected !== "none";
         for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
             const ck = bonfireClassOrder[ci];
             view.updateVal(`shrine_class_btn_${ck}`, selected === ck, "classList.toggle", "shrine-class-btn--selected");
+            view.updateVal(`shrine_class_btn_${ck}`, classLocked && selected === ck, "classList.toggle", "shrine-class-btn--demo-locked");
         }
+        view.updateVal("shrineMoveMountainRow", classLocked, "classList.toggle", "shrine-move-row--locked");
+        view.updateVal("shrineClassDemoNote", shrineBuilt && classLocked ? "" : "none", "style.display");
         const confirmChk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
         const moveBtn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
+        if (confirmChk) {
+            confirmChk.disabled = classLocked;
+            if (classLocked) {
+                confirmChk.checked = false;
+            }
+        }
         if (moveBtn) {
-            moveBtn.disabled = !(confirmChk && confirmChk.checked);
+            moveBtn.disabled = classLocked || !(confirmChk && confirmChk.checked);
         }
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
@@ -1097,23 +1107,24 @@ let view = {
         view.updateVal("shrinePackEpicCount", packs.epic || 0, "textContent", "floor");
 
         const ms = shrine.milestones || {};
-        const shrineLevelThresholds = [1, 2, 4, 7, 11, 16, 22];
-        const shrineProgress = engine.getShrineContinuousLevelProgress();
-        const shrineFill = engine.getFixedMilestoneFillPct(shrineProgress, shrineLevelThresholds);
-        view.updateVal("shrineMs_shrineLevel_fill", `${shrineFill}%`, "style.width");
-        const claimedLevels = ms.shrineLevelClaimed || {};
-        for (let i = 0; i < shrineLevelThresholds.length; i++) {
-            view.updateVal(`shrineMs_shrineLevel_icon_${i}`, !!claimedLevels[String(shrineLevelThresholds[i])], "classList.toggle", "shrine-pack-icon--claimed");
-        }
-
-        const starThresholds = [5, 10, 15, 20, 25, 30];
-        const starCount = engine.getTotalEarnedStarsCount();
-        const starFill = engine.getFixedMilestoneFillPct(starCount, starThresholds);
-        view.updateVal("shrineMs_totalStars_fill", `${starFill}%`, "style.width");
-        const claimedStars = ms.totalStarsClaimed || {};
-        for (let si = 0; si < starThresholds.length; si++) {
-            view.updateVal(`shrineMs_totalStars_icon_${si}`, !!claimedStars[String(starThresholds[si])], "classList.toggle", "shrine-pack-icon--claimed");
-        }
+        const setCapped = function(id, progress, thresholds, claimedMap) {
+            const fill = engine.getFixedMilestoneFillPct(progress, thresholds);
+            view.updateVal(`shrineMs_${id}_fill`, `${fill}%`, "style.width");
+            let allClaimed = thresholds.length > 0;
+            for (let i = 0; i < thresholds.length; i++) {
+                const claimed = !!claimedMap[String(thresholds[i])];
+                if (!claimed) {
+                    allClaimed = false;
+                }
+                view.updateVal(`shrineMs_${id}_icon_${i}`, claimed, "classList.toggle", "shrine-pack-icon--claimed");
+                view.updateVal(`shrineMs_${id}_icon_${i}`, claimed, "classList.toggle", "shrine-pack-icon--spent");
+            }
+            view.updateVal(`shrineMs_${id}_check`, allClaimed ? "visible" : "hidden", "style.visibility");
+        };
+        setCapped("shrineLevel", engine.getShrineContinuousLevelProgress(), [1, 2, 4, 7, 11, 16, 22], ms.shrineLevelClaimed || {});
+        setCapped("totalStars", engine.getTotalEarnedStarsCount(), [5, 10, 15, 20, 25, 30], ms.totalStarsClaimed || {});
+        const okami = engine.getOkami();
+        setCapped("okamiLevel", (okami && okami.level) || 0, [10, 20, 30, 40, 50, 60, 70, 80], ms.okamiLevelClaimed || {});
 
         const setEscalating = function(id, current, req) {
             const need = Math.max(1, req || 1);
@@ -1121,18 +1132,22 @@ let view = {
             const pct = Math.max(0, Math.min(100, (cur / need) * 100));
             view.updateVal(`shrineMs_${id}_fill`, `${pct}%`, "style.width");
             view.updateVal(`shrineMs_${id}_progress`, `${intToStringRound(cur)} / ${intToStringRound(need)}`);
+            const rarity = engine.getShrineEscalatingRarity(id, need);
+            view.updateVal(`shrineMs_${id}_icon`, `img/${rarity}.svg`, "src");
         };
 
         const market = data.progress.base && data.progress.base.market;
         setEscalating("marketLevel", (market && market.level) || 0, ms.marketLevelReq || 4);
-        setEscalating("depthReached", engine.getMineHighestDepthReached(), ms.depthReachedReq || 12);
+        setEscalating("depthReached", engine.getMineHighestDepthReached(), ms.depthReachedReq || 10);
         const orb = data.progress.base && data.progress.base.mage_tower;
-        setEscalating("orbLevel", (orb && orb.level) || 0, ms.orbLevelReq || 40);
+        setEscalating("orbLevel", (orb && orb.level) || 0, ms.orbLevelReq || 35);
         setEscalating("essenceMade", data.progress.essenceMade || 0, ms.essenceMadeReq || 10000);
         setEscalating("maxMana", engine.getManaCapacity(), ms.maxManaReq || 200000);
         const divinity = data.progress.divinity;
-        setEscalating("divinityAmount", (divinity && divinity.amount) || 0, ms.divinityAmountReq || 100000);
+        setEscalating("divinityAmount", (divinity && divinity.amount) || 0, ms.divinityAmountReq || 30000);
         setEscalating("totalGoldStars", engine.getTotalEarnedGoldStars(), ms.totalGoldStarsReq || 1);
+        view.updateVal("shrineMs_buildShrine_check", ms.buildShrineClaimed ? "visible" : "hidden", "style.visibility");
+        view.updateVal("shrineMs_buildShrine_icon", !!ms.buildShrineClaimed, "classList.toggle", "shrine-pack-icon--claimed");
     },
 
     updateBasePanelInn: function(base, t) {
@@ -2459,9 +2474,11 @@ let view = {
                 const key = offered[i];
                 view.updateVal(`noodleTipSkill_${i}`, key ? "" : "none", "style.display");
                 if (!key) {
+                    view.updateVal(`noodleTipSkill_${i}_shard`, "none", "style.display");
                     continue;
                 }
                 const skill = data.progress.skills && data.progress.skills[key];
+                view.updateVal(`noodleTipSkill_${i}_shard`, engine.skillHasShardOnTravelableMap(key) ? "" : "none", "style.display");
                 view.updateVal(`noodleTipSkill_${i}_name`, engine.getNoodleSkillDisplayName(key));
                 view.updateVal(`noodleTipSkill_${i}_desc`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(key)), "innerHTML");
                 view.updateVal(`noodleTipSkill_${i}_tips`, `Talent: ${(skill && skill.talentLevel) || 0} | Tips: ${(skill && skill.tips) || 0}`);
@@ -3269,8 +3286,8 @@ let view = {
         if (typeof events.applyBaseBuildingInfoOverlay === "function") {
             events.applyBaseBuildingInfoOverlay(selected);
         }
-        view.updateVal("baseCoinsText", (Math.round((data.progress.coins || 0) * 10) / 10).toFixed(1));
-        view.updateVal("baseStarBeadsText", data.progress.starBeads || 0, "textContent", "floor");
+        view.updateVal("baseCoinsText", data.progress.coins, "textContent", "floor");
+        view.updateVal("baseStarBeadsText", data.progress.starBeads, "textContent", "floor");
                 view.updateVal("baseWorkersAssigned", engine.getAvailableWorkers(), "textContent", 1);
         view.updateVal("baseWorkersFound", engine.getTotalFoundWorkers(), "textContent", 1);
         view.updateVal("basePaneTitleStarBeads", engine.isInnBuiltFromFoxDen() ? "" : "none", "style.display");
@@ -3598,7 +3615,6 @@ let view = {
         this.refreshBaseBuildingNotifications();
         this.updateResortMapProgressBars();
         this.updateResortMapTokens();
-        this.updatePathSegmentHighlight();
         this.updateFoxDenConstructionMap();
     },
     updatePathSegmentHighlight: function(hoverIndex) {
@@ -3608,34 +3624,76 @@ let view = {
         const specs = engine.getResortPathSegmentSpecs();
         const selIdx = data.progress.selectedBaseBuilding === "path" ? data.progress.selectedPathSegmentIndex : null;
         const hoverIdx = viewData.pathSegmentHoverIndex;
-        engine.syncResortPathDom();
+        const pathDebug = typeof showPathDebug !== "undefined" && showPathDebug;
+        if (!viewData.pathHighlightSig) {
+            viewData.pathHighlightSig = [];
+        }
+        const prev = viewData.pathHighlightSig;
+        const next = [];
+        let changed = prev.length !== specs.length;
+        let revealChanged = changed;
         for (let i = 0; i < specs.length; i++) {
-            const hiEl = document.getElementById(`pathSegmentHighlight_${i}`);
-            const hitEl = document.querySelector(`.path-seg-hit[data-segment-index="${i}"]`);
-            if (!hiEl) {
-                continue;
-            }
-            const pathDebug = typeof showPathDebug !== "undefined" && showPathDebug;
             const revealed = engine.isPathSegmentRevealed(i);
             const accessible = pathDebug || engine.isPathSegmentAccessible(i);
-            const showSeg = revealed ? "" : "none";
-            hiEl.style.display = showSeg;
-            if (hitEl) {
-                hitEl.style.display = showSeg;
-                hitEl.style.pointerEvents = accessible ? "stroke" : "none";
+            let mode = "";
+            if (selIdx === i) {
+                mode = "s";
+            } else if (hoverIdx === i && accessible) {
+                mode = "h";
             }
-            if (pathDebug) {
-                hiEl.style.stroke = `hsl(${(i * 53) % 360}, 75%, 58%)`;
-            } else {
-                hiEl.style.stroke = "";
+            const sig = (revealed ? "1" : "0") + (accessible ? "a" : "") + mode + (pathDebug ? "d" : "");
+            next.push(sig);
+            if (prev[i] !== sig) {
+                changed = true;
+                if ((prev[i] || "").charAt(0) !== sig.charAt(0) || ((prev[i] || "").indexOf("d") >= 0) !== (sig.indexOf("d") >= 0)) {
+                    revealChanged = true;
+                }
+            }
+        }
+        if (!changed) {
+            return;
+        }
+        if (revealChanged) {
+            engine.syncResortPathDom();
+        }
+        const hiEls = viewData.pathSegHighlightEls || [];
+        const hitEls = viewData.pathSegHitEls || [];
+        for (let i = 0; i < specs.length; i++) {
+            if (prev[i] === next[i]) {
+                continue;
+            }
+            const hiEl = hiEls[i] || document.getElementById(`pathSegmentHighlight_${i}`);
+            if (!hiEl) {
+                next[i] = "";
+                continue;
+            }
+            const hitEl = hitEls[i] || document.querySelector(`.path-seg-hit[data-segment-index="${i}"]`);
+            const sig = next[i];
+            const prevSig = prev[i] || "";
+            const visualsSame = prevSig.charAt(0) === sig.charAt(0)
+                && (prevSig.indexOf("a") >= 0) === (sig.indexOf("a") >= 0)
+                && (prevSig.indexOf("d") >= 0) === (sig.indexOf("d") >= 0);
+            if (!visualsSame) {
+                const showSeg = sig.charAt(0) === "1" ? "" : "none";
+                hiEl.style.display = showSeg;
+                if (hitEl) {
+                    hitEl.style.display = showSeg;
+                    hitEl.style.pointerEvents = sig.indexOf("a") >= 0 ? "stroke" : "none";
+                }
+                if (sig.indexOf("d") >= 0) {
+                    hiEl.style.stroke = `hsl(${(i * 53) % 360}, 75%, 58%)`;
+                } else if (prevSig.indexOf("d") >= 0) {
+                    hiEl.style.stroke = "";
+                }
             }
             hiEl.classList.remove("path-seg-hover", "path-seg-selected");
-            if (selIdx === i) {
+            if (sig.indexOf("s") >= 0) {
                 hiEl.classList.add("path-seg-selected");
-            } else if (hoverIdx === i && accessible) {
+            } else if (sig.indexOf("h") >= 0) {
                 hiEl.classList.add("path-seg-hover");
             }
         }
+        viewData.pathHighlightSig = next;
     },
     updateOkamiMapVisuals: function() {
         const visual = engine.getOkamiMapVisual();
@@ -5097,7 +5155,7 @@ let view = {
         }, { once: true });
     },
     spawnKillRewardFloater: function(centerXPx, topYPx, lines) {
-        if (document.hidden) {
+        if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
             return;
         }
         const battlefield = viewData.cached.battlefield;
@@ -5203,7 +5261,7 @@ let view = {
     },
 
     spawnInnBeadFloat: function(beads) {
-        if (document.hidden) {
+        if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
             return;
         }
         const innBtn = viewData.cached.baseBuilding_inn || document.getElementById("baseBuilding_inn");
@@ -5224,7 +5282,7 @@ let view = {
         innBtn.appendChild(el);
     },
     spawnNoodleTipFloat: function(skillName) {
-        if (document.hidden) {
+        if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
             return;
         }
         const noodleBtn = viewData.cached.baseBuilding_noodleBar || document.getElementById("baseBuilding_noodleBar");
@@ -5245,6 +5303,9 @@ let view = {
 
     //helpers
     scheduleUpdate: function(elementId, value, type) {
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+            return;
+        }
         viewData.scheduled.push({
             id:elementId,
             value:value,

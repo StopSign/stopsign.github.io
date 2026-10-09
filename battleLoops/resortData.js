@@ -4688,12 +4688,14 @@ var resortData = {
                 milestones: {
                     shrineLevelClaimed: {},
                     totalStarsClaimed: {},
+                    okamiLevelClaimed: {},
+                    buildShrineClaimed: false,
                     marketLevelReq: 4,
-                    depthReachedReq: 12,
-                    orbLevelReq: 40,
+                    depthReachedReq: 10,
+                    orbLevelReq: 35,
                     essenceMadeReq: 10000,
                     maxManaReq: 200000,
-                    divinityAmountReq: 100000,
+                    divinityAmountReq: 30000,
                     totalGoldStarsReq: 1
                 }
             },

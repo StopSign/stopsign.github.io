@@ -11,11 +11,19 @@ let driver = {
         screenSize = document.body.scrollHeight;
     },
     checkOfflineProgress: function() {
+        if (!data.currentGameState) {
+            return;
+        }
+        if (typeof offline !== "undefined" && offline.ensureState) {
+            offline.ensureState();
+        } else if (data.currentGameState.pendingOfflineMs === undefined) {
+            data.currentGameState.pendingOfflineMs = 0;
+        }
         if (data.lastVisit) {
             const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
-            if (offlineMilliseconds > 5000) {
-                data.currentGameState.bonusTime += offlineMilliseconds;
-                console.log(`Welcome back! Gained ${(offlineMilliseconds / 1000).toFixed(1)}s of bonus time.`);
+            if (offlineMilliseconds >= OFFLINE_MIN_PROCESS_MS) {
+                offline.addPendingOfflineMs(offlineMilliseconds);
+                console.log(`Welcome back! ${((data.currentGameState.pendingOfflineMs || 0) / 1000).toFixed(1)}s pending offline to process.`);
             }
         }
     },
@@ -23,8 +31,13 @@ let driver = {
         postMessage({ type: 'update' });
     },
     animationTick: function(currentTime) {
-        if (data.gameSettings.stopAll) {
+        if (isProcessingOffline || data.gameSettings.stopAll) {
             lastAnimationTime = currentTime;
+            if (!isProcessingOffline) {
+                return;
+            }
+            // Keep RAF alive so the page stays responsive; skip view work while processing.
+            requestAnimationFrame(driver.animationTick);
             return;
         }
 
@@ -55,8 +68,14 @@ let driver = {
 
         requestAnimationFrame(driver.animationTick);
     },
-    initTimingSystem: function() {
+    initTimingSystem: async function() {
         driver.checkOfflineProgress();
+
+        if ((data.currentGameState.pendingOfflineMs || 0) >= OFFLINE_MIN_PROCESS_MS) {
+            await offline.process();
+        } else if (data.currentGameState.pendingOfflineMs) {
+            data.currentGameState.pendingOfflineMs = 0;
+        }
 
         postMessage({
             command: 'start'
@@ -81,6 +100,10 @@ let driver = {
             engine.updateDivinityPerSecond();
         }
 
+        if (isProcessingOffline) {
+            return;
+        }
+
         const bf = data.progress.base && data.progress.base.bonfire;
         if (!bf || (!bonfire.isAutoRetryEnabled() && !bonfire.isStartWithFullManaEnabled())) {
             return;
@@ -100,7 +123,7 @@ let driver = {
     },
     skipTime: function(time) {
 
-        if (isSkipping) return;
+        if (isSkipping || isProcessingOffline) return;
 
         let ticksToUse = time * 60 * 1000;
         if(data.currentGameState.instantTime < ticksToUse) {

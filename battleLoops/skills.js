@@ -316,7 +316,12 @@ const SKILL_DEFINITION_ROWS = [
             return { flatDamagePerEnemy: (sk.level || 0) * 0.1 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${roundNearestDecimals(e.flatDamagePerEnemy || 0, 2)} ego dmg per visible enemy`;
+            const vis = (typeof engine !== "undefined" && engine.countVisibleIntruders && data.battle && data.battle.enemies)
+                ? engine.countVisibleIntruders()
+                : 0;
+            const total = (e.flatDamagePerEnemy || 0) * vis;
+            const noun = vis === 1 ? "enemy" : "enemies";
+            return `Current: +${roundNearestDecimals(total, 2)} damage from ${vis} visible ${noun}`;
         }
     },
     {
@@ -327,13 +332,13 @@ const SKILL_DEFINITION_ROWS = [
         initialExpToLevel: 5,
         initialTalentToLevel: 5,
         flavorText: '"A wrong unavenged is a wound unhealed." — Italian Proverb',
-        shortDescription: "+5% ego damage per skill level vs enemies that have attacked you.",
+        shortDescription: "+3% ego damage per skill level vs enemies that have attacked you.",
         rewardText: function(sk) {
-            return `Reward: +5% ego damage per skill level against intruders that have attacked you.`;
+            return `Reward: +3% ego damage per skill level against intruders that have attacked you.`;
         },
         triggerText: "Trigger: each attack against an intruder that has attacked you.",
         getEffect: function(sk) {
-            return { damageMultPerLevel: (sk.level || 0) * 0.05 };
+            return { damageMultPerLevel: (sk.level || 0) * 0.03 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals((e.damageMultPerLevel || 0) * 100, 1)}% dmg vs attackers`;
@@ -570,11 +575,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"There is a kind of sweet madness in the pursuit of victory." — Pindar',
         shortDescription: "Gain Malice when defeating intruders while above 50% Aud.",
         rewardText: function(sk) {
-            return `Reward: Gain 0.5 Malice per skill level when defeating an intruder while above 50% Aud.`;
+            return `Reward: +0.5 Malice + 0.25 per skill level when defeating an intruder while above 50% Aud.`;
         },
         triggerText: "Trigger: each intruder removal.",
         getEffect: function(sk) {
-            return { malicePerLevel: (sk.level || 0) * 0.5 };
+            return { malicePerLevel: 0.5 + (sk.level || 0) * 0.25 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${round2(e.malicePerLevel || 0)} Malice per kill above half Aud`;
@@ -590,11 +595,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"You wouldn\'t like me when I\'m comfortable."',
         shortDescription: "Malice when taking damage above half Aud.",
         rewardText: function(sk) {
-            return `Reward: +0.5 Malice per skill level when taking damage while above 50% Aud.`;
+            return `Reward: +0.5 Malice + 0.25 per skill level when taking damage while above 50% Aud.`;
         },
         triggerText: "Trigger: each damaging intruder attack while above 50% Aud.",
         getEffect: function(sk) {
-            return { malicePerLevel: (sk.level || 0) * 0.5 };
+            return { malicePerLevel: 0.5 + (sk.level || 0) * 0.25 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${round2(e.malicePerLevel || 0)} Malice per hit above half Aud`;
@@ -609,11 +614,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"Excess on occasion is exhilarating." — W. Somerset Maugham',
         shortDescription: "Malice when killing enemies; exp from overkill.",
         rewardText: function(sk) {
-            return `Reward: +0.5 Malice per skill level when defeating an intruder.`;
+            return `Reward: +0.4 Malice + 0.2 per skill level when defeating an intruder.`;
         },
         triggerText: "Trigger: log2(overkill damage) on each intruder removal.",
         getEffect: function(sk) {
-            return { malicePerLevel: (sk.level || 0) * 0.5 };
+            return { malicePerLevel: 0.4 + (sk.level || 0) * 0.2 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${round2(e.malicePerLevel || 0)} Malice per kill`;
@@ -662,8 +667,8 @@ const SKILL_DEFINITION_ROWS = [
         key: "applyTearDrops",
         name: "Apply Tear Drops",
         category: "combat",
-        initialExpToLevel: 10,
-        initialTalentToLevel: 10,
+        initialExpToLevel: 20,
+        initialTalentToLevel: 20,
         flavorText: '"Tears are the silent language of manipulation." — French Maxim',
         shortDescription: "Fake Tears while advancing on the battlefield.",
         rewardText: function(sk) {
@@ -780,16 +785,16 @@ const SKILL_DEFINITION_ROWS = [
         key: "crowdWork",
         name: "Crowd Work",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         initialTalentToLevel: 5,
         flavorText: "\"A packed house is just a bigger mirror.\"",
         shortDescription: "More ego damage % while many intruders are visible.",
         rewardText: function(sk) {
-            return `Reward: +5% ego damage per skill level while 4 or more intruders are visible.`;
+            return `Reward: +4% ego damage per skill level while 4 or more intruders are visible.`;
         },
         triggerText: "Trigger: 1 skill exp per second while 4 or more intruders are visible.",
         getEffect: function(sk) {
-            return { damageBonusFraction: (sk.level || 0) * 0.05 };
+            return { damageBonusFraction: (sk.level || 0) * 0.04 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals((e.damageBonusFraction || 0) * 100, 1)}% dmg with 4+ visible`;
@@ -800,7 +805,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "walkingItOff",
         name: "Walking It Off",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         initialTalentToLevel: 5,
         flavorText: "\"Keep moving and the sting can't catch up.\"",
         shortDescription: "Restore Aud while advancing on the battlefield.",
@@ -1038,18 +1043,18 @@ const SKILL_DEFINITION_ROWS = [
         key: "righteousRant",
         name: "Righteous Rant",
         category: "combat",
-        initialExpToLevel: 5,
+        initialExpToLevel: 10,
         flavorText: "\"The speech writes itself if you just keep walking toward them.\"",
         shortDescription: "Outrage while advancing on the battlefield.",
         rewardText: function(sk) {
-            return `Reward: +0.1s per skill level Outrage every 0.5s while moving forward.`;
+            return `Reward: +0.2s + 0.05s per skill level Outrage every 1s while moving forward.`;
         },
-        triggerText: "Trigger: 1 skill exp per 0.5s while moving forward on the battlefield.",
+        triggerText: "Trigger: 1 skill exp per 1s while moving forward on the battlefield.",
         getEffect: function(sk) {
-            return { outrageMs: (sk.level || 0) * 100 };
+            return { outrageMs: 200 + (sk.level || 0) * 50 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${intToString(e.outrageMs || 0, 2)} ms Outrage per 0.5s while moving`;
+            return `Current: +${intToString(e.outrageMs || 0, 2)} ms Outrage per 1s while moving`;
         }
     },
     {
@@ -1080,14 +1085,14 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"I'm fine. That's what makes it worse.\"",
         shortDescription: "Malice while at max Aud.",
         rewardText: function(sk) {
-            return `Reward: +0.25 Malice per skill level every 0.5s while at max Aud.`;
+            return `Reward: +0.5 Malice + 0.25 per skill level every 2s while at max Aud.`;
         },
-        triggerText: "Trigger: 1 skill exp per 0.5s while at max Aud.",
+        triggerText: "Trigger: 1 skill exp per 2s while at max Aud.",
         getEffect: function(sk) {
-            return { malicePerLevel: (sk.level || 0) * 0.25 };
+            return { malicePerLevel: 0.5 + (sk.level || 0) * 0.25 };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${round2(e.malicePerLevel || 0)} Malice every 0.5s at max Aud`;
+            return `Current: +${round2(e.malicePerLevel || 0)} Malice every 2s at max Aud`;
         }
     },
     {
@@ -1732,9 +1737,9 @@ let skills = {
     buffDescriptions: {
         "Fury": "Your next strike deals +1% damage per stack. All stacks are consumed when you attack.",
         "Desensitized": "Incoming damage is multiplied by 1 / (1 + 0.03 × stacks). Each stack expires on its own timer.",
-        "Outrage": "Your attack timer recharges 50% faster while active. Additional time extends the buff.",
-        "Malice": "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks.",
-        "Fake Tears": "You take 20% less damage while active. Additional time extends the buff.",
+        "Outrage": "Your attack timer recharges 50% faster while active. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5.",
+        "Malice": "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level × 5.",
+        "Fake Tears": "You take 20% less damage while active. Additional time extends the buff. Duration is capped at 10 seconds + Okami's level.",
         "Clout": "Each stack blocks 1 incoming damage. Stacks consumed equal damage prevented. Clout cannot exceed your max Audacity."
     },
     wrapBuffNamesInHtml: function(text) {

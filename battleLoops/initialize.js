@@ -5,6 +5,7 @@ let timeAccumulators = { view20: 0, view10: 0, view1: 0 };
 let debugDelta = Date.now();
 let timeSinceLastSave = 0;
 let isSkipping = false;
+let isProcessingOffline = false;
 let lastRealSecondTime = performance.now();
 let tickResidue = 0; // Stores fractional ticks
 let lastTickTime = 0;
@@ -66,6 +67,10 @@ function debugShowPaths() {
         }
     });
     engine.checkMapRevealTriggers();
+    engine.syncResortPathDom();
+    if (typeof view !== "undefined" && view.updatePathSegmentHighlight) {
+        view.updatePathSegmentHighlight();
+    }
 }
 
 function debugAddPlantSpirits() {
@@ -411,6 +416,8 @@ let initials = {
     currentGameState: function() {
         return {
             bonusTime: 0,
+            pendingOfflineMs: 0,
+            offlineShardBank: {},
             instantTime: 0,
             instantTimerCooldown: 0,
             secondsPassed: 0,
@@ -578,6 +585,7 @@ let initials = {
             numbingCrowdsSecondAccMs: 0,
             combatSkillHalfSecondAccMs: 0,
             combatSkillSecondAccMs: 0,
+            combatSkillTwoSecondAccMs: 0,
             combatSkillFiveSecondAccMs: 0,
             secondWindRestoreUsed: false,
             classPowerA: 0,
@@ -1214,6 +1222,12 @@ let initialize = {
             }
             if (!shrine.milestones.totalStarsClaimed) {
                 shrine.milestones.totalStarsClaimed = {};
+            }
+            if (!shrine.milestones.okamiLevelClaimed) {
+                shrine.milestones.okamiLevelClaimed = {};
+            }
+            if (shrine.milestones.buildShrineClaimed === undefined || shrine.milestones.buildShrineClaimed === null) {
+                shrine.milestones.buildShrineClaimed = false;
             }
         }
         if (data.progress.essenceMade === undefined || data.progress.essenceMade === null) {

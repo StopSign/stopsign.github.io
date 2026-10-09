@@ -226,6 +226,9 @@ var bonfire = {
     },
 
     tryPostBattleCloneSpawn: function() {
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+            return false;
+        }
         if (!data.battle || data.battle.state === "running") {
             return false;
         }

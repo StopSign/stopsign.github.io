@@ -132,8 +132,8 @@ body {
 }
 
 .resort-map-progress-shrine {
-    bottom: 36px;
-    left: 218px;
+    bottom: 273px;
+    left: 41px;
     transform: translateX(-50%);
 }
 
@@ -178,8 +178,33 @@ body {
 }
 
 .noodle-tip-skill-label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 6px;
     min-width: 0;
+}
+
+.noodle-tip-skill-shard {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    cursor: help;
+}
+
+.noodle-tip-skill-shard-img {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+
+.noodle-tip-skill-shard .showthis {
+    left: 0;
+    min-width: 180px;
+    max-width: 240px;
+    white-space: normal;
+    font-weight: normal;
 }
 
 .noodle-tip-skill-meta {
@@ -939,6 +964,65 @@ button {
     text-align: center;
     padding: 12px;
     box-sizing: border-box;
+}
+
+#offlineProcessingOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(5, 8, 12, 0.88);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box;
+    color: var(--text-primary);
+}
+
+#offlineProcessingLabel {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.offline-processing-track {
+    width: min(420px, 80vw);
+    height: 14px;
+}
+
+.offline-processing-summary {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #bac2de;
+    text-align: left;
+    max-width: min(520px, 90vw);
+    width: 100%;
+}
+
+.offline-processing-columns {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.offline-processing-col {
+    min-width: 160px;
+    flex: 1 1 160px;
+}
+
+.offline-processing-col-title {
+    font-weight: bold;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+}
+
+#offlineProcessingDismiss {
+    margin-top: 8px;
+    padding: 8px 16px;
 }
 
 .death-talent-block {
@@ -1853,8 +1937,8 @@ button {
 }
 
 .resort-building-shrine {
-    bottom: 74px;
-    left: 220px;
+    bottom: 311px;
+    left: 42px;
     transform: translateX(-50%);
 }
 
@@ -1934,11 +2018,30 @@ button {
     border-color: #3b82f6;
 }
 
+.shrine-class-btn--demo-locked {
+    outline: 2px solid #ef4444;
+    outline-offset: 2px;
+}
+
 .shrine-move-row {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
+}
+
+.shrine-move-row--locked::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 0, 0, 0.4);
+    pointer-events: none;
+}
+
+.shrine-class-demo-note {
+    color: #ef4444;
+    margin: 4px 0 8px;
 }
 
 .shrine-move-confirm {
@@ -2016,20 +2119,49 @@ button {
     border-radius: 4px;
 }
 
+.shrine-pack-icon--spent {
+    opacity: 0.45;
+}
+
 .shrine-milestones-list {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
+.shrine-milestone-heading {
+    font-weight: 600;
+}
+
+.shrine-milestone-heading--split {
+    margin-top: 4px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.shrine-milestone-capped {
+    padding-right: 16px;
+}
+
 .shrine-milestone-name {
     margin-bottom: 4px;
+}
+
+.shrine-milestone-check {
+    color: #22c55e;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+.shrine-milestone-once-reward {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .shrine-milestone-markers {
     position: relative;
     height: 26px;
-    margin: 0 4px;
 }
 
 .shrine-milestone-marker {
@@ -2040,6 +2172,52 @@ button {
 
 .shrine-milestone-pack-icon {
     display: block;
+}
+
+.shrine-milestone-bar {
+    position: relative;
+    margin-top: 2px;
+}
+
+.shrine-milestone-bar .shrine-milestone-track {
+    margin-top: 0;
+}
+
+.shrine-milestone-ticks {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.shrine-milestone-tick {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transform: translateX(-50%);
+}
+
+.shrine-milestone-tick-line {
+    display: block;
+    width: 2px;
+    height: 100%;
+    background: #3b82f6;
+}
+
+.shrine-milestone-values {
+    position: relative;
+    height: 14px;
+    margin-top: 2px;
+}
+
+.shrine-milestone-value {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    color: #3b82f6;
+    font-size: 11px;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .shrine-milestone-track {

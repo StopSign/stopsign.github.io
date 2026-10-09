@@ -25,14 +25,14 @@ var battleBuffDefs = {
         img: "img/outrage.svg",
         kind: "duration",
         effectPercent: 50,
-        description: "Your attack timer recharges 50% faster while active. Additional time extends the buff."
+        description: "Your attack timer recharges 50% faster while active. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5."
     },
     malice: {
         key: "malice",
         label: "Malice",
         img: "img/malice.svg",
         kind: "counter",
-        description: "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks."
+        description: "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level × 5."
     },
     fakeTears: {
         key: "fakeTears",
@@ -40,7 +40,7 @@ var battleBuffDefs = {
         img: "img/fakeTears.svg",
         kind: "duration",
         effectPercent: 20,
-        description: "You take 20% less damage while active. Additional time extends the buff."
+        description: "You take 20% less damage while active. Additional time extends the buff. Duration is capped at 10 seconds + Okami's level."
     },
     clout: {
         key: "clout",
@@ -154,14 +154,17 @@ var battleBuffs = {
             const counter = entry.counter || 0;
             const bonus = battleBuffs.getMaliceAttackBonus(counter);
             const strikePct = Math.round((bonus.mult - 1) * 100);
+            const cap = battleBuffs.getMaliceCap();
             bottomRight = intToString(counter, 1);
             topRight = `+${strikePct}%`;
-            tooltipExtra = `Counter: ${round2(counter)}<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
+            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + Okami level × 5)<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
         } else if (key === "outrage" || key === "fakeTears") {
             const pct = def.effectPercent || 0;
+            const capMs = key === "fakeTears" ? battleBuffs.getFakeTearsCapMs() : battleBuffs.getOutrageCapMs();
+            const capRule = key === "fakeTears" ? "10s + Okami level" : "2s + Okami level / 5";
             bottomRight = battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0);
             topRight = `${pct}%`;
-            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}`;
+            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}<br>Cap: ${battleBuffs.formatDurationCapLabel(capMs)} (${capRule})`;
         } else if (key === "clout") {
             const stacks = entry.stacks || 0;
             bottomRight = intToString(stacks, 2);
@@ -222,7 +225,50 @@ var battleBuffs = {
                 entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
             }
         }
+        battleBuffs.clampCappedBuffs(state);
         battleBuffs.pruneQueue(state);
+    },
+    getOkamiLevel: function() {
+        const okami = data.progress && data.progress.okami;
+        return (okami && okami.level) || 0;
+    },
+    getFakeTearsCapMs: function() {
+        return (10 + battleBuffs.getOkamiLevel()) * 1000;
+    },
+    getOutrageCapMs: function() {
+        return 2000 + (battleBuffs.getOkamiLevel() * 200);
+    },
+    getMaliceCap: function() {
+        return 10 + (battleBuffs.getOkamiLevel() * 5);
+    },
+    getDurationCapMs: function(key) {
+        if (key === "fakeTears") {
+            return battleBuffs.getFakeTearsCapMs();
+        }
+        if (key === "outrage") {
+            return battleBuffs.getOutrageCapMs();
+        }
+        return null;
+    },
+    formatDurationCapLabel: function(ms) {
+        return roundNearestDecimals(Math.max(0, ms) / 1000, 2) + "s";
+    },
+    clampCappedBuffs: function(state) {
+        const tears = state.byKey.fakeTears;
+        const tearsCap = battleBuffs.getFakeTearsCapMs();
+        if (tears && (tears.remainingMs || 0) > tearsCap) {
+            tears.remainingMs = tearsCap;
+        }
+        const outrage = state.byKey.outrage;
+        const outrageCap = battleBuffs.getOutrageCapMs();
+        if (outrage && (outrage.remainingMs || 0) > outrageCap) {
+            outrage.remainingMs = outrageCap;
+        }
+        const malice = state.byKey.malice;
+        const maliceCap = battleBuffs.getMaliceCap();
+        if (malice && (malice.counter || 0) > maliceCap) {
+            malice.counter = maliceCap;
+        }
     },
     addFuryStacks: function(amount) {
         if (!amount || amount <= 0) {
@@ -257,7 +303,12 @@ var battleBuffs = {
         if (!state.byKey[key]) {
             state.byKey[key] = { remainingMs: 0 };
         }
-        state.byKey[key].remainingMs = (state.byKey[key].remainingMs || 0) + ms;
+        let next = (state.byKey[key].remainingMs || 0) + ms;
+        const cap = battleBuffs.getDurationCapMs(key);
+        if (cap !== null && next > cap) {
+            next = cap;
+        }
+        state.byKey[key].remainingMs = next;
         battleBuffs.ensureInQueue(state, key);
     },
     addCloutStacks: function(amount) {
@@ -317,7 +368,8 @@ var battleBuffs = {
         if (!state.byKey.malice) {
             state.byKey.malice = { counter: 0 };
         }
-        state.byKey.malice.counter = (state.byKey.malice.counter || 0) + amount;
+        const cap = battleBuffs.getMaliceCap();
+        state.byKey.malice.counter = Math.min(cap, (state.byKey.malice.counter || 0) + amount);
         battleBuffs.ensureInQueue(state, "malice");
     },
     getMaliceAttackBonus: function(counter) {

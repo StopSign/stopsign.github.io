@@ -2,6 +2,11 @@
 function loop() {
     if (timerId !== null) clearTimeout(timerId);
 
+    if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+        timerId = setTimeout(runMessage, 50);
+        return;
+    }
+
     const now = performance.now();
     if (now - lastRealSecondTime >= 1000) {
         driver.realSecondPassed();

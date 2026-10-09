@@ -262,6 +262,12 @@ let onLoad = {
         data.resetCount = toLoad.resetCount ?? 1;
 
         data.currentGameState = toLoad.currentGameState ?? initials.currentGameState();
+        if (data.currentGameState.pendingOfflineMs === undefined || data.currentGameState.pendingOfflineMs === null) {
+            data.currentGameState.pendingOfflineMs = 0;
+        }
+        if (!data.currentGameState.offlineShardBank || typeof data.currentGameState.offlineShardBank !== "object") {
+            data.currentGameState.offlineShardBank = {};
+        }
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();

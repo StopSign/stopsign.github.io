@@ -1474,12 +1474,23 @@ let events = {
         view.updateBasePanelShrine();
     },
     toggleShrineMoveConfirm: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const classLocked = !!(shrine && (shrine.selectedClassKey || "none") !== "none");
+        const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
         const btn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
+        if (classLocked && chk) {
+            chk.checked = false;
+            chk.disabled = true;
+        }
         if (btn) {
-            btn.disabled = !checked;
+            btn.disabled = classLocked || !checked;
         }
     },
     moveToNewMountain: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine || (shrine.selectedClassKey || "none") !== "none") {
+            return;
+        }
         const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
         if (!chk || !chk.checked) {
             return;
