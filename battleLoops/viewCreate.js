@@ -143,7 +143,7 @@ let createView = {
                 ${assignOkamiBtn(siteKey)}
             `;
         };
-        const resortUpgradeRowsHtml = function(scopeKey, excludeKeys) {
+        const resortUpgradeRowsHtml = function(scopeKey, excludeKeys, opts) {
             const cfg = resortData.buildings[scopeKey];
             if (!cfg || !cfg.upgradesOrder) {
                 return "";
@@ -162,7 +162,9 @@ let createView = {
                     continue;
                 }
                 if (first) {
-                    h += `<div class="base-upgrade-divider"></div>`;
+                    if (!(opts && opts.skipDivider)) {
+                        h += `<div class="base-upgrade-divider"></div>`;
+                    }
                     first = false;
                 }
                 const slug = resortData.slug(ud);
@@ -249,7 +251,7 @@ let createView = {
         };
         const htmlShrineEscalatingMilestone = function(id, name, packImg) {
             return `<div class="shrine-milestone" id="shrineMs_${id}_wrap">
-                <div class="shrine-milestone-name">${name} <span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span></div>
+                <div class="shrine-milestone-name">${name} <span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span><span class="muted-text" id="shrineMs_${id}_completed"></span></div>
                 <div class="shrine-milestone-markers"><div class="shrine-milestone-marker" style="left:100%"><img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false"></div></div>
                 <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
             </div>`;
@@ -273,7 +275,7 @@ let createView = {
             const commonImg = "img/common.svg";
             const rareImg = "img/rare.svg";
             const epicImg = "img/epic.svg";
-            const shrineLevelPacks = [commonImg, commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
+            const shrineLevelPacks = engine.shrineLevelMilestonePacks.map(function(rarity) { return `img/${rarity}.svg`; });
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
             return `
@@ -291,7 +293,7 @@ let createView = {
                     </div>
                     <div id="shrineMilestonesList" class="shrine-milestones-list">
                         ${htmlShrineMilestoneHeading("Capped Milestones", false)}
-                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", [1, 2, 4, 7, 11, 16, 22], shrineLevelPacks)}
+                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
                         ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
                         ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
@@ -306,6 +308,10 @@ let createView = {
                         ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
+                <div id="shrinePrestigeHeading">
+                    <div class="base-upgrade-divider"></div>
+                    <div class="base-info-title">Prestige</div>
+                </div>
                 <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
                 <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
                 <div id="shrinePrestigeNote" class="base-row muted-text">Moving to a new mountain resets the resort to a fresh start. Divinity max increases by the total talent levels of unlocked skills. Card bonuses, noodle bar tips, and that Divinity max are kept.</div>
@@ -315,7 +321,7 @@ let createView = {
                 </div>
                 <div id="shrineMovePackError" class="shrine-move-pack-error" style="display:none">At least 1 pack is required.</div>
                 <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
-                ${resortUpgradeRowsHtml("shrine")}
+                ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
             `;
         };
         const scrollArchivesChoicesHtml = function() {
@@ -586,6 +592,7 @@ let createView = {
                     <div class="base-row muted-text">Holds stone.</div>
                     ${buildingManaRowHtml("stonePile", "Every 10 seconds, uses 100 mana to duplicate one unduplicated stone. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
                     <div id="stonePileDupeProgressWrap" class="base-mini-progress stone-pile-dupe-progress" style="display:none"><div id="stonePileDupeProgressFill" class="base-mini-progress-fill"></div></div>
+                    <div id="stonePileDupeIntervalText" class="base-row muted-text" style="display:none">every 10s</div>
                     <div class="base-row">${resortData.resourceIconHtml("stone")} Stone: <span id="stonePileInfoValue"></span></div>
                     <div id="stonePileUsedStone_row" class="base-row" style="display:none">Used stone: <span id="stonePileUsedStoneValue"></span></div>
                     <div id="stonePileDupedStone_row" class="base-row" style="display:none">Duplicated stone: <span id="stonePileDupedStoneValue"></span></div>
@@ -882,7 +889,6 @@ let createView = {
         if (typeof engine.cacheMapBuildingPositions === "function") {
             engine.cacheMapBuildingPositions();
         }
-        view.updateVal("saveToFileRow", isDebug ? "" : "none", "style.display");
     },
     /** One-time on load: 40% skill rows + 60% Skill Info panel. Visibility via view.updateSkillsListVisibility. */
     createSkillElements: function() {
@@ -916,13 +922,23 @@ let createView = {
         col += `</div>`;
         const sortRadios = `
             <div id="skillSortRadios" class="skill-sort-radios">
-                <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
-                <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
-                <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
+                <div class="skill-sort-row">
+                    <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
+                </div>
+                <div class="skill-sort-row">
+                    <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Sort by Tips</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Sort by Grouping</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortShards" value="shards" onchange="events.setSkillListSort('shards')"> Sort by Shards</label>
+                </div>
             </div>`;
         const aside = `
             <aside id="skillInfoPanel" class="skill-info-aside">
-                <div id="skillInfo_title" class="skill-info-title"></div>
+                <div class="skill-info-title-row">
+                    <div id="skillInfo_title" class="skill-info-title"></div>
+                    <label class="skill-grouping-label">Grouping: <input type="number" id="skillInfo_grouping" class="skill-grouping-input" min="0" max="99" step="1" inputmode="numeric" value="0" oninput="events.setSkillGrouping(this)" onchange="events.setSkillGrouping(this, true)"></label>
+                </div>
                 <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current"></div></div>
                 <div class="skill-reward" id="skillInfo_reward"></div>
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
@@ -942,8 +958,8 @@ let createView = {
         skillsList.className = "skills-tab-layout";
         skillsList.innerHTML = col + `<div class="skills-info-column">${sortRadios}${aside}</div>`;
         createView.queueCache(
-            "skillsListColumn", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillInfoPanel",
-            "skillInfo_title", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
+            "skillsListColumn", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards", "skillInfoPanel",
+            "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
             "skillInfo_star_effect_row", "skillInfo_star_effect",
@@ -1148,7 +1164,7 @@ let createView = {
             "hiddenSpringCollectStone_row", "hiddenSpringCollectStone_btn",
             "hiddenSpringManaRow", "hiddenSpringFillMana_btn", "hiddenSpringManaProgressWrap", "hiddenSpringManaFill", "hiddenSpringManaAmount", "hiddenSpringManaCap", "hiddenSpringManaExplain_row",
             "hiddenSpringAllowCarriersMana_row", "hiddenSpringAllowCarriersMana_chk",
-            "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileUsedStone_row", "stonePileUsedStoneValue", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
+            "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileDupeIntervalText", "stonePileUsedStone_row", "stonePileUsedStoneValue", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
             "foxDenManaOrders_row", "foxDenManaOrders_chk", "foxDenCarry_resource", "foxDenCarryMana_row", "foxDenCarry_mana",
             "mapInnManaProgressWrap", "mapInnManaProgressFill",
             "mapInnWaterProgressWrap", "mapInnWaterProgressFill",
@@ -1184,7 +1200,7 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "shrineClassSelectRow", "shrineClassRow", "shrinePrestigeNote", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
+            "shrinePrestigeHeading", "shrineClassSelectRow", "shrineClassRow", "shrinePrestigeNote", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
@@ -1192,13 +1208,13 @@ let createView = {
             "shrineMilestonesList",
             "shrineMs_shrineLevel_fill", "shrineMs_shrineLevel_check", "shrineMs_totalStars_fill", "shrineMs_totalStars_check",
             "shrineMs_okamiLevel_fill", "shrineMs_okamiLevel_check",
-            "shrineMs_marketLevel_fill", "shrineMs_marketLevel_progress", "shrineMs_marketLevel_icon",
-            "shrineMs_depthReached_fill", "shrineMs_depthReached_progress", "shrineMs_depthReached_icon",
-            "shrineMs_orbLevel_fill", "shrineMs_orbLevel_progress", "shrineMs_orbLevel_icon",
-            "shrineMs_essenceMade_fill", "shrineMs_essenceMade_progress", "shrineMs_essenceMade_icon",
-            "shrineMs_maxMana_fill", "shrineMs_maxMana_progress", "shrineMs_maxMana_icon",
-            "shrineMs_divinityAmount_fill", "shrineMs_divinityAmount_progress", "shrineMs_divinityAmount_icon",
-            "shrineMs_totalGoldStars_fill", "shrineMs_totalGoldStars_progress", "shrineMs_totalGoldStars_icon",
+            "shrineMs_marketLevel_fill", "shrineMs_marketLevel_progress", "shrineMs_marketLevel_completed", "shrineMs_marketLevel_icon",
+            "shrineMs_depthReached_fill", "shrineMs_depthReached_progress", "shrineMs_depthReached_completed", "shrineMs_depthReached_icon",
+            "shrineMs_orbLevel_fill", "shrineMs_orbLevel_progress", "shrineMs_orbLevel_completed", "shrineMs_orbLevel_icon",
+            "shrineMs_essenceMade_fill", "shrineMs_essenceMade_progress", "shrineMs_essenceMade_completed", "shrineMs_essenceMade_icon",
+            "shrineMs_maxMana_fill", "shrineMs_maxMana_progress", "shrineMs_maxMana_completed", "shrineMs_maxMana_icon",
+            "shrineMs_divinityAmount_fill", "shrineMs_divinityAmount_progress", "shrineMs_divinityAmount_completed", "shrineMs_divinityAmount_icon",
+            "shrineMs_totalGoldStars_fill", "shrineMs_totalGoldStars_progress", "shrineMs_totalGoldStars_completed", "shrineMs_totalGoldStars_icon",
             "shrineMs_buildShrine_icon", "shrineMs_buildShrine_check",
             "bonfireDenseClones_row", "bonfireDenseClones_value",
             "bonfireDenseClones_dec_all", "bonfireDenseClones_dec_ten", "bonfireDenseClones_dec_one",

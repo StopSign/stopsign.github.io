@@ -1055,6 +1055,13 @@ button {
     padding: 10px;
 }
 
+#tabPane_cardBonuses {
+    position: absolute;
+    inset: 0;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
 /* Match battlefield column height (gameData.battle.battlefieldHeightPx + 2). */
 #tabPane_travel {
     max-height: 720px;
@@ -1205,9 +1212,15 @@ button {
 
 .skill-sort-radios {
     display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.skill-sort-row {
+    display: flex;
     flex-wrap: wrap;
     gap: 6px 14px;
-    font-size: 12px;
 }
 
 .skill-sort-radios label {
@@ -1325,10 +1338,45 @@ button {
     color: #e2e8f0;
 }
 
+.skill-info-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
 .skill-info-title {
     font-weight: bold;
-    margin-bottom: 6px;
+    margin-bottom: 0;
     font-size:16px;
+    min-width: 0;
+}
+
+.skill-grouping-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: normal;
+    white-space: nowrap;
+}
+
+.skill-grouping-input {
+    width: 2.4em;
+    font-size: 11px;
+    padding: 0 2px;
+    text-align: center;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.skill-grouping-input::-webkit-outer-spin-button,
+.skill-grouping-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .skill-info-flavor {
@@ -1854,6 +1902,7 @@ button {
 
 .inn-bead-float {
     --inn-bead-x: 0px;
+    --inn-bead-y: 0px;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -1871,17 +1920,13 @@ button {
 }
 
 @keyframes inn-bead-float {
-    0% {
+    0%, 25% {
         opacity: 1;
-        transform: translate(calc(-50% + var(--inn-bead-x)), -50%);
-    }
-    50% {
-        opacity: 1;
-        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% - 18px));
+        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% + var(--inn-bead-y)));
     }
     100% {
         opacity: 0;
-        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% - 36px));
+        transform: translate(calc(-50% + var(--inn-bead-x)), calc(-50% + var(--inn-bead-y) - 36px));
     }
 }
 
@@ -2373,9 +2418,10 @@ button {
 
 .fox-den-carrier-token {
     position: absolute;
-    width: 32px;
-    height: 32px;
-    z-index: 15;
+    width: 46px;
+    height: 46px;
+    transform: translate(-50%, -50%);
+    z-index: 5;
     pointer-events: none;
 }
 
@@ -3910,6 +3956,11 @@ button {
     line-height: 1.3;
 }
 
+.prestige-pack-card-max {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
 .prestige-pack-error {
     color: #ef4444;
     min-height: 1.2em;
@@ -3919,9 +3970,135 @@ button {
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex: 1 1 0;
+    min-height: 140px;
+    overflow-y: auto;
+}
+
+.prestige-pack-summary-sep {
+    height: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+    margin: 8px 0 2px;
 }
 
 #prestigePackActionBtn,
 #prestigeFinishBtn {
     align-self: center;
+}
+
+#tutorialToastStack {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 700;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 8px;
+    width: 320px;
+    overflow: visible;
+    box-sizing: border-box;
+}
+
+.tutorial-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    width: 320px;
+    max-width: 320px;
+    box-sizing: border-box;
+    background: #101621;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 8px 8px 8px 10px;
+    cursor: pointer;
+}
+
+.tutorial-toast--on {
+    background: #3a6ea5;
+}
+
+.tutorial-toast--closed {
+    background: #5c5f6e;
+}
+
+.tutorial-toast-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.tutorial-toast-x {
+    flex: 0 0 auto;
+    background: #45475a;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 2px 8px;
+    cursor: pointer;
+    font: inherit;
+    line-height: 1.2;
+}
+
+.tutorial-toast-x:hover {
+    background: #6c7086;
+}
+
+#tutorialToastBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 800;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#tutorialToastPanel {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 810;
+    width: min(560px, calc(100vw - 48px));
+    max-height: 80vh;
+    box-sizing: border-box;
+    flex-direction: column;
+    background: #101621;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 16px 16px 18px;
+}
+
+#tutorialToastPanelX {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#tutorialToastPanelTitle {
+    font-size: 22px;
+    font-weight: bold;
+    padding-right: 36px;
+    line-height: 1.2;
+}
+
+#tutorialToastPanelBody {
+    overflow-y: auto;
+    min-height: 0;
+    margin-top: 12px;
+}
+
+.tutorial-tip-entry + .tutorial-tip-entry {
+    border-top: 1px solid var(--border-color);
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
+.tutorial-tip-title {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 8px;
+}
+
+.tutorial-tip-text {
+    overflow-wrap: anywhere;
 }

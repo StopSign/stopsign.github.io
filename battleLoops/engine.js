@@ -67,7 +67,7 @@ let engine = {
             engine.updateSelfAffirmationsEachSecond(tickMs);
             engine.updateMainCharacterSkillExp(tickMs);
             engine.updateSeetheEachSecond(tickMs);
-            engine.updateApplyTearDropsEachHalfSecond(tickMs);
+            engine.updateApplyTearDropsEachSecond(tickMs);
             engine.updateBitterRivalryInRange(tickMs);
             engine.updateNumbingCrowdsEachSecond(tickMs);
             engine.updateCombatSkillPeriodics(tickMs);
@@ -604,8 +604,8 @@ let engine = {
             data.battle.seetheSecondAccMs = 0;
         }
         data.battle.seetheSecondAccMs += tickMs;
-        while (data.battle.seetheSecondAccMs >= 500) {
-            data.battle.seetheSecondAccMs -= 500;
+        while (data.battle.seetheSecondAccMs >= 1000) {
+            data.battle.seetheSecondAccMs -= 1000;
             const eff = skills.getSkillEffect("seethe");
             const stacks = eff.furyPerLevel || 0;
             if (stacks > 0) {
@@ -614,7 +614,7 @@ let engine = {
             engine.addSkillExp("seethe", 1);
         }
     },
-    updateApplyTearDropsEachHalfSecond: function(tickMs) {
+    updateApplyTearDropsEachSecond: function(tickMs) {
         if (!skills.isSkillUnlocked("applyTearDrops")) {
             return;
         }
@@ -625,8 +625,8 @@ let engine = {
             data.battle.applyTearDropsAccMs = 0;
         }
         data.battle.applyTearDropsAccMs += tickMs;
-        while (data.battle.applyTearDropsAccMs >= 500) {
-            data.battle.applyTearDropsAccMs -= 500;
+        while (data.battle.applyTearDropsAccMs >= 1000) {
+            data.battle.applyTearDropsAccMs -= 1000;
             const eff = skills.getSkillEffect("applyTearDrops");
             const ms = eff.fakeTearsMs || 0;
             if (ms > 0) {
@@ -686,28 +686,12 @@ let engine = {
     },
     updateCombatSkillPeriodics: function(tickMs) {
         const moving = engine.isPlayerMovingForward();
-        const belowHalf = engine.isPlayerBelowAudFraction(0.5);
         const atMax = engine.isPlayerAtMaxAud();
         const inSlap = engine.anyIntruderInSlapRange();
         const slapCount = inSlap ? engine.countIntrudersInSlapRange() : 0;
         const visible = engine.countVisibleIntruders();
 
-        engine.advanceBattleAccMs("combatSkillHalfSecondAccMs", tickMs, 500, function() {
-            if (belowHalf && skills.isSkillUnlocked("thinIce")) {
-                const iceEff = skills.getSkillEffect("thinIce");
-                const fury = iceEff.furyPerLevel || 0;
-                if (fury > 0) {
-                    engine.addFuryStacks(fury);
-                }
-                engine.addSkillExp("thinIce", 1);
-            }
-        });
-
         engine.advanceBattleAccMs("combatSkillSecondAccMs", tickMs, 1000, function() {
-            if (belowHalf) {
-                engine.addSkillExp("secondWind", 1);
-                engine.trySecondWindRestore();
-            }
             if (moving && skills.isSkillUnlocked("righteousRant")) {
                 const rantEff = skills.getSkillEffect("righteousRant");
                 const ms = rantEff.outrageMs || 0;
@@ -728,7 +712,7 @@ let engine = {
                 engine.addSkillExp("peerPressure", 1);
                 if (skills.isSkillUnlocked("slowBurn")) {
                     const burnEff = skills.getSkillEffect("slowBurn");
-                    const fury = burnEff.furyPerLevel || 0;
+                    const fury = (burnEff.furyPerLevel || 0) * slapCount;
                     if (fury > 0) {
                         engine.addFuryStacks(fury);
                     }
@@ -811,6 +795,27 @@ let engine = {
         }
         data.battle.secondWindRestoreUsed = true;
         engine.grantPlayerCurrentAudGain(heal);
+    },
+    onPlayerTookDamage: function() {
+        engine.addSkillExp("secondWind", 1);
+        engine.trySecondWindRestore();
+        if (skills.isSkillUnlocked("thinIce")) {
+            const iceEff = skills.getSkillEffect("thinIce");
+            const iceFury = iceEff.furyPerLevel || 0;
+            if (iceFury > 0) {
+                engine.addFuryStacks(iceFury);
+            }
+            engine.addSkillExp("thinIce", 1);
+        }
+        engine.addSkillExp("stiffUpperLip", 1);
+        if (skills.isSkillUnlocked("imposterSyndrome")) {
+            const isEff = skills.getSkillEffect("imposterSyndrome");
+            const furyStacks = isEff.furyPerLevel || 0;
+            if (furyStacks > 0) {
+                engine.addFuryStacks(furyStacks);
+            }
+            engine.addSkillExp("imposterSyndrome", 1);
+        }
     },
     updateSelfAffirmationsEachSecond: function(tickMs) {
         if (data.battle.selfAffirmationsSecondAccMs === undefined) {
@@ -1165,17 +1170,6 @@ let engine = {
                 if ((intruder.playerAttackCount || 0) >= 2) {
                     engine.addSkillExp("insultFatigue", 1);
                 }
-                if (damageApplied && skills.isSkillUnlocked("imposterSyndrome")) {
-                    const p = data.battle.player;
-                    const maxAud = Math.max(1, p.maxAud || 1);
-                    if ((p.aud / maxAud) < 0.5) {
-                        const isEff = skills.getSkillEffect("imposterSyndrome");
-                        const furyStacks = isEff.furyPerLevel || 0;
-                        if (furyStacks > 0) {
-                            engine.addFuryStacks(furyStacks);
-                        }
-                    }
-                }
                 if (damageApplied && aboveHalfAudBeforeHit && skills.isSkillUnlocked("temper")) {
                     const tEff = skills.getSkillEffect("temper");
                     const maliceAmt = tEff.malicePerLevel || 0;
@@ -1185,9 +1179,6 @@ let engine = {
                     engine.addSkillExp("temper", 1);
                 }
                 engine.addSkillExp("aboveItAll", 1);
-                if (atOrBelowHalfBeforeHit) {
-                    engine.addSkillExp("stiffUpperLip", 1);
-                }
                 if (damageApplied) {
                     engine.addSkillExp("toughness_condescend", 1);
                     engine.addSkillExp("thorns", 1);
@@ -1212,7 +1203,9 @@ let engine = {
                 if (data.battle.player.aud < 0) {
                     data.battle.player.aud = 0;
                 }
-                engine.trySecondWindRestore();
+                if (damageApplied) {
+                    engine.onPlayerTookDamage();
+                }
                 if (intruder.aud <= 0) {
                     intruder.aud = 0;
                     intruder.alive = false;
@@ -1397,7 +1390,7 @@ let engine = {
             const forageExp = intruder.expBase !== undefined ? intruder.expBase : 1;
             engine.addPendingOkamiExpFromClone(forageExp);
             if (growthUnlocked) {
-                data.battle.levelState.exp += forageExp;
+                engine.addCloneLevelExp(forageExp);
             }
             data.battle.enemiesKilled++;
             engine.addSkillExp("quick_rest", 1);
@@ -1419,7 +1412,7 @@ let engine = {
         data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + coinsGain;
         engine.addPendingOkamiExpFromClone(expGain);
         if (growthUnlocked) {
-            data.battle.levelState.exp += expGain;
+            engine.addCloneLevelExp(expGain);
         }
         data.battle.enemiesKilled++;
         const shardDrop = engine.trySkillShardDropOnKill(intruder);
@@ -1608,7 +1601,9 @@ let engine = {
         const tier = data.battle.mapTier || 0;
         const chanceMult = tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
         const lootMult = engine.getShardLootChanceMultiplier();
-        const p = Math.min(0.999, softChance * chanceMult * lootMult);
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
+        const p = Math.min(1, softChance * chanceMult * lootMult * (1 + cardAdd));
         if (Math.random() >= p) {
             return null;
         }
@@ -1703,6 +1698,7 @@ let engine = {
             engine.addSkillExp("savageLessons", 1);
             engine.addSkillExp("paddingResume", 1);
             engine.addSkillExp("hindsight", 1);
+            engine.addSkillExp("studyGroup", 1);
             if (skills.isSkillUnlocked("levelHeaded")) {
                 const lhEff = skills.getSkillEffect("levelHeaded");
                 const desMs = lhEff.desensitizedMsPerLevel || 0;
@@ -1869,6 +1865,17 @@ let engine = {
     isPlayerMovingForward: function() {
         return engine.getIntruderPushBonusPxPerSecond() > 0;
     },
+    getLevelingExpCardMultiplier: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().levelingExpAdd || 0) : 0;
+        return 1 + cardAdd;
+    },
+    addCloneLevelExp: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        data.battle.levelState.exp += amount * engine.getLevelingExpCardMultiplier();
+    },
     grantCloneCharacterExp: function(amount) {
         if (!amount || amount <= 0) {
             return;
@@ -1876,7 +1883,7 @@ let engine = {
         const granted = amount * engine.getCharacterExpMultiplier();
         engine.addPendingOkamiExpFromClone(granted);
         if (bonfire.isGrowthBlessingUnlocked()) {
-            data.battle.levelState.exp += granted;
+            engine.addCloneLevelExp(granted);
             engine.resolveLevelUps();
         }
     },
@@ -3381,7 +3388,9 @@ let engine = {
             return;
         }
         const gainBase = skills.expGainForSkillTrigger(skill, amount);
-        const intMult = skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1;
+        const intMult = typeof skills.getOtherSkillExpMultiplier === "function"
+            ? skills.getOtherSkillExpMultiplier(skillKey)
+            : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1);
         const soulMult = engine.getSoulSkillExpMultiplier();
         const gain = gainBase * intMult * soulMult;
         const cardEff = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
@@ -3412,22 +3421,15 @@ let engine = {
             engine.addSkillExp("echoChamber", 1);
         }
         if (skills.isSkillUnlocked("recognition")) {
-            const recEff = skills.getSkillEffect("recognition");
-            const cloutGain = recEff.cloutPerLevel || 0;
-            if (cloutGain > 0) {
-                engine.addCloutStacks(cloutGain);
-            }
-            if (skill.key !== "recognition") {
+            if (skill.key === "recognition") {
+                const recEff = skills.getSkillEffect("recognition");
+                const cloutGain = recEff.cloutPerLevel || 0;
+                if (cloutGain > 0) {
+                    engine.addCloutStacks(cloutGain);
+                }
+            } else {
                 engine.addSkillExp("recognition", 1);
             }
-        }
-        if (skill.key !== "studyGroup" && cat === "combat" && skills.isSkillUnlocked("studyGroup")) {
-            const sgEff = skills.getSkillEffect("studyGroup");
-            const charExp = sgEff.characterExpPerLevel || 0;
-            if (charExp > 0) {
-                engine.grantCloneCharacterExp(charExp);
-            }
-            engine.addSkillExp("studyGroup", 1);
         }
         if (skill.key === "adaptation") {
             data.battle.levelState.skillConBonus++;
@@ -4141,13 +4143,19 @@ let engine = {
         }
         return { stone: 1, mana: 100 };
     },
+    getStoneDuplicatorIntervalMs: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().stoneDupeSpeedAdd || 0) : 0;
+        return 10000 / (1 + cardAdd);
+    },
     updateStonePileDuplication: function(tickMs) {
         const pile = data.progress.base && data.progress.base.stonePile;
         if (!pile || !pile.stoneDuplicatorUnlocked) {
             return;
         }
+        const intervalMs = engine.getStoneDuplicatorIntervalMs();
         if (pile.dupeTimerMs === undefined || pile.dupeTimerMs === null) {
-            pile.dupeTimerMs = 10000;
+            pile.dupeTimerMs = intervalMs;
         }
         pile.dupeTimerMs -= tickMs;
         while (pile.dupeTimerMs <= 0) {
@@ -4158,7 +4166,7 @@ let engine = {
                 pile.usedStone = (pile.usedStone || 0) + batch.stone;
                 pile.dupedStone = (pile.dupedStone || 0) + batch.stone;
             }
-            pile.dupeTimerMs += 10000;
+            pile.dupeTimerMs += intervalMs;
         }
     },
     applyInnGentleLightsTick: function(sec) {
@@ -8495,7 +8503,9 @@ let engine = {
     getDirtRoadMaxProgress: function() {
         const atelier = data.progress.base && data.progress.base.atelier;
         const bought = (atelier && atelier.improveDirtRoadsBought) || 0;
-        return 100 + 20 * bought;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().dirtRoadMaxProgressFlat || 0) : 0;
+        return 100 + 20 * bought + cardAdd;
     },
     getDirtRoadProgressPerDelivery: function() {
         const atelier = data.progress.base && data.progress.base.atelier;
@@ -9787,6 +9797,15 @@ let engine = {
         const market = data.progress.base && data.progress.base.market;
         return (market && market.assignedTraders) || 0;
     },
+    getMarketTradeBaseSeconds: function(tradeKey) {
+        const td = resortData.marketTrades[tradeKey];
+        if (!td) {
+            return 0;
+        }
+        const reduce = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().marketTradeDurationReduceSec || 0) : 0;
+        return Math.max(0, (td.seconds || 0) - reduce);
+    },
     /** Trade time is static: spirit strands never shorten it, but each Trader divides it. */
     getMarketTradeDurationMs: function(tradeKey) {
         const td = resortData.marketTrades[tradeKey];
@@ -9794,7 +9813,7 @@ let engine = {
             return 0;
         }
         const traders = Math.max(1, engine.getMarketTraderCount());
-        return (td.seconds * 1000) / traders;
+        return (engine.getMarketTradeBaseSeconds(tradeKey) * 1000) / traders;
     },
     isMarketTradeUnlocked: function(tradeKey) {
         const td = resortData.marketTrades[tradeKey];
@@ -9979,7 +9998,10 @@ let engine = {
         }
         const td = resortData.marketTrades[active.key];
         if (td) {
-            market[active.key] = (market[active.key] || 0) + td.yieldAmount;
+            const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+                ? (shrineCards.getAggregatedEffects().marketTradeYieldAdd || 0) : 0;
+            const yieldAmt = Math.ceil((td.yieldAmount || 0) * (1 + cardAdd));
+            market[active.key] = (market[active.key] || 0) + yieldAmt;
         }
         market.activeTrade = null;
         const paused = engine.ensureMarketPausedTrades();
@@ -10151,6 +10173,7 @@ let engine = {
         cistern.waterVolume = round1(Math.max(0, (cistern.waterVolume || 0) - amount));
         const innCarrier = {
             id: inn.carrierIdCounter || 1,
+            resourceType: "water",
             amount: amount,
             isOkami: isOkami,
             progress: 0,
@@ -10378,6 +10401,7 @@ let engine = {
         const cisternCarrier = {
             id: cistern.carrierIdCounter || 1,
             targetKey: target.key,
+            resourceType: "water",
             amount: amount,
             isOkami: isOkami,
             progress: 0,
@@ -11208,14 +11232,19 @@ let engine = {
         const orb = data.progress.base && data.progress.base.mage_tower;
         return (orb && orb.buildFloorBought) || 0;
     },
+    getOrbMaxFloors: function() {
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().higherMaxOrbFloorsFlat || 0) : 0;
+        return 2 + cardAdd;
+    },
     getOrbBuildWallsMax: function() {
         return 4 + 4 * engine.getOrbBuildFloorBought();
     },
     getOrbBuildStairsMax: function() {
-        return Math.floor(engine.getOrbBuildWallsBought() / 4);
+        return Math.min(Math.floor(engine.getOrbBuildWallsBought() / 4), engine.getOrbMaxFloors());
     },
     getOrbBuildFloorMax: function() {
-        return engine.getOrbBuildStairsBought();
+        return Math.min(engine.getOrbBuildStairsBought(), engine.getOrbMaxFloors());
     },
     getOrbFloorBonusMultiplier: function() {
         return 1 + 0.1 * engine.getOrbBuildFloorBought();
@@ -11483,7 +11512,9 @@ let engine = {
         if (!market || !(amount > 0)) {
             return;
         }
-        market.exp = (market.exp || 0) + amount;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().marketExpAdd || 0) : 0;
+        market.exp = (market.exp || 0) + amount * (1 + cardAdd);
         engine.applyMarketLevelUps();
     },
     getMarketMysticalGlovesBought: function() {
@@ -11701,6 +11732,8 @@ let engine = {
         }
         shrine.packs[rarity] = (shrine.packs[rarity] || 0) + 1;
     },
+    shrineLevelMilestoneThresholds: [1, 3, 6, 10, 15, 21, 27],
+    shrineLevelMilestonePacks: ["common", "common", "common", "common", "rare", "rare", "epic"],
     getFixedMilestoneFillPct: function(progress, thresholds) {
         const n = thresholds.length;
         if (n === 0) {
@@ -11760,6 +11793,96 @@ let engine = {
             return req <= 3 ? "rare" : "epic";
         }
         return "rare";
+    },
+    getShrineRepeatingMilestoneSpec: function(id) {
+        if (id === "marketLevel") {
+            return {
+                reqKey: "marketLevelReq",
+                start: 4,
+                bump: function(r) { return r + 1; },
+                rarity: function(r) { return engine.getShrineEscalatingRarity("marketLevel", r); }
+            };
+        }
+        if (id === "depthReached") {
+            return {
+                reqKey: "depthReachedReq",
+                start: 10,
+                bump: function(r) { return r === 10 ? 12 : r + 3; },
+                rarity: function(r) { return engine.getShrineEscalatingRarity("depthReached", r); }
+            };
+        }
+        if (id === "orbLevel") {
+            return {
+                reqKey: "orbLevelReq",
+                start: 35,
+                bump: function(r) { return r + 5; },
+                rarity: function(r) { return engine.getShrineEscalatingRarity("orbLevel", r); }
+            };
+        }
+        if (id === "essenceMade") {
+            return {
+                reqKey: "essenceMadeReq",
+                start: 10000,
+                bump: function(r) { return r * 10; },
+                rarity: "rare"
+            };
+        }
+        if (id === "maxMana") {
+            return {
+                reqKey: "maxManaReq",
+                start: 200000,
+                bump: function(r) { return Math.round(r * 1.5); },
+                rarity: "rare"
+            };
+        }
+        if (id === "divinityAmount") {
+            return {
+                reqKey: "divinityAmountReq",
+                start: 30000,
+                bump: function(r) {
+                    if (r === 30000) {
+                        return 60000;
+                    }
+                    if (r === 60000) {
+                        return 100000;
+                    }
+                    return Math.round(r * 1.3);
+                },
+                rarity: function(r) { return engine.getShrineEscalatingRarity("divinityAmount", r); }
+            };
+        }
+        if (id === "totalGoldStars") {
+            return {
+                reqKey: "totalGoldStarsReq",
+                start: 1,
+                bump: function(r) { return r + 2; },
+                rarity: function(r) { return engine.getShrineEscalatingRarity("totalGoldStars", r); }
+            };
+        }
+        return null;
+    },
+    getShrineRepeatingCompletedCount: function(id) {
+        const spec = engine.getShrineRepeatingMilestoneSpec(id);
+        if (!spec) {
+            return 0;
+        }
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const ms = (shrine && shrine.milestones) || {};
+        const target = ms[spec.reqKey];
+        if (typeof target !== "number") {
+            return 0;
+        }
+        let req = spec.start;
+        let count = 0;
+        while (req < target && count < 10000) {
+            const next = spec.bump(req);
+            if (!(next > req)) {
+                break;
+            }
+            req = next;
+            count++;
+        }
+        return count;
     },
     updateShrineMilestones: function() {
         if (!engine.isShrineBuilt()) {
@@ -11840,7 +11963,25 @@ let engine = {
             }
         };
 
-        claimFixed("shrineLevelClaimed", engine.getShrineContinuousLevelProgress(), [1, 2, 4, 7, 11, 16, 22], ["common", "common", "common", "common", "rare", "rare", "epic"]);
+        if (!ms.shrineLevelThresholdsV2) {
+            const claimedLevels = ms.shrineLevelClaimed;
+            const oldThresholds = [1, 2, 4, 7, 11, 16, 22];
+            const newThresholds = engine.shrineLevelMilestoneThresholds;
+            const levelProgress = engine.getShrineContinuousLevelProgress();
+            for (let si = 0; si < newThresholds.length; si++) {
+                const oldKey = String(oldThresholds[si]);
+                const newKey = String(newThresholds[si]);
+                if (claimedLevels[oldKey] && levelProgress >= newThresholds[si]) {
+                    claimedLevels[newKey] = true;
+                }
+                if (oldKey !== newKey) {
+                    delete claimedLevels[oldKey];
+                }
+            }
+            ms.shrineLevelThresholdsV2 = true;
+        }
+
+        claimFixed("shrineLevelClaimed", engine.getShrineContinuousLevelProgress(), engine.shrineLevelMilestoneThresholds, engine.shrineLevelMilestonePacks);
         claimFixed("totalStarsClaimed", engine.getTotalEarnedStarsCount(), [5, 10, 15, 20, 25, 30], ["common", "common", "common", "rare", "rare", "epic"]);
         const okami = engine.getOkami();
         claimFixed("okamiLevelClaimed", (okami && okami.level) || 0, [10, 20, 30, 40, 50, 60, 70, 80], ["common", "common", "rare", "rare", "epic", "epic", "epic", "epic"]);
@@ -11858,26 +11999,26 @@ let engine = {
             }
         };
 
+        const claimRepeating = function(id, cur) {
+            const spec = engine.getShrineRepeatingMilestoneSpec(id);
+            if (!spec) {
+                return;
+            }
+            claimEscalating(cur, spec.reqKey, spec.bump, spec.rarity);
+        };
+
         const market = data.progress.base && data.progress.base.market;
-        claimEscalating((market && market.level) || 0, "marketLevelReq", function(r) { return r + 1; }, function(r) { return engine.getShrineEscalatingRarity("marketLevel", r); });
-        claimEscalating(engine.getMineHighestDepthReached(), "depthReachedReq", function(r) { return r === 10 ? 12 : r + 3; }, function(r) { return engine.getShrineEscalatingRarity("depthReached", r); });
+        claimRepeating("marketLevel", (market && market.level) || 0);
+        claimRepeating("depthReached", engine.getMineHighestDepthReached());
 
         const orb = data.progress.base && data.progress.base.mage_tower;
-        claimEscalating((orb && orb.level) || 0, "orbLevelReq", function(r) { return r + 5; }, function(r) { return engine.getShrineEscalatingRarity("orbLevel", r); });
-        claimEscalating(data.progress.essenceMade || 0, "essenceMadeReq", function(r) { return r * 10; }, "rare");
-        claimEscalating(engine.getManaCapacity(), "maxManaReq", function(r) { return Math.round(r * 1.5); }, "rare");
+        claimRepeating("orbLevel", (orb && orb.level) || 0);
+        claimRepeating("essenceMade", data.progress.essenceMade || 0);
+        claimRepeating("maxMana", engine.getManaCapacity());
 
         const divinity = data.progress.divinity;
-        claimEscalating((divinity && divinity.amount) || 0, "divinityAmountReq", function(r) {
-            if (r === 30000) {
-                return 60000;
-            }
-            if (r === 60000) {
-                return 100000;
-            }
-            return Math.round(r * 1.3);
-        }, function(r) { return engine.getShrineEscalatingRarity("divinityAmount", r); });
-        claimEscalating(engine.getTotalEarnedGoldStars(), "totalGoldStarsReq", function(r) { return r + 2; }, function(r) { return engine.getShrineEscalatingRarity("totalGoldStars", r); });
+        claimRepeating("divinityAmount", (divinity && divinity.amount) || 0);
+        claimRepeating("totalGoldStars", engine.getTotalEarnedGoldStars());
 
         if (!ms.buildShrineClaimed) {
             ms.buildShrineClaimed = true;
@@ -12499,7 +12640,8 @@ let engine = {
     },
     getScrollArchivesCompletedResearchCount: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
-        const raw = onLoad.countUnlockedSkills(archives.unlockedSkills) + (archives.researchesToChoose || 0);
+        const credit = (archives && archives.freeResearchCostCredit) || 0;
+        const raw = onLoad.countUnlockedSkills(archives.unlockedSkills) + (archives.researchesToChoose || 0) - credit;
         return Math.max(0, raw - engine.getLostScrollsBought());
     },
     ensureResearchCoinCosts: function(lib) {
@@ -12625,9 +12767,69 @@ let engine = {
         }
         return false;
     },
-    shuffleArrayInPlace: function(arr) {
+    deriveStableSeed: function(salt) {
+        const p = data.progress || {};
+        const gs = data.currentGameState || {};
+        const lib = p.base && p.base.scrollArchives;
+        const shrine = p.base && p.base.shrine;
+        const unlocked = lib && lib.unlockedSkills ? Object.keys(lib.unlockedSkills).sort().join(",") : "";
+        const text = [
+            salt,
+            data.lastVisit || 0,
+            data.resetCount || 0,
+            gs.secondsPassed || 0,
+            p.coins || 0,
+            p.starBeads || 0,
+            (shrine && shrine.level) || 0,
+            (shrine && shrine.exp) || 0,
+            unlocked
+        ].join("|");
+        let seed = hashIt(text) >>> 0;
+        if (!seed) {
+            seed = 1;
+        }
+        return seed;
+    },
+    ensureSavedSeed: function(holder, key, salt) {
+        if (!holder) {
+            return 1;
+        }
+        const cur = holder[key];
+        if (typeof cur === "number" && isFinite(cur) && cur >= 0) {
+            holder[key] = cur >>> 0;
+            return holder[key];
+        }
+        let seed;
+        if (typeof initialize !== "undefined" && initialize.useStableSeeds) {
+            seed = engine.deriveStableSeed(salt);
+        } else {
+            seed = (Math.floor(Math.random() * 0x7fffffff) + 1) >>> 0;
+        }
+        if (!seed) {
+            seed = 1;
+        }
+        const archives = data.progress && data.progress.base && data.progress.base.scrollArchives;
+        const shrine = data.progress && data.progress.base && data.progress.base.shrine;
+        const other = salt === "packOpen" ? (archives && archives.researchSeed) : (shrine && shrine.packSeed);
+        if (typeof other === "number" && seed === (other >>> 0)) {
+            seed = (seed + 1) >>> 0;
+            if (!seed) {
+                seed = 1;
+            }
+        }
+        holder[key] = seed;
+        return seed;
+    },
+    nextSeededFloat: function(holder, key) {
+        let state = (typeof holder[key] === "number" ? holder[key] : 1) >>> 0;
+        state = (1664525 * state + 1013904223) >>> 0;
+        holder[key] = state;
+        return state / 4294967296;
+    },
+    shuffleArrayInPlace: function(arr, rng) {
+        const random = rng || Math.random;
         for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
+            const j = Math.floor(random() * (i + 1));
             const tmp = arr[i];
             arr[i] = arr[j];
             arr[j] = tmp;
@@ -12636,6 +12838,10 @@ let engine = {
     },
     rollScrollArchivesResearchChoices: function() {
         const lib = data.progress.base.scrollArchives;
+        engine.ensureSavedSeed(lib, "researchSeed", "scrollArchives");
+        const rand = function() {
+            return engine.nextSeededFloat(lib, "researchSeed");
+        };
         const viable = engine.getScrollArchivesViableSkillPool();
         const shardSet = {};
         const shardKeys = engine.getSkillKeysWithShardsOnTravelableMaps();
@@ -12651,7 +12857,7 @@ let engine = {
         const choices = [];
         const chosen = {};
         if (shardViable.length > 0) {
-            const pick = shardViable[Math.floor(Math.random() * shardViable.length)];
+            const pick = shardViable[Math.floor(rand() * shardViable.length)];
             choices.push(pick);
             chosen[pick] = true;
         }
@@ -12661,7 +12867,7 @@ let engine = {
                 fillPool.push(viable[fi]);
             }
         }
-        engine.shuffleArrayInPlace(fillPool);
+        engine.shuffleArrayInPlace(fillPool, rand);
         const need = Math.min(3, viable.length) - choices.length;
         for (let ni = 0; ni < need; ni++) {
             choices.push(fillPool[ni]);

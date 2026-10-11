@@ -241,11 +241,41 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     setSkillListSort: function(mode) {
-        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha") {
+        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha" && mode !== "tips" && mode !== "grouping" && mode !== "shards") {
             return;
         }
         data.progress.skillListSort = mode;
         view.applySkillListSort();
+    },
+    setSkillGrouping: function(inputEl, commit) {
+        const key = data.progress.selectedSkillDetailKey;
+        const sk = key && data.progress.skills && data.progress.skills[key];
+        if (!sk || !inputEl) {
+            return;
+        }
+        const digits = String(inputEl.value == null ? "" : inputEl.value).replace(/\D/g, "");
+        if (digits === "") {
+            if (commit) {
+                sk.grouping = 0;
+                inputEl.value = "0";
+            }
+            return;
+        }
+        let n = parseInt(digits, 10);
+        if (!isFinite(n) || n < 0) {
+            n = 0;
+        }
+        if (n > 99) {
+            n = 99;
+        }
+        sk.grouping = n;
+        const shown = String(n);
+        if (commit || inputEl.value !== shown) {
+            inputEl.value = shown;
+        }
+        if (data.progress.skillListSort === "grouping" && typeof view !== "undefined" && view.applySkillListSort) {
+            view.applySkillListSort();
+        }
     },
     switchSkillsTab: function(tabKey) {
         const valid = ["combat", "foraging", "class"];
@@ -1538,9 +1568,12 @@ let events = {
             shrine.packs = { common: 0, rare: 0, epic: 0 };
         }
         shrine.packs[rarity] = Math.max(0, (shrine.packs[rarity] || 0) - 1);
+        engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
         session.openPack = {
             rarity: rarity,
-            cards: shrineCards.rollPackCards(rarity)
+            cards: shrineCards.rollPackCards(rarity, function() {
+                return engine.nextSeededFloat(shrine, "packSeed");
+            })
         };
         session.previewRarity = rarity;
         session.phase = "choose";
@@ -1592,7 +1625,7 @@ let events = {
         const need = shrineCards.packDefs[session.openPack.rarity].choose;
         const sel = viewData.prestigeSelection || [];
         if (sel.length !== need) {
-            viewData.prestigePackError = "Select " + need + " cards.";
+            viewData.prestigePackError = need === 1 ? "Select 1 card." : "Select " + need + " cards.";
             view.renderPrestigePackPanel();
             return;
         }
@@ -1631,6 +1664,9 @@ let events = {
                 tipsBySkill[skillKeys[i]] = tips;
             }
         }
+        const oldArchives = progress.base && progress.base.scrollArchives;
+        const researchSeed = oldArchives && typeof oldArchives.researchSeed === "number" ? oldArchives.researchSeed : null;
+        const packSeed = shrine && typeof shrine.packSeed === "number" ? shrine.packSeed : null;
         const talentAdd = skills.unlockedTalentLevelTotal();
         const oldCap = (progress.divinity && progress.divinity.capacity) || 100000;
         const newCap = oldCap + talentAdd;
@@ -1657,6 +1693,12 @@ let events = {
         }
         newShrine.prestigeSession = null;
         initialize.initializeShrine();
+        if (researchSeed !== null && data.progress.base.scrollArchives) {
+            data.progress.base.scrollArchives.researchSeed = researchSeed;
+        }
+        if (packSeed !== null) {
+            newShrine.packSeed = packSeed;
+        }
         const newSkills = data.progress.skills || {};
         const tipKeys = Object.keys(tipsBySkill);
         for (let ti = 0; ti < tipKeys.length; ti++) {
@@ -1671,6 +1713,9 @@ let events = {
             shrineCards.invalidateAggregatedEffects();
         }
         initialize.calcPlayerStats(false);
+        if (typeof shrineCards !== "undefined" && shrineCards.applyPrestigeStartBonuses) {
+            shrineCards.applyPrestigeStartBonuses();
+        }
 
         data.gameSettings.prestigePackOpen = false;
         data.gameSettings.stop = false;
@@ -1680,9 +1725,20 @@ let events = {
         if (typeof createView !== "undefined" && createView.showCurrentTab) {
             createView.showCurrentTab();
         }
+        engine._pathDomSig = [];
+        viewData.pathHighlightSig = [];
+        if (typeof engine.syncResortPathDom === "function") {
+            engine.syncResortPathDom();
+        }
         if (typeof view !== "undefined") {
             if (view.updateTabButtons) {
                 view.updateTabButtons("base");
+            }
+            if (view.updatePathSegmentHighlight) {
+                view.updatePathSegmentHighlight(null);
+            }
+            if (view.updateDirtRoadLayer) {
+                view.updateDirtRoadLayer();
             }
             if (view.updateView) {
                 view.updateView();

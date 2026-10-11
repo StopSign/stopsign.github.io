@@ -84,6 +84,21 @@ let view = {
         img.classList.toggle("fox-travel-mirror", !!goingEast);
         img.classList.remove("okami-tail-mirror");
     },
+    getCarrierSprite: function(carrier, fallbackResource) {
+        if (carrier && carrier.isOkami) {
+            return "img/foxTail.svg";
+        }
+        const sprites = {
+            mana: "img/foxWorker_mana.svg",
+            wood: "img/foxWorker_wood.svg",
+            stone: "img/foxWorker_stone.svg",
+            water: "img/foxWorker_water.svg",
+            bars: "img/foxWorker_bars.svg",
+            coal: "img/foxWorker_coal.svg"
+        };
+        const resourceType = (carrier && carrier.resourceType) || fallbackResource;
+        return sprites[resourceType] || "img/foxWorker.svg";
+    },
     refreshBattleUiNow: function() {
         view.updateGlobals();
         view.updateCompactLayout();
@@ -452,7 +467,8 @@ let view = {
         view.updateVal("spdText", ls.levelSpd || 0, "textContent", 1);
         view.updateVal("soulText", engine.getCloneSoulLevel(), "textContent", 1);
         const soulLv = engine.getCloneSoulLevel();
-        view.updateVal("soulStatTip", `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`, "innerHTML");
+        const ringSoul = engine.getMarketAnchoringRingBought();
+        view.updateVal("soulStatTip", `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Anchoring Ring: +${ringSoul} Soul.<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`, "innerHTML");
         view.renderAttributePlanList();
     },
     updateStatsTab: function() {
@@ -473,7 +489,6 @@ let view = {
         const cdCfg = gameData.battle.cooldowns;
         const fortInner = skills.getSkillEffect("shameless").baseAudBonus || 0;
         const tenB = skills.getSkillEffect("corneredEgo").audInnerBonus || 0;
-        const forceFlatStats = roundNearestDecimals(skills.getSkillEffect("force").baseDamage || 0, 2);
         const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").characterExpMultiplier || 1, 2);
         const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").killCoinsMultiplier || 1, 2);
         const shamelessResearched = skills.isSkillResearchComplete("shameless");
@@ -482,100 +497,149 @@ let view = {
         const alacrityResearched = skills.isSkillResearchComplete("alacrity");
         const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
         const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
-        let audTip = `Base inner Aud: +${gc.baseAudInner}`;
         const runDensity = (data.battle && data.battle.cloneDensity) || 0;
-        if (runDensity > 0) {
-            audTip += `<br>Dense Clones: +${Math.round(runDensity * 10)}% base Aud`;
+        const cardEffStats = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? shrineCards.getAggregatedEffects() : {};
+        const cardAud = cardEffStats.baseAudFlat || 0;
+        const cardSlap = cardEffStats.baseSlapFlat || 0;
+        const densMult = (typeof bonfire !== "undefined" && bonfire.getCloneDensityStatMult)
+            ? bonfire.getCloneDensityStatMult(runDensity) : (1 + runDensity * 0.1);
+        const statDiv = gc.conStrStatDivisor;
+        const conMult = 1 + (conTotal / statDiv);
+        const strMult = 1 + (strTotal / statDiv);
+        const audBaseLines = [];
+        let audBaseSum = 0;
+        audBaseLines.push(`Base Aud: +${gc.baseAudInner}`);
+        audBaseSum += gc.baseAudInner;
+        if (cardAud) {
+            audBaseLines.push(`Base Audacity: +${cardAud}`);
+            audBaseSum += cardAud;
         }
         if (shamelessResearched) {
-            audTip += `<br>Shameless: +${fortInner}`;
+            audBaseLines.push(`Shameless: +${fortInner}`);
+            audBaseSum += fortInner;
         }
+        const corneredAmt = corneredResearched ? tenB : 0;
         if (corneredResearched) {
-            audTip += `<br>Cornered Ego: +${tenB}`;
+            const corneredCurrent = corneredAmt * 2;
+            audBaseLines.push(`Cornered Ego: +${corneredAmt} base, +${corneredCurrent} current`);
+            audBaseSum += corneredAmt + corneredCurrent;
         }
-        if (skills.isSkillUnlocked("adaptation")) {
-            audTip += `<br>Adaptation: +${skills.getSkillEffect("adaptation").bonusCon || 0} Con from skill levels`;
-        }
-        if (skills.isSkillUnlocked("windfallSwagger")) {
-            audTip += `<br>Windfall Swagger: +${windfallEffStats.bonusCon || 0} Con from skill level`;
-        }
+        let valAud = 0;
         if (skills.isSkillUnlocked("validation")) {
-            const valAud = engine.getValidationAudFromKills();
+            valAud = engine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
             const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
-            audTip += `<br>Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`;
+            audBaseLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`);
+            audBaseSum += valAud;
         }
+        let padAud = 0;
         if (skills.isSkillUnlocked("paddingResume")) {
             const padEffUi = skills.getSkillEffect("paddingResume");
-            audTip += `<br>Padding the Resume: +${padEffUi.audBonus || 0} Aud (${padEffUi.audPerCharLevel || 0} per character level)`;
+            padAud = padEffUi.audBonus || 0;
+            audBaseLines.push(`Padding the Resume: +${padAud} (${padEffUi.audPerCharLevel || 0} per character level)`);
+            audBaseSum += padAud;
         }
-        if (growthUnlocked) {
-            audTip += `<br>Confidence multiplier: +${Math.round(conTotal * (100 / gc.conStrStatDivisor))}%`;
+        audBaseLines.push(`Total base: ${audBaseSum}`);
+        const shamelessAmt = shamelessResearched ? fortInner : 0;
+        const baseInner = (gc.baseAudInner + cardAud) * densMult + shamelessAmt + corneredAmt;
+        const multipliedAud = Math.ceil(baseInner * conMult) + Math.ceil((corneredAmt * 2) * conMult) + valAud + padAud;
+        const finalAud = Math.max(1, multipliedAud);
+        const audMultExtra = finalAud - audBaseSum;
+        const audEffective = audBaseSum > 0 ? finalAud / audBaseSum : 1;
+        const audMultLines = [];
+        if (runDensity > 0) {
+            audMultLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base Aud)`);
         }
+        if (growthUnlocked || conTotal > 0) {
+            audMultLines.push(`Confidence: ×${roundNearestDecimals(conMult, 2)} (+${Math.round(conTotal * (100 / statDiv))}%)`);
+        }
+        const audExtraText = audMultExtra > 0 ? ` (+${audMultExtra} Aud)` : "";
+        audMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(audEffective, 2)}${audExtraText}`);
+        const audTip = audBaseLines.join("<br>") + "<br><br>" + audMultLines.join("<br>");
         view.updateVal("statsAudText", `${intToStringRound(p.maxAud)} Aud`);
         view.updateVal("statsAudTip", audTip, "innerHTML");
         const regenVal = p.regenPerSecond || 0;
         view.updateVal("statsRegenText", `${round2(regenVal)}/s`);
         view.updateVal("statsRegenTip", "From Self-Affirmations skill level (Aud/s).", "innerHTML");
         view.updateVal("statsRegenCard", regenVal > 0 ? "" : "none", "style.display");
-        let attackTip = `Base slap: ${gc.baseSlapDamage}`;
-        if (runDensity > 0) {
-            attackTip += `<br>Dense Clones: +${Math.round(runDensity * 10)}% base ego damage`;
+        const forceRaw = forceResearched ? (skills.getSkillEffect("force").baseDamage || 0) : 0;
+        const mcRaw = (skills.isSkillUnlocked("mainCharacter") && typeof engine.getMainCharacterFlatDamage === "function")
+            ? engine.getMainCharacterFlatDamage() : 0;
+        const ppRaw = (skills.isSkillUnlocked("peerPressure") && typeof engine.getPeerPressureFlatDamage === "function")
+            ? engine.getPeerPressureFlatDamage() : 0;
+        const attackBaseLines = [];
+        const attackBaseSum = gc.baseSlapDamage + cardSlap + forceRaw + mcRaw + ppRaw;
+        attackBaseLines.push(`Base slap: +${gc.baseSlapDamage}`);
+        if (cardSlap) {
+            attackBaseLines.push(`Base ego damage: +${roundNearestDecimals(cardSlap, 2)}`);
         }
-            if (forceResearched) {
-            attackTip += `<br>Force (base): +${forceFlatStats}`;
+        if (forceResearched) {
+            attackBaseLines.push(`Force (base): +${roundNearestDecimals(forceRaw, 2)}`);
         }
         if (skills.isSkillUnlocked("mainCharacter")) {
-            const mcFlat = typeof engine.getMainCharacterFlatDamage === "function" ? engine.getMainCharacterFlatDamage() : 0;
             const vis = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
-            attackTip += `<br>Main Character: +${roundNearestDecimals(mcFlat, 2)} from ${vis} visible ${vis === 1 ? "enemy" : "enemies"}`;
+            attackBaseLines.push(`Main Character: +${roundNearestDecimals(mcRaw, 2)} from ${vis} visible ${vis === 1 ? "enemy" : "enemies"}`);
         }
-        if (skills.isSkillUnlocked("savageLessons")) {
-            attackTip += `<br>Savage Lessons: +${skills.getSkillEffect("savageLessons").bonusStr || 0} Bru from skill levels`;
+        if (skills.isSkillUnlocked("peerPressure")) {
+            const inSlap = typeof engine.countIntrudersInSlapRange === "function" ? engine.countIntrudersInSlapRange() : 0;
+            attackBaseLines.push(`Peer Pressure: +${roundNearestDecimals(ppRaw, 2)} from ${inSlap} in slap range`);
         }
-        if (skills.isSkillUnlocked("shockValue")) {
-            attackTip += `<br>Shock Value: +${shockEffStats.bonusStr || 0} Bru from skill level`;
+        attackBaseLines.push(`Total base: ${roundNearestDecimals(attackBaseSum, 2)}`);
+        let afterAttack = ((gc.baseSlapDamage + cardSlap) * densMult + forceRaw) * strMult + mcRaw + ppRaw;
+        const attackMultLines = [];
+        if (runDensity > 0) {
+            attackMultLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% base ego damage)`);
+        }
+        if (growthUnlocked || strTotal > 0) {
+            attackMultLines.push(`Brutality: ×${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
         }
         if (skills.isSkillUnlocked("bitterRivalry")) {
             const brPct = skills.getSkillEffect("bitterRivalry").damagePercentPerSecond || 0;
-            let brLine = `<br>Bitter Rivalry: +${round2(brPct)}% damage per second an enemy is in slap range`;
+            let brLine = `Bitter Rivalry: +${round2(brPct)}% damage per second an enemy is in slap range`;
             const brTarget = typeof engine.findIntruderById === "function"
                 ? engine.findIntruderById(data.battle.activeTargetId)
                 : null;
             if (brTarget && brTarget.alive) {
                 const brSecs = brTarget.bitterRivalrySeconds || 0;
-                brLine += ` (current target +${round2(brPct * brSecs)}%)`;
+                const brFactor = 1 + (brPct / 100) * brSecs;
+                brLine += ` (current target ×${roundNearestDecimals(brFactor, 2)})`;
+                if (brSecs > 0) {
+                    afterAttack *= brFactor;
+                }
             }
-            attackTip += brLine;
-        }
-        if (skills.isSkillUnlocked("peerPressure")) {
-            const ppFlat = typeof engine.getPeerPressureFlatDamage === "function" ? engine.getPeerPressureFlatDamage() : 0;
-            const inSlap = typeof engine.countIntrudersInSlapRange === "function" ? engine.countIntrudersInSlapRange() : 0;
-            attackTip += `<br>Peer Pressure: +${roundNearestDecimals(ppFlat, 2)} from ${inSlap} in slap range`;
+            attackMultLines.push(brLine);
         }
         if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAboveHalfAud === "function" && engine.isPlayerAboveHalfAud()) {
             const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
-            attackTip += `<br>High Horse: +${roundNearestDecimals(hhFrac * 100, 1)}% while above half Aud`;
+            attackMultLines.push(`High Horse: ×${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% while above half Aud)`);
+            afterAttack *= (1 + hhFrac);
         }
         if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtOrBelowAudFraction === "function" && engine.isPlayerAtOrBelowAudFraction(0.5)) {
             const udFrac = skills.getSkillEffect("underdog").damageBonusFraction || 0;
-            attackTip += `<br>Underdog: +${roundNearestDecimals(udFrac * 100, 1)}% at or below half Aud`;
+            attackMultLines.push(`Underdog: ×${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% at or below half Aud)`);
+            afterAttack *= (1 + udFrac);
         }
         if (skills.isSkillUnlocked("crowdWork")) {
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             if (visNow >= 4) {
                 const cwFrac = skills.getSkillEffect("crowdWork").damageBonusFraction || 0;
-                attackTip += `<br>Crowd Work: +${roundNearestDecimals(cwFrac * 100, 1)}% with ${visNow} visible`;
+                attackMultLines.push(`Crowd Work: ×${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% with ${visNow} visible)`);
+                afterAttack *= (1 + cwFrac);
             }
         }
         if (skills.isSkillUnlocked("marathonEgo")) {
             const mePct = skills.getSkillEffect("marathonEgo").damagePercentPerTenSec || 0;
             const tens = Math.floor((data.battle.cloneAliveMs || 0) / 10000);
-            attackTip += `<br>Marathon Ego: +${round2(mePct * tens)}% from ${tens * 10}s`;
+            const meFactor = 1 + (mePct / 100) * tens;
+            attackMultLines.push(`Marathon Ego: ×${roundNearestDecimals(meFactor, 2)} (+${round2(mePct * tens)}% from ${tens * 10}s)`);
+            afterAttack *= meFactor;
         }
-        if (growthUnlocked) {
-            attackTip += `<br>Brutality multiplier: +${Math.round(strTotal * (100 / gc.conStrStatDivisor))}%`;
-        }
+        const atkExtra = afterAttack - attackBaseSum;
+        const atkEffective = attackBaseSum > 0 ? afterAttack / attackBaseSum : 1;
+        const atkExtraText = Math.abs(atkExtra) >= 0.05 ? ` (${atkExtra > 0 ? "+" : ""}${roundNearestDecimals(atkExtra, 2)} ego dmg)` : "";
+        attackMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(atkEffective, 2)}${atkExtraText}`);
+        const attackTip = attackBaseLines.join("<br>") + "<br><br>" + attackMultLines.join("<br>");
         view.updateVal("statsAttackText", `${roundNearestDecimals(p.attackDamage, 1).toFixed(1)} ego dmg`);
         view.updateVal("statsAttackTip", attackTip, "innerHTML");
         const twEff = skills.getSkillEffect("toughness_condescend");
@@ -606,6 +670,8 @@ let view = {
         if (alacrityResearched) {
             slapTip += `<br>Alacrity reduction: ${alaLv * cdCfg.alacritySlapReductionPerLevelMs} ms`;
         }
+        const glovesMs = engine.getMarketMysticalGlovesBought() * 100;
+        slapTip += `<br>Mystical Gloves: -${glovesMs} ms`;
         slapTip += `<br>Floor: ${round2(cdCfg.slapFloorMs / 1000)}s`;
         view.updateVal("statsSlapTip", slapTip, "innerHTML");
         view.updateVal("statsSandalText", hasSandal ? `${round2((p.sandalAttackCooldownMs || 0) / 1000)}s` : "Locked");
@@ -1070,6 +1136,7 @@ let view = {
         const shrine = data.progress.base.shrine || {};
         const shrineBuilt = engine.isShrineBuilt();
         const selected = shrine.selectedClassKey || "none";
+        view.updateVal("shrinePrestigeHeading", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineClassSelectRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineClassRow", shrineBuilt ? "" : "none", "style.display");
         view.updateVal("shrineMoveMountainRow", shrineBuilt ? "" : "none", "style.display");
@@ -1116,7 +1183,7 @@ let view = {
             }
             view.updateVal(`shrineMs_${id}_check`, allClaimed ? "visible" : "hidden", "style.visibility");
         };
-        setCapped("shrineLevel", engine.getShrineContinuousLevelProgress(), [1, 2, 4, 7, 11, 16, 22], ms.shrineLevelClaimed || {});
+        setCapped("shrineLevel", engine.getShrineContinuousLevelProgress(), engine.shrineLevelMilestoneThresholds, ms.shrineLevelClaimed || {});
         setCapped("totalStars", engine.getTotalEarnedStarsCount(), [5, 10, 15, 20, 25, 30], ms.totalStarsClaimed || {});
         const okami = engine.getOkami();
         setCapped("okamiLevel", (okami && okami.level) || 0, [10, 20, 30, 40, 50, 60, 70, 80], ms.okamiLevelClaimed || {});
@@ -1127,6 +1194,9 @@ let view = {
             const pct = Math.max(0, Math.min(100, (cur / need) * 100));
             view.updateVal(`shrineMs_${id}_fill`, `${pct}%`, "style.width");
             view.updateVal(`shrineMs_${id}_progress`, `${intToStringRound(cur)} / ${intToStringRound(need)}`);
+            const completed = engine.getShrineRepeatingCompletedCount(id);
+            const timesWord = completed === 1 ? "time" : "times";
+            view.updateVal(`shrineMs_${id}_completed`, ` · completed ${intToStringRound(completed)} ${timesWord}`);
             const rarity = engine.getShrineEscalatingRarity(id, need);
             view.updateVal(`shrineMs_${id}_icon`, `img/${rarity}.svg`, "src");
         };
@@ -1546,13 +1616,13 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x - 16)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y - 16)}px`, "style.top");
+                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
+                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".fox-den-carrier-img");
                     if (img) {
-                        img.src = carrier.isOkami ? "img/foxTail.svg" : "img/foxWorker.svg";
+                        img.src = view.getCarrierSprite(carrier);
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
                     }
                 }
@@ -1582,13 +1652,13 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x - 16)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y - 16)}px`, "style.top");
+                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
+                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".bonfire-carrier-img");
                     if (img) {
-                        img.src = carrier.isOkami ? "img/foxTail.svg" : "img/foxWorker.svg";
+                        img.src = view.getCarrierSprite(carrier);
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
                     }
                 }
@@ -1618,13 +1688,13 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x - 16)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y - 16)}px`, "style.top");
+                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
+                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".market-carrier-img");
                     if (img) {
-                        img.src = carrier.isOkami ? "img/foxTail.svg" : "img/foxWorker.svg";
+                        img.src = view.getCarrierSprite(carrier);
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
                     }
                 }
@@ -1660,13 +1730,13 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x - 16)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y - 16)}px`, "style.top");
+                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
+                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".cistern-carrier-img");
                     if (img) {
-                        img.src = carrier.isOkami ? "img/foxTail.svg" : "img/foxWorker.svg";
+                        img.src = view.getCarrierSprite(carrier, "water");
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
                     }
                 }
@@ -1702,13 +1772,13 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x - 16)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y - 16)}px`, "style.top");
+                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
+                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".inn-carrier-img");
                     if (img) {
-                        img.src = carrier.isOkami ? "img/foxTail.svg" : "img/foxWorker.svg";
+                        img.src = view.getCarrierSprite(carrier, "water");
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
                     }
                 }
@@ -1913,8 +1983,8 @@ let view = {
         const expToLevel = orb.expToLevel || 200;
         const pct = expToLevel > 0 ? Math.max(0, Math.min(100, (exp / expToLevel) * 100)) : 0;
         view.updateVal("orbLevelText", level, "textContent", "floor");
-        view.updateVal("orbExpText", Math.round(exp), "textContent");
-        view.updateVal("orbExpToLevelText", Math.round(expToLevel), "textContent");
+        view.updateVal("orbExpText", Math.round(exp), "textContent", 1);
+        view.updateVal("orbExpToLevelText", Math.round(expToLevel), "textContent", 1);
         view.updateVal("orbExpFill", `${pct}%`, "style.width");
         view.updateVal("orbManaRateText", round2(engine.getEffectiveManaRatePerSecond()));
         view.updateVal("orbBaseManaText", intToStringRound(engine.getManaBaseCapacity()));
@@ -2000,8 +2070,8 @@ let view = {
         const expToLevel = shrine.expToLevel || 10000;
         const pct = expToLevel > 0 ? Math.max(0, Math.min(100, (exp / expToLevel) * 100)) : 0;
         view.updateVal("shrineLevelText", level, "textContent", "floor");
-        view.updateVal("shrineExpText", Math.round(exp), "textContent");
-        view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent");
+        view.updateVal("shrineExpText", Math.round(exp), "textContent", 1);
+        view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent", 1);
         view.updateVal("shrineExpFill", `${pct}%`, "style.width");
         view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
@@ -2024,13 +2094,6 @@ let view = {
             viewData.dirtRoadHoverEls = {};
         }
         if (!unlocked) {
-            const hideKeys = Object.keys(viewData.dirtRoadHoverEls);
-            for (let hi = 0; hi < hideKeys.length; hi++) {
-                const hideEl = viewData.dirtRoadHoverEls[hideKeys[hi]];
-                if (hideEl) {
-                    hideEl.style.display = "none";
-                }
-            }
             const mouseTip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
             if (mouseTip) {
                 mouseTip.style.display = "none";
@@ -2042,12 +2105,14 @@ let view = {
             viewData.dirtRoadCoordsLocked = true;
         }
         const svgNs = "http://www.w3.org/2000/svg";
+        const activeRoadKeys = {};
         for (let i = 0; i < roads.length; i++) {
             const road = roads[i];
             const key = engine.getDirtRoadKey(road.fromKey, road.toKey);
             if (!key || key === "|") {
                 continue;
             }
+            activeRoadKeys[key] = true;
             let line = viewData.dirtRoadLineEls[key];
             let hotspot = viewData.dirtRoadHoverEls[key];
             const from = engine.getMapBuildingPosition(road.fromKey);
@@ -2128,6 +2193,30 @@ let view = {
                     hotspot._dirtRoadTipHtml = `${progress} / ${roadCap}<br>+${round1(progress * 0.5)}% speed<br>${Math.ceil(remainMs / 1000)}s to next decrease`;
                 }
             }
+        }
+        const staleLineKeys = Object.keys(viewData.dirtRoadLineEls);
+        for (let si = 0; si < staleLineKeys.length; si++) {
+            const staleKey = staleLineKeys[si];
+            if (activeRoadKeys[staleKey]) {
+                continue;
+            }
+            const staleLine = viewData.dirtRoadLineEls[staleKey];
+            if (staleLine && staleLine.parentNode) {
+                staleLine.parentNode.removeChild(staleLine);
+            }
+            delete viewData.dirtRoadLineEls[staleKey];
+        }
+        const staleHoverKeys = Object.keys(viewData.dirtRoadHoverEls);
+        for (let hi = 0; hi < staleHoverKeys.length; hi++) {
+            const staleKey = staleHoverKeys[hi];
+            if (activeRoadKeys[staleKey]) {
+                continue;
+            }
+            const staleHover = viewData.dirtRoadHoverEls[staleKey];
+            if (staleHover && staleHover.parentNode) {
+                staleHover.parentNode.removeChild(staleHover);
+            }
+            delete viewData.dirtRoadHoverEls[staleKey];
         }
     },
     bindFoxDenQueueTip: function() {
@@ -2394,7 +2483,11 @@ let view = {
                 view.updateVal(`marketTrade_${tk}_extra`, `Unlocks at Market level ${requiredLevel}`);
             } else {
                 const costHtml = resortData.formatCostAmountHtml(td.creditCost, "credit", "Credit");
-                let extra = `Cost: [${costHtml}] &middot; ${td.seconds}s base`;
+                const baseSec = engine.getMarketTradeBaseSeconds
+                    ? engine.getMarketTradeBaseSeconds(tk)
+                    : (td.seconds || 0);
+                const baseSecStr = roundNearestDecimals(baseSec, 2);
+                let extra = `Cost: [${costHtml}] &middot; ${baseSecStr}s base`;
                 if (traders > 0) {
                     extra += ` (${round1(engine.getMarketTradeDurationMs(tk) / 1000)}s with ${traders})`;
                 }
@@ -3468,10 +3561,16 @@ let view = {
             view.updateBuildingManaRow("stonePile");
             const dupeWrapOn = duplicator;
             view.updateVal("stonePileDupeProgressWrap", dupeWrapOn ? "" : "none", "style.display");
+            view.updateVal("stonePileDupeIntervalText", dupeWrapOn ? "" : "none", "style.display");
             if (dupeWrapOn) {
-                const remain = pile.dupeTimerMs === undefined || pile.dupeTimerMs === null ? 10000 : pile.dupeTimerMs;
-                const pct = Math.max(0, Math.min(100, (1 - (Math.max(0, remain) / 10000)) * 100));
+                const intervalMs = engine.getStoneDuplicatorIntervalMs ? engine.getStoneDuplicatorIntervalMs() : 10000;
+                const remain = pile.dupeTimerMs === undefined || pile.dupeTimerMs === null ? intervalMs : pile.dupeTimerMs;
+                const pct = intervalMs > 0
+                    ? Math.max(0, Math.min(100, (1 - (Math.max(0, remain) / intervalMs)) * 100))
+                    : 100;
                 view.updateVal("stonePileDupeProgressFill", `${pct}%`, "style.width");
+                const everySec = roundNearestDecimals(intervalMs / 1000, 2);
+                view.updateVal("stonePileDupeIntervalText", `every ${everySec}s`);
             }
             const garden = base.garden || {};
             const showUndup = !!(garden.arrangementOfDoubledStoneUnlocked && duplicator);
@@ -4075,12 +4174,16 @@ let view = {
         if (!column) {
             return;
         }
-        const sort = data.progress.skillListSort === "talent" || data.progress.skillListSort === "alpha"
-            ? data.progress.skillListSort
+        const sortMode = data.progress.skillListSort;
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "shards"
+            ? sortMode
             : "oldest";
         const oldestRadio = viewData.cached.skillSortOldest;
         const talentRadio = viewData.cached.skillSortTalent;
         const alphaRadio = viewData.cached.skillSortAlpha;
+        const tipsRadio = viewData.cached.skillSortTips;
+        const groupingRadio = viewData.cached.skillSortGrouping;
+        const shardsRadio = viewData.cached.skillSortShards;
         if (oldestRadio) {
             oldestRadio.checked = sort === "oldest";
         }
@@ -4089,6 +4192,15 @@ let view = {
         }
         if (alphaRadio) {
             alphaRadio.checked = sort === "alpha";
+        }
+        if (tipsRadio) {
+            tipsRadio.checked = sort === "tips";
+        }
+        if (groupingRadio) {
+            groupingRadio.checked = sort === "grouping";
+        }
+        if (shardsRadio) {
+            shardsRadio.checked = sort === "shards";
         }
         const unlocked = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.unlockedSkills) || {};
         const unlockIndex = {};
@@ -4117,6 +4229,24 @@ let view = {
                 const cmp = na.localeCompare(nb);
                 if (cmp !== 0) {
                     return cmp;
+                }
+            } else if (sort === "tips") {
+                const ta = (sa && sa.tips) || 0;
+                const tb = (sb && sb.tips) || 0;
+                if (tb !== ta) {
+                    return tb - ta;
+                }
+            } else if (sort === "grouping") {
+                const ga = (sa && sa.grouping) || 0;
+                const gb = (sb && sb.grouping) || 0;
+                if (ga !== gb) {
+                    return ga - gb;
+                }
+            } else if (sort === "shards") {
+                const ha = (sa && sa.shards) || 0;
+                const hb = (sb && sb.shards) || 0;
+                if (hb !== ha) {
+                    return hb - ha;
                 }
             } else {
                 const ia = unlockIndex[a];
@@ -4266,13 +4396,22 @@ let view = {
         view.updateVal("skillInfoPanel", "", "style.display");
         const skill = data.progress.skills[skillKey];
         const parts = skills.skillExpGainParts(skill);
-        const intMultOthers = skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1;
+        const intMultOthers = typeof skills.getOtherSkillExpMultiplier === "function"
+            ? skills.getOtherSkillExpMultiplier(skillKey)
+            : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1);
         const soulMult = engine.getSoulSkillExpMultiplier();
         const expPerTrigger = skills.expGainForSkillTrigger(skill, 1) * intMultOthers * soulMult;
         const expPct = Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100));
         const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
         const tipsVal = skill.tips || 0;
         view.updateVal("skillInfo_title", skill.name);
+        const groupingInput = viewData.cached.skillInfo_grouping;
+        if (groupingInput && document.activeElement !== groupingInput) {
+            const grouping = Math.max(0, Math.min(99, Math.floor(Number(skill.grouping) || 0)));
+            if (groupingInput.value !== String(grouping)) {
+                groupingInput.value = String(grouping);
+            }
+        }
         const sum = skills.skillEffectUiSummary(skillKey, skill);
         if (sum) {
             view.updateVal("skillInfo_current", sum, "innerHTML");
@@ -4296,14 +4435,15 @@ let view = {
         view.updateVal("skillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("skillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
         view.updateVal("skillInfo_tips_mults", "");
-        const showEchoChamberMult = skills.isSkillUnlocked("echoChamber") && skillKey !== "echoChamber";
-        if (showEchoChamberMult) {
+        const showOtherSkillMult = (skills.isSkillUnlocked("echoChamber") && skillKey !== "echoChamber")
+            || (skills.isSkillUnlocked("studyGroup") && skillKey !== "studyGroup");
+        if (showOtherSkillMult) {
             view.updateVal("skillInfo_integration_mult", `×${intMultOthers.toFixed(4)}`);
             view.updateVal("skillInfo_integration_row", "", "style.display");
         } else {
             view.updateVal("skillInfo_integration_row", "none", "style.display");
         }
-        // Combined includes Echo Chamber for other skills; Echo Chamber itself is excluded from its own bonus.
+        // Combined includes Echo Chamber / Study Group for other skills; each is excluded from its own bonus.
         view.updateVal("skillInfo_combined_mults", `×${(parts.combinedMult * intMultOthers).toFixed(4)}`);
         view.updateVal("skillInfo_flavor", skills.getSkillFlavorText(skillKey), "innerHTML");
     },
@@ -5267,14 +5407,15 @@ let view = {
         if (!innBtn) {
             return;
         }
-        const amount = round2(Number(beads) || 0);
+        const amount = Math.round(Number(beads) || 0);
         const el = document.createElement("div");
         el.className = "inn-bead-float hypervisible";
         const label = Math.abs(amount) >= 10000 ? intToStringRound(amount) : String(amount);
         el.textContent = `+${label}`;
-        const slot = innBtn.querySelectorAll(".inn-bead-float").length % 5;
-        const offsets = [0, -14, 14, -28, 28];
-        el.style.setProperty("--inn-bead-x", `${offsets[slot]}px`);
+        const beadX = (Math.random() - 0.5) * 50;
+        const beadY = (Math.random() - 0.5) * 50;
+        el.style.setProperty("--inn-bead-x", `${beadX}px`);
+        el.style.setProperty("--inn-bead-y", `${beadY}px`);
         el.addEventListener("animationend", function() {
             el.remove();
         });
@@ -5343,22 +5484,25 @@ let view = {
         view.updateVal("prestigePackCards", summary ? "none" : "", "style.display");
         view.updateVal("prestigePackError", summary ? "none" : "", "style.display");
         view.updateVal("prestigePackActionBtn", summary ? "none" : "", "style.display");
-        view.updateVal("prestigePackSummary", summary ? "flex" : "none", "style.display");
+        view.updateVal("prestigePackSummary", "flex", "style.display");
         view.updateVal("prestigeFinishBtn", summary ? "" : "none", "style.display");
         const summaryEl = viewData.cached.prestigePackSummary || document.getElementById("prestigePackSummary");
+        const lines = shrineCards.sessionBonusLines(session.gained || []);
+        let summaryHtml = "";
+        for (let bi = 0; bi < lines.length; bi++) {
+            summaryHtml += `<div>${view.escapeHtml(lines[bi])}</div>`;
+        }
         if (summary) {
-            const lines = shrineCards.sessionBonusLines(session.gained || []);
-            let html = "";
-            for (let i = 0; i < lines.length; i++) {
-                html += `<div>${view.escapeHtml(lines[i])}</div>`;
-            }
             const talentAdd = (typeof skills !== "undefined" && skills.unlockedTalentLevelTotal)
                 ? skills.unlockedTalentLevelTotal() : 0;
-            html += `<div>Divinity max: +${talentAdd}</div>`;
-            html += `<div class="muted-text">From the total talent levels of unlocked skills.</div>`;
-            if (summaryEl && summaryEl.innerHTML !== html) {
-                summaryEl.innerHTML = html;
-            }
+            summaryHtml += `<div class="prestige-pack-summary-sep"></div>`;
+            summaryHtml += `<div>Divinity max: +${talentAdd}</div>`;
+            summaryHtml += `<div class="muted-text">From the total talent levels of unlocked skills.</div>`;
+        }
+        if (summaryEl && summaryEl.innerHTML !== summaryHtml) {
+            summaryEl.innerHTML = summaryHtml;
+        }
+        if (summary) {
             return;
         }
         const packs = shrine.packs || {};
@@ -5409,7 +5553,13 @@ let view = {
                 const border = shrineCards.rarityBorder[card.rarity] || "#9fb6d5";
                 const bg = shrineCards.rarityBackground[card.rarity] || "rgba(159, 182, 213, 0.5)";
                 const selClass = selected.indexOf(i) >= 0 ? " prestige-pack-card--selected" : "";
-                cardsHtml += `<button type="button" class="prestige-pack-card${selClass}" style="border-color:${border};background:${bg}" onclick="events.selectPrestigeCard(${i})"><div class="prestige-pack-card-name">${view.escapeHtml(name)}</div><div class="prestige-pack-card-effect">${view.escapeHtml(effect)}</div></button>`;
+                const max = def && def.rarity ? def.rarity[card.rarity] : -1;
+                let maxHtml = "";
+                if (typeof max === "number" && max !== -1) {
+                    const owned = shrineCards.getOwned(card.key, card.rarity);
+                    maxHtml = `<div class="prestige-pack-card-max">${owned}/${max}</div>`;
+                }
+                cardsHtml += `<button type="button" class="prestige-pack-card${selClass}" style="border-color:${border};background:${bg}" onclick="events.selectPrestigeCard(${i})"><div class="prestige-pack-card-name">${view.escapeHtml(name)}</div><div class="prestige-pack-card-effect">${view.escapeHtml(effect)}</div>${maxHtml}</button>`;
             }
         }
         if (cardsEl && cardsEl.innerHTML !== cardsHtml) {

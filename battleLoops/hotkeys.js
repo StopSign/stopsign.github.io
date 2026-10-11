@@ -6,6 +6,11 @@ document.addEventListener("keydown", function(e) {
 
     const code = e.code;
 
+    if (code === "Escape" && typeof toasts !== "undefined" && toasts.isPanelOpen && toasts.isPanelOpen()) {
+        toasts.closePanel();
+        return;
+    }
+
     keysPressed[code] = true;
     keysPressed['shift'] = e.shiftKey;
 

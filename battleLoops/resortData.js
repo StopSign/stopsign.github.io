@@ -4495,11 +4495,15 @@ var resortData = {
                         return `Exp bonus: +${engine.getOrbBuildStairsBought() * 20}%`;
                     },
                     rowVisible: function() {
+                        const max = engine.getOrbBuildStairsMax();
+                        const bought = engine.getOrbBuildStairsBought();
+                        if (max > 0 && bought >= max) {
+                            return false;
+                        }
                         return engine.getOrbBuildWallsBought() >= 4;
                     },
                     upgradeSoldOut: function() {
-                        const max = engine.getOrbBuildStairsMax();
-                        return max > 0 && engine.getOrbBuildStairsBought() >= max;
+                        return false;
                     },
                     soldOutButtonLabel: "Max stairs"
                 },
@@ -4530,11 +4534,15 @@ var resortData = {
                         return `Mana gen and cap: +${engine.getOrbBuildFloorBought() * 10}%`;
                     },
                     rowVisible: function() {
+                        const max = engine.getOrbBuildFloorMax();
+                        const bought = engine.getOrbBuildFloorBought();
+                        if (max > 0 && bought >= max) {
+                            return false;
+                        }
                         return engine.getOrbBuildStairsBought() >= 1;
                     },
                     upgradeSoldOut: function() {
-                        const max = engine.getOrbBuildFloorMax();
-                        return max > 0 && engine.getOrbBuildFloorBought() >= max;
+                        return false;
                     },
                     soldOutButtonLabel: "Max floors"
                 },

@@ -183,7 +183,54 @@ mapData.getDefaultMaps = function() {
                 { key: "crowdWork", gain: 1, chance: 0.0005, cap: 10 },
                 { key: "walkingItOff", gain: 1, chance: 0.0005, cap: 10 }
             ]
+        }),
+        mapData.createMap({
+            version: 0,
+            key: "map_9",
+            name: "Fedora Tippers",
+            description: "They tip their hats when they wink and leer, but the illusion of chivalry does not fool the Okami.",
+            seed: 21888,
+            baseDifficulty: 6,
+            unlocksAfterMapKey: "map_8",
+            zones: [
+                mapData.createZone(4, "scoundrel", 0, 175, 1, 1.25, 60),
+                mapData.createZone(2, "lecher", 5000, 100, 1.3, 0.75, 75),
+                mapData.createZone(4, "scoundrel", 16000, 250, 1.5, 1, 90),
+                mapData.createZone(5, "scoundrel", 30000, 300, 1.6, 1, 105),
+                mapData.createZone(2, "lecher", 34000, 200, 1.8, 0.75, 120),
+                mapData.createZone(5, "scoundrel", 60000, 150, 2, 1, 135),
+                mapData.createZone(1, "lecher", 62000, 200, 2, 0.75, 150),
+            ],
+            zoneShards: [
+                { key: "publicApology", gain: 1, chance: 0.0004, cap: 10 },
+                { key: "secondWind", gain: 1, chance: 0.0004, cap: 10 },
+                { key: "slowBurn", gain: 1, chance: 0.0004, cap: 10 }
+            ]
+        }),
+        mapData.createMap({
+            version: 0,
+            key: "map_10",
+            name: "Catcallers",
+            description: "Seeking to whistle at the rumored beauties in the mist, they will take a good beating before giving up.",
+            seed: 21888,
+            baseDifficulty: 10,
+            unlocksAfterMapKey: "map_8",
+            zones: [
+                mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5, 140),
+                mapData.createZone(3, "lecher", 12000, 100, 1.3, 1.25, 160),
+                mapData.createZone(3, "scoundrel", 24000, 100, 1.6, 1.5, 180),
+                mapData.createZone(3, "lecher", 36000, 100, 1.8, 1.25, 200),
+                mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5, 220),
+            ],
+            zoneShards: [
+                { key: "experienceHog", gain: 1, chance: 0.0003, cap: 10 },
+                { key: "socialArmor", gain: 1, chance: 0.0003, cap: 10 },
+                { key: "closingArgument", gain: 1, chance: 0.0003, cap: 10 }
+            ]
         })
+
+        //gropers - 1 scoundrel lots of lechers 
+        
         // mapData.createMap({
         //     key: "map_condescend_1",
         //     name: "Shieldwall Gauntlet",

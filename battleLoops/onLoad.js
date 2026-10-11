@@ -180,6 +180,9 @@ let onLoad = {
                     data.progress.skills[k].key = k;
                     data.progress.skills[k].name = def.name;
                 }
+                if (data.progress.skills[k].grouping === undefined || data.progress.skills[k].grouping === null) {
+                    data.progress.skills[k].grouping = 0;
+                }
             }
         }
     },
@@ -274,6 +277,10 @@ let onLoad = {
         }
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
+        data.tutorialToasts = Array.isArray(toLoad.tutorialToasts) ? toLoad.tutorialToasts.slice() : [];
+        if (typeof toasts !== "undefined" && toasts.ensureStates) {
+            toasts.ensureStates();
+        }
         onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
         onLoad.ensureAllSkillStates();
         if (data.battle && (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null)) {
@@ -281,6 +288,7 @@ let onLoad = {
             delete data.battle.fakeTearDropsSecondAccMs;
         }
 
+        initialize.useStableSeeds = true;
         initialize.initializeBaseContentNotify();
         initialize.initializeBambooForest();
         initialize.initializeScrollArchives();
@@ -303,6 +311,7 @@ let onLoad = {
         initialize.initializePathSegments();
 
         onLoad.applySaveVersionMigrations(loadedSaveVersion);
+        initialize.useStableSeeds = false;
         data.saveVersion = CODE_SAVE_VERSION;
 
         if (!data.battle.cloneAttributePlan) {
@@ -324,6 +333,10 @@ let onLoad = {
         }
         if (typeof events !== "undefined" && events.restorePrestigePackOverlay) {
             events.restorePrestigePackOverlay();
+        }
+        if (typeof toasts !== "undefined" && toasts.create) {
+            toasts.create();
+            toasts.check();
         }
         debug();
     }

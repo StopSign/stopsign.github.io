@@ -130,6 +130,9 @@ let driver = {
         }
     },
     realSecondPassed: function() {
+        if (typeof toasts !== "undefined" && toasts.check) {
+            toasts.check();
+        }
     },
     skipTime: function(time) {
 

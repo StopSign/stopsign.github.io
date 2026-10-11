@@ -11,11 +11,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Mana Regen",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 5, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { manaRegenAdd: 0.10 };
-            if (rarity === "rare") return { manaRegenAdd: 0.30 };
-            if (rarity === "epic") return { manaRegenAdd: 1.00 };
+            if (rarity === "common") return { manaRegenAdd: 0.5 };
+            if (rarity === "rare") return { manaRegenAdd: 0.15 };
+            if (rarity === "epic") return { manaRegenAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -31,10 +31,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Mana Capacity",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { manaCapacityAdd: 0.20 };
-            if (rarity === "epic") return { manaCapacityAdd: 0.50 };
+            if (rarity === "rare") return { manaCapacityAdd: 0.15 };
+            if (rarity === "epic") return { manaCapacityAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -50,11 +50,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Okami Exp Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { okamiExpAdd: 0.10 };
-            if (rarity === "rare") return { okamiExpAdd: 0.40 };
-            if (rarity === "epic") return { okamiExpAdd: 1.00 };
+            if (rarity === "common") return { okamiExpAdd: 0.05 };
+            if (rarity === "rare") return { okamiExpAdd: 0.15 };
+            if (rarity === "epic") return { okamiExpAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -70,11 +70,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Skill Exp Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 5, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { skillExpAdd: 0.05 };
+            if (rarity === "common") return { skillExpAdd: 0.03 };
             if (rarity === "rare") return { skillExpAdd: 0.10 };
-            if (rarity === "epic") return { skillExpAdd: 0.40 };
+            if (rarity === "epic") return { skillExpAdd: 0.25 };
             return {};
         },
         effectText: function(rarity) {
@@ -90,11 +90,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Talent Exp Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 5, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { talentExpAdd: 0.05 };
+            if (rarity === "common") return { talentExpAdd: 0.03 };
             if (rarity === "rare") return { talentExpAdd: 0.10 };
-            if (rarity === "epic") return { talentExpAdd: 0.40 };
+            if (rarity === "epic") return { talentExpAdd: 0.25 };
             return {};
         },
         effectText: function(rarity) {
@@ -110,10 +110,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "More Base Mana Per Dead Clone",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 4, epic: 1 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { manaPerDeadCloneAdd: 0.20 };
-            if (rarity === "epic") return { manaPerDeadCloneAdd: 0.50 };
+            if (rarity === "rare") return { manaPerDeadCloneAdd: 0.10 };
+            if (rarity === "epic") return { manaPerDeadCloneAdd: 0.30 };
             return {};
         },
         effectText: function(rarity) {
@@ -126,14 +126,14 @@ var SHRINE_CARD_DEFINITION_ROWS = [
     },
     {
         key: "baseAudacity",
-        name: "Base Audacity",
+        name: "Base Clone Audacity",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 5, epic: 1 },
+        rarity: { common: -1, rare: 5, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "common") return { baseAudFlat: 1 };
             if (rarity === "rare") return { baseAudFlat: 3 };
-            if (rarity === "epic") return { baseAudFlat: 10 };
+            if (rarity === "epic") return { baseAudFlat: 8 };
             return {};
         },
         effectText: function(rarity) {
@@ -146,10 +146,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
     },
     {
         key: "baseEgoDamage",
-        name: "Base Ego Damage",
+        name: "Base Clone Ego Damage",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 5, epic: 1 },
+        rarity: { common: -1, rare: 5, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "common") return { baseSlapFlat: 0.25 };
             if (rarity === "rare") return { baseSlapFlat: 1 };
@@ -173,11 +173,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Okami Spirit Strands Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { spiritStrandsAdd: 0.10 };
-            if (rarity === "rare") return { spiritStrandsAdd: 0.30 };
-            if (rarity === "epic") return { spiritStrandsAdd: 1.00 };
+            if (rarity === "common") return { spiritStrandsAdd: 0.05 };
+            if (rarity === "rare") return { spiritStrandsAdd: 0.15 };
+            if (rarity === "epic") return { spiritStrandsAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -193,11 +193,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Chop Power",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { chopPowerAdd: 0.10 };
-            if (rarity === "rare") return { chopPowerAdd: 0.30 };
-            if (rarity === "epic") return { chopPowerAdd: 1.00 };
+            if (rarity === "common") return { chopPowerAdd: 0.05 };
+            if (rarity === "rare") return { chopPowerAdd: 0.15 };
+            if (rarity === "epic") return { chopPowerAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -213,11 +213,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Bamboo Base Chips",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 5, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "common") return { bambooBaseChipsFlat: 2 };
-            if (rarity === "rare") return { bambooBaseChipsFlat: 10 };
-            if (rarity === "epic") return { bambooBaseChipsFlat: 30 };
+            if (rarity === "rare") return { bambooBaseChipsFlat: 5 };
+            if (rarity === "epic") return { bambooBaseChipsFlat: 15 };
             return {};
         },
         effectText: function(rarity) {
@@ -233,11 +233,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Orb Exp",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { orbExpAdd: 0.10 };
-            if (rarity === "rare") return { orbExpAdd: 0.30 };
-            if (rarity === "epic") return { orbExpAdd: 1.00 };
+            if (rarity === "common") return { orbExpAdd: 0.05 };
+            if (rarity === "rare") return { orbExpAdd: 0.15 };
+            if (rarity === "epic") return { orbExpAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -253,11 +253,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Reduced Base Clone Cost",
         class: "none",
         category: "buff",
-        rarity: { common: 10, rare: 3, epic: 1 },
+        rarity: { common: 10, rare: 6, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "common") return { cloneBaseCostReduction: 25 };
-            if (rarity === "rare") return { cloneBaseCostReduction: 100 };
-            if (rarity === "epic") return { cloneBaseCostReduction: 500 };
+            if (rarity === "rare") return { cloneBaseCostReduction: 50 };
+            if (rarity === "epic") return { cloneBaseCostReduction: 250 };
             return {};
         },
         effectText: function(rarity) {
@@ -273,11 +273,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Increased Research Speed",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { researchSpeedAdd: 0.10 };
-            if (rarity === "rare") return { researchSpeedAdd: 0.30 };
-            if (rarity === "epic") return { researchSpeedAdd: 1.00 };
+            if (rarity === "common") return { researchSpeedAdd: 0.05 };
+            if (rarity === "rare") return { researchSpeedAdd: 0.15 };
+            if (rarity === "epic") return { researchSpeedAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -347,9 +347,9 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Hidden Spring Mana Cost Reduction",
         class: "none",
         category: "buff",
-        rarity: { rare: 4 },
+        rarity: { rare: 9 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { hiddenSpringManaCostReductionAdd: 0.20 };
+            if (rarity === "rare") return { hiddenSpringManaCostReductionAdd: 0.10 };
             return {};
         },
         effectText: function(rarity) {
@@ -390,10 +390,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Hidden Spring Speed",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { hiddenSpringDurationReduceMs: 6000 };
-            if (rarity === "epic") return { hiddenSpringDurationReduceMs: 22000 };
+            if (rarity === "rare") return { hiddenSpringDurationReduceMs: 5000 };
+            if (rarity === "epic") return { hiddenSpringDurationReduceMs: 10000 };
             return {};
         },
         effectText: function(rarity) {
@@ -427,10 +427,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Longer Guest Stay",
         class: "none",
         category: "buff",
-        rarity: { rare: 4, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "rare") return { innRestDurationFlat: 1 };
-            if (rarity === "epic") return { innRestDurationFlat: 5 };
+            if (rarity === "epic") return { innRestDurationFlat: 3 };
             return {};
         },
         effectText: function(rarity) {
@@ -446,7 +446,7 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Restfulness Bonus",
         class: "none",
         category: "buff",
-        rarity: { rare: 4, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "rare") return { innRestfulnessPerSecFlat: 0.5 };
             if (rarity === "epic") return { innRestfulnessPerSecFlat: 2 };
@@ -465,11 +465,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Star Bead Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { starBeadAdd: 0.10 };
-            if (rarity === "rare") return { starBeadAdd: 0.30 };
-            if (rarity === "epic") return { starBeadAdd: 1.00 };
+            if (rarity === "common") return { starBeadAdd: 0.05 };
+            if (rarity === "rare") return { starBeadAdd: 0.15 };
+            if (rarity === "epic") return { starBeadAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -485,11 +485,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Intruder Coin Bonus",
         class: "none",
         category: "buff",
-        rarity: { common: -1, rare: 3, epic: 1 },
+        rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { intruderCoinAdd: 0.10 };
-            if (rarity === "rare") return { intruderCoinAdd: 0.30 };
-            if (rarity === "epic") return { intruderCoinAdd: 1.00 };
+            if (rarity === "common") return { intruderCoinAdd: 0.05 };
+            if (rarity === "rare") return { intruderCoinAdd: 0.15 };
+            if (rarity === "epic") return { intruderCoinAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -505,10 +505,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Visitor Repetition",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
             if (rarity === "rare") return { visitorRepetitionChance: 0.05 };
-            if (rarity === "epic") return { visitorRepetitionChance: 0.25 };
+            if (rarity === "epic") return { visitorRepetitionChance: 0.15 };
             return {};
         },
         effectText: function(rarity) {
@@ -542,7 +542,7 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Okami Stone Bonus",
         class: "none",
         category: "buff",
-        rarity: { rare: 2, epic: 1 },
+        rarity: { rare: 3, epic: 1 },
         getEffect: function(rarity) {
             if (rarity === "rare") return { okamiStoneFlat: 1 };
             if (rarity === "epic") return { okamiStoneFlat: 3 };
@@ -561,9 +561,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Carrier Speed Bonus",
         class: "none",
         category: "buff",
-        rarity: { rare: 5 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { carrierSpeedAdd: 0.10 };
+            if (rarity === "rare") return { carrierSpeedAdd: 0.1 };
+            if (rarity === "epic") return { carrierSpeedAdd: 0.2 };
             return {};
         },
         effectText: function(rarity) {
@@ -615,7 +616,7 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Fox Den Queue Amount",
         class: "none",
         category: "buff",
-        rarity: { rare: 2 },
+        rarity: { rare: 3 },
         getEffect: function(rarity) {
             if (rarity === "rare") return { foxDenQueueFlat: 1 };
             return {};
@@ -633,10 +634,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Kitsune Power on Torii Gate",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { toriiWorkerTimerReduceMs: 1000 };
-            if (rarity === "epic") return { toriiWorkerTimerReduceMs: 3000 };
+            if (rarity === "rare") return { toriiWorkerTimerReduceMs: 500 };
+            if (rarity === "epic") return { toriiWorkerTimerReduceMs: 2000 };
             return {};
         },
         effectText: function(rarity) {
@@ -652,11 +653,11 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Bonfire Heat Gain",
         class: "none",
         category: "buff",
-        rarity: { common: 11, rare: 3, epic: 1 },
+        rarity: { common: 12, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { bonfireHeatAdd: 0.10 };
-            if (rarity === "rare") return { bonfireHeatAdd: 0.30 };
-            if (rarity === "epic") return { bonfireHeatAdd: 1.00 };
+            if (rarity === "common") return { bonfireHeatAdd: 0.05 };
+            if (rarity === "rare") return { bonfireHeatAdd: 0.15 };
+            if (rarity === "epic") return { bonfireHeatAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
@@ -665,6 +666,252 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         },
         totalBonusText: function(totalEffect) {
             return "Bonfire Heat From Wood/Coal: +" + Math.round((totalEffect.bonfireHeatAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "higherMaxOrbFloors",
+        name: "Higher Max Orb Floors",
+        class: "none",
+        category: "unique",
+        rarity: { rare: 6 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { higherMaxOrbFloorsFlat: 1 };
+            return {};
+        },
+        effectText: function(rarity) {
+            return "Orb Max Floors: +1";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Orb Max Floors: +" + (totalEffect.higherMaxOrbFloorsFlat || 0);
+        }
+    },
+    {
+        key: "duplicateStoneSpeed",
+        name: "Duplicate Stone Speed",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 6, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { stoneDupeSpeedAdd: 0.15 };
+            if (rarity === "epic") return { stoneDupeSpeedAdd: 0.40 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Stone Duplicator Speed: +" + Math.round((e.stoneDupeSpeedAdd || 0) * 100) + "%";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Stone Duplicator Speed: +" + Math.round((totalEffect.stoneDupeSpeedAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "moreMarketExp",
+        name: "More Market Exp",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 6, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { marketExpAdd: 0.15 };
+            if (rarity === "epic") return { marketExpAdd: 0.40 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Market Exp: +" + Math.round((e.marketExpAdd || 0) * 100) + "%";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Market Exp: +" + Math.round((totalEffect.marketExpAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "boostShardDropRates",
+        name: "Boost Shard Drop Rates",
+        class: "none",
+        category: "buff",
+        rarity: { common: 12, rare: 6, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "common") return { shardDropChanceAdd: 0.05 };
+            if (rarity === "rare") return { shardDropChanceAdd: 0.15 };
+            if (rarity === "epic") return { shardDropChanceAdd: 0.40 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Shard Drop Chance: +" + Math.round((e.shardDropChanceAdd || 0) * 100) + "%";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Shard Drop Chance: +" + Math.round((totalEffect.shardDropChanceAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "levelingExpBonus",
+        name: "Leveling Exp Bonus",
+        class: "none",
+        category: "buff",
+        rarity: { common: 12, rare: 6, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "common") return { levelingExpAdd: 0.05 };
+            if (rarity === "rare") return { levelingExpAdd: 0.15 };
+            if (rarity === "epic") return { levelingExpAdd: 0.40 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Clone Leveling Exp: +" + Math.round((e.levelingExpAdd || 0) * 100) + "%";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Clone Leveling Exp: +" + Math.round((totalEffect.levelingExpAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "freeResearchLevels",
+        name: "Free Research Levels",
+        class: "none",
+        category: "unique",
+        rarity: { epic: 4 },
+        getEffect: function(rarity) {
+            if (rarity === "epic") return { freeResearchLevelsFlat: 1 };
+            return {};
+        },
+        effectText: function(rarity) {
+            return "Free Research Choices: +1 (does not raise research/weave cost)";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Free Research Choices: +" + (totalEffect.freeResearchLevelsFlat || 0);
+        }
+    },
+    {
+        key: "spiritTrainingSpotAvailable",
+        name: "Spirit Training Spot Available",
+        class: "none",
+        category: "unique",
+        rarity: { epic: 1 },
+        getEffect: function(rarity) {
+            if (rarity === "epic") return { spiritTrainingSpotAvailable: 1 };
+            return {};
+        },
+        effectText: function(rarity) {
+            return "After prestige: Spirit Training Spot bought, Hidden Spring starts at full mana capacity";
+        },
+        totalBonusText: function(totalEffect) {
+            return "After prestige: Spirit Training Spot bought, Hidden Spring starts at full mana capacity";
+        }
+    },
+    {
+        key: "roadWork",
+        name: "Road Work",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 7, epic: 1 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { dirtRoadMaxProgressFlat: 10 };
+            if (rarity === "epic") return { dirtRoadMaxProgressFlat: 30, prestigeFormDirtRoads: 1 };
+            return {};
+        },
+        effectText: function(rarity) {
+            if (rarity === "epic") {
+                return "Dirt Road Max Progress: +50; Form Dirt Roads unlocked after prestige";
+            }
+            return "Dirt Road Max Progress: +10";
+        },
+        totalBonusText: function(totalEffect) {
+            let t = "Dirt Road Max Progress: +" + (totalEffect.dirtRoadMaxProgressFlat || 0);
+            if ((totalEffect.prestigeFormDirtRoads || 0) > 0) {
+                t += "; Form Dirt Roads unlocked after prestige";
+            }
+            return t;
+        }
+    },
+    {
+        key: "tradersBargain",
+        name: "Traders Bargain",
+        class: "none",
+        category: "buff",
+        rarity: { epic: 4 },
+        getEffect: function(rarity) {
+            if (rarity === "epic") return { marketTradeYieldAdd: 0.25 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Market Trade Yield: +" + Math.round((e.marketTradeYieldAdd || 0) * 100) + "%";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Market Trade Yield: +" + Math.round((totalEffect.marketTradeYieldAdd || 0) * 100) + "%";
+        }
+    },
+    {
+        key: "traderSpeed",
+        name: "Trader Speed",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 4 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { marketTradeDurationReduceSec: 5 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Market Trade Base Time: -" + (e.marketTradeDurationReduceSec || 0) + "s";
+        },
+        totalBonusText: function(totalEffect) {
+            return "Market Trade Base Time: -" + (totalEffect.marketTradeDurationReduceSec || 0) + "s";
+        }
+    },
+    {
+        key: "startingCoins",
+        name: "Starting Coins",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 2, epic: 1 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { prestigeStartingCoinsFlat: 60 };
+            if (rarity === "epic") return { prestigeStartingCoinsFlat: 160 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Starting Coins After Prestige: +" + (e.prestigeStartingCoinsFlat || 0);
+        },
+        totalBonusText: function(totalEffect) {
+            return "Starting Coins After Prestige: +" + (totalEffect.prestigeStartingCoinsFlat || 0);
+        }
+    },
+    {
+        key: "startingKitsune",
+        name: "Starting Kitsune",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 4, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { prestigeStartingKitsuneFlat: 1 };
+            if (rarity === "epic") return { prestigeStartingKitsuneFlat: 2 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Starting Kitsune After Prestige: +" + (e.prestigeStartingKitsuneFlat || 0);
+        },
+        totalBonusText: function(totalEffect) {
+            return "Starting Kitsune After Prestige: +" + (totalEffect.prestigeStartingKitsuneFlat || 0);
+        }
+    },
+    {
+        key: "initialBaseMana",
+        name: "Initial Base Mana",
+        class: "none",
+        category: "buff",
+        rarity: { rare: 4 },
+        getEffect: function(rarity) {
+            if (rarity === "rare") return { prestigeStartingManaCapacityFlat: 250 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Starting Mana Capacity After Prestige: +" + (e.prestigeStartingManaCapacityFlat || 0);
+        },
+        totalBonusText: function(totalEffect) {
+            return "Starting Mana Capacity After Prestige: +" + (totalEffect.prestigeStartingManaCapacityFlat || 0);
         }
     }
 ];
@@ -885,27 +1132,27 @@ var shrineCards = {
     packDefs: {
         common: {
             slots: 6,
-            choose: 2,
+            choose: 1,
             weights: { common: 85, rare: 14, epic: 1 },
             minRare: 0,
             minEpic: 0,
-            oddsHtml: "6 cards with their own rolls for rarity:<br>85% Common Cards<br>14% Rare Cards<br>1% Epic Cards<br>Open and choose two!"
+            oddsHtml: "6 cards with their own rolls for rarity:<br>85% Common Cards<br>14% Rare Cards<br>1% Epic Cards<br>Open and choose one!"
         },
         rare: {
             slots: 6,
-            choose: 2,
+            choose: 1,
             weights: { common: 70, rare: 27, epic: 3 },
             minRare: 2,
             minEpic: 0,
-            oddsHtml: "6 cards with their own rolls for rarity:<br>70% Common Cards<br>27% Rare Cards<br>3% Epic Cards<br>At least 2 cards will be rare<br>Open and choose two!"
+            oddsHtml: "6 cards with their own rolls for rarity:<br>70% Common Cards<br>27% Rare Cards<br>3% Epic Cards<br>At least 2 cards will be rare<br>Open and choose one!"
         },
         epic: {
             slots: 9,
-            choose: 3,
+            choose: 2,
             weights: { common: 40, rare: 50, epic: 10 },
             minRare: 0,
             minEpic: 1,
-            oddsHtml: "9 cards with their own rolls for rarity:<br>40% Common Cards<br>50% Rare Cards<br>10% Epic Cards<br>At least 1 card will be epic<br>Open and choose three!"
+            oddsHtml: "9 cards with their own rolls for rarity:<br>40% Common Cards<br>50% Rare Cards<br>10% Epic Cards<br>At least 1 card will be epic<br>Open and choose two!"
         }
     },
 
@@ -943,8 +1190,9 @@ var shrineCards = {
         };
     },
 
-    rollOneRarity: function(weights) {
-        let roll = Math.random() * 100;
+    rollOneRarity: function(weights, rng) {
+        const random = rng || Math.random;
+        let roll = random() * 100;
         const order = ["common", "rare", "epic"];
         let acc = 0;
         for (let i = 0; i < order.length; i++) {
@@ -1000,14 +1248,15 @@ var shrineCards = {
         return slots;
     },
 
-    rollPackRarities: function(packRarity) {
+    rollPackRarities: function(packRarity, rng) {
+        const random = rng || Math.random;
         const def = shrineCards.packDefs[packRarity];
         const maxAttempts = 40;
         let slots = [];
         for (let attempt = 0; attempt < maxAttempts; attempt++) {
             slots = [];
             for (let i = 0; i < def.slots; i++) {
-                slots.push(shrineCards.rollOneRarity(def.weights));
+                slots.push(shrineCards.rollOneRarity(def.weights, random));
             }
             if (shrineCards.raritiesMeetMinimum(slots, def)) {
                 return slots;
@@ -1041,7 +1290,8 @@ var shrineCards = {
         return keys;
     },
 
-    cardsForRarityRolls: function(rolls) {
+    cardsForRarityRolls: function(rolls, rng) {
+        const random = rng || Math.random;
         const reserved = {};
         const cards = [];
         for (let i = 0; i < rolls.length; i++) {
@@ -1071,7 +1321,7 @@ var shrineCards = {
             if (!pool.length) {
                 continue;
             }
-            const key = pool[Math.floor(Math.random() * pool.length)];
+            const key = pool[Math.floor(random() * pool.length)];
             if (!reserved[key]) reserved[key] = {};
             reserved[key][rarity] = (reserved[key][rarity] || 0) + 1;
             cards.push({ key: key, rarity: rarity });
@@ -1079,8 +1329,9 @@ var shrineCards = {
         return cards;
     },
 
-    rollPackCards: function(packRarity) {
-        return shrineCards.cardsForRarityRolls(shrineCards.rollPackRarities(packRarity));
+    rollPackCards: function(packRarity, rng) {
+        const random = rng || Math.random;
+        return shrineCards.cardsForRarityRolls(shrineCards.rollPackRarities(packRarity, random), random);
     },
 
     sessionBonusLines: function(gained) {
@@ -1115,5 +1366,70 @@ var shrineCards = {
             } catch (err) {}
         }
         return lines;
+    },
+
+    /**
+     * Apply card starting bonuses immediately after finishPrestige rebuild.
+     * Call after shrine.cards are restored and aggregated effects invalidated.
+     */
+    applyPrestigeStartBonuses: function() {
+        const card = shrineCards.getAggregatedEffects();
+        const progress = data.progress;
+        if (!progress) {
+            return;
+        }
+
+        const coinFlat = card.prestigeStartingCoinsFlat || 0;
+        if (coinFlat > 0) {
+            progress.coins = (progress.coins || 0) + coinFlat;
+        }
+
+        const kitsuneFlat = card.prestigeStartingKitsuneFlat || 0;
+        if (kitsuneFlat > 0) {
+            if (!progress.kitsune) {
+                progress.kitsune = { total: 2 };
+            }
+            progress.kitsune.total = (progress.kitsune.total || 0) + kitsuneFlat;
+        }
+
+        const manaFlat = card.prestigeStartingManaCapacityFlat || 0;
+        if (manaFlat > 0) {
+            if (!progress.mana) {
+                progress.mana = { amount: 0, capacityBonus: 0 };
+            }
+            progress.mana.capacityBonus = (progress.mana.capacityBonus || 0) + manaFlat;
+            if (typeof engine !== "undefined" && engine.getManaCapacity) {
+                progress.mana.amount = engine.getManaCapacity();
+            }
+        }
+
+        const freeN = card.freeResearchLevelsFlat || 0;
+        const archives = progress.base && progress.base.scrollArchives;
+        if (archives) {
+            archives.freeResearchCostCredit = freeN;
+            if (freeN > 0) {
+                archives.researchesToChoose = (archives.researchesToChoose || 0) + freeN;
+            }
+            if (typeof engine !== "undefined" && engine.syncScrollArchivesResearchCost) {
+                engine.syncScrollArchivesResearchCost(archives);
+            }
+        }
+
+        if ((card.spiritTrainingSpotAvailable || 0) > 0) {
+            const hs = progress.base && progress.base.hiddenSpring;
+            if (hs) {
+                hs.spiritTrainingSpotBought = true;
+                hs.mana = (typeof engine !== "undefined" && engine.getBuildingManaCapacity)
+                    ? engine.getBuildingManaCapacity("hiddenSpring")
+                    : (hs.manaCapacity || 40000);
+            }
+        }
+
+        if ((card.prestigeFormDirtRoads || 0) > 0) {
+            const atelier = progress.base && progress.base.atelier;
+            if (atelier) {
+                atelier.formDirtRoadsUnlocked = true;
+            }
+        }
     }
 };

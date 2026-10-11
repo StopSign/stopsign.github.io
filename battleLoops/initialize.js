@@ -25,8 +25,8 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
 let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
@@ -613,6 +613,7 @@ let initials = {
 };
 
 let initialize = {
+    useStableSeeds: false,
     initializeBambooForest: function() {
         const base = data.progress.base;
         const bf = base.bambooForest;
@@ -675,6 +676,7 @@ let initialize = {
         if (!lib.finishWeaveCostQueue) {
             lib.finishWeaveCostQueue = [];
         }
+        engine.ensureSavedSeed(lib, "researchSeed", "scrollArchives");
         if ((lib.researchesToChoose || 0) > 0 && !lib.researchChoices.length) {
             engine.rollScrollArchivesResearchChoices();
         }
@@ -1280,6 +1282,9 @@ let initialize = {
         if (data.progress.divinity.capacity === undefined || data.progress.divinity.capacity === null || data.progress.divinity.capacity === 10000) {
             data.progress.divinity.capacity = 100000;
         }
+        if (typeof engine !== "undefined" && engine.ensureSavedSeed) {
+            engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
+        }
         if (typeof engine !== "undefined" && engine.updateShrineMilestones) {
             engine.updateShrineMilestones();
         }
@@ -1503,8 +1508,10 @@ let initialize = {
         data.resetCount = 1;
         data.gameSettings = initials.gameSettings();
         data.currentGameState = initials.currentGameState();
+        initialize.useStableSeeds = false;
         data.progress = initials.progress();
         data.battle = initials.battle();
+        data.tutorialToasts = typeof toasts !== "undefined" ? toasts.blankStates() : [];
         initialize.rebuildFreshRun();
     },
     rebuildFreshRun: function() {
@@ -1683,6 +1690,15 @@ let initialize = {
         totalStr += shockEff.bonusStr || 0;
         const windfallEff = skills.getSkillEffect("windfallSwagger");
         totalCon += windfallEff.bonusCon || 0;
+        const prevCon = data.battle.borrowedGlorySeenCon;
+        if (prevCon !== undefined && prevCon !== null && totalCon > prevCon && skills.isSkillUnlocked("borrowedGlory")) {
+            const bgEff = skills.getSkillEffect("borrowedGlory");
+            const clout = bgEff.cloutPerLevel || 0;
+            if (clout > 0) {
+                engine.addCloutStacks(clout);
+            }
+        }
+        data.battle.borrowedGlorySeenCon = totalCon;
         const fEff = skills.getSkillEffect("force");
         const forceFlat = fEff.baseDamage || 0;
         const fortEff = skills.getSkillEffect("shameless");
@@ -1722,11 +1738,6 @@ let initialize = {
                 engine.addSkillExp("narcissism", 1);
             }
             if (maxRise > 0 && skills.isSkillUnlocked("borrowedGlory")) {
-                const bgEff = skills.getSkillEffect("borrowedGlory");
-                const clout = bgEff.cloutPerLevel || 0;
-                if (clout > 0) {
-                    engine.addCloutStacks(clout);
-                }
                 engine.addSkillExp("borrowedGlory", 1);
             }
             data.battle.player.aud = newAud;

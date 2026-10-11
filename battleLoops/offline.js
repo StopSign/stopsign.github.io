@@ -36,6 +36,15 @@ let offline = {
         return secondsToTime(Math.max(0, Math.floor((ms || 0) / 1000)));
     },
 
+    /** Signed amount for report lines that may go negative (wood/stone). */
+    formatSignedAmount: function(value) {
+        const n = Number(value) || 0;
+        if (n < 0) {
+            return intToStringRound(n);
+        }
+        return `+${intToStringRound(n)}`;
+    },
+
     yieldToBrowser: function() {
         return new Promise(function(resolve) {
             setTimeout(resolve, 0);
@@ -110,8 +119,8 @@ let offline = {
         }
 
         const resortLines = [];
-        resortLines.push(`Wood: +${intToStringRound(g.wood || 0)}`);
-        resortLines.push(`Stone: +${intToStringRound(g.stone || 0)}`);
+        resortLines.push(`Wood: ${offline.formatSignedAmount(g.wood)}`);
+        resortLines.push(`Stone: ${offline.formatSignedAmount(g.stone)}`);
         if (engine.isInnBuiltFromFoxDen && engine.isInnBuiltFromFoxDen()) {
             resortLines.push(`Star Beads: +${intToStringRound(g.starBeads || 0)}`);
         }
@@ -277,7 +286,9 @@ let offline = {
             runCoins: (data.battle && data.battle.runCoinsFromKills) || 0,
             manaCapacity: mana.capacityBonus || 0,
             wood: (base.bambooForest && base.bambooForest.wood) || 0,
-            stone: (base.stonePile && base.stonePile.stone) || 0,
+            stone: (typeof engine.getTotalStone === "function")
+                ? engine.getTotalStone()
+                : ((base.stonePile && ((base.stonePile.stone || 0) + (base.stonePile.usedStone || 0) + (base.stonePile.dupedStone || 0))) || 0),
             starBeads: data.progress.starBeads || 0,
             credit: market.credit || 0,
             spiritLevels: offline.totalSpiritLevels()
@@ -290,8 +301,8 @@ let offline = {
         g.characterExp += Math.max(0, (after.characterExp || 0) - (before.characterExp || 0));
         g.talentLevels += Math.max(0, (after.talentLevels || 0) - (before.talentLevels || 0));
         g.manaCapacity += Math.max(0, (after.manaCapacity || 0) - (before.manaCapacity || 0));
-        g.wood += Math.max(0, (after.wood || 0) - (before.wood || 0));
-        g.stone += Math.max(0, (after.stone || 0) - (before.stone || 0));
+        g.wood += (after.wood || 0) - (before.wood || 0);
+        g.stone += (after.stone || 0) - (before.stone || 0);
         g.starBeads += Math.max(0, (after.starBeads || 0) - (before.starBeads || 0));
         g.credit += Math.max(0, (after.credit || 0) - (before.credit || 0));
         g.spiritLevels += Math.max(0, (after.spiritLevels || 0) - (before.spiritLevels || 0));
@@ -306,11 +317,10 @@ let offline = {
         }
     },
 
-    /** One game-second: ticksPerSecond gameTicks + one secondPassed. */
+    /** One game-second: ticksPerSecond gameTicks + one secondPassed. Always unpaused. */
     runOneGameSecond: function(opts) {
         opts = opts || {};
         const tps = data.gameSettings.ticksPerSecond || 20;
-        const prevStop = data.gameSettings.stop;
         data.gameSettings.stop = false;
         for (let i = 0; i < tps; i++) {
             if (opts.nonCombatOnly) {
@@ -323,7 +333,6 @@ let offline = {
         }
         data.gameSettings.ticksForSeconds = 0;
         driver.secondPassed();
-        data.gameSettings.stop = prevStop;
     },
 
     runGameSecondsChunked: async function(seconds, opts) {
@@ -394,7 +403,7 @@ let offline = {
         return used;
     },
 
-    measureRunRates: function(before, after, durationSec) {
+    measureRunRates: function(before, after, durationSec, runStart) {
         const T = Math.max(1 / 20, durationSec);
         const skillRates = {};
         const keys = Object.keys(after.skills || {});
@@ -411,11 +420,14 @@ let offline = {
         const manaCost = settings
             ? (settings.manaCost || bonfire.getCloneManaCostFromSnapshot(settings.cloneDensity))
             : bonfire.getCloneManaCost();
+        const runCoins0 = runStart && runStart.runCoins !== undefined ? runStart.runCoins : (before.runCoins || 0);
+        const kills0 = runStart && runStart.kills !== undefined ? runStart.kills : (before.kills || 0);
+        const char0 = runStart && runStart.characterExp !== undefined ? runStart.characterExp : (before.characterExp || 0);
         return {
             durationSec: T,
-            coinsPerSec: Math.max(0, (after.runCoins || 0) - (before.runCoins || 0)) / T,
-            characterExpPerSec: Math.max(0, (after.characterExp || 0) - (before.characterExp || 0)) / T,
-            killsPerSec: Math.max(0, (after.kills || 0) - (before.kills || 0)) / T,
+            coinsPerSec: Math.max(0, (after.runCoins || 0) - runCoins0) / T,
+            characterExpPerSec: Math.max(0, (after.characterExp || 0) - char0) / T,
+            killsPerSec: Math.max(0, (after.kills || 0) - kills0) / T,
             skillRates: skillRates,
             manaCost: manaCost
         };
@@ -514,8 +526,8 @@ let offline = {
         const before = offline.startSnap;
         const after = offline.snapshotProgress();
         const g = offline.gains;
-        g.wood = Math.max(0, (after.wood || 0) - (before.wood || 0));
-        g.stone = Math.max(0, (after.stone || 0) - (before.stone || 0));
+        g.wood = (after.wood || 0) - (before.wood || 0);
+        g.stone = (after.stone || 0) - (before.stone || 0);
         g.starBeads = Math.max(0, (after.starBeads || 0) - (before.starBeads || 0));
         g.credit = Math.max(0, (after.credit || 0) - (before.credit || 0));
         g.spiritLevels = Math.max(0, (after.spiritLevels || 0) - (before.spiritLevels || 0));
@@ -656,8 +668,12 @@ let offline = {
             return;
         }
 
-        // Ensure we can start a sample: regen mana via non-combat if needed (bounded by chunk).
-        if (!(data.battle && data.battle.state === "running")) {
+        const alreadyRunning = !!(data.battle && data.battle.state === "running");
+        // Snapshot skill/talent BEFORE starting a new sample so start-of-run grants
+        // (shards, immediate level-up chains into paddingResume/savageLessons/etc.) are included.
+        let before = null;
+        if (!alreadyRunning) {
+            before = offline.snapshotProgress();
             let waited = 0;
             while (remainingInChunk >= 1000 && !bonfire.canAffordCreateClone()) {
                 offline.runOneGameSecond({ nonCombatOnly: true });
@@ -671,16 +687,21 @@ let offline = {
             if (remainingInChunk <= 0) {
                 return;
             }
+            // Re-snapshot after mana wait so resort gains during wait aren't blamed on combat rates.
+            before = offline.snapshotProgress();
             if (!offline.startSampleCloneIfNeeded()) {
                 await offline.runGameSecondsChunked(remainingInChunk / 1000, { nonCombatOnly: true });
                 return;
             }
+        } else {
+            before = offline.snapshotProgress();
         }
 
-        const before = offline.snapshotProgress();
-        before.runCoins = (data.battle && data.battle.runCoinsFromKills) || 0;
-        before.kills = (data.battle && data.battle.enemiesKilled) || 0;
-        before.characterExp = offline.characterExpLifetime(data.battle && data.battle.levelState);
+        const runStart = {
+            runCoins: (data.battle && data.battle.runCoinsFromKills) || 0,
+            kills: (data.battle && data.battle.enemiesKilled) || 0,
+            characterExp: offline.characterExpLifetime(data.battle && data.battle.levelState)
+        };
 
         const sampleUsedSec = await offline.advanceBattleSeconds(remainingInChunk / 1000);
         remainingInChunk -= sampleUsedSec * 1000;
@@ -690,13 +711,17 @@ let offline = {
         after.kills = (data.battle && data.battle.enemiesKilled) || 0;
         after.characterExp = offline.characterExpLifetime(data.battle && data.battle.levelState);
         offline.accumulateGainsFromSnapshots(before, after);
+        // Character exp is per-run: undo snapshot delta (may use a prior dead run's level) and use post-start baseline.
+        const charSnapDelta = Math.max(0, (after.characterExp || 0) - (before.characterExp || 0));
+        const charRunDelta = Math.max(0, (after.characterExp || 0) - (runStart.characterExp || 0));
+        offline.gains.characterExp += charRunDelta - charSnapDelta;
 
         if (remainingInChunk > 0) {
             const bulkSec = remainingInChunk / 1000;
             await offline.runGameSecondsChunked(bulkSec, { nonCombatOnly: true });
             if (sampleUsedSec > 0 && !(data.battle && data.battle.state === "running")) {
                 // Only apply bulk combat rates when the sample run fully finished.
-                const rates = offline.measureRunRates(before, after, sampleUsedSec);
+                const rates = offline.measureRunRates(before, after, sampleUsedSec, runStart);
                 const uptime = offline.getManaUptime(rates);
                 const combatSec = bulkSec * uptime;
                 offline.applyCombatRates(rates, combatSec);
@@ -726,6 +751,9 @@ let offline = {
 
         isProcessingOffline = true;
         data.gameSettings.stopAll = true;
+        // Process as if unpaused regardless of save pause state.
+        const prevStop = !!data.gameSettings.stop;
+        data.gameSettings.stop = false;
         if (typeof events !== "undefined" && events.toggleSkipButtons) {
             events.toggleSkipButtons(true);
         }
@@ -742,59 +770,62 @@ let offline = {
 
         let remaining = offline.totalToProcessMs;
 
-        // Phase A: spend offline on current run first
-        if (data.battle && data.battle.state === "running") {
-            const before = offline.snapshotProgress();
-            before.runCoins = data.battle.runCoinsFromKills || 0;
-            before.kills = data.battle.enemiesKilled || 0;
-            const usedSec = await offline.advanceBattleSeconds(remaining / 1000);
-            remaining -= usedSec * 1000;
-            const after = offline.snapshotProgress();
-            after.runCoins = (data.battle.runCoinsFromKills || 0);
-            after.kills = data.battle.enemiesKilled || 0;
-            offline.accumulateGainsFromSnapshots(before, after);
-        }
-
-        // Phase B: hour chunks with sample + rates
-        while (remaining >= 1000) {
-            const chunk = Math.min(OFFLINE_HOUR_MS, remaining);
-            const beforeChunk = remaining;
-            await offline.processHourChunk(chunk);
-            remaining -= chunk;
-            // processHourChunk marks processed internally; clamp if overshot
-            if (offline.processedMs > offline.totalToProcessMs) {
-                offline.processedMs = offline.totalToProcessMs;
+        try {
+            // Phase A: spend offline on current run first
+            if (data.battle && data.battle.state === "running") {
+                const before = offline.snapshotProgress();
+                before.runCoins = data.battle.runCoinsFromKills || 0;
+                before.kills = data.battle.enemiesKilled || 0;
+                const usedSec = await offline.advanceBattleSeconds(remaining / 1000);
+                remaining -= usedSec * 1000;
+                const after = offline.snapshotProgress();
+                after.runCoins = (data.battle.runCoinsFromKills || 0);
+                after.kills = data.battle.enemiesKilled || 0;
+                offline.accumulateGainsFromSnapshots(before, after);
             }
-            if (remaining === beforeChunk) {
-                // safety: avoid infinite loop
-                break;
+
+            // Phase B: hour chunks with sample + rates
+            while (remaining >= 1000) {
+                const chunk = Math.min(OFFLINE_HOUR_MS, remaining);
+                const beforeChunk = remaining;
+                await offline.processHourChunk(chunk);
+                remaining -= chunk;
+                // processHourChunk marks processed internally; clamp if overshot
+                if (offline.processedMs > offline.totalToProcessMs) {
+                    offline.processedMs = offline.totalToProcessMs;
+                }
+                if (remaining === beforeChunk) {
+                    // safety: avoid infinite loop
+                    break;
+                }
+                await offline.yieldToBrowser();
             }
-            await offline.yieldToBrowser();
-        }
 
-        // Persist fractional shard bank
-        data.currentGameState.offlineShardBank = offline.shardBank || {};
-        data.currentGameState.pendingOfflineMs = 0;
+            // Persist fractional shard bank
+            data.currentGameState.offlineShardBank = offline.shardBank || {};
+            data.currentGameState.pendingOfflineMs = 0;
 
-        offline.finalizeGainsFromStartSnap();
-        offline.updateProgressUi();
-        offline.showSummary();
-        saving.save();
+            offline.finalizeGainsFromStartSnap();
+            offline.updateProgressUi();
+            offline.showSummary();
+            saving.save();
 
-        if (typeof view !== "undefined") {
-            if (view.invalidateFormattedNumberCache) {
-                view.invalidateFormattedNumberCache();
+            if (typeof view !== "undefined") {
+                if (view.invalidateFormattedNumberCache) {
+                    view.invalidateFormattedNumberCache();
+                }
+                view.updateView();
+                if (view.refreshBattleUiNow) {
+                    view.refreshBattleUiNow();
+                }
             }
-            view.updateView();
-            if (view.refreshBattleUiNow) {
-                view.refreshBattleUiNow();
+        } finally {
+            data.gameSettings.stop = prevStop;
+            data.gameSettings.stopAll = false;
+            isProcessingOffline = false;
+            if (typeof events !== "undefined" && events.toggleSkipButtons) {
+                events.toggleSkipButtons(false);
             }
-        }
-
-        data.gameSettings.stopAll = false;
-        isProcessingOffline = false;
-        if (typeof events !== "undefined" && events.toggleSkipButtons) {
-            events.toggleSkipButtons(false);
         }
         return true;
     }

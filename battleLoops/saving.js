@@ -19,7 +19,8 @@ let saving = {
                 if (resp.ok) {
                     const text = await resp.text();
                     if (text.trim()) {
-                        toLoad = JSON.parse(text);
+                        const decoded = decode64(text.trim());
+                        toLoad = JSON.parse(typeof decoded === "string" ? decoded : "");
                         console.log("Loaded saveFile.txt");
                     }
                 }
@@ -45,11 +46,11 @@ let saving = {
         let sdata = structuredClone(data);
         window.localStorage[saveName] = JSON.stringify(sdata);
     },
-    /** Debug: download current game data as plaintext saveFile.txt (place in battleLoops/ for loadStaticSaveFile). */
+    /** Download current game data as encode64 saveFile.txt (place in battleLoops/ for loadStaticSaveFile). */
     saveToFile: function() {
         saving.save();
         const text = window.localStorage[saveName] || JSON.stringify(structuredClone(data));
-        const blob = new Blob([text], { type: "text/plain" });
+        const blob = new Blob([encode64(text)], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -59,7 +60,7 @@ let saving = {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     },
-    /** Debug: pick a plaintext save (same format as Save to file) and load it. */
+    /** Pick an encode64 save (same format as Save to file) and load it. */
     importFromFile: function() {
         const input = document.getElementById("importFromFileInput");
         if (!input) return;
@@ -72,9 +73,10 @@ let saving = {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = function() {
-            let text = typeof reader.result === "string" ? reader.result : "";
-            text = text.replace(/^\uFEFF/, "").trim();
-            if (!saving.isValidSaveText(text)) {
+            let encoded = typeof reader.result === "string" ? reader.result : "";
+            encoded = encoded.replace(/^\uFEFF/, "").trim();
+            const text = decode64(encoded);
+            if (typeof text !== "string" || !saving.isValidSaveText(text)) {
                 alert("That file is not a valid save.");
                 return;
             }

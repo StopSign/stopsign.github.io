@@ -132,8 +132,9 @@ let mapData = {
         const coinsMult = tm.coins || 1;
         const expMult = tm.exp || 1;
         const totalDifficulty = (mapDefinition.baseDifficulty || 1) * combatMult;
-        const rawAud = gameData.battle.intruderBaseAud * ratio * totalDifficulty * trade;
-        const rawDamage = gameData.battle.intruderAttackDamage * ratio * totalDifficulty / trade;
+        const N = ratio * totalDifficulty;
+        const rawAud = gameData.battle.intruderBaseAud * Math.pow(N, 1.2) * trade;
+        const rawDamage = gameData.battle.intruderAttackDamage * N / trade;
         const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
         const perIntruderGain = Math.ceil(coinsPerIntruderBase * coinsMult);
         const expBasePerIntruder = Math.max(0, (mapDefinition.baseDifficulty || 1) * ratio * expMult);

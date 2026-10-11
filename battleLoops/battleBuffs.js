@@ -25,7 +25,7 @@ var battleBuffDefs = {
         img: "img/outrage.svg",
         kind: "duration",
         effectPercent: 50,
-        description: "Your attack timer recharges 50% faster while active. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5."
+        description: "Your attack timer recharges 50% faster while active. Its timer counts down only while your slap cooldown is not full. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5."
     },
     malice: {
         key: "malice",
@@ -222,7 +222,14 @@ var battleBuffs = {
                 }
                 entry.stacks = nextStacks;
             } else if (def.kind === "duration") {
-                entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
+                // Outrage only drains while the slap cooldown bar is still filling.
+                const outragePaused = key === "outrage"
+                    && typeof engine !== "undefined"
+                    && engine.slapAttackReady
+                    && engine.slapAttackReady();
+                if (!outragePaused) {
+                    entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
+                }
             }
         }
         battleBuffs.clampCappedBuffs(state);
