@@ -3249,11 +3249,33 @@ button {
     transition: none;
 }
 
-.base-info-close-btn {
+.base-info-header-btns {
     position: absolute;
     top: 6px;
     right: 6px;
     z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.base-info-hide-btn {
+    border: 1px solid var(--border-color);
+    background: #1f2b3e;
+    color: #e5e7eb;
+    height: 24px;
+    line-height: 20px;
+    padding: 0 8px;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.base-info-hide-btn:hover {
+    background: #2d4e7a;
+}
+
+.base-info-close-btn {
     border: 1px solid var(--border-color);
     background: #1f2b3e;
     color: #e5e7eb;
@@ -3263,10 +3285,34 @@ button {
     padding: 0;
     font-size: 16px;
     cursor: pointer;
+    flex: 0 0 auto;
 }
 
 .base-info-close-btn:hover {
     background: #2d4e7a;
+}
+
+#baseBuildingInfo.base-info-has-hide-toggle .base-info-scroll {
+    padding-right: 100px;
+}
+
+#baseBuildingInfo.base-info-spirit-collapsed {
+    left: auto;
+    right: 8px;
+    top: 8px;
+    width: auto;
+    max-height: none;
+    height: auto;
+    padding: 6px;
+}
+
+#baseBuildingInfo.base-info-spirit-collapsed .base-info-header-btns {
+    position: static;
+}
+
+#baseBuildingInfo.base-info-spirit-collapsed .base-info-scroll,
+#baseBuildingInfo.base-info-spirit-collapsed .base-info-worker-dock {
+    display: none !important;
 }
 
 .torii-next-visitor-progress {

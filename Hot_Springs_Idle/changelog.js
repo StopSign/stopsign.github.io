@@ -57,7 +57,9 @@ const changelog = {
             .replace(/"/g, "&quot;");
     }
 };
-
+changelog.addSection("Bug Fixes", "0.1.2", 
+    `* Fixed a gamebreaking bug if you happened to load the game before I told anyone it existed
+* Added hide info for spirits to allow for switching them in compact mode`)
 changelog.addSection("Small Changes", "0.1.1",
     "* Added changelog\n" +
     "* Added a \"Select next path\" button to reduce confusion\n"

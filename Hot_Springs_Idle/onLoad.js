@@ -166,10 +166,45 @@ let onLoad = {
         }
     },
 
+    removeUnknownSkillStates: function() {
+        if (!data.progress.skills) {
+            return;
+        }
+        const sks = data.progress.skills;
+        const keys = Object.keys(sks);
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        for (let i = 0; i < keys.length; i++) {
+            const k = keys[i];
+            if (skills._byKey[k]) {
+                continue;
+            }
+            onLoad.returnSkillStarsToPool(sks[k]);
+            delete sks[k];
+            if (lib && lib.unlockedSkills) {
+                delete lib.unlockedSkills[k];
+            }
+            if (lib && lib.researchChoices) {
+                lib.researchChoices = lib.researchChoices.filter(function(choice) {
+                    return choice !== k;
+                });
+            }
+            if (lib && lib.selectedResearchChoice === k) {
+                lib.selectedResearchChoice = null;
+            }
+            if (data.progress.selectedSkillDetailKey === k) {
+                data.progress.selectedSkillDetailKey = null;
+            }
+            if (data.battle && data.battle.runSkillTalentStart) {
+                delete data.battle.runSkillTalentStart[k];
+            }
+        }
+    },
+
     ensureAllSkillStates: function() {
         if (!data.progress.skills) {
             data.progress.skills = {};
         }
+        onLoad.removeUnknownSkillStates();
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const k = skills.keysInOrder[i];
             if (!data.progress.skills[k]) {

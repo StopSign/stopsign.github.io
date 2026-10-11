@@ -926,6 +926,13 @@ let events = {
     closeBaseBuildingInfo: function() {
         events.clearBaseBuildingSelection();
     },
+    toggleSpiritInfoCollapsed: function() {
+        viewData.spiritInfoCollapsedCompact = !viewData.spiritInfoCollapsedCompact;
+        if (viewData.spiritInfoCollapsedCompact) {
+            events.finishSpiritRename();
+        }
+        view.syncSpiritInfoCompactCollapse();
+    },
     clickSpiritTrainingSlot: function() {
         if (!engine.isSpiritTrainingSpotBought()) {
             return;

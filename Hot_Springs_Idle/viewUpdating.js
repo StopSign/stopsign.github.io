@@ -34,7 +34,8 @@ let viewData = {
     playerFloatRender: [],
     deathOverlayFilled: false,
     prestigeSelection: [],
-    prestigePackError: ""
+    prestigePackError: "",
+    spiritInfoCollapsedCompact: false
 };
 
 
@@ -4719,17 +4720,36 @@ let view = {
         view.updateVal("battlefieldWrap", showBattle ? "" : "none", "style.display");
         view.updateVal("battleHud", showBattle ? "" : "none", "style.display");
     },
+    syncSpiritInfoCompactCollapse: function() {
+        const infoPanel = viewData.cached.baseBuildingInfo;
+        const toggle = viewData.cached.baseBuildingInfoHideToggle;
+        const infoType = data.progress
+            ? (data.progress.selectedResortInfoType || data.progress.selectedBaseBuilding || "")
+            : "";
+        const isSpirit = infoType === "spirit" && !!data.progress.selectedSpiritId;
+        const forceWide = !!(data.progress && data.progress.options && data.progress.options.disableCompactLayout);
+        const compactOn = !forceWide && window.innerWidth < 1420;
+        const showToggle = compactOn && isSpirit;
+        const collapsed = showToggle && !!viewData.spiritInfoCollapsedCompact;
+        if (toggle) {
+            toggle.style.display = showToggle ? "" : "none";
+            toggle.textContent = collapsed ? "Show Info" : "Hide Info";
+            toggle.title = collapsed ? "Show Info" : "Hide Info";
+        }
+        if (infoPanel) {
+            infoPanel.classList.toggle("base-info-has-hide-toggle", showToggle && !collapsed);
+            infoPanel.classList.toggle("base-info-spirit-collapsed", collapsed);
+        }
+    },
     updateBaseBuildingInfoLayout: function() {
         const selected = !!(data.progress && data.progress.selectedBaseBuilding);
         const infoPanel = viewData.cached.baseBuildingInfo;
-        const compactBreakpointPx = 1420;
-        const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
-        const compactOn = !forceWide && window.innerWidth < compactBreakpointPx;
         view.repositionBaseBuildingInfo();
         if (infoPanel) {
             infoPanel.style.display = selected ? "flex" : "none";
         }
         view.updateWorkerDockVisibility();
+        view.syncSpiritInfoCompactCollapse();
     },
     /** True when baseResortMap (carriers/okami/weaving) is on-screen. Matches updateCompactLayout menuColumn rules. */
     isResortMapVisible: function() {
