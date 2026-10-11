@@ -20,6 +20,9 @@ document.addEventListener("keydown", function(e) {
     // }
 
     if (code === 'Space') {
+        if (typeof isDebug === "undefined" || !isDebug) {
+            return;
+        }
         if (data.gameSettings && data.gameSettings.prestigePackOpen) {
             return;
         }
