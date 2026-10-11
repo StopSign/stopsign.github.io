@@ -479,12 +479,7 @@ button {
 .hypervisible {
     color: #fff7a8;
     font-weight: 700;
-    text-shadow:
-        -1px -1px 0 #000,
-        1px -1px 0 #000,
-        -1px 1px 0 #000,
-        1px 1px 0 #000,
-        0 0 3px rgba(0, 0, 0, 0.95);
+    text-shadow: 0 0 2px #000, 0 1px 2px rgba(0, 0, 0, 0.95);
 }
 
 .player-buff-slot .showthis {
@@ -526,7 +521,18 @@ button {
     inset: 0;
     z-index: 1;
     border-radius: inherit;
-    background: linear-gradient(to top, #2ad15f 100%, #0f3a1d 100%);
+    background: #0f3a1d;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#playerTokenAudFill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #2ad15f;
+    transform-origin: bottom center;
+    transform: scaleY(1);
     pointer-events: none;
 }
 
@@ -591,6 +597,8 @@ button {
 
 .slap-hand-img {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 42px;
     height: 42px;
     display: none;
@@ -598,26 +606,33 @@ button {
     user-select: none;
     transform-origin: center center;
     object-fit: contain;
+    will-change: transform;
 }
 
 .intruder-attack-gfx {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 42px;
     height: 42px;
     display: none;
     pointer-events: none;
     user-select: none;
     object-fit: contain;
+    will-change: transform, opacity;
 }
 
 .slap-dmg-num {
     position: absolute;
+    left: 0;
+    top: 0;
     display: none;
     pointer-events: none;
     font-size: 22px;
     line-height: 1;
     white-space: nowrap;
     z-index: 2;
+    will-change: transform, opacity;
 }
 
 .slap-dmg-num.float-aud-gain {
@@ -630,6 +645,8 @@ button {
 
 .attack-line-fx-anim {
     position: absolute;
+    left: 0;
+    top: 0;
     height: 2px;
     background: #ff4d4d;
     transform-origin: 0 50%;
@@ -638,15 +655,13 @@ button {
 }
 
 .attack-line-fx-anim.attack-line-sandal {
-    background: #89b4fa;
-    box-shadow: 0 0 4px rgba(137, 180, 250, 0.85);
+    background: #a6c8ff;
     animation: attackLineFade 0.8s forwards;
 }
 
 .attack-line-fx-anim.attack-line-intruder-sandal {
     height: 1px;
-    background: #ff9f1c;
-    box-shadow: 0 0 3px rgba(255, 159, 28, 0.85);
+    background: #ffb14a;
     animation: attackLineFade 0.3s forwards;
 }
 
@@ -679,6 +694,10 @@ button {
 
 .player-prog-track {
     height: 6px;
+}
+
+.player-prog-track .prog-fill {
+    transition: none;
 }
 
 .prog-track {
@@ -760,9 +779,12 @@ button {
 
 .intruder-token {
     position: absolute;
+    left: 0;
+    top: 0;
     box-sizing: border-box;
     overflow: visible;
     z-index: 20;
+    will-change: transform;
 }
 
 .intruder-shape-layer {
@@ -792,7 +814,29 @@ button {
 .intruder-aud-layer {
     position: absolute;
     inset: 4px;
+    overflow: hidden;
+    background: #1a0a2e;
     pointer-events: none;
+}
+
+.intruder-aud-layer.intruder-aud-lecher {
+    background: #0d1d3a;
+}
+
+.intruder-aud-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    background: #6b21a8;
+    transform-origin: bottom center;
+    transform: scaleY(1);
+    pointer-events: none;
+}
+
+.intruder-aud-layer.intruder-aud-lecher .intruder-aud-fill {
+    background: #4da3ff;
 }
 
 .intruder-overlay {
@@ -2398,11 +2442,12 @@ button {
 
 .fox-den-map-slot {
     position: absolute;
+    left: 0;
+    top: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2px;
-    transform: translate(-50%, -50%);
     z-index: 11;
     pointer-events: none;
     overflow: visible;
@@ -2418,9 +2463,10 @@ button {
 
 .fox-den-carrier-token {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 46px;
     height: 46px;
-    transform: translate(-50%, -50%);
     z-index: 5;
     pointer-events: none;
 }
@@ -2564,6 +2610,8 @@ button {
 
 .fire-launcher-projectile {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 28px;
     height: 28px;
     z-index: 16;
@@ -2578,12 +2626,13 @@ button {
 
 .fire-launcher-aoe-pulse {
     position: absolute;
+    left: 0;
+    top: 0;
     border-radius: 50%;
     background: rgba(255, 60, 30, 0.35);
     border: 1px solid rgba(255, 100, 50, 0.6);
     pointer-events: none;
     z-index: 13;
-    transform: translate(-50%, -50%);
     animation: fireLauncherAoeFade 0.5s ease-out forwards;
 }
 
@@ -2789,6 +2838,8 @@ button {
 
 .pebble-token {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -2801,6 +2852,8 @@ button {
 
 .droplet-token {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 10px;
     height: 10px;
     border-radius: 50%;
@@ -2829,12 +2882,13 @@ button {
 
 .path-token-amount-label {
     position: absolute;
+    left: 0;
+    top: 0;
     z-index: 14;
     pointer-events: none;
     font-size: 10px;
     line-height: 1;
     white-space: nowrap;
-    transform: translateX(-50%);
     text-align: center;
 }
 
@@ -2886,6 +2940,8 @@ button {
 
 .okami-travel-token {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 16px;
     height: 16px;
     z-index: 14;
@@ -2894,11 +2950,12 @@ button {
 
 .okami-path-weave-token {
     position: absolute;
+    left: 0;
+    top: 0;
     width: 20px;
     height: 20px;
     z-index: 14;
     pointer-events: none;
-    transform: translate(-100%, -50%);
 }
 
 .okami-path-weave-tail {

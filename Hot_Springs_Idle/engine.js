@@ -2704,6 +2704,9 @@ let engine = {
         engine.startSlapWindup(null);
     },
     spawnSlapDamageFx: function(x, y, damage) {
+        if (typeof view === "undefined" || !view.isBattleVisible || !view.isBattleVisible()) {
+            return;
+        }
         const fx = engine.ensureSlapFx();
         if (!fx) {
             return;
@@ -2792,6 +2795,9 @@ let engine = {
         };
     },
     spawnPlayerFloatSlot: function(x, y, text, kind) {
+        if (typeof view === "undefined" || !view.isBattleVisible || !view.isBattleVisible()) {
+            return;
+        }
         const fx = engine.ensurePlayerFloatFx();
         if (!fx || !text) {
             return;
@@ -4938,8 +4944,7 @@ let engine = {
                         !!(guest.everUsedTowel || guest.usedTowel),
                         !!(guest.everAteNoodles || guest.ateNoodles)
                     );
-                    const onResortTab = !data.battle || (data.battle.currentTab || "base") === "base";
-                    if (onResortTab && typeof view !== "undefined" && view.spawnInnBeadFloat) {
+                    if (typeof view !== "undefined" && view.spawnInnBeadFloat) {
                         view.spawnInnBeadFloat(beads);
                     }
                 }
@@ -11424,8 +11429,7 @@ let engine = {
         }
         bar.lastTipText = line;
         bar.tipProgress = 0;
-        const onResortTab = !data.battle || (data.battle.currentTab || "base") === "base";
-        if (onResortTab && typeof view !== "undefined" && view.spawnNoodleTipFloat) {
+        if (typeof view !== "undefined" && view.spawnNoodleTipFloat) {
             view.spawnNoodleTipFloat(engine.getNoodleSkillDisplayName(selected));
             if (extraName) {
                 view.spawnNoodleTipFloat(extraName);

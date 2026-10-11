@@ -1045,7 +1045,7 @@ let createView = {
             el.style.display = "none";
             layer.appendChild(el);
             viewData.playerFloatElements.push(el);
-            viewData.playerFloatRender.push({ active: false, text: "", left: "", top: "", opacity: "", transform: "", cls: "" });
+            viewData.playerFloatRender.push({ active: false, text: "", opacity: "", transform: "", cls: "" });
         }
     },
     createIntruderAttackGfxElements: function() {
@@ -1074,8 +1074,7 @@ let createView = {
             viewData.intruderAttackGfxRender.push({
                 active: false,
                 kind: "",
-                left: "",
-                top: "",
+                transform: "",
                 opacity: ""
             });
         }
@@ -1122,7 +1121,7 @@ let createView = {
         createView.queueCache(
             "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
             "divinityProgressBar", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
-            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
+            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",

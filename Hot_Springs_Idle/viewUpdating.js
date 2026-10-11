@@ -238,7 +238,8 @@ let view = {
             }
             view.updateVal("playerBattleHudSecondary", secondaryParts.length ? secondaryParts.join(" · ") : "-");
             const audPct = Math.max(0, Math.min(100, (data.battle.player.aud / data.battle.player.maxAud) * 100));
-            view.updateVal("playerTokenAudLayer", `linear-gradient(to top, #2ad15f ${audPct}%, #0f3a1d ${audPct}%)`, "style.background");
+            const audScale = Math.round((audPct / 100) * 1000) / 1000;
+            view.updateVal("playerTokenAudFill", `scaleY(${audScale})`, "style.transform");
             const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
             view.updateWaveInfoPanel(runClock, growthUnlocked);
         }
@@ -1568,8 +1569,7 @@ let view = {
             const pos = engine.getFoxDenMapSlotPosition(uk)
             view.updateVal(`foxDenSlot_${uk}`, building ? "" : "none", "style.display");
             if (building) {
-                view.updateVal(`foxDenSlot_${uk}`, `${Math.round(pos.x)}px`, "style.left");
-                view.updateVal(`foxDenSlot_${uk}`, `${Math.round(pos.y)}px`, "style.top");
+                view.updateVal(`foxDenSlot_${uk}`, view.gpuTranslate(pos.x, pos.y, "translate(-50%, -50%)"), "style.transform");
                 view.updateVal(`foxDenSlotPct_${uk}`, `${resortData.getConstructionPercent(site)}%`);
             }
             const mapBtnKey = `baseBuilding_${uk}`;
@@ -1616,8 +1616,7 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
+                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".fox-den-carrier-img");
@@ -1652,8 +1651,7 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
+                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".bonfire-carrier-img");
@@ -1688,8 +1686,7 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
+                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".market-carrier-img");
@@ -1730,8 +1727,7 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
+                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".cistern-carrier-img");
@@ -1772,8 +1768,7 @@ let view = {
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, `${Math.round(x)}px`, "style.left");
-                view.updateVal(elId, `${Math.round(y)}px`, "style.top");
+                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".inn-carrier-img");
@@ -2727,13 +2722,11 @@ let view = {
             view.updateVal(pAmtId, pebble ? "" : "none", "style.display");
             if (pebble && engine.getResortPathPosition) {
                 const pos = engine.getResortPathPosition(pebble.pathProgress || 0);
-                view.updateVal(pid, `${Math.round(pos.x - 4)}px`, "style.left");
-                view.updateVal(pid, `${Math.round(pos.y - 4)}px`, "style.top");
+                view.updateVal(pid, view.gpuTranslate(pos.x - 4, pos.y - 4), "style.transform");
                 view.updateVal(pid, engine.earthSpiritColors[pebble.colorIndex || 0], "style.backgroundColor");
                 view.updateVal(pid, engine.earthSpiritColors[pebble.colorIndex || 0], "style.borderColor");
                 view.updateVal(pAmtId, pebble ? engine.formatPebblePayloadLabel(pebble) : "", "textContent");
-                view.updateVal(pAmtId, `${Math.round(pos.x)}px`, "style.left");
-                view.updateVal(pAmtId, `${Math.round(pos.y + 8)}px`, "style.top");
+                view.updateVal(pAmtId, view.gpuTranslate(pos.x, pos.y + 8, "translateX(-50%)"), "style.transform");
             }
         }
         const droplets = base.droplets || [];
@@ -2747,8 +2740,7 @@ let view = {
             view.updateVal(dAmtTop, droplet ? "" : "none", "style.display");
             if (droplet && engine.getResortPathPosition) {
                 const dpos = engine.getResortPathPosition(droplet.pathProgress || 0);
-                view.updateVal(did, `${Math.round(dpos.x - 5)}px`, "style.left");
-                view.updateVal(did, `${Math.round(dpos.y - 5)}px`, "style.top");
+                view.updateVal(did, view.gpuTranslate(dpos.x - 5, dpos.y - 5), "style.transform");
                 const innerId = `dropletTokenInner_${di}`;
                 let fill = "#4a9fd4";
                 if (droplet.hitFlashAt) {
@@ -2763,15 +2755,13 @@ let view = {
                 }
                 view.updateVal(innerId, fill, "style.backgroundColor");
                 view.updateVal(dAmtBelow, `${intToStringRound(droplet.waterVolume || 0)}L`, "textContent");
-                view.updateVal(dAmtBelow, `${Math.round(dpos.x)}px`, "style.left");
-                view.updateVal(dAmtBelow, `${Math.round(dpos.y + 10)}px`, "style.top");
+                view.updateVal(dAmtBelow, view.gpuTranslate(dpos.x, dpos.y + 10, "translateX(-50%)"), "style.transform");
                 const essDisp = round2(droplet.essence || 0);
                 const topLabel = essDisp > 1
                     ? `${essDisp}E`
                     : `${round1(droplet.heat || 0)}C`;
                 view.updateVal(dAmtTop, topLabel, "textContent");
-                view.updateVal(dAmtTop, `${Math.round(dpos.x)}px`, "style.left");
-                view.updateVal(dAmtTop, `${Math.round(dpos.y - 18)}px`, "style.top");
+                view.updateVal(dAmtTop, view.gpuTranslate(dpos.x, dpos.y - 18, "translateX(-50%)"), "style.transform");
             }
         }
         view.updateFireLauncherMap();
@@ -2825,8 +2815,7 @@ let view = {
             const half = size / 2;
             view.updateVal(pid, `${size}px`, "style.width");
             view.updateVal(pid, `${size}px`, "style.height");
-            view.updateVal(pid, `${Math.round(x - half)}px`, "style.left");
-            view.updateVal(pid, `${Math.round(y - half)}px`, "style.top");
+            view.updateVal(pid, view.gpuTranslate(x - half, y - half), "style.transform");
         }
         const pulses = (fl && fl.aoePulses) || [];
         for (let ai = 0; ai < 8; ai++) {
@@ -2838,15 +2827,17 @@ let view = {
                 continue;
             }
             const diam = (pulse.rangePx || 0) * 2;
-            view.updateVal(aid, `${Math.round(pulse.x)}px`, "style.left");
-            view.updateVal(aid, `${Math.round(pulse.y)}px`, "style.top");
+            view.updateVal(aid, view.gpuTranslate(pulse.x, pulse.y, "translate(-50%, -50%)"), "style.transform");
             view.updateVal(aid, `${diam}px`, "style.width");
             view.updateVal(aid, `${diam}px`, "style.height");
             const el = viewData.cached[aid];
             if (el && viewData.fireLauncherAoeLastId[ai] !== pulse.id) {
                 el.style.animation = "none";
-                void el.offsetWidth;
-                el.style.animation = "";
+                requestAnimationFrame(function() {
+                    if (viewData.fireLauncherAoeLastId[ai] === pulse.id) {
+                        el.style.animation = "";
+                    }
+                });
                 viewData.fireLauncherAoeLastId[ai] = pulse.id;
             }
         }
@@ -3824,8 +3815,7 @@ let view = {
             if (visual.mode === "travel") {
                 const pos = engine.getResortPathPosition(visual.pathProgress || 0);
                 travelEl.style.display = "";
-                travelEl.style.left = `${Math.round(pos.x - 8)}px`;
-                travelEl.style.top = `${Math.round(pos.y - 8)}px`;
+                travelEl.style.transform = view.gpuTranslate(pos.x - 8, pos.y - 8);
                 const img = travelEl.querySelector(".okami-travel-tail");
                 if (img) {
                     img.classList.toggle("fox-travel-mirror", !!visual.east);
@@ -3843,8 +3833,7 @@ let view = {
                 const pos = spec ? engine.getResortPathPosition(spec.midDist) : null;
                 if (pos) {
                     weaveTokenEl.style.display = "";
-                    weaveTokenEl.style.left = `${Math.round(pos.x)}px`;
-                    weaveTokenEl.style.top = `${Math.round(pos.y)}px`;
+                    weaveTokenEl.style.transform = view.gpuTranslate(pos.x, pos.y, "translate(-100%, -50%)");
                 } else {
                     weaveTokenEl.style.display = "none";
                 }
@@ -4762,6 +4751,23 @@ let view = {
         const pane = data.progress.compactViewPane || "menus";
         return pane === "menus";
     },
+    /** True when the battle column/battlefield is on-screen. Matches updateCompactLayout battleColumn rules. */
+    isBattleVisible: function() {
+        if (!(data.progress && data.progress.showBattle)) {
+            return false;
+        }
+        const compactBreakpointPx = 1420;
+        const forceWide = !!(data.progress.options && data.progress.options.disableCompactLayout);
+        const compactOn = !forceWide && window.innerWidth < compactBreakpointPx;
+        if (!compactOn) {
+            return true;
+        }
+        if (data.progress.selectedBaseBuilding) {
+            return false;
+        }
+        const pane = data.progress.compactViewPane || "menus";
+        return pane === "battle";
+    },
     updateCompactLayout: function() {
         view.updateBattleVisibility();
         const showBattle = !!(data.progress && data.progress.showBattle);
@@ -4834,8 +4840,7 @@ let view = {
                 renderCache.sizeKey = sizeKey;
             }
             if (renderCache.posKey !== posKey) {
-                intruderEl.style.left = `${leftPx}px`;
-                intruderEl.style.top = `${renderY}px`;
+                intruderEl.style.transform = view.gpuTranslate(leftPx, renderY);
                 renderCache.posKey = posKey;
             }
             const shapeLayer = intruderEl.querySelector(".intruder-shape-layer");
@@ -4876,14 +4881,18 @@ let view = {
                     renderCache.forageKey = null;
                 }
             }
-            const audLayer = intruderEl.querySelector(".intruder-aud-layer");
+            const audLayer = view.ensureIntruderAudFill(intruderEl);
             if (audLayer) {
-                const audBg = intruder.intruderType === "lecher"
-                    ? `linear-gradient(to top, #4da3ff ${audPct}%, #0d1d3a ${audPct}%)`
-                    : `linear-gradient(to top, #6b21a8 ${audPct}%, #1a0a2e ${audPct}%)`;
-                if (renderCache.audBg !== audBg) {
-                    audLayer.style.background = audBg;
-                    renderCache.audBg = audBg;
+                const lecherAud = intruder.intruderType === "lecher";
+                const audScale = Math.round(Math.max(0, Math.min(1, audPct / 100)) * 1000) / 1000;
+                const audKey = `${lecherAud ? 1 : 0}|${audScale}`;
+                if (renderCache.audKey !== audKey) {
+                    audLayer.classList.toggle("intruder-aud-lecher", lecherAud);
+                    const audFill = audLayer.querySelector(".intruder-aud-fill");
+                    if (audFill) {
+                        audFill.style.transform = `scaleY(${audScale})`;
+                    }
+                    renderCache.audKey = audKey;
                 }
             }
             const audLine = intruderEl.querySelector(".intruder-stat-aud");
@@ -5016,15 +5025,7 @@ let view = {
         if (!visible) {
             return;
         }
-        const left = `${Math.round(x)}px`;
-        const top = `${Math.round(y)}px`;
-        const transform = flip ? "scaleX(-1)" : "scaleX(1)";
-        if (el.style.left !== left) {
-            el.style.left = left;
-        }
-        if (el.style.top !== top) {
-            el.style.top = top;
-        }
+        const transform = view.gpuTranslate(x, y, flip ? "scaleX(-1)" : "scaleX(1)");
         if (el.style.transform !== transform) {
             el.style.transform = transform;
         }
@@ -5045,7 +5046,7 @@ let view = {
             const el = els[i];
             let render = viewData.intruderAttackGfxRender[i];
             if (!render) {
-                render = viewData.intruderAttackGfxRender[i] = { active: false, kind: "", left: "", top: "", opacity: "" };
+                render = viewData.intruderAttackGfxRender[i] = { active: false, kind: "", transform: "", opacity: "" };
             }
             const slot = slots[i];
             if (raisingDifficulty || !slot || !slot.active) {
@@ -5068,8 +5069,7 @@ let view = {
                 opacity = po + ((slot.opacity - po) * alpha);
             }
             const kind = slot.kind === "leer" ? "leer" : "wink";
-            const left = `${Math.round(x - half)}px`;
-            const top = `${Math.round(y - half)}px`;
+            const transform = view.gpuTranslate(x - half, y - half);
             const opacityText = String(Math.round(Math.max(0, opacity) * 1000) / 1000);
             if (!render.active) {
                 el.style.display = "block";
@@ -5079,13 +5079,9 @@ let view = {
                 el.src = kind === "leer" ? "img/leer.svg" : "img/wink.svg";
                 render.kind = kind;
             }
-            if (render.left !== left) {
-                el.style.left = left;
-                render.left = left;
-            }
-            if (render.top !== top) {
-                el.style.top = top;
-                render.top = top;
+            if (render.transform !== transform) {
+                el.style.transform = transform;
+                render.transform = transform;
             }
             if (render.opacity !== opacityText) {
                 el.style.opacity = opacityText;
@@ -5147,7 +5143,7 @@ let view = {
             const slot = fx.dmgSlots[i];
             let render = viewData.slapDmgRender[i];
             if (!render) {
-                render = viewData.slapDmgRender[i] = { active: false, text: "", left: "", top: "", opacity: "", transform: "" };
+                render = viewData.slapDmgRender[i] = { active: false, text: "", opacity: "", transform: "" };
             }
             if (!slot || !slot.active) {
                 if (render.active) {
@@ -5156,10 +5152,8 @@ let view = {
                 }
                 continue;
             }
-            const motion = view.floatHoldThenRise(slot.elapsedMs);
+            const motion = view.floatHoldThenRise(slot.elapsedMs, slot.x, slot.y);
             const text = view.formatSlapDamageText(slot.damage);
-            const left = `${Math.round(slot.x)}px`;
-            const top = `${Math.round(slot.y)}px`;
             const opacity = motion.opacity;
             const transform = motion.transform;
             if (!render.active) {
@@ -5169,14 +5163,6 @@ let view = {
             if (render.text !== text) {
                 el.textContent = text;
                 render.text = text;
-            }
-            if (render.left !== left) {
-                el.style.left = left;
-                render.left = left;
-            }
-            if (render.top !== top) {
-                el.style.top = top;
-                render.top = top;
             }
             if (render.opacity !== opacity) {
                 el.style.opacity = opacity;
@@ -5188,17 +5174,17 @@ let view = {
             }
         }
     },
-    floatHoldThenRise: function(elapsedMs) {
+    floatHoldThenRise: function(elapsedMs, x, y) {
         const holdMs = engine.FLOAT_HOLD_MS || 500;
         const riseMs = engine.FLOAT_RISE_MS || 1500;
         const risePx = engine.FLOAT_RISE_PX || 28;
         if (elapsedMs <= holdMs) {
-            return { opacity: "1", transform: "translate(-50%, 0px)" };
+            return { opacity: "1", transform: view.gpuTranslate(x, y, "translate(-50%, 0px)") };
         }
         const t = Math.max(0, Math.min(1, (elapsedMs - holdMs) / riseMs));
         return {
             opacity: String(1 - t),
-            transform: `translate(-50%, ${Math.round(-risePx * t)}px)`
+            transform: view.gpuTranslate(x, y, `translate(-50%, ${Math.round(-risePx * t)}px)`)
         };
     },
     renderPlayerFloats: function() {
@@ -5215,7 +5201,7 @@ let view = {
             const slot = fx.slots[i];
             let render = viewData.playerFloatRender[i];
             if (!render) {
-                render = viewData.playerFloatRender[i] = { active: false, text: "", left: "", top: "", opacity: "", transform: "", cls: "" };
+                render = viewData.playerFloatRender[i] = { active: false, text: "", opacity: "", transform: "", cls: "" };
             }
             if (!slot || !slot.active) {
                 if (render.active) {
@@ -5224,10 +5210,8 @@ let view = {
                 }
                 continue;
             }
-            const motion = view.floatHoldThenRise(slot.elapsedMs);
+            const motion = view.floatHoldThenRise(slot.elapsedMs, slot.x, slot.y);
             const text = slot.text || "";
-            const left = `${Math.round(slot.x)}px`;
-            const top = `${Math.round(slot.y)}px`;
             const opacity = motion.opacity;
             const transform = motion.transform;
             const cls = slot.kind === "hurt"
@@ -5244,14 +5228,6 @@ let view = {
             if (render.text !== text) {
                 el.textContent = text;
                 render.text = text;
-            }
-            if (render.left !== left) {
-                el.style.left = left;
-                render.left = left;
-            }
-            if (render.top !== top) {
-                el.style.top = top;
-                render.top = top;
             }
             if (render.opacity !== opacity) {
                 el.style.opacity = opacity;
@@ -5282,10 +5258,8 @@ let view = {
         } else {
             el.className = "attack-line-fx-anim";
         }
-        el.style.left = `${seg.x1}px`;
-        el.style.top = `${seg.y1}px`;
         el.style.width = `${length}px`;
-        el.style.transform = `translateY(-50%) rotate(${angle}deg)`;
+        el.style.transform = view.gpuTranslate(seg.x1, seg.y1, `translateY(-50%) rotate(${angle}deg)`);
         parent.appendChild(el);
         el.addEventListener("animationend", function() {
             if (el.parentNode) {
@@ -5295,6 +5269,9 @@ let view = {
     },
     spawnKillRewardFloater: function(centerXPx, topYPx, lines) {
         if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
+            return;
+        }
+        if (!view.isBattleVisible()) {
             return;
         }
         const battlefield = viewData.cached.battlefield;
@@ -5331,6 +5308,9 @@ let view = {
             spriteImg.draggable = false;
             const audLayer = document.createElement("div");
             audLayer.className = "intruder-aud-layer";
+            const audFill = document.createElement("div");
+            audFill.className = "intruder-aud-fill";
+            audLayer.appendChild(audFill);
             const overlay = document.createElement("div");
             overlay.className = "intruder-overlay";
             const audLine = document.createElement("div");
@@ -5353,8 +5333,32 @@ let view = {
             intruderEl.appendChild(shapeLayer);
             intruderEl.appendChild(overlay);
         }
+        view.ensureIntruderAudFill(intruderEl);
+        intruderEl.style.left = "0px";
+        intruderEl.style.top = "0px";
         intruderEl.style.display = "block";
         return intruderEl;
+    },
+    ensureIntruderAudFill: function(intruderEl) {
+        if (!intruderEl) {
+            return null;
+        }
+        let audLayer = intruderEl.querySelector(".intruder-aud-layer");
+        if (!audLayer) {
+            const shapeLayer = intruderEl.querySelector(".intruder-shape-layer");
+            if (!shapeLayer) {
+                return null;
+            }
+            audLayer = document.createElement("div");
+            audLayer.className = "intruder-aud-layer";
+            shapeLayer.appendChild(audLayer);
+        }
+        if (!audLayer.querySelector(".intruder-aud-fill")) {
+            const audFill = document.createElement("div");
+            audFill.className = "intruder-aud-fill";
+            audLayer.appendChild(audFill);
+        }
+        return audLayer;
     },
     ensureIntruderOverlayLayout: function(intruderEl) {
         if (!intruderEl) {
@@ -5403,6 +5407,9 @@ let view = {
         if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
             return;
         }
+        if (!view.isResortMapVisible()) {
+            return;
+        }
         const innBtn = viewData.cached.baseBuilding_inn || document.getElementById("baseBuilding_inn");
         if (!innBtn) {
             return;
@@ -5423,6 +5430,9 @@ let view = {
     },
     spawnNoodleTipFloat: function(skillName) {
         if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
+            return;
+        }
+        if (!view.isResortMapVisible()) {
             return;
         }
         const noodleBtn = viewData.cached.baseBuilding_noodleBar || document.getElementById("baseBuilding_noodleBar");
@@ -5580,6 +5590,10 @@ let view = {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;");
+    },
+    gpuTranslate: function(x, y, extra) {
+        const t = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
+        return extra ? `${t} ${extra}` : t;
     },
     updateVal: function(id, newVal, type="textContent", sigFigs) {
         const el = viewData.cached[id];
