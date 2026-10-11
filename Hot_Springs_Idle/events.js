@@ -458,6 +458,20 @@ let events = {
             events.buyUpgrade("path", nextKey);
         }
     },
+    selectNextPathSegment: function() {
+        if (data.progress.selectedBaseBuilding !== "path") {
+            return;
+        }
+        const idx = data.progress.selectedPathSegmentIndex;
+        if (idx === undefined || idx === null || idx <= 0) {
+            return;
+        }
+        const seg = engine.getPathSegmentData(idx);
+        if (!seg || seg.state === "Large Rocks") {
+            return;
+        }
+        events.openBaseBuilding("path", idx - 1);
+    },
     bindPathSegmentSvgHandlers: function() {
         const hitLayer = document.getElementById("pathSegmentHitLayer");
         if (!hitLayer || hitLayer._pathSegBound) {

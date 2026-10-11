@@ -275,6 +275,11 @@ let onLoad = {
         if (data.gameSettings.prestigePackOpen === undefined || data.gameSettings.prestigePackOpen === null) {
             data.gameSettings.prestigePackOpen = false;
         }
+        // Debug pause / x3 / x10 should not persist across loads
+        data.gameSettings.gameSpeed = 1;
+        data.gameSettings.debugSpeedMultiplier = 0;
+        data.gameSettings.stop = false;
+
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
         data.tutorialToasts = Array.isArray(toLoad.tutorialToasts) ? toLoad.tutorialToasts.slice() : [];

@@ -2974,7 +2974,7 @@ var resortData = {
                 arrangementOfRemembrance: {
                     key: "arrangement_of_remembrance",
                     name: "Arrangement of Remembrance",
-                    description: "After weaving, the Okami returns to the last place she was a worker.",
+                    description: "After weaving, the Okami returns to the last place she was a worker. If a path upgrade was interrupted by a weave, she finishes that path upgrade first, then returns to her last building. Interrupting a path upgrade with another path upgrade abandons the old one.",
                     cost: { stone: 10 },
                     weavingTime: 30,
                     weavingTimeIncrease: 1,

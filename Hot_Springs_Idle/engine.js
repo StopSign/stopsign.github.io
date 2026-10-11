@@ -4727,6 +4727,13 @@ let engine = {
             engine.clearBambooCutIfNoWorkers();
         }
     },
+    isPathSegmentUpgradeJob: function(job) {
+        return !!(job
+            && job.segmentIndex !== undefined
+            && job.segmentIndex !== null
+            && !engine.isManaCloneJob(job)
+            && !engine.isCollectStoneJob(job));
+    },
     unassignOkamiForWeaving: function() {
         const okami = engine.getOkami();
         if (okami.assignedBuildingKey) {
@@ -4736,7 +4743,13 @@ let engine = {
             engine.syncOkamiWorkerSite(prev);
         }
         if (okami.pathJob && !okami.pathJob.paused) {
+            const pathUpgrade = engine.isPathSegmentUpgradeJob(okami.pathJob);
+            const segIdx = pathUpgrade ? okami.pathJob.segmentIndex : null;
             engine.pauseOkamiPathJob();
+            const garden = data.progress.base && data.progress.base.garden;
+            if (pathUpgrade && garden && garden.arrangementOfRemembranceUnlocked) {
+                okami.resumePathAfterWeaveSegmentIndex = segIdx;
+            }
         }
     },
     admitWaitingToriiVisitors: function() {
@@ -7744,6 +7757,13 @@ let engine = {
         if (okami.assignedBuildingKey) {
             return;
         }
+        const resumeIdx = okami.resumePathAfterWeaveSegmentIndex;
+        if (resumeIdx !== undefined && resumeIdx !== null) {
+            okami.resumePathAfterWeaveSegmentIndex = null;
+            if (engine.resumePathJobForSegment(resumeIdx)) {
+                return;
+            }
+        }
         const garden = data.progress.base && data.progress.base.garden;
         const site = okami.lastAssignedBuildingKey;
         if (!garden || !garden.arrangementOfRemembranceUnlocked || !engine.isOkamiWorkerSite(site)) {
@@ -7787,8 +7807,19 @@ let engine = {
         }
         engine.rememberOkamiWorkerSite(okami.assignedBuildingKey);
         engine.interruptOkamiForPathJob();
+        // Path interrupting path: abandon the previous path upgrade (do not chain back to it).
+        okami.resumePathAfterWeaveSegmentIndex = null;
         if (job) {
-            engine.pauseActivePathJobToStorage();
+            if (engine.isPathSegmentUpgradeJob(job)) {
+                const oldIdx = job.segmentIndex;
+                okami.pathJob = null;
+                if (engine.parsePathAssignmentKey(okami.assignedBuildingKey) === oldIdx) {
+                    okami.assignedBuildingKey = "";
+                }
+                engine.clearPausedPathJob(oldIdx);
+            } else {
+                engine.pauseActivePathJobToStorage();
+            }
         }
         const totalDist = engine.getResortPathTotalDistance();
         const target = engine.getPathSegmentTargetProgress(segmentIndex);
@@ -8030,6 +8061,26 @@ let engine = {
         job.status = "ready";
         engine.tryAutoWeaveOnGatherReady(jobKey);
     },
+    isOkamiBusyWithPathWork: function() {
+        const okami = engine.getOkami();
+        const job = okami.pathJob;
+        if (job && !job.paused) {
+            return true;
+        }
+        if (engine.parsePathAssignmentKey(okami.assignedBuildingKey || "") !== null) {
+            return true;
+        }
+        return false;
+    },
+    isOkamiIdleOrAtBuilding: function() {
+        if (engine.isOkamiWeaving()) {
+            return false;
+        }
+        if (engine.isOkamiBusyWithPathWork()) {
+            return false;
+        }
+        return true;
+    },
     tryAutoWeaveOnGatherReady: function(jobKey) {
         const parsed = engine.parseUpgradeGatherJobKey(jobKey);
         if (!parsed) {
@@ -8039,7 +8090,7 @@ let engine = {
         if (!garden || !garden.arrangementOfAppraisalUnlocked || !garden.autoWeaveOnGatherComplete) {
             return;
         }
-        if (engine.isOkamiWeaving()) {
+        if (!engine.isOkamiIdleOrAtBuilding()) {
             return;
         }
         engine.startUpgradeWeave(parsed.scopeKey, parsed.upgradeKey);
@@ -8055,7 +8106,7 @@ let engine = {
         if (!garden || !garden.arrangementOfReviewUnlocked || !garden.autoWeaveCheapestReady) {
             return;
         }
-        if (engine.isOkamiWeaving()) {
+        if (!engine.isOkamiIdleOrAtBuilding()) {
             return;
         }
         const queue = rh.upgradeGatherQueue || [];

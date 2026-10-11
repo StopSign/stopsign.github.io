@@ -44,6 +44,28 @@
 </div>
 
 <div id="mainLayout">
+    <div id="gameProgressBars" class="game-progress-bars">
+        <div id="okamiProgressBar" class="game-progress-bar">
+            <div class="prog-track game-progress-track okami-progress-track">
+                <div id="okamiExpFill" class="prog-fill prog-fill-okami-exp"></div>
+                <div class="game-progress-bar-label">
+                    <span id="okamiTailLabel" class="game-progress-bold">One Tail</span> - Level <span id="okamiLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Exp: <span id="okamiExpText" class="game-progress-bold">0 / 200</span><span class="game-progress-sep">|</span>Spirit Strands: <span id="okamiSpiritStrands" class="game-progress-bold">1</span><span id="okamiSpiritStrandsNext" class="muted-text"></span><span class="game-progress-sep">|</span>Inspiration Bonus: <span id="okamiInspirationBonus" class="game-progress-bold">x1.2</span> <span id="okamiInspirationHint" class="muted-text">(+.02/level)</span><span class="game-progress-sep">|</span>Currently: <span id="okamiStateDisplay" class="okami-state-display game-progress-bold" onclick="events.goToOkamiAssignment(event)">Idling</span>
+                </div>
+            </div>
+        </div>
+        <div id="manaProgressBar" class="game-progress-bar" style="display:none">
+            <div class="prog-track game-progress-track mana-progress-track">
+                <div id="manaFill" class="prog-fill prog-fill-mana"></div>
+                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">—</span></div>
+            </div>
+        </div>
+        <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
+            <div class="prog-track game-progress-track divinity-progress-track">
+                <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
+                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">100000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
+            </div>
+        </div>
+    </div>
     <div id="compactViewTabs">
         <button id="compactPane_menus" class="tab-button" onclick="events.switchCompactPane('menus')">Menus</button>
         <button id="compactPane_battle" class="tab-button" onclick="events.switchCompactPane('battle')">Battle</button>
@@ -323,6 +345,7 @@
             </div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
+                <div class="options-row"><button type="button" id="changelogButton" class="tab-button" onclick="changelog.open()">Changelog</button></div>
                 <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
                 <div class="options-row"><button type="button" id="manualSaveButton" class="tab-button" onclick="saving.save()">Save now</button><button type="button" id="viewTipsButton" class="tab-button" onclick="toasts.openTips()">View Tips</button></div>
                 <div class="options-row" id="saveToFileRow"><button type="button" id="saveToFileButton" class="tab-button" onclick="saving.saveToFile()">Save to file</button><button type="button" id="importFromFileButton" class="tab-button" onclick="saving.importFromFile()">Import from file</button><input type="file" id="importFromFileInput" style="display:none" onchange="saving.onImportFromFileSelected(this)"></div>
@@ -404,28 +427,6 @@
     </div>
     </div>
     <div id="baseBuildingInfo" class="base-info-panel"></div>
-    <div id="gameProgressBars" class="game-progress-bars">
-        <div id="okamiProgressBar" class="game-progress-bar">
-            <div class="prog-track game-progress-track okami-progress-track">
-                <div id="okamiExpFill" class="prog-fill prog-fill-okami-exp"></div>
-                <div class="game-progress-bar-label">
-                    <span id="okamiTailLabel" class="game-progress-bold">One Tail</span> - Level <span id="okamiLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Exp: <span id="okamiExpText" class="game-progress-bold">0 / 200</span><span class="game-progress-sep">|</span>Spirit Strands: <span id="okamiSpiritStrands" class="game-progress-bold">1</span><span id="okamiSpiritStrandsNext" class="muted-text"></span><span class="game-progress-sep">|</span>Inspiration Bonus: <span id="okamiInspirationBonus" class="game-progress-bold">x1.2</span> <span id="okamiInspirationHint" class="muted-text">(+.02/level)</span><span class="game-progress-sep">|</span>Currently: <span id="okamiStateDisplay" class="okami-state-display game-progress-bold" onclick="events.goToOkamiAssignment(event)">Idling</span>
-                </div>
-            </div>
-        </div>
-        <div id="manaProgressBar" class="game-progress-bar" style="display:none">
-            <div class="prog-track game-progress-track mana-progress-track">
-                <div id="manaFill" class="prog-fill prog-fill-mana"></div>
-                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">—</span></div>
-            </div>
-        </div>
-        <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
-            <div class="prog-track game-progress-track divinity-progress-track">
-                <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
-                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">100000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div id="debugSpeedPanel" class="debug-speed-panel" style="display:none">
@@ -459,6 +460,13 @@
     <button id="offlineProcessingDismiss" class="button" type="button" style="display:none;" onclick="offline.dismissSummary()">Continue</button>
 </div>
 
+<div id="changelogBackdrop" style="display:none" onclick="changelog.close()"></div>
+<div id="changelogPanel" style="display:none">
+    <button type="button" id="changelogPanelX" class="tutorial-toast-x" onclick="changelog.close()">X</button>
+    <div id="changelogPanelTitle">Changelog</div>
+    <div id="changelogPanelBody"></div>
+</div>
+
 </body>
 
 
@@ -485,6 +493,7 @@
 <script src="viewUpdating.js"></script>
 <script src="hotkeys.js"></script>
 <script src="toasts.js"></script>
+<script src="changelog.js"></script>
 
 
 <script>

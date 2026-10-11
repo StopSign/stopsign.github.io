@@ -481,7 +481,8 @@ let initials = {
                 pathJob: null,
                 pausedPathJobs: {},
                 pausedManaCloneJob: null,
-                pausedCollectStoneJob: null
+                pausedCollectStoneJob: null,
+                resumePathAfterWeaveSegmentIndex: null
             },
             mana: {
                 amount: 0,
@@ -981,7 +982,8 @@ let initialize = {
             pathJob: null,
             pausedPathJobs: {},
             pausedManaCloneJob: null,
-            pausedCollectStoneJob: null
+            pausedCollectStoneJob: null,
+            resumePathAfterWeaveSegmentIndex: null
         };
         if (!data.progress.okami) {
             data.progress.okami = JSON.parse(JSON.stringify(def));

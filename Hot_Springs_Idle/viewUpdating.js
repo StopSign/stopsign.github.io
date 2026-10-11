@@ -3507,6 +3507,8 @@ let view = {
                 stateText += " (Lanterns)";
             }
             view.updateVal("pathSegmentStateText", stateText);
+            const showNextPathBtn = !!(seg && seg.state !== "Large Rocks" && pathIdx > 0);
+            view.updateVal("base_path_select_next_row", showNextPathBtn ? "" : "none", "style.display");
             const t = view._basePanelPurchasingTools(base, null, false);
             const pathOpts = Object.assign({}, t.soldOutUpgradeRowOpts(false, "path"), {
                 buyButtonText: function(pk, u) {
