@@ -2715,7 +2715,7 @@ let view = {
             const stalk = bf.stalks[si];
             view.updateVal(`bambooCutBtn_${si}`, active === si, "classList.toggle", "bamboo-cut-active");
             let statusText;
-            if (active === si) {
+            if (active === si && engine.getBambooChopPower() > 0) {
                 statusText = "Harvesting";
             } else {
                 statusText = `Growing ${engine.getBambooStalkGrowthPercent(stalk)}%`;

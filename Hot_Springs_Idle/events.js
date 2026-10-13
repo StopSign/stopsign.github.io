@@ -832,7 +832,8 @@ let events = {
             if (purchaseUi.disabled) {
                 return;
             }
-            if (!engine.canEnqueueFoxDenJob()) {
+            const cost = resortData.resolveCost(up, scopeKey);
+            if (!resortData.isWeaveOnlyCost(cost) && !engine.canEnqueueFoxDenJob()) {
                 view.flashFoxDenQueueFull();
                 return;
             }
@@ -884,9 +885,6 @@ let events = {
             if (buildingKey === "market") {
                 engine.syncMarketCarriersToWorkforce();
             }
-            if (buildingKey === "bambooForest") {
-                engine.clearBambooCutIfNoWorkers();
-            }
             return;
         }
         const prevAssign = okami.assignedBuildingKey;
@@ -918,9 +916,6 @@ let events = {
         }
         okami.assignedBuildingKey = buildingKey;
         engine.rememberOkamiWorkerSite(buildingKey);
-        if (prevAssign === "bambooForest" && buildingKey !== "bambooForest") {
-            engine.clearBambooCutIfNoWorkers();
-        }
         if (buildingKey === "foxDen") {
             engine.syncFoxDenCarriersToWorkforce();
         }

@@ -3725,12 +3725,19 @@ let engine = {
                 sum += carriers[i].amount || 0;
             }
         }
+        if (targetKey === "inn") {
+            const inn = data.progress.base && data.progress.base.inn;
+            const innCarriers = (inn && inn.waterCarriers) || [];
+            for (let j = 0; j < innCarriers.length; j++) {
+                sum += innCarriers[j].amount || 0;
+            }
+        }
         return sum;
     },
     /**
      * Valid water delivery targets: temperature first, then lowest stored-plus-inbound liters.
-     * Room left is capacity minus water already stored. Water on carriers does not count toward that capacity.
-     * A target is included only when that stored room can accept a full carrier load.
+     * Room left is capacity minus stored minus inbound (water already on carriers to that sink).
+     * Prefer sinks that can take a full carrier load; otherwise allow partial top-offs.
      */
     getWaterDeliveryTargets: function() {
         const cistern = data.progress.base && data.progress.base.cistern;
@@ -3740,7 +3747,8 @@ let engine = {
         const temp = cistern.temperature || 0;
         const sinks = engine.getWaterDeliverySinksNeedingWater();
         const fullLoad = Math.min(resortData.getCisternWaterCarryAmount(), cistern.waterVolume || 0);
-        const targets = [];
+        const fullTargets = [];
+        const partialTargets = [];
         for (let i = 0; i < sinks.length; i++) {
             const sink = sinks[i];
             const min = sink.tempMin;
@@ -3749,13 +3757,20 @@ let engine = {
                 continue;
             }
             const stored = sink.current || 0;
-            const room = (sink.capacity || 0) - stored;
-            if (room < fullLoad) {
+            const inbound = engine.getCisternInboundWater(sink.key);
+            const room = (sink.capacity || 0) - stored - inbound;
+            if (room <= 0) {
                 continue;
             }
-            sink.scheduled = stored + engine.getCisternInboundWater(sink.key);
-            targets.push(sink);
+            sink.scheduled = stored + inbound;
+            sink.room = room;
+            if (room >= fullLoad) {
+                fullTargets.push(sink);
+            } else {
+                partialTargets.push(sink);
+            }
         }
+        const targets = fullTargets.length ? fullTargets : partialTargets;
         targets.sort(function(a, b) {
             return (a.scheduled || 0) - (b.scheduled || 0);
         });
@@ -4723,8 +4738,6 @@ let engine = {
             engine.syncInnCarriersToWorkforce();
         } else if (buildingKey === "market") {
             engine.syncMarketCarriersToWorkforce();
-        } else if (buildingKey === "bambooForest") {
-            engine.clearBambooCutIfNoWorkers();
         }
     },
     isPathSegmentUpgradeJob: function(job) {
@@ -6514,17 +6527,22 @@ let engine = {
             if (loc === "bonfire" && heatExpRate > 0) {
                 engine.grantSpiritExp(spirit, heatExpRate * dtSec);
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
-                spirit.forgeTimerMs = (spirit.forgeTimerMs || 0) + tickMs;
-                while (spirit.forgeTimerMs >= forgeCycleMs && (atelier.ore || 0) > 0) {
-                    spirit.forgeTimerMs -= forgeCycleMs;
-                    const batchSize = engine.getForgeSmeltBatch(spirit);
-                    const toProcess = Math.min(batchSize, atelier.ore || 0);
-                    if (toProcess <= 0) {
-                        break;
+                if ((atelier.ore || 0) > 0) {
+                    spirit.forgeTimerMs = (spirit.forgeTimerMs || 0) + tickMs;
+                    while (spirit.forgeTimerMs >= forgeCycleMs && (atelier.ore || 0) > 0) {
+                        spirit.forgeTimerMs -= forgeCycleMs;
+                        const batchSize = engine.getForgeSmeltBatch(spirit);
+                        const toProcess = Math.min(batchSize, atelier.ore || 0);
+                        if (toProcess <= 0) {
+                            break;
+                        }
+                        atelier.ore -= toProcess;
+                        atelier.bars = (atelier.bars || 0) + toProcess;
+                        engine.grantSpiritExp(spirit, toProcess * 3);
                     }
-                    atelier.ore -= toProcess;
-                    atelier.bars = (atelier.bars || 0) + toProcess;
-                    engine.grantSpiritExp(spirit, toProcess * 3);
+                }
+                if ((atelier.ore || 0) <= 0) {
+                    spirit.forgeTimerMs = (spirit.forgeTimerMs || 0) % forgeCycleMs;
                 }
             }
         }
@@ -8230,11 +8248,12 @@ let engine = {
         if (rh.upgradeGatherJobs[jobKey]) {
             return false;
         }
-        if (!engine.canEnqueueFoxDenJob()) {
-            return false;
-        }
         const cost = resortData.resolveCost(up, scopeKey);
         const split = resortData.splitGatherWeaveCost(cost);
+        const weaveOnly = resortData.isWeaveOnlyCost(cost);
+        if (!weaveOnly && !engine.canEnqueueFoxDenJob()) {
+            return false;
+        }
         const weaveCost = Object.assign({}, split.weave);
         const hasWeaveCost = resortData.hasWeaveCost(weaveCost);
         if (hasWeaveCost) {
@@ -8248,7 +8267,7 @@ let engine = {
             upgradeKey: upgradeKey,
             required: Object.assign({}, split.gather),
             delivered: resortData.emptyGatherDelivered(),
-            weaveCost: { coins: 0, starBeads: 0, mana: 0 },
+            weaveCost: { coins: 0, starBeads: 0, mana: 0, credit: 0, divinity: 0 },
             weaveCostPaid: hasWeaveCost,
             paused: false,
             status: "gathering"
@@ -8396,7 +8415,8 @@ let engine = {
         const cost = typeof up.getCost === "function" ? up.getCost() : resortData.resolveCost(up, scopeKey);
         const split = resortData.splitGatherWeaveCost(cost);
         const affordWeave = resortData.canAffordCost(split.weave);
-        const queueBlocked = !engine.canEnqueueFoxDenJob();
+        const weaveOnly = resortData.isWeaveOnlyCost(cost);
+        const queueBlocked = !weaveOnly && !engine.canEnqueueFoxDenJob();
         return {
             label: resortData.gatherLabelFromCost(costGetter),
             disabled: !affordWeave || queueBlocked,
@@ -8483,18 +8503,6 @@ let engine = {
         }
         const label = resortData.collectedProgressLabel(site.delivered, site.required);
         return site.paused ? `Paused · ${label}` : label;
-    },
-    clearBambooCutIfNoWorkers: function() {
-        const bf = data.progress.base.bambooForest;
-        if (bf.activeHarvestStalk === null || bf.activeHarvestStalk === undefined) {
-            return;
-        }
-        const assigned = bf.assignedWorkers || 0;
-        const okami = engine.getOkami();
-        const okamiHere = okami.assignedBuildingKey === "bambooForest";
-        if (assigned <= 0 && !okamiHere) {
-            bf.activeHarvestStalk = null;
-        }
     },
     getFoxDenConstructionSite: function(unlockKey) {
         const rh = data.progress.base.foxDen;
@@ -9563,13 +9571,20 @@ let engine = {
                 workerCarriersInFlight++;
             }
         }
+        const freeWorkers = Math.max(0, workersOnly - workerCarriersInFlight);
+        const okamiFree = okamiHere && okamiCarriersInFlight < 1;
+        if (freeWorkers <= 0 && !okamiFree) {
+            return false;
+        }
         let isOkami = false;
-        if (workerCarriersInFlight < workersOnly) {
+        if (freeWorkers > 0 && !okamiFree) {
             isOkami = false;
-        } else if (okamiHere && okamiCarriersInFlight < 1) {
+        } else if (okamiFree && freeWorkers <= 0) {
             isOkami = true;
         } else {
-            return false;
+            const okamiSpeed = engine.getBonfireCarrierSpeed({ isOkami: true });
+            const workerSpeed = engine.getBonfireCarrierSpeed({ isOkami: false });
+            isOkami = okamiSpeed >= workerSpeed;
         }
         const fromKey = useCoal ? "market" : "bambooForest";
         const from = engine.getFoxDenMapSlotPosition(fromKey);
@@ -10272,8 +10287,8 @@ let engine = {
         }
         const cistern = data.progress.base.cistern || {};
         const carryCap = resortData.getKitsuneWaterCarryAmount();
-        const hotRem = engine.getInnHotWaterCapacity() - (inn.hotWater || 0);
-        const amount = Math.min(carryCap, cistern.waterVolume || 0, hotRem);
+        const room = engine.getInnHotWaterCapacity() - (inn.hotWater || 0) - engine.getCisternInboundWater("inn");
+        const amount = Math.min(carryCap, cistern.waterVolume || 0, room);
         if (amount <= 0) {
             return false;
         }
@@ -10498,9 +10513,8 @@ let engine = {
             return false;
         }
         const target = targets[0];
-        const rem = target.capacity - (target.current || 0);
         const carryCap = resortData.getCisternWaterCarryAmount();
-        const amount = Math.min(carryCap, cistern.waterVolume || 0, rem);
+        const amount = Math.min(carryCap, cistern.waterVolume || 0, target.room);
         if (amount <= 0) {
             return false;
         }
@@ -10799,7 +10813,7 @@ let engine = {
         }
     },
     updateBambooStalkGrowth: function(bf, stalkIndex, tickMs) {
-        if (bf.activeHarvestStalk === stalkIndex) {
+        if (bf.activeHarvestStalk === stalkIndex && engine.getBambooChopPower() > 0) {
             return;
         }
         const stalk = bf.stalks[stalkIndex];
@@ -12705,9 +12719,6 @@ let engine = {
         }
         if (kind === "inn") {
             engine.syncInnCarriersToWorkforce();
-        }
-        if (kind === "bambooForest") {
-            engine.clearBambooCutIfNoWorkers();
         }
         return true;
     },

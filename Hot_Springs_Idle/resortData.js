@@ -256,6 +256,9 @@ var resortData = {
             const credit = (base.market && base.market.credit) || 0;
             return credit + (resortData.coinsCountForCredit() ? (data.progress.coins || 0) : 0);
         }
+        if (key === "divinity") {
+            return (data.progress.divinity && data.progress.divinity.amount) || 0;
+        }
         return 0;
     },
     /** Coins never cover a Credit cost. */
@@ -294,6 +297,7 @@ var resortData = {
         if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
         if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
         if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
+        if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
         return parts;
     },
 
@@ -389,13 +393,20 @@ var resortData = {
         }
         return {
             gather: gather,
-            weave: { coins: c.coins || 0, starBeads: c.starBeads || 0, mana: c.mana || 0, credit: c.credit || 0 }
+            weave: {
+                coins: c.coins || 0,
+                starBeads: c.starBeads || 0,
+                mana: c.mana || 0,
+                credit: c.credit || 0,
+                divinity: c.divinity || 0
+            }
         };
     },
 
     hasWeaveCost: function(weaveCost) {
         const w = weaveCost || {};
-        return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0 || (w.credit || 0) > 0;
+        return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0
+            || (w.credit || 0) > 0 || (w.divinity || 0) > 0;
     },
 
     hasGatherCost: function(gatherCost) {
@@ -409,7 +420,7 @@ var resortData = {
         return false;
     },
 
-    isCoinOrBeadOnlyCost: function(cost) {
+    isWeaveOnlyCost: function(cost) {
         const split = resortData.splitGatherWeaveCost(cost);
         return !resortData.hasGatherCost(split.gather) && resortData.hasWeaveCost(split.weave);
     },
@@ -420,7 +431,7 @@ var resortData = {
         if (!parts.length) {
             return "Start upgrade";
         }
-        if (resortData.isCoinOrBeadOnlyCost(c)) {
+        if (resortData.isWeaveOnlyCost(c)) {
             return `Buy [${parts.join(", ")}]`;
         }
         return `Gather [${parts.join(", ")}]`;
@@ -555,6 +566,7 @@ var resortData = {
         if (coinsNeed > data.progress.coins) return false;
         if ((c.starBeads || 0) > (data.progress.starBeads || 0)) return false;
         if ((c.mana || 0) > ((data.progress.mana && data.progress.mana.amount) || 0)) return false;
+        if ((c.divinity || 0) > ((data.progress.divinity && data.progress.divinity.amount) || 0)) return false;
         if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) return false;
         if ((c.stone || 0) > engine.getTotalStone()) return false;
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) return false;
@@ -581,6 +593,9 @@ var resortData = {
         data.progress.starBeads = (data.progress.starBeads || 0) - (c.starBeads || 0);
         if ((c.mana || 0) > 0 && data.progress.mana) {
             data.progress.mana.amount = Math.max(0, (data.progress.mana.amount || 0) - (c.mana || 0));
+        }
+        if ((c.divinity || 0) > 0 && data.progress.divinity) {
+            data.progress.divinity.amount = Math.max(0, (data.progress.divinity.amount || 0) - (c.divinity || 0));
         }
         if ((c.wood || 0) > 0 && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - (c.wood || 0));

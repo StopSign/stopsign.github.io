@@ -46,7 +46,7 @@ let saving = {
         let sdata = structuredClone(data);
         window.localStorage[saveName] = JSON.stringify(sdata);
     },
-    /** Download current game data as encode64 saveFile.txt (place in battleLoops/ for loadStaticSaveFile). */
+    /** Download current game data as encode64 save (place in battleLoops/ for loadStaticSaveFile). */
     saveToFile: function() {
         saving.save();
         const text = window.localStorage[saveName] || JSON.stringify(structuredClone(data));
@@ -54,7 +54,12 @@ let saving = {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = "saveFile.txt";
+        const now = new Date();
+        const day = String(now.getDate()).padStart(2, '0');
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        a.download = `Hot_Springs_Save_${day}-${month}_${hours}-${minutes}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
