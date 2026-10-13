@@ -411,6 +411,7 @@ let initials = {
             ticksForSeconds: 0,
             renderAlpha: 1,
             numberType: "numberSuffix",
+            offlineProgressMode: "catchUp",
             redeemedBonusCodes: {}
         };
     },

@@ -8,6 +8,10 @@ Math.log10 = Math.log10 || function(x) { return Math.log(x) * Math.LOG10E; };
 function round1(num) {
     return Math.floor(num * 10 + .000000001) / 10;
 }
+/** Like round1, but always shows one decimal (e.g. 5.0) for stable display width. */
+function round1Fixed(num) {
+    return round1(num).toFixed(1);
+}
 function round2(num) {
     return Math.floor(num * 100 + .000000001) / 100;
 }

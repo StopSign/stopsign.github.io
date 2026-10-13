@@ -3,6 +3,7 @@ const OFFLINE_CAP_MS = 24 * 60 * 60 * 1000;
 const OFFLINE_HOUR_MS = 60 * 60 * 1000;
 const OFFLINE_MIN_PROCESS_MS = 60 * 1000;
 const OFFLINE_TICK_BUDGET_MS = 12;
+const BONUS_TIME_CAP_MS = 6 * 60 * 60 * 1000;
 
 let offline = {
     totalToProcessMs: 0,
@@ -10,6 +11,8 @@ let offline = {
     wallStartMs: 0,
     gains: null,
     shardBank: null,
+    pendingBonusGainMsgMs: 0,
+    _bonusGainToastTimer: null,
 
     ensureState: function() {
         if (!data.currentGameState) {
@@ -21,6 +24,9 @@ let offline = {
         if (!data.currentGameState.offlineShardBank || typeof data.currentGameState.offlineShardBank !== "object") {
             data.currentGameState.offlineShardBank = {};
         }
+        if (data.currentGameState.bonusTime === undefined || data.currentGameState.bonusTime === null) {
+            data.currentGameState.bonusTime = 0;
+        }
     },
 
     addPendingOfflineMs: function(ms) {
@@ -30,6 +36,62 @@ let offline = {
         }
         const cur = data.currentGameState.pendingOfflineMs || 0;
         data.currentGameState.pendingOfflineMs = Math.min(OFFLINE_CAP_MS, cur + ms);
+    },
+
+    /** Add bonus time ms; clamps total bank to BONUS_TIME_CAP_MS. Returns actual ms added. */
+    addBonusTimeMs: function(ms) {
+        offline.ensureState();
+        if (!ms || ms <= 0) {
+            return 0;
+        }
+        const before = data.currentGameState.bonusTime || 0;
+        const next = Math.min(BONUS_TIME_CAP_MS, before + ms);
+        data.currentGameState.bonusTime = next;
+        return Math.max(0, next - before);
+    },
+
+    clampBonusTime: function() {
+        offline.ensureState();
+        const cur = data.currentGameState.bonusTime || 0;
+        if (cur > BONUS_TIME_CAP_MS) {
+            data.currentGameState.bonusTime = BONUS_TIME_CAP_MS;
+        } else if (cur < 0) {
+            data.currentGameState.bonusTime = 0;
+        }
+    },
+
+    isPauseBonusMode: function() {
+        return (data.gameSettings && data.gameSettings.offlineProgressMode) === "pauseBonus";
+    },
+
+    /** Convert wall-clock offline ms into bonus time at 1/5 ratio. Returns ms actually banked. */
+    convertOfflineMsToBonus: function(offlineMs) {
+        if (!offlineMs || offlineMs < OFFLINE_MIN_PROCESS_MS) {
+            return 0;
+        }
+        const cappedOffline = Math.min(OFFLINE_CAP_MS, offlineMs);
+        return offline.addBonusTimeMs(cappedOffline / 5);
+    },
+
+    showBonusGainMessage: function(gainedMs) {
+        if (!gainedMs || gainedMs <= 0) {
+            return;
+        }
+        let el = document.getElementById("bonusGainToast");
+        if (!el) {
+            el = document.createElement("div");
+            el.id = "bonusGainToast";
+            el.className = "bonus-gain-toast";
+            document.body.appendChild(el);
+        }
+        el.textContent = `Gained ${offline.formatDuration(gainedMs)} of bonus time`;
+        el.style.display = "block";
+        if (offline._bonusGainToastTimer) {
+            clearTimeout(offline._bonusGainToastTimer);
+        }
+        offline._bonusGainToastTimer = setTimeout(function() {
+            el.style.display = "none";
+        }, 5000);
     },
 
     formatDuration: function(ms) {

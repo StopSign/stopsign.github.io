@@ -33,6 +33,10 @@ function loop() {
     if (ticksAvailable > maxTicksPerLoop) {
         const extraTicks = ticksAvailable - maxTicksPerLoop;
         data.currentGameState.bonusTime += extraTicks * tickInterval;
+        const bonusCap = (typeof BONUS_TIME_CAP_MS !== "undefined") ? BONUS_TIME_CAP_MS : (6 * 60 * 60 * 1000);
+        if (data.currentGameState.bonusTime > bonusCap) {
+            data.currentGameState.bonusTime = bonusCap;
+        }
     }
 
     if (ticksProcessed > 0) {

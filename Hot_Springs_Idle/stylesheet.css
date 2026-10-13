@@ -2449,7 +2449,8 @@ button {
     align-items: center;
     gap: 2px;
     z-index: 11;
-    pointer-events: none;
+    pointer-events: auto;
+    cursor: default;
     overflow: visible;
 }
 
@@ -3854,6 +3855,33 @@ button {
     display: flex;
     align-items: center;
     gap: 8px;
+}
+
+.options-separator {
+    margin-top: 10px;
+    margin-bottom: 4px;
+    border-top: 1px solid var(--border-color);
+    height: 0;
+    padding: 0;
+}
+
+.bonus-gain-toast {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--overlay-color);
+    color: var(--text-primary);
+    pointer-events: none;
+}
+
+.debug-speed-label {
+    font-size: 12px;
+    align-self: center;
+    margin-left: 4px;
 }
 
 .base-guest-row {

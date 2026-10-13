@@ -75,6 +75,26 @@ let events = {
             }
         }
     },
+    setOfflineProgressMode: function(mode) {
+        const valid = ["catchUp", "pauseBonus"];
+        if (valid.indexOf(mode) < 0) {
+            return;
+        }
+        data.gameSettings.offlineProgressMode = mode;
+        if (typeof view !== "undefined" && view.updateOptionsTab) {
+            view.updateOptionsTab();
+        }
+    },
+    syncOfflineProgressModeRadiosFromSettings: function() {
+        const t = (data.gameSettings && data.gameSettings.offlineProgressMode) || "catchUp";
+        const ids = { catchUp: "offlineModeCatchUp", pauseBonus: "offlineModePauseBonus" };
+        for (const k in ids) {
+            const el = document.getElementById(ids[k]);
+            if (el) {
+                el.checked = k === t;
+            }
+        }
+    },
     mainMenuTabOrder: function() {
         if (!(data.progress && data.progress.battleUnlocked)) {
             const preTabs = ["base", "options"];
@@ -685,6 +705,25 @@ let events = {
         } else {
             gs.gameSpeed = multiplier;
             gs.debugSpeedMultiplier = multiplier;
+            gs.bonusSpeed = 1;
+        }
+        view.updateDebugSpeedButtons();
+    },
+    toggleBonusGameSpeed: function(multiplier) {
+        const gs = data.gameSettings;
+        const bonusMs = (data.currentGameState && data.currentGameState.bonusTime) || 0;
+        const current = gs.bonusSpeed || 1;
+        if (current === multiplier) {
+            gs.bonusSpeed = 1;
+        } else {
+            if (bonusMs <= 0) {
+                gs.bonusSpeed = 1;
+                view.updateDebugSpeedButtons();
+                return;
+            }
+            gs.bonusSpeed = multiplier;
+            gs.gameSpeed = 1;
+            gs.debugSpeedMultiplier = 0;
         }
         view.updateDebugSpeedButtons();
     },

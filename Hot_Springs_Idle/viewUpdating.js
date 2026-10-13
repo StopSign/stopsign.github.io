@@ -145,7 +145,7 @@ let view = {
         view.updateVal("waveInfoStar", starClass, "className");
         view.updateVal("waveInfoStar", tierStarTitle, "title");
         view.updateVal("waveInfoStar", tierStarFilled ? "★" : "☆");
-        view.updateVal("waveInfoTimeLabel", `Time ${round1(runClock)}s`);
+        view.updateVal("waveInfoTimeLabel", `Time ${round1Fixed(runClock)}s`);
         const transitioning = (data.battle.transitionCountdownMs || 0) > 0;
         if (transitioning) {
             const sec = Math.ceil(data.battle.transitionCountdownMs / 1000);
@@ -257,9 +257,9 @@ let view = {
                 ? ` | Retry in ${Math.max(0, data.progress.autoRetryCountdownSec || 0)}s`
                 : "";
             if (battleState === "completed") {
-                view.updateVal("deathSummary", `Bonus coins: ${intToStringRound(data.battle.completionBonusCoins || 0)} | Time ${round1(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
+                view.updateVal("deathSummary", `Bonus coins: ${intToStringRound(data.battle.completionBonusCoins || 0)} | Time ${round1Fixed(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
             } else {
-                view.updateVal("deathSummary", `Time ${round1(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
+                view.updateVal("deathSummary", `Time ${round1Fixed(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${retryTxt}`, "innerHTML");
             }
             view.updateVal("deathManaBonus", `+${manaBonus} base mana capacity`);
             const runSettings = data.battle.cloneRunSettings;
@@ -269,12 +269,12 @@ let view = {
                 const retryLabel = bonfire.cloneLiveSettingsDifferFromStored()
                     ? "Try Again with changed settings"
                     : "Try Again with the same settings";
-                view.updateVal("tryAgainButton", `${retryLabel} - ${bonfire.formatCloneCostText(livePlan.manaCost)}`);
+                view.updateVal("tryAgainButton", `${retryLabel} - ${bonfire.formatCloneCostHtml(livePlan.manaCost)}`, "innerHTML");
                 view.updateVal("tryAgainButton", !canRetry, "disabled");
             } else if (runSettings) {
                 const retryMana = runSettings.manaCost || bonfire.getCloneManaCostFromSnapshot(runSettings.cloneDensity);
                 const canRetry = bonfire.canAffordRetryWithStoredSettings();
-                view.updateVal("tryAgainButton", `Try Again with the same settings - ${bonfire.formatCloneCostText(retryMana)}`);
+                view.updateVal("tryAgainButton", `Try Again with the same settings - ${bonfire.formatCloneCostHtml(retryMana)}`, "innerHTML");
                 view.updateVal("tryAgainButton", !canRetry, "disabled");
             } else {
                 view.updateVal("tryAgainButton", "Try Again?");
@@ -295,20 +295,45 @@ let view = {
         if (!panel) {
             return;
         }
-        const show = typeof isDebug !== "undefined" && isDebug;
-        panel.style.display = show ? "" : "none";
-        if (!show) {
-            return;
-        }
         const gs = data.gameSettings || {};
-        const active = gs.debugSpeedMultiplier || 0;
+        const bonusMs = (data.currentGameState && data.currentGameState.bonusTime) || 0;
+        const showDebug = typeof isDebug !== "undefined" && isDebug;
+        const showBonus = bonusMs > 0;
+        const show = showDebug || showBonus;
+        panel.style.display = show ? "" : "none";
+
         const x3 = viewData.cached.debugSpeed_x3;
         const x10 = viewData.cached.debugSpeed_x10;
         if (x3) {
-            x3.classList.toggle("debug-speed-active", active === 3);
+            x3.style.display = showDebug ? "" : "none";
+            x3.classList.toggle("debug-speed-active", showDebug && (gs.debugSpeedMultiplier || 0) === 3);
         }
         if (x10) {
-            x10.classList.toggle("debug-speed-active", active === 10);
+            x10.style.display = showDebug ? "" : "none";
+            x10.classList.toggle("debug-speed-active", showDebug && (gs.debugSpeedMultiplier || 0) === 10);
+        }
+
+        const bonusLabel = viewData.cached.bonusSpeedLabel || document.getElementById("bonusSpeedLabel");
+        const bonusRemaining = viewData.cached.bonusSpeedRemaining || document.getElementById("bonusSpeedRemaining");
+        const bonusBtn = viewData.cached.bonusSpeed_x2 || document.getElementById("bonusSpeed_x2");
+        if (bonusLabel) {
+            bonusLabel.style.display = showBonus ? "" : "none";
+        }
+        if (bonusRemaining) {
+            bonusRemaining.textContent = showBonus
+                ? secondsToTime(Math.floor(bonusMs / 1000))
+                : "";
+        }
+        if (bonusBtn) {
+            bonusBtn.style.display = showBonus ? "" : "none";
+            bonusBtn.classList.toggle("debug-speed-active", showBonus && (gs.bonusSpeed || 1) === 2);
+        }
+
+        if ((gs.bonusSpeed || 1) > 1 && bonusMs <= 0) {
+            gs.bonusSpeed = 1;
+            if (bonusBtn) {
+                bonusBtn.classList.toggle("debug-speed-active", false);
+            }
         }
     },
     buildDeathTalentSummaryHtml: function() {
@@ -760,7 +785,7 @@ let view = {
             }
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
-            view.updateVal(`mapTime_${map.key}`, `${round1((map.totalDurationMs || 0) / 1000)}s`);
+            view.updateVal(`mapTime_${map.key}`, `${round1Fixed((map.totalDurationMs || 0) / 1000)}s`);
             const workersFound = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[map.key]) || 0;
             const workersMax = 6;
             view.updateVal(`mapWorkers_${map.key}`, `${workersFound}/${workersMax}`);
@@ -1019,10 +1044,10 @@ let view = {
     },
     updateCloneCostDisplays: function() {
         const plan = bonfire.getCreateClonePlan();
-        const costText = bonfire.formatCloneCostText(plan.manaCost);
+        const costHtml = bonfire.formatCloneCostHtml(plan.manaCost);
         const canAfford = bonfire.canAffordCreateClone();
-        view.updateVal("base_bonfire_mana_cost", costText);
-        view.updateVal("travelBonfireManaCost", costText);
+        view.updateVal("base_bonfire_mana_cost", costHtml, "innerHTML");
+        view.updateVal("travelBonfireManaCost", costHtml, "innerHTML");
         view.updateVal("base_bonfire_clone_btn", !canAfford, "classList.toggle", "bonfire-clone-btn--unaffordable");
         view.updateVal("travelBonfireLaunchBtn", !canAfford, "classList.toggle", "bonfire-clone-btn--unaffordable");
         const stored = data.battle && data.battle.cloneRunSettings;
@@ -1235,8 +1260,8 @@ let view = {
         const progress = lib.researchTaskProgress || 0;
         const required = lib.researchTaskRequired || 10;
         const remain = Math.max(0, required - progress);
-        view.updateVal("scrollArchivesResearchProgressText", round1(progress));
-        view.updateVal("scrollArchivesResearchRequiredText", round1(required));
+        view.updateVal("scrollArchivesResearchProgressText", round1Fixed(progress));
+        view.updateVal("scrollArchivesResearchRequiredText", round1Fixed(required));
         view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
         if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
             view.updateEtaText("scrollArchivesResearchEtaText", remain, gainedRate);
@@ -1404,7 +1429,7 @@ let view = {
             const etaText = (!lib.researchPaused && gainedRate > 0 && remain > 0)
                 ? secondsToTime(remain / gainedRate)
                 : "—";
-            prodText += `<br>Research: ${round1(progress)} / ${round1(required)} · ETA: ${etaText} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
+            prodText += `<br>Research: ${round1Fixed(progress)} / ${round1(required)} · ETA: ${etaText} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
             if (lib.researchPaused) {
                 prodText += "<br>Paused - need more coins, star beads, or mana";
             }
@@ -1572,6 +1597,7 @@ let view = {
             if (building) {
                 view.updateVal(`foxDenSlot_${uk}`, view.gpuTranslate(pos.x, pos.y, "translate(-50%, -50%)"), "style.transform");
                 view.updateVal(`foxDenSlotPct_${uk}`, `${resortData.getConstructionPercent(site)}%`);
+                view.bindConstructionSlotTip(uk);
             }
             const mapBtnKey = `baseBuilding_${uk}`;
             const mapBtn = viewData.cached[mapBtnKey];
@@ -1593,6 +1619,7 @@ let view = {
                 view.updateVal(progressKey, unlocked && !building ? "" : "none", "style.display");
             }
         }
+        view.refreshConstructionMouseTip();
     },
     updateFoxDenCarriers: function() {
         const rh = data.progress.base.foxDen;
@@ -1825,12 +1852,12 @@ let view = {
         view.updateVal("manaFill", `${pct}%`, "style.width");
         view.updateVal("manaAmount", amount, "textContent", "floor");
         view.updateVal("manaCap", cap, "textContent", "manaCap");
-        view.updateVal("manaRate", round1(rate), "textContent");
+        view.updateVal("manaRate", round1Fixed(rate), "textContent");
         const lib = data.progress.base && data.progress.base.scrollArchives;
         const researchRate = typeof engine.getScrollArchivesResearchRate === "function" ? engine.getScrollArchivesResearchRate() : 0;
         const researching = researchRate > 0 && lib && !lib.researchPaused;
         const drain = researching ? researchRate * 10 : 0;
-        view.updateVal("manaRateArchiveDrain", researching ? ` (-${round1(drain)}/s)` : "");
+        view.updateVal("manaRateArchiveDrain", researching ? ` (-${round1Fixed(drain)}/s)` : "");
         const remainMana = Math.max(0, cap - amount);
         const netRate = rate - drain;
         view.updateEtaText("manaEtaText", remainMana, netRate);
@@ -1849,7 +1876,7 @@ let view = {
         view.updateVal("divinityFill", `${pct}%`, "style.width");
         view.updateVal("divinityAmount", amount, "textContent", "floor");
         view.updateVal("divinityCap", cap, "textContent", "floor");
-        view.updateVal("divinityRate", round1(rate), "textContent");
+        view.updateVal("divinityRate", round1Fixed(rate), "textContent");
     },
     updateBuildingManaRow: function(buildingKey) {
         const visible = engine.isBuildingManaRowVisible(buildingKey);
@@ -2322,47 +2349,53 @@ let view = {
         }
         view.showFoxDenQueueTip();
     },
+    positionResortMapMouseTip: function(tip, e) {
+        const map = viewData.cached.baseResortMap || document.getElementById("baseResortMap");
+        if (!map || !tip || !e) {
+            return;
+        }
+        const rect = map.getBoundingClientRect();
+        const mapX = e.clientX - rect.left;
+        const mapY = e.clientY - rect.top;
+        let pondX = 439;
+        const pond = viewData.cached.baseBuilding_pond || document.getElementById("baseBuilding_pond");
+        if (pond) {
+            const pondRect = pond.getBoundingClientRect();
+            if (pondRect.width > 0) {
+                pondX = pondRect.left - rect.left;
+            }
+        }
+        let left = mapX + 12;
+        if (mapX > pondX) {
+            left = mapX - tip.offsetWidth - 12;
+        }
+        const maxLeft = Math.max(4, rect.width - tip.offsetWidth - 4);
+        if (left < 4) {
+            left = 4;
+        } else if (left > maxLeft) {
+            left = maxLeft;
+        }
+        tip.style.left = `${left}px`;
+        tip.style.top = `${mapY + 12}px`;
+    },
     bindDirtRoadTipEvents: function(hit) {
         if (!hit || hit._dirtRoadTipBound) {
             return;
         }
         hit._dirtRoadTipBound = true;
         hit.addEventListener("mousemove", function(e) {
-            const map = viewData.cached.baseResortMap || document.getElementById("baseResortMap");
             const tip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
             const hotspot = hit.parentElement;
-            if (!map || !tip || !hotspot) {
+            if (!tip || !hotspot) {
                 return;
             }
-            const rect = map.getBoundingClientRect();
             const html = hotspot._dirtRoadTipHtml || "";
             if (tip._dirtRoadTipHtml !== html) {
                 tip._dirtRoadTipHtml = html;
                 tip.innerHTML = html;
             }
             tip.style.display = "block";
-            const mapX = e.clientX - rect.left;
-            const mapY = e.clientY - rect.top;
-            let pondX = 439;
-            const pond = viewData.cached.baseBuilding_pond || document.getElementById("baseBuilding_pond");
-            if (pond) {
-                const pondRect = pond.getBoundingClientRect();
-                if (pondRect.width > 0) {
-                    pondX = pondRect.left - rect.left;
-                }
-            }
-            let left = mapX + 12;
-            if (mapX > pondX) {
-                left = mapX - tip.offsetWidth - 12;
-            }
-            const maxLeft = Math.max(4, rect.width - tip.offsetWidth - 4);
-            if (left < 4) {
-                left = 4;
-            } else if (left > maxLeft) {
-                left = maxLeft;
-            }
-            tip.style.left = `${left}px`;
-            tip.style.top = `${mapY + 12}px`;
+            view.positionResortMapMouseTip(tip, e);
         });
         hit.addEventListener("mouseleave", function() {
             const tip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
@@ -2370,6 +2403,68 @@ let view = {
                 tip.style.display = "none";
             }
         });
+    },
+    getConstructionSiteTipHtml: function(unlockKey) {
+        const site = engine.getFoxDenConstructionSite(unlockKey);
+        if (!site || site.status !== "building") {
+            return "";
+        }
+        const def = resortData.foxDenUnlockGetDef(unlockKey);
+        const name = (def && def.label) || unlockKey;
+        const progress = resortData.collectedProgressLabel(site.delivered, site.required);
+        const paused = site.paused ? " (paused)" : "";
+        return `${name}${paused}<br>${progress}`;
+    },
+    bindConstructionSlotTip: function(unlockKey) {
+        const slot = viewData.cached[`foxDenSlot_${unlockKey}`] || document.getElementById(`foxDenSlot_${unlockKey}`);
+        if (!slot || slot._constructionTipBound) {
+            return;
+        }
+        slot._constructionTipBound = true;
+        slot._constructionUnlockKey = unlockKey;
+        slot.addEventListener("mousemove", function(e) {
+            const tip = viewData.cached.constructionMouseTip || document.getElementById("constructionMouseTip");
+            if (!tip) {
+                return;
+            }
+            const key = slot._constructionUnlockKey;
+            const html = view.getConstructionSiteTipHtml(key);
+            if (!html) {
+                tip.style.display = "none";
+                tip._constructionUnlockKey = null;
+                return;
+            }
+            tip._constructionUnlockKey = key;
+            if (tip._constructionTipHtml !== html) {
+                tip._constructionTipHtml = html;
+                tip.innerHTML = html;
+            }
+            tip.style.display = "block";
+            view.positionResortMapMouseTip(tip, e);
+        });
+        slot.addEventListener("mouseleave", function() {
+            const tip = viewData.cached.constructionMouseTip || document.getElementById("constructionMouseTip");
+            if (tip) {
+                tip.style.display = "none";
+                tip._constructionUnlockKey = null;
+            }
+        });
+    },
+    refreshConstructionMouseTip: function() {
+        const tip = viewData.cached.constructionMouseTip || document.getElementById("constructionMouseTip");
+        if (!tip || tip.style.display === "none" || !tip._constructionUnlockKey) {
+            return;
+        }
+        const html = view.getConstructionSiteTipHtml(tip._constructionUnlockKey);
+        if (!html) {
+            tip.style.display = "none";
+            tip._constructionUnlockKey = null;
+            return;
+        }
+        if (tip._constructionTipHtml !== html) {
+            tip._constructionTipHtml = html;
+            tip.innerHTML = html;
+        }
     },
     updateResortMapProgressBars: function() {
         const base = data.progress.base || {};
@@ -2517,13 +2612,13 @@ let view = {
         view.updateVal("noodleBarNoodlesText", intToStringRound((market && market.driedNoodles) || 0));
         const noodleCap = engine.getNoodleBarHotWaterCapacity();
         const noodleWater = bar.hotWater || 0;
-        view.updateVal("noodleBarHotWaterText", `Hot Water: ${round1(noodleWater)}/${noodleCap}`);
+        view.updateVal("noodleBarHotWaterText", `Hot Water: ${round1Fixed(noodleWater)}/${noodleCap}`);
         view.updateVal("noodleBarHotWaterFill", noodleCap > 0 ? `${Math.max(0, Math.min(100, (noodleWater / noodleCap) * 100))}%` : "0%", "style.width");
         view.syncAllowCarriersWaterCheckbox("noodleBar", engine.isNoodleBarBuilt());
         view.updateVal("noodleBarEatRestBonusText", engine.getNoodleEatRestBonus());
         view.updateVal("noodleBarGuestsEatingText", engine.countGuestsEatingNoodles(), "textContent", "floor");
         const shown = Math.min(100, Math.max(0, bar.tipProgress || 0));
-        view.updateVal("noodleTipProgressText", round1(shown));
+        view.updateVal("noodleTipProgressText", round1Fixed(shown));
         view.updateVal("noodleTipProgressFill", `${shown}%`, "style.width");
         view.updateVal("noodleTipLast_row", bar.lastTipText || "");
         view.updateVal("noodleTipLast_row", bar.lastTipText ? "" : "none", "style.display");
@@ -2595,12 +2690,12 @@ let view = {
         const pondBuilt = typeof engine.isPondBuiltFromFoxDen === "function" && engine.isPondBuiltFromFoxDen();
         view.updateVal("bambooForestWater_row", pondBuilt ? "" : "none", "style.display");
         if (pondBuilt) {
-            view.updateVal("bambooForestWaterText", `${round1(bf.water || 0)}L`);
+            view.updateVal("bambooForestWaterText", `${round1Fixed(bf.water || 0)}L`);
         }
         const marketBuiltForest = engine.isMarketBuilt();
         view.updateVal("bambooForestFertilizer_row", marketBuiltForest ? "" : "none", "style.display");
         if (marketBuiltForest) {
-            view.updateVal("bambooForestFertilizerText", round1(engine.getMarketGoodAmount("fertilizer")));
+            view.updateVal("bambooForestFertilizerText", round1Fixed(engine.getMarketGoodAmount("fertilizer")));
         }
         const torii = data.progress.base && data.progress.base.torii;
         view.updateVal("bambooTagline_row", (torii && (torii.plantSpiritsBought || 0) > 0) ? "" : "none", "style.display");
@@ -2863,8 +2958,9 @@ let view = {
         const heatBonusPct = engine.getFireLauncherHeatBonusPct(key);
         view.updateVal("fireLauncherInfoTitle", def.name);
         view.updateVal("fireLauncherInfoType", attackLabel);
-        view.updateVal("fireLauncherInfoEmbers", round1(state ? state.embers || 0 : 0));
+        view.updateVal("fireLauncherInfoEmbers", round1Fixed(state ? state.embers || 0 : 0));
         view.updateVal("fireLauncherInfoEmbersCap", engine.getFireLauncherMaxEmbers(key));
+        view.updateVal("fireLauncherInfoEmbersRequire", spirit ? "none" : "", "style.display");
         view.updateVal("fireLauncherInfoRange", rangePx);
         view.updateVal("fireLauncherInfoRangeBonus", rangeBonusPct > 0 ? ` (+${rangeBonusPct}%)` : "");
         view.updateVal("fireLauncherInfoInterval", intervalStr);
@@ -2966,8 +3062,8 @@ let view = {
             view.updateVal(`guestItineraryLine_${li}`, "", "style.display");
         }
         const range = engine.getExpectedGuestStarBeadsRange();
-        view.updateVal("guestStarBeadsMin", round1(range.min));
-        view.updateVal("guestStarBeadsMax", round1(range.max));
+        view.updateVal("guestStarBeadsMin", round1Fixed(range.min));
+        view.updateVal("guestStarBeadsMax", round1Fixed(range.max));
     },
     updateGuestsList: function() {
         const guests = (data.progress.base && data.progress.base.inn && data.progress.base.inn.guests) || [];
@@ -3106,7 +3202,7 @@ let view = {
         const trainingBought = engine.isSpiritTrainingSpotBought();
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
-        view.updateVal("spiritInfoTraining", round1(spirit.training || 0));
+        view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
         view.updateVal("spiritInfoTrainingNote", atTraining ? "" : "none", "style.display");
         if (atTraining && engine.getSpiritTrainingCardEffects) {
             const trainFx = engine.getSpiritTrainingCardEffects();
@@ -3147,6 +3243,22 @@ let view = {
                     digChk.checked = spirit.autoReturnToMine !== false;
                 }
             }
+            const spiritPebbles = engine.getPebblesForSpirit(spirit.id);
+            if (spiritPebbles.length > 0) {
+                const etaLines = [];
+                for (let pei = 0; pei < spiritPebbles.length; pei++) {
+                    const peb = spiritPebbles[pei];
+                    const etaSec = engine.estimatePebbleTravelSeconds(peb);
+                    const payload = engine.formatPebblePayloadLabel(peb);
+                    const label = payload ? `Pebble ${pei + 1} (${payload})` : `Pebble ${pei + 1}`;
+                    etaLines.push(`${label} ETA: ${secondsToTime(etaSec)}`);
+                }
+                view.updateVal("spiritInfoPebbleEtas", etaLines.join("<br>"), "innerHTML");
+                view.updateVal("spiritInfoPebbleEtas", "", "style.display");
+            } else {
+                view.updateVal("spiritInfoPebbleEtas", "none", "style.display");
+                view.updateVal("spiritInfoPebbleEtas", "", "innerHTML");
+            }
             if (atHiddenSpring) {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
                 const task = engine.getEarthSpiritPebbleTaskInfo(spirit);
@@ -3157,10 +3269,13 @@ let view = {
                 view.updateVal("spiritInfoTaskText", engine.isMineCleared() ? "Playing in the Dirt" : "Mining...");
             }
         } else if (kind === "water") {
+            view.updateVal("spiritInfoPebbleEtas", "none", "style.display");
             if (spirit.location === "pond") {
                 view.updateVal("spiritInfoWaterVolume", "-");
                 view.updateVal("spiritInfoHeat", "-");
                 view.updateVal("spiritInfoEssence", "-");
+                view.updateVal("spiritInfoDropletEtas", "none", "style.display");
+                view.updateVal("spiritInfoDropletEtas", "", "innerHTML");
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
                 const pond = data.progress.base.pond || {};
                 const pondWater = pond.waterVolume || 0;
@@ -3170,13 +3285,26 @@ let view = {
                     : "playing at pond (pond is empty)");
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
-                const droplet = engine.getDropletForSpirit(spirit.id);
-                if (droplet) {
+                const spiritDroplets = engine.getDropletsForSpirit(spirit.id);
+                if (spiritDroplets.length > 0) {
+                    const droplet = spiritDroplets[0];
                     view.updateVal("spiritInfoWaterVolume", `${round2(droplet.waterVolume || 0)}L`);
-                    view.updateVal("spiritInfoHeat", `${round1(droplet.heat || 0)}C`);
+                    view.updateVal("spiritInfoHeat", `${round1Fixed(droplet.heat || 0)}C`);
                     view.updateVal("spiritInfoEssence", round2(droplet.essence || 0));
                     view.updateVal("spiritInfoTaskText", "droplet active");
                     view.updateVal("spiritInfoTaskFill", "100%", "style.width");
+                    const dEtaLines = [];
+                    for (let dei = 0; dei < spiritDroplets.length; dei++) {
+                        const drop = spiritDroplets[dei];
+                        const dEta = engine.estimateDropletTravelSeconds(drop);
+                        const volLabel = `${intToStringRound(drop.waterVolume || 0)}L`;
+                        const label = spiritDroplets.length > 1
+                            ? `Droplet ${dei + 1} (${volLabel})`
+                            : `Droplet (${volLabel})`;
+                        dEtaLines.push(`${label} ETA: ${secondsToTime(dEta)}`);
+                    }
+                    view.updateVal("spiritInfoDropletEtas", dEtaLines.join("<br>"), "innerHTML");
+                    view.updateVal("spiritInfoDropletEtas", "", "style.display");
                 } else {
                     const formingVol = engine.getWaterDropletVolumeForSpirit(spirit);
                     view.updateVal("spiritInfoWaterVolume", `${round2(formingVol)}L`);
@@ -3185,6 +3313,8 @@ let view = {
                     const task = engine.getWaterSpiritDropletTaskInfo(spirit);
                     view.updateVal("spiritInfoTaskText", task.text);
                     view.updateVal("spiritInfoTaskFill", `${task.pct}%`, "style.width");
+                    view.updateVal("spiritInfoDropletEtas", "none", "style.display");
+                    view.updateVal("spiritInfoDropletEtas", "", "innerHTML");
                 }
             }
         } else if (kind === "fire") {
@@ -3201,7 +3331,7 @@ let view = {
                 data.progress.selectedFireLauncherKey = launcherKey;
                 view.updateVal("spiritInfoFireLauncherExtras", "", "style.display");
                 view.updateVal("spiritInfoFireLauncherName", def ? def.name : "Fire Launcher");
-                view.updateVal("spiritInfoFireLauncherEmbers", round1(embers));
+                view.updateVal("spiritInfoFireLauncherEmbers", round1Fixed(embers));
                 view.updateVal("spiritInfoFireLauncherEmbersCap", maxEmbers);
                 if (def) {
                     const intervalSec = def.intervalMs / 1000;
@@ -3217,7 +3347,7 @@ let view = {
                 view.updateVal("spiritInfoFireNote", def
                     ? `Powering ${def.name} (+${round2(regenRate)} embers/s).`
                     : "Assigned to fire launcher.");
-                view.updateVal("spiritInfoTaskText", `charging embers (${round1(embers)}/${maxEmbers})`);
+                view.updateVal("spiritInfoTaskText", `charging embers (${round1Fixed(embers)}/${maxEmbers})`);
                 const pct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
@@ -3256,7 +3386,7 @@ let view = {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
                 const ms = spirit.trainingTimerMs || 0;
                 const pct = Math.max(0, Math.min(100, (ms / 60000) * 100));
-                view.updateVal("spiritInfoTaskText", `Training (${round1(ms / 1000)}/60s)`);
+                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/60s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
@@ -3428,7 +3558,7 @@ let view = {
             view.syncAllowCarriersWaterCheckbox("torii", bowl);
             if (bowl) {
                 const toriiWater = torii.water || 0;
-                view.updateVal("toriiWaterText", `Hot Water: ${round1(toriiWater)}/${toriiWaterCap}`);
+                view.updateVal("toriiWaterText", `Hot Water: ${round1Fixed(toriiWater)}/${toriiWaterCap}`);
                 view.updateVal("toriiWaterFill", toriiWaterCap > 0 ? `${Math.max(0, Math.min(100, (toriiWater / toriiWaterCap) * 100))}%` : "0%", "style.width");
             }
             this.updateResortWorkerControls("torii", toriiRate > 0);
@@ -3470,7 +3600,7 @@ let view = {
             if (onsen) {
                 const hot = inn.hotWater || 0;
                 const hotCap = engine.getInnHotWaterCapacity();
-                view.updateVal("innHotWaterText", `Hot Water: ${round1(hot)}/${hotCap}`);
+                view.updateVal("innHotWaterText", `Hot Water: ${round1Fixed(hot)}/${hotCap}`);
                 view.updateVal("innHotWaterFill", hotCap > 0 ? `${Math.max(0, Math.min(100, (hot / hotCap) * 100))}%` : "0%", "style.width");
             }
             const marketBuiltInn = engine.isMarketBuilt();
@@ -3612,7 +3742,7 @@ let view = {
             const maxCap = engine.getCisternMaxCapacity();
             const curVol = cistern.waterVolume || 0;
             view.updateVal("cisternInfoWater", `${round2(curVol)}L`);
-            view.updateVal("cisternInfoTemperature", `${round1(cistern.temperature || 0)}C`);
+            view.updateVal("cisternInfoTemperature", `${round1Fixed(cistern.temperature || 0)}C`);
             const launcherBuilt = !!((base.atelier && base.atelier.fireLaunchersBought) >= 1);
             view.updateVal("cisternInfoEssence_row", launcherBuilt ? "" : "none", "style.display");
             if (launcherBuilt) {
@@ -3622,7 +3752,11 @@ let view = {
             const wellCoins = engine.getWishingWellCoinRate ? engine.getWishingWellCoinRate() : 0;
             view.updateVal("cisternWishingWell_row", wellCoins > 0 ? "" : "none", "style.display");
             view.updateVal("cisternWishingWellCoins", wellCoins > 0 ? wellCoins.toFixed(1) : "");
-            view.updateVal("cisternWaterCarry", resortData.getCisternWaterCarryAmount());
+            const waterCarryVisible = engine.cisternWorkersRevealed();
+            view.updateVal("cisternWaterCarry_row", waterCarryVisible ? "" : "none", "style.display");
+            if (waterCarryVisible) {
+                view.updateVal("cisternWaterCarry", resortData.getCisternWaterCarryAmount());
+            }
             const garden = base.garden || {};
             const thirstUnlocked = !!garden.arrangementOfThirstUnlocked;
             view.updateVal("cisternRefuseWater_row", thirstUnlocked ? "" : "none", "style.display");
@@ -4417,9 +4551,9 @@ let view = {
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
         view.updateVal("skillInfo_initial_exp_shards", `Initial exp from shards: ${intToStringRound(skill.shards || 0)}`);
         view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}`);
-        view.updateVal("skillInfo_exp_text", `${round1(skill.exp)} / ${round1(skill.expToLevel)}`);
+        view.updateVal("skillInfo_exp_text", `${round1Fixed(skill.exp)} / ${round1Fixed(skill.expToLevel)}`);
         view.updateVal("skillInfo_exp_fill", `${expPct}%`, "style.width");
-        view.updateVal("skillInfo_talent_text", `${round1(skill.talent)} / ${round1(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
+        view.updateVal("skillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
         view.updateVal("skillInfo_talent_fill", `${talPct}%`, "style.width");
         const starMult = parts.starMult || 1;
         view.updateVal("skillInfo_star_effect_row", starMult > 1 ? "" : "none", "style.display");

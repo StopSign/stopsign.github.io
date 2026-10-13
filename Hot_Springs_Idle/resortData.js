@@ -4449,6 +4449,12 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return Math.floor(engine.getOrbBuildWallsBought() / 4);
                     },
+                    getPurchaseCount: function() {
+                        return engine.getOrbBuildWallsBought();
+                    },
+                    getMaxPurchases: function() {
+                        return 4 + 4 * engine.getOrbMaxFloors();
+                    },
                     canBuy: function() {
                         return engine.getOrbBuildWallsBought() < engine.getOrbBuildWallsMax();
                     },
@@ -4483,6 +4489,9 @@ var resortData = {
                     weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
                         return engine.getOrbBuildStairsBought();
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getOrbMaxFloors();
                     },
                     canBuy: function() {
                         return engine.getOrbBuildStairsBought() < engine.getOrbBuildStairsMax();
@@ -4522,6 +4531,9 @@ var resortData = {
                     weavingTimeIncreaseAdd: 90,
                     getWeavingPurchaseIndex: function() {
                         return engine.getOrbBuildFloorBought();
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getOrbMaxFloors();
                     },
                     canBuy: function() {
                         return engine.getOrbBuildFloorBought() < engine.getOrbBuildFloorMax();

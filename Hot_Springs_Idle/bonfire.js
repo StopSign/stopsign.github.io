@@ -121,6 +121,11 @@ var bonfire = {
         return `${intToStringRound(manaCost)} mana`;
     },
 
+    /** Upgrade-parity HTML: green when affordable, red when over mana capacity. */
+    formatCloneCostHtml: function(manaCost) {
+        return resortData.formatCostAmountHtml(manaCost, "mana", "mana");
+    },
+
     getEffectiveClonePlan: function() {
         const density = bonfire.getCloneDensity();
         return {
@@ -178,6 +183,10 @@ var bonfire = {
     },
 
     shouldUseLiveCloneSettings: function() {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || !bf.denseClonesUnlocked) {
+            return true;
+        }
         if (bonfire.isApplyLiveSettingsToNextClone()) {
             return true;
         }

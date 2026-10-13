@@ -91,6 +91,7 @@
                     <svg id="dirtRoadLayer" class="dirt-road-svg" aria-hidden="true"></svg>
                     <div id="dirtRoadHoverLayer" class="dirt-road-hover-layer"></div>
                     <div id="dirtRoadMouseTip" class="dirt-road-mouse-tip" style="display:none"></div>
+                    <div id="constructionMouseTip" class="dirt-road-mouse-tip" style="display:none"></div>
                     <div id="foxDenQueueTip" class="dirt-road-mouse-tip" style="display:none"></div>
                     <button id="baseBuilding_foxDen" class="base-building-label resort-building-label resort-building-map-btn resort-building-fox-den" onclick="events.selectBaseBuilding('foxDen')">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
@@ -355,6 +356,9 @@
                 <label class="options-row"><input type="radio" id="numberTypeSuffix" name="numberType" value="numberSuffix" onchange="events.setNumberType('numberSuffix')"> Suffix (1.23K)</label>
                 <label class="options-row"><input type="radio" id="numberTypeScientific" name="numberType" value="scientific" onchange="events.setNumberType('scientific')"> Scientific</label>
                 <label class="options-row"><input type="radio" id="numberTypeEngineering" name="numberType" value="engineering" onchange="events.setNumberType('engineering')"> Engineering</label>
+                <div class="options-row options-separator"></div>
+                <label class="options-row"><input type="radio" id="offlineModeCatchUp" name="offlineProgressMode" value="catchUp" onchange="events.setOfflineProgressMode('catchUp')" checked> Keep game running offline (100% speed up to 24hrs)</label>
+                <label class="options-row"><input type="radio" id="offlineModePauseBonus" name="offlineProgressMode" value="pauseBonus" onchange="events.setOfflineProgressMode('pauseBonus')"> Pause game while offline, gain 1 minute of x2 speed every 5 minutes, up to 6 hours bonus</label>
             </div>
         </div>
     </div>
@@ -432,6 +436,8 @@
 <div id="debugSpeedPanel" class="debug-speed-panel" style="display:none">
     <button id="debugSpeed_x3" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(3)">x3</button>
     <button id="debugSpeed_x10" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(10)">x10</button>
+    <span id="bonusSpeedLabel" class="debug-speed-label" style="display:none">Bonus Time <span id="bonusSpeedRemaining" class="muted-text"></span></span>
+    <button id="bonusSpeed_x2" class="button debug-speed-btn" type="button" style="display:none" onclick="events.toggleBonusGameSpeed(2)">x2</button>
 </div>
 
 <div id="prestigePackOverlay" style="display:none;">

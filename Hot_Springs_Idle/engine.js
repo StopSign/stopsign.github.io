@@ -6384,14 +6384,27 @@ let engine = {
         }
     },
     countPebblesForSpirit: function(spiritId) {
+        return engine.getPebblesForSpirit(spiritId).length;
+    },
+    getPebblesForSpirit: function(spiritId) {
         const pebbles = (data.progress.base && data.progress.base.pebbles) || [];
-        let count = 0;
+        const out = [];
         for (let i = 0; i < pebbles.length; i++) {
             if (pebbles[i].spiritId === spiritId) {
-                count++;
+                out.push(pebbles[i]);
             }
         }
-        return count;
+        return out;
+    },
+    getDropletsForSpirit: function(spiritId) {
+        const droplets = (data.progress.base && data.progress.base.droplets) || [];
+        const out = [];
+        for (let i = 0; i < droplets.length; i++) {
+            if (droplets[i].spiritId === spiritId) {
+                out.push(droplets[i]);
+            }
+        }
+        return out;
     },
     createPebbleForSpirit: function(spiritId) {
         const base = data.progress.base;
@@ -6448,17 +6461,13 @@ let engine = {
         if (!pebbles) {
             return;
         }
-        const speed = 35;
         const distance = engine.getResortPathTotalDistance();
         const dtSec = tickMs / 1000;
+        const speedOpts = engine.getPebbleTravelSpeedOpts();
         const next = [];
         for (let i = 0; i < pebbles.length; i++) {
             const pebble = pebbles[i];
-            pebble.pathProgress = engine.advancePathProgress(pebble.pathProgress || 0, dtSec, 1, {
-                baseSpeed: speed,
-                getSegmentMult: engine.getPathSegmentSpeedMultiplier,
-                maxProgress: distance
-            });
+            pebble.pathProgress = engine.advancePathProgress(pebble.pathProgress || 0, dtSec, 1, speedOpts);
             if (pebble.pathProgress >= distance) {
                 const stoneAmt = engine.getPebblePayloadStone(pebble);
                 const oreAmt = engine.getPebblePayloadOre(pebble);
@@ -6653,10 +6662,9 @@ let engine = {
         if (!droplets || !droplets.length) {
             return;
         }
-        const pebbleSpeed = 35;
-        const speed = pebbleSpeed * 1.5;
         const distance = engine.getResortPathTotalDistance();
         const sec = tickMs / 1000;
+        const speedOpts = engine.getDropletTravelSpeedOpts();
         const next = [];
         for (let i = 0; i < droplets.length; i++) {
             const d = droplets[i];
@@ -6664,11 +6672,7 @@ let engine = {
             if (heat > 0) {
                 d.heat = Math.max(0, heat - (heat * 0.02 * sec));
             }
-            d.pathProgress = engine.advancePathProgress(d.pathProgress || 0, sec, 1, {
-                baseSpeed: speed,
-                getSegmentMult: engine.getDropletPathSegmentSpeedMultiplier,
-                maxProgress: distance
-            });
+            d.pathProgress = engine.advancePathProgress(d.pathProgress || 0, sec, 1, speedOpts);
             if (d.pathProgress >= distance) {
                 engine.completeDropletDelivery(d);
             } else {
@@ -7569,6 +7573,68 @@ let engine = {
         return engine.getOkamiPathSegmentSpeedMultForIndex(
             engine.getPathSegmentIndexAtProgress(pathProgress)
         );
+    },
+    /** Seconds remaining to reach maxProgress from pathProgress, honoring per-segment speed mults. */
+    estimatePathTravelSeconds: function(pathProgress, opts) {
+        const o = opts || {};
+        const baseSpeed = o.baseSpeed;
+        const getSegmentMult = o.getSegmentMult;
+        if (!baseSpeed || !getSegmentMult) {
+            return 0;
+        }
+        const totalDist = engine.getResortPathTotalDistance();
+        const maxP = o.maxProgress !== undefined ? o.maxProgress : totalDist;
+        let p = Math.max(0, Math.min(maxP, pathProgress || 0));
+        if (p >= maxP - 1e-9) {
+            return 0;
+        }
+        const specs = engine.getResortPathSegmentSpecs();
+        let timeSec = 0;
+        const maxSteps = specs.length + 2;
+        for (let step = 0; step < maxSteps && p < maxP - 1e-9; step++) {
+            const segIdx = engine.getPathSegmentIndexAtProgress(p);
+            const spec = specs[segIdx];
+            if (!spec) {
+                break;
+            }
+            const mult = getSegmentMult(segIdx);
+            const speed = baseSpeed * mult;
+            if (speed <= 0) {
+                return Infinity;
+            }
+            const end = Math.min(spec.endDist, maxP);
+            let toEdge = end - p;
+            if (toEdge <= 1e-9) {
+                p = Math.min(maxP, spec.endDist + 1e-9);
+                continue;
+            }
+            timeSec += toEdge / speed;
+            p = end;
+            if (p >= maxP - 1e-9) {
+                break;
+            }
+            p = Math.min(maxP, end + 1e-9);
+        }
+        return timeSec;
+    },
+    getPebbleTravelSpeedOpts: function() {
+        return {
+            baseSpeed: 35,
+            getSegmentMult: engine.getPathSegmentSpeedMultiplier,
+            maxProgress: engine.getResortPathTotalDistance()
+        };
+    },
+    estimatePebbleTravelSeconds: function(pebble) {
+        if (!pebble) {
+            return 0;
+        }
+        return engine.estimatePathTravelSeconds(pebble.pathProgress || 0, engine.getPebbleTravelSpeedOpts());
+    },
+    estimateDropletTravelSeconds: function(droplet) {
+        if (!droplet) {
+            return 0;
+        }
+        return engine.estimatePathTravelSeconds(droplet.pathProgress || 0, engine.getDropletTravelSpeedOpts());
     },
     /** Integrate pathProgress over dtSec, applying per-segment speed mult at each boundary crossed. */
     advancePathProgress: function(pathProgress, dtSec, direction, opts) {

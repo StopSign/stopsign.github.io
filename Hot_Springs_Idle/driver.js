@@ -27,8 +27,17 @@ let driver = {
         if (data.lastVisit) {
             const offlineMilliseconds = Date.now() - parseInt(data.lastVisit, 10);
             if (offlineMilliseconds >= OFFLINE_MIN_PROCESS_MS) {
-                offline.addPendingOfflineMs(offlineMilliseconds);
-                console.log(`Welcome back! ${((data.currentGameState.pendingOfflineMs || 0) / 1000).toFixed(1)}s pending offline to process.`);
+                if (typeof offline !== "undefined" && offline.isPauseBonusMode && offline.isPauseBonusMode()) {
+                    data.currentGameState.pendingOfflineMs = 0;
+                    const gained = offline.convertOfflineMsToBonus(offlineMilliseconds);
+                    if (gained > 0) {
+                        offline.pendingBonusGainMsgMs = gained;
+                        console.log(`Welcome back! Banked ${offline.formatDuration(gained)} bonus time.`);
+                    }
+                } else {
+                    offline.addPendingOfflineMs(offlineMilliseconds);
+                    console.log(`Welcome back! ${((data.currentGameState.pendingOfflineMs || 0) / 1000).toFixed(1)}s pending offline to process.`);
+                }
             }
         }
     },
@@ -81,7 +90,16 @@ let driver = {
     initTimingSystem: async function() {
         driver.checkOfflineProgress();
 
-        if ((data.currentGameState.pendingOfflineMs || 0) >= OFFLINE_MIN_PROCESS_MS) {
+        if (typeof offline !== "undefined" && offline.isPauseBonusMode && offline.isPauseBonusMode()) {
+            data.currentGameState.pendingOfflineMs = 0;
+            if (offline.pendingBonusGainMsgMs > 0) {
+                offline.showBonusGainMessage(offline.pendingBonusGainMsgMs);
+                offline.pendingBonusGainMsgMs = 0;
+            }
+            if (typeof view !== "undefined" && view.updateDebugSpeedButtons) {
+                view.updateDebugSpeedButtons();
+            }
+        } else if ((data.currentGameState.pendingOfflineMs || 0) >= OFFLINE_MIN_PROCESS_MS) {
             await offline.process();
         } else if (data.currentGameState.pendingOfflineMs) {
             data.currentGameState.pendingOfflineMs = 0;

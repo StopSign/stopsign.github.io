@@ -20,3 +20,4 @@ You are assisting with a vanilla JavaScript idle game. Follow these strict archi
 19. NO DEFENSIVE EARLY EXITS: Do not add `if (missingOrInvalid) { return; }` (or `continue`) solely to avoid errors from game-owned state or cached DOM ids. Do not add `throw new Error` or extra `console` for that either. Prefer deleting such guards and accessing the real object so mistakes show up as normal runtime failures in devtools.
 20. NO "ENSURE" METHODS: Data should be created in initialize() on load and assumed to exist from there, not double-checked for validity with "ensure" type methods
 21. SKIP THE BROWSER CHECK: Do not attempt to run a browser check to test the result.
+22. DO NOT ADD CHANGELOG AUTOMATICALLY: I will manually add text for the changelog, do not add it yourself.

@@ -214,7 +214,7 @@ mapData.getDefaultMaps = function() {
             description: "Seeking to whistle at the rumored beauties in the mist, they will take a good beating before giving up.",
             seed: 21888,
             baseDifficulty: 10,
-            unlocksAfterMapKey: "map_8",
+            unlocksAfterMapKey: "map_9",
             zones: [
                 mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5, 140),
                 mapData.createZone(3, "lecher", 12000, 100, 1.3, 1.25, 160),

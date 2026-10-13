@@ -314,6 +314,22 @@ let onLoad = {
         data.gameSettings.gameSpeed = 1;
         data.gameSettings.debugSpeedMultiplier = 0;
         data.gameSettings.stop = false;
+        if (data.gameSettings.offlineProgressMode !== "catchUp" && data.gameSettings.offlineProgressMode !== "pauseBonus") {
+            data.gameSettings.offlineProgressMode = "catchUp";
+        }
+        // Bonus x2 stays on across load when bank remains; otherwise force off
+        if (!data.currentGameState.bonusTime || data.currentGameState.bonusTime <= 0) {
+            data.currentGameState.bonusTime = 0;
+            data.gameSettings.bonusSpeed = 1;
+        } else if ((data.gameSettings.bonusSpeed || 1) > 1) {
+            // Mutually exclusive with debug speeds (already cleared above)
+            data.gameSettings.bonusSpeed = 2;
+        } else {
+            data.gameSettings.bonusSpeed = 1;
+        }
+        if (typeof BONUS_TIME_CAP_MS !== "undefined" && data.currentGameState.bonusTime > BONUS_TIME_CAP_MS) {
+            data.currentGameState.bonusTime = BONUS_TIME_CAP_MS;
+        }
 
         data.progress = toLoad.progress ?? initials.progress();
         data.battle = toLoad.battle ?? initials.battle();
