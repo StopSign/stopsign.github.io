@@ -2103,7 +2103,7 @@ let engine = {
         if (engine.isPlayerAtOrBelowAudFraction(0.5)) {
             engine.addSkillExp("underdog", 1);
         }
-        if (target && (target.aud / Math.max(1, target.maxAud || 1)) < 0.5) {
+        if (priorHits > 0) {
             engine.addSkillExp("closingArgument", 1);
         }
     },
@@ -4116,7 +4116,7 @@ let engine = {
         if (!pile) {
             return 0;
         }
-        return (pile.stone || 0) + (pile.usedStone || 0) + (pile.dupedStone || 0);
+        return (pile.stone || 0) + (pile.dupedStone || 0);
     },
     isStoneCarryUnduplicatedAllowed: function() {
         const pile = data.progress.base && data.progress.base.stonePile;
@@ -4124,13 +4124,13 @@ let engine = {
     },
     deductStone: function(amount, opts) {
         const pile = data.progress.base && data.progress.base.stonePile;
-        const taken = { duped: 0, used: 0, raw: 0 };
+        const taken = { duped: 0, raw: 0 };
         if (!pile) {
             return taken;
         }
-        let left = Math.max(0, amount || 0);
+        let left = Math.floor(Math.max(0, amount || 0));
         const takeFrom = function(field, key) {
-            const n = Math.min(left, pile[field] || 0);
+            const n = Math.min(left, Math.floor(pile[field] || 0));
             if (n > 0) {
                 pile[field] = (pile[field] || 0) - n;
                 taken[key] += n;
@@ -4138,7 +4138,6 @@ let engine = {
             }
         };
         takeFrom("dupedStone", "duped");
-        takeFrom("usedStone", "used");
         if (!opts || opts.allowUnduplicated !== false) {
             takeFrom("stone", "raw");
         }
@@ -4150,8 +4149,8 @@ let engine = {
             return;
         }
         if (stoneTaken) {
-            pile.dupedStone = (pile.dupedStone || 0) + (stoneTaken.duped || 0);
-            pile.usedStone = (pile.usedStone || 0) + (stoneTaken.used || 0);
+            const dupedBack = (stoneTaken.duped || 0) + (stoneTaken.used || 0);
+            pile.dupedStone = (pile.dupedStone || 0) + dupedBack;
             pile.stone = (pile.stone || 0) + (stoneTaken.raw || 0);
             return;
         }
@@ -4184,8 +4183,7 @@ let engine = {
             if ((pile.stone || 0) >= batch.stone && (pile.mana || 0) >= batch.mana) {
                 pile.mana -= batch.mana;
                 pile.stone -= batch.stone;
-                pile.usedStone = (pile.usedStone || 0) + batch.stone;
-                pile.dupedStone = (pile.dupedStone || 0) + batch.stone;
+                pile.dupedStone = (pile.dupedStone || 0) + batch.stone * 2;
             }
             pile.dupeTimerMs += intervalMs;
         }
@@ -4307,6 +4305,23 @@ let engine = {
         }
         interval *= adMult;
         return interval;
+    },
+    /** Real seconds until the next arrival event, with mana, advertising, and worker timer reduction. */
+    getToriiAverageVisitorArrivalSeconds: function() {
+        const torii = data.progress.base && data.progress.base.torii;
+        const intervalSec = engine.getToriiVisitorIntervalMs() / 1000;
+        const workRate = engine.getSiteEffectiveWorkerRate("torii");
+        const required = (torii && torii.visitorDrawPowerRequired) || 30;
+        const reduceSec = engine.getToriiWorkerTimerReduceSeconds();
+        const reducingPerSec = required > 0 && workRate > 0 ? (reduceSec * workRate) / required : 0;
+        return intervalSec / (1 + reducingPerSec);
+    },
+    getToriiArrivalGuestCount: function() {
+        const torii = data.progress.base && data.progress.base.torii;
+        if (engine.isToriiDrinkingBowlUnlocked() && torii && (torii.water || 0) >= engine.getToriiVisitorWaterCost()) {
+            return 2;
+        }
+        return 1;
     },
     updateToriiVisitors: function(tickMs) {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -5869,6 +5884,22 @@ let engine = {
             }
             return null;
         }
+        if (kind === "water") {
+            for (let si = 0; si < slotMax; si++) {
+                if (!engine.getSpiritAtLocation("hiddenSpring", si, "water")) {
+                    return { location: "hiddenSpring", slot: si };
+                }
+            }
+            if (engine.isPondBuiltFromFoxDen()) {
+                const pondMax = engine.getPondWaterSpiritSlotMax();
+                for (let psi = 0; psi < pondMax; psi++) {
+                    if (!engine.getSpiritAtLocation("pond", psi, "water")) {
+                        return { location: "pond", slot: psi };
+                    }
+                }
+            }
+            return null;
+        }
         for (let si = 0; si < slotMax; si++) {
             if (!engine.getSpiritAtLocation("hiddenSpring", si, kind)) {
                 return { location: "hiddenSpring", slot: si };
@@ -5915,7 +5946,9 @@ let engine = {
             spirit.pebbleCooldownMs = 5000;
             spirit.autoReturnToMine = true;
         } else if (kind === "water") {
-            spirit.dropletCooldownMs = 5000;
+            if (placement.location === "hiddenSpring") {
+                spirit.dropletCooldownMs = 5000;
+            }
         } else if (kind === "fire") {
             spirit.forgeTimerMs = 0;
         }
@@ -5987,8 +6020,11 @@ let engine = {
         if (!resortData.canAffordCost(cost)) {
             return false;
         }
+        if (!engine.assembleSpiritFromPurchase(kind)) {
+            return false;
+        }
         resortData.deductCost(cost);
-        return engine.assembleSpiritFromPurchase(kind);
+        return true;
     },
     getEffectiveSpiritPower: function(spirit) {
         if (!spirit) {
@@ -7086,17 +7122,41 @@ let engine = {
         return d;
     },
     getNextAccessiblePathSegment: function() {
+        return engine.getNextPathSegmentNeedingJob("removeRocks");
+    },
+    getNextPathSegmentNeedingJob: function(jobType) {
         const last = engine.getLastPathSegmentIndex();
         for (let i = last; i >= 0; i--) {
             if (!engine.isPathSegmentAccessible(i)) {
                 continue;
             }
-            const seg = engine.getPathSegmentData(i);
-            if (seg && seg.state !== "Clear") {
+            if (engine.canStartPathSegmentJob(i, jobType)) {
                 return i;
             }
         }
         return null;
+    },
+    allPathSegmentsHaveUpgrade: function(kind) {
+        const segs = data.progress.base && data.progress.base.pathSegments;
+        if (!segs || segs.length <= 0) {
+            return false;
+        }
+        for (let i = 0; i < segs.length; i++) {
+            if (kind === "railing" && !segs[i].hasRailing) {
+                return false;
+            }
+            if (kind === "stairs" && !segs[i].hasStairs) {
+                return false;
+            }
+            if (kind === "lanterns" && !segs[i].hasLanterns) {
+                return false;
+            }
+        }
+        return true;
+    },
+    isAtelierBuiltFromFoxDen: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        return !!(rh && rh.unlocks && rh.unlocks.atelier);
     },
     getResortPathSvgSubpathByDistance: function(startDist, endDist) {
         const geomSegs = engine.getResortPathPoints();
@@ -7848,13 +7908,150 @@ let engine = {
                 return;
             }
         }
-        const garden = data.progress.base && data.progress.base.garden;
+        const garden = data.progress.base.garden;
         const site = okami.lastAssignedBuildingKey;
-        if (!garden || !garden.arrangementOfRemembranceUnlocked || !engine.isOkamiWorkerSite(site)) {
+        if (!engine.isOkamiWorkerSite(site)) {
             return;
         }
-        okami.assignedBuildingKey = site;
-        engine.syncOkamiWorkerSite(site);
+        if (garden.arrangementOfRemembranceUnlocked) {
+            okami.assignedBuildingKey = site;
+            engine.syncOkamiWorkerSite(site);
+            return;
+        }
+        if (site === "foxDen" && engine.foxDenPathAutoShouldReturnOkami()) {
+            okami.assignedBuildingKey = "foxDen";
+            engine.syncOkamiWorkerSite("foxDen");
+        }
+    },
+    getPathUpgradeJobCost: function(jobType) {
+        const up = resortData.buildings.path.upgrades[jobType];
+        if (!up) {
+            return {};
+        }
+        return typeof up.getCost === "function" ? up.getCost() : (up.cost || {});
+    },
+    getMissingCostWaitText: function(cost) {
+        const c = cost || {};
+        const base = data.progress.base;
+        const missing = [];
+        if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) {
+            missing.push("wood");
+        }
+        if ((c.starBeads || 0) > (data.progress.starBeads || 0)) {
+            missing.push("star beads");
+        }
+        if ((c.stone || 0) > engine.getTotalStone()) {
+            missing.push("stone");
+        }
+        if ((c.bars || 0) > ((base.atelier && base.atelier.bars) || 0)) {
+            missing.push("bars");
+        }
+        if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) {
+            missing.push("ore");
+        }
+        if ((c.coins || 0) > (data.progress.coins || 0)) {
+            missing.push("coins");
+        }
+        if (missing.length <= 0) {
+            return "";
+        }
+        if (missing.length === 1) {
+            return "Waiting for " + missing[0];
+        }
+        return "Waiting for " + missing.slice(0, -1).join(", ") + " and " + missing[missing.length - 1];
+    },
+    listFoxDenAutoPathJobTypes: function() {
+        const rh = data.progress.base.foxDen;
+        const garden = data.progress.base.garden;
+        const jobs = [];
+        if (garden.arrangementOfPathMakingUnlocked && rh.autoClearPathRocks
+            && !engine.isMapElementRevealed("hiddenSpring")) {
+            jobs.push("removeRocks");
+        }
+        if (garden.arrangementOfRailingSafetyUnlocked && rh.autoAddPathRailings
+            && !engine.allPathSegmentsHaveUpgrade("railing")) {
+            jobs.push("addRailing");
+        }
+        if (garden.arrangementOfStepBuildingUnlocked && rh.autoAddPathStairs
+            && !engine.allPathSegmentsHaveUpgrade("stairs")) {
+            jobs.push("addStairs");
+        }
+        if (garden.arrangementOfLanternPlacingUnlocked && rh.autoAddPathLanterns
+            && !engine.allPathSegmentsHaveUpgrade("lanterns")) {
+            jobs.push("addLanterns");
+        }
+        return jobs;
+    },
+    foxDenPathAutoShouldReturnOkami: function() {
+        const jobs = engine.listFoxDenAutoPathJobTypes();
+        for (let i = 0; i < jobs.length; i++) {
+            if (engine.getNextPathSegmentNeedingJob(jobs[i]) !== null) {
+                return true;
+            }
+        }
+        return false;
+    },
+    getFoxDenAutoPathWaitInfo: function() {
+        const jobs = engine.listFoxDenAutoPathJobTypes();
+        for (let i = 0; i < jobs.length; i++) {
+            const jobType = jobs[i];
+            const idx = engine.getNextPathSegmentNeedingJob(jobType);
+            if (idx === null) {
+                continue;
+            }
+            const paused = data.progress.okami.pausedPathJobs;
+            if (paused && paused[idx]) {
+                return null;
+            }
+            if (jobType === "removeRocks") {
+                return null;
+            }
+            const cost = engine.getPathUpgradeJobCost(jobType);
+            if (resortData.canAffordCost(cost)) {
+                return null;
+            }
+            return {
+                jobType: jobType,
+                text: engine.getMissingCostWaitText(cost)
+            };
+        }
+        return null;
+    },
+    tryStartFoxDenOkamiAutoPathJob: function(jobType) {
+        const idx = engine.getNextPathSegmentNeedingJob(jobType);
+        if (idx === null) {
+            return false;
+        }
+        const paused = data.progress.okami.pausedPathJobs;
+        if (paused && paused[idx]) {
+            return engine.resumePathJobForSegment(idx);
+        }
+        if (jobType !== "removeRocks") {
+            const cost = engine.getPathUpgradeJobCost(jobType);
+            if (!resortData.canAffordCost(cost)) {
+                return false;
+            }
+            resortData.deductCost(cost);
+        }
+        return engine.startPathSegmentJob(idx, jobType);
+    },
+    tryFoxDenOkamiAutoPathJobs: function() {
+        const rh = data.progress.base.foxDen;
+        const wf = engine.getFoxDenFreeWorkforce(rh);
+        if (!wf.okamiFree) {
+            return false;
+        }
+        const jobs = engine.listFoxDenAutoPathJobTypes();
+        for (let i = 0; i < jobs.length; i++) {
+            if (engine.tryStartFoxDenOkamiAutoPathJob(jobs[i])) {
+                return true;
+            }
+            const idx = engine.getNextPathSegmentNeedingJob(jobs[i]);
+            if (idx !== null) {
+                return false;
+            }
+        }
+        return false;
     },
     canStartPathSegmentJob: function(segmentIndex, jobType) {
         const seg = engine.getPathSegmentData(segmentIndex);
@@ -8028,6 +8225,12 @@ let engine = {
     getBuildingJobKey: function(unlockKey) {
         return "building:" + unlockKey;
     },
+    parseBuildingJobKey: function(jobKey) {
+        if (!jobKey || jobKey.indexOf("building:") !== 0) {
+            return null;
+        }
+        return jobKey.slice("building:".length);
+    },
     getUpgradeGatherJobKey: function(scopeKey, upgradeKey) {
         return "upgrade:" + scopeKey + ":" + upgradeKey;
     },
@@ -8042,6 +8245,27 @@ let engine = {
         }
         return { scopeKey: rest.slice(0, colon), upgradeKey: rest.slice(colon + 1) };
     },
+    enqueueFoxDenJob: function(jobKey) {
+        const queue = data.progress.base.foxDen.jobQueue;
+        if (queue.indexOf(jobKey) < 0) {
+            queue.push(jobKey);
+        }
+    },
+    removeFoxDenJob: function(jobKey) {
+        const queue = data.progress.base.foxDen.jobQueue;
+        const qi = queue.indexOf(jobKey);
+        if (qi >= 0) {
+            queue.splice(qi, 1);
+        }
+    },
+    moveFoxDenJobToFront: function(jobKey) {
+        const queue = data.progress.base.foxDen.jobQueue;
+        const qi = queue.indexOf(jobKey);
+        if (qi >= 0) {
+            queue.splice(qi, 1);
+        }
+        queue.unshift(jobKey);
+    },
     getFoxDenQueueMax: function() {
         const w = data.progress.base && data.progress.base.atelier;
         const level = w.organizeOrdersBought || 0;
@@ -8052,16 +8276,17 @@ let engine = {
     getFoxDenQueuedJobCount: function() {
         const rh = data.progress.base.foxDen;
         let count = 0;
-        for (let qi = 0; qi < rh.constructionQueue.length; qi++) {
-            const key = rh.constructionQueue[qi];
-            const site = rh.constructionSites[key];
-            if (site && site.status === "building" && !site.paused) {
-                count++;
+        for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+            const jobKey = rh.jobQueue[qi];
+            const unlockKey = engine.parseBuildingJobKey(jobKey);
+            if (unlockKey) {
+                const site = rh.constructionSites[unlockKey];
+                if (site && site.status === "building" && !site.paused) {
+                    count++;
+                }
+                continue;
             }
-        }
-        const queue = rh.upgradeGatherQueue || [];
-        for (let ui = 0; ui < queue.length; ui++) {
-            const job = rh.upgradeGatherJobs[queue[ui]];
+            const job = rh.upgradeGatherJobs[jobKey];
             if (job && !job.paused && job.status === "gathering") {
                 count++;
             }
@@ -8108,6 +8333,7 @@ let engine = {
             return false;
         }
         site.paused = false;
+        engine.moveFoxDenJobToFront(engine.getBuildingJobKey(unlockKey));
         return true;
     },
     toggleBuildingGatherPause: function(unlockKey) {
@@ -8143,6 +8369,7 @@ let engine = {
             return;
         }
         job.status = "ready";
+        engine.removeFoxDenJob(jobKey);
         engine.tryAutoWeaveOnGatherReady(jobKey);
     },
     isOkamiBusyWithPathWork: function() {
@@ -8193,11 +8420,11 @@ let engine = {
         if (!engine.isOkamiIdleOrAtBuilding()) {
             return;
         }
-        const queue = rh.upgradeGatherQueue || [];
+        const jobKeys = Object.keys(rh.upgradeGatherJobs);
         let best = null;
         let bestSec = Infinity;
-        for (let ui = 0; ui < queue.length; ui++) {
-            const jobKey = queue[ui];
+        for (let ui = 0; ui < jobKeys.length; ui++) {
+            const jobKey = jobKeys[ui];
             const job = rh.upgradeGatherJobs[jobKey];
             if (!job || job.status !== "ready") {
                 continue;
@@ -8276,7 +8503,12 @@ let engine = {
             job.status = "ready";
         }
         rh.upgradeGatherJobs[jobKey] = job;
-        rh.upgradeGatherQueue.push(jobKey);
+        if (job.status === "gathering") {
+            engine.applyInstantSameBuildingGatherForJob(jobKey);
+        }
+        if (job.status === "gathering") {
+            engine.enqueueFoxDenJob(jobKey);
+        }
         if (job.status === "ready") {
             engine.tryAutoWeaveOnGatherReady(jobKey);
         }
@@ -8304,6 +8536,7 @@ let engine = {
             return false;
         }
         job.paused = false;
+        engine.moveFoxDenJobToFront(jobKey);
         return true;
     },
     toggleUpgradeGatherPause: function(scopeKey, upgradeKey) {
@@ -8324,10 +8557,7 @@ let engine = {
         const rh = data.progress.base.foxDen;
         const jobKey = engine.getUpgradeGatherJobKey(scopeKey, upgradeKey);
         delete rh.upgradeGatherJobs[jobKey];
-        const qi = rh.upgradeGatherQueue.indexOf(jobKey);
-        if (qi >= 0) {
-            rh.upgradeGatherQueue.splice(qi, 1);
-        }
+        engine.removeFoxDenJob(jobKey);
     },
     startUpgradeWeave: function(scopeKey, upgradeKey) {
         const job = engine.getUpgradeGatherJob(scopeKey, upgradeKey);
@@ -8544,9 +8774,7 @@ let engine = {
             delivered: resortData.emptyGatherDelivered(),
             weaveCostPaid: hasWeaveCost
         };
-        if (rh.constructionQueue.indexOf(unlockKey) < 0) {
-            rh.constructionQueue.push(unlockKey);
-        }
+        engine.enqueueFoxDenJob(engine.getBuildingJobKey(unlockKey));
         return true;
     },
     completeFoxDenConstruction: function(unlockKey) {
@@ -8556,10 +8784,7 @@ let engine = {
         if (site) {
             site.status = "complete";
         }
-        const qi = rh.constructionQueue.indexOf(unlockKey);
-        if (qi >= 0) {
-            rh.constructionQueue.splice(qi, 1);
-        }
+        engine.removeFoxDenJob(engine.getBuildingJobKey(unlockKey));
         if (unlockKey === "torii") {
             const torii = data.progress.base.torii;
             if (torii) {
@@ -8807,7 +9032,7 @@ let engine = {
             if (!pile) {
                 return 0;
             }
-            return (pile.dupedStone || 0) + (pile.usedStone || 0)
+            return (pile.dupedStone || 0)
                 + (engine.isStoneCarryUnduplicatedAllowed() ? (pile.stone || 0) : 0);
         }
         if (resourceType === "bars") {
@@ -8823,7 +9048,9 @@ let engine = {
     },
     deductConstructionResource: function(resourceType, amount) {
         const base = data.progress.base;
-        const amt = Math.max(0, amount || 0);
+        const amt = resourceType === "stone"
+            ? Math.floor(Math.max(0, amount || 0))
+            : Math.max(0, amount || 0);
         if (resourceType === "wood" && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - amt);
             return null;
@@ -8903,15 +9130,97 @@ let engine = {
             okamiHere: okamiHere
         };
     },
+    getFoxDenJobDeliverMapKey: function(jobKey, site) {
+        const unlockKey = engine.parseBuildingJobKey(jobKey);
+        if (unlockKey) {
+            return unlockKey;
+        }
+        if (site && site.scopeKey) {
+            return engine.getUpgradeGatherDeliverMapKey(site.scopeKey);
+        }
+        const parsed = engine.parseUpgradeGatherJobKey(jobKey);
+        if (parsed) {
+            return engine.getUpgradeGatherDeliverMapKey(parsed.scopeKey);
+        }
+        return null;
+    },
+    isSameBuildingGatherResource: function(resourceType, deliverMapKey) {
+        return !!deliverMapKey && engine.getConstructionSourceBuildingKey(resourceType) === deliverMapKey;
+    },
+    applyInstantSameBuildingGatherForJob: function(jobKey) {
+        const rh = data.progress.base.foxDen;
+        const unlockKey = engine.parseBuildingJobKey(jobKey);
+        let site = null;
+        if (unlockKey) {
+            site = rh.constructionSites[unlockKey];
+            if (!site || site.status !== "building" || site.paused) {
+                return false;
+            }
+        } else {
+            site = rh.upgradeGatherJobs[jobKey];
+            if (!site || site.status !== "gathering" || site.paused) {
+                return false;
+            }
+        }
+        const deliverMapKey = engine.getFoxDenJobDeliverMapKey(jobKey, site);
+        if (!deliverMapKey) {
+            return false;
+        }
+        const types = resortData.gatherResourceKeys;
+        let transferred = false;
+        for (let i = 0; i < types.length; i++) {
+            const t = types[i];
+            if (!engine.isSameBuildingGatherResource(t, deliverMapKey)) {
+                continue;
+            }
+            const stillNeeded = engine.getConstructionStillNeeded(site, jobKey, t);
+            if (stillNeeded <= 0) {
+                continue;
+            }
+            const stock = engine.getConstructionResourceAvailable(t);
+            if (stock <= 0) {
+                continue;
+            }
+            const amount = Math.floor(Math.min(stillNeeded, stock));
+            if (amount <= 0) {
+                continue;
+            }
+            engine.deductConstructionResource(t, amount);
+            site.delivered[t] = (site.delivered[t] || 0) + amount;
+            transferred = true;
+        }
+        if (!transferred) {
+            return false;
+        }
+        if (unlockKey) {
+            if (engine.isUpgradeGatherSiteComplete(site)) {
+                engine.completeFoxDenConstruction(unlockKey);
+            }
+        } else {
+            engine.checkUpgradeGatherJobComplete(jobKey);
+        }
+        return true;
+    },
+    tryInstantSameBuildingGatherTransfers: function() {
+        const rh = data.progress.base.foxDen;
+        const queue = (rh.jobQueue || []).slice();
+        for (let i = 0; i < queue.length; i++) {
+            engine.applyInstantSameBuildingGatherForJob(queue[i]);
+        }
+    },
     getFoxDenResourcePriority: function(site, jobKey) {
         if (!site || !site.required) {
             return null;
         }
+        const deliverMapKey = engine.getFoxDenJobDeliverMapKey(jobKey, site);
         const carryCap = resortData.getKitsuneCarryCapacity();
         const types = resortData.gatherResourceKeys;
         let best = null;
         for (let i = 0; i < types.length; i++) {
             const t = types[i];
+            if (engine.isSameBuildingGatherResource(t, deliverMapKey)) {
+                continue;
+            }
             const required = site.required[t] || 0;
             if (required <= 0) {
                 continue;
@@ -8926,7 +9235,7 @@ let engine = {
             if (stock <= 0) {
                 continue;
             }
-            const amount = Math.min(carryCap, stillNeeded, stock);
+            const amount = Math.floor(Math.min(carryCap, stillNeeded, stock));
             if (amount <= 0 || delivered + inFlight + amount > required) {
                 continue;
             }
@@ -8959,43 +9268,48 @@ let engine = {
         const workerSpeed = engine.getFoxDenCarrierSpeed({ isOkami: false });
         return { spawnOkami: okamiSpeed >= workerSpeed };
     },
-    getFoxDenSpawnTarget: function(rh) {
-        for (let qi = 0; qi < rh.constructionQueue.length; qi++) {
-            const key = rh.constructionQueue[qi];
-            const site = rh.constructionSites[key];
+    getFoxDenSpawnTargetForJobKey: function(rh, jobKey) {
+        const unlockKey = engine.parseBuildingJobKey(jobKey);
+        if (unlockKey) {
+            const site = rh.constructionSites[unlockKey];
             if (!site || site.status !== "building" || site.paused) {
-                continue;
+                return null;
             }
-            const jobKey = engine.getBuildingJobKey(key);
             const priority = engine.getFoxDenResourcePriority(site, jobKey);
-            if (priority) {
-                return {
-                    jobKey: jobKey,
-                    mapKey: key,
-                    site: site,
-                    resourceType: priority.resourceType,
-                    stillNeeded: priority.stillNeeded,
-                    amount: priority.amount
-                };
+            if (!priority) {
+                return null;
             }
+            return {
+                jobKey: jobKey,
+                mapKey: unlockKey,
+                site: site,
+                resourceType: priority.resourceType,
+                stillNeeded: priority.stillNeeded,
+                amount: priority.amount
+            };
         }
-        const uQueue = rh.upgradeGatherQueue || [];
-        for (let ui = 0; ui < uQueue.length; ui++) {
-            const jobKey = uQueue[ui];
-            const job = rh.upgradeGatherJobs[jobKey];
-            if (!job || job.status !== "gathering" || job.paused) {
-                continue;
-            }
-            const priority = engine.getFoxDenResourcePriority(job, jobKey);
-            if (priority) {
-                return {
-                    jobKey: jobKey,
-                    mapKey: engine.getUpgradeGatherDeliverMapKey(job.scopeKey),
-                    site: job,
-                    resourceType: priority.resourceType,
-                    stillNeeded: priority.stillNeeded,
-                    amount: priority.amount
-                };
+        const job = rh.upgradeGatherJobs[jobKey];
+        if (!job || job.status !== "gathering" || job.paused) {
+            return null;
+        }
+        const priority = engine.getFoxDenResourcePriority(job, jobKey);
+        if (!priority) {
+            return null;
+        }
+        return {
+            jobKey: jobKey,
+            mapKey: engine.getUpgradeGatherDeliverMapKey(job.scopeKey),
+            site: job,
+            resourceType: priority.resourceType,
+            stillNeeded: priority.stillNeeded,
+            amount: priority.amount
+        };
+    },
+    getFoxDenSpawnTarget: function(rh) {
+        for (let oi = 0; oi < rh.jobQueue.length; oi++) {
+            const target = engine.getFoxDenSpawnTargetForJobKey(rh, rh.jobQueue[oi]);
+            if (target) {
+                return target;
             }
         }
         return engine.getFoxDenManaSpawnTarget(rh);
@@ -9351,6 +9665,7 @@ let engine = {
     },
     updateFoxDenConstruction: function(tickMs) {
         const rh = data.progress.base.foxDen;
+        engine.tryInstantSameBuildingGatherTransfers();
         const assigned = rh.assignedWorkers || 0;
         const okami = engine.getOkami();
         if (assigned <= 0 && okami.assignedBuildingKey !== "foxDen") {
@@ -9400,6 +9715,7 @@ let engine = {
             }
         }
         rh.constructionCarriers = next;
+        engine.tryFoxDenOkamiAutoPathJobs();
         engine.updateArrangementOfReview(tickMs);
         rh._sinceLastCarrierMs = (rh._sinceLastCarrierMs || 0) + tickMs;
         const minGap = (resortData.foxDenCarrierSpawnMinMs !== undefined) ? resortData.foxDenCarrierSpawnMinMs : 500;

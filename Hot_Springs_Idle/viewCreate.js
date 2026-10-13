@@ -514,7 +514,7 @@ let createView = {
                     <div class="base-info-title">Zenko Torii Gate</div>
                     <div class="base-row muted-text">Invites visitors the resort. They move to the Inn if possible.</div>
                     <div class="base-row">Visitors at the gate: <span id="toriiVisitorsWaiting"></span>/<span id="toriiVisitorsMax"></span></div>
-                    <div class="base-row">Next visitor: <span id="toriiNextVisitor"></span></div>
+                    <div class="base-row">Next visitor: <span id="toriiNextVisitor"></span><span id="toriiAvgVisitorArrival" class="muted-text"></span></div>
                     <div id="toriiNextVisitorProgressWrap" class="base-mini-progress torii-next-visitor-progress" style="display:none"><div id="toriiNextVisitorProgressFill" class="base-mini-progress-fill"></div></div>
                     ${buildingManaRowHtml("torii", "Enticing Lights use 10 mana/s to make visitors arrive every 30 seconds instead of 60 while the gate is not full. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
                     <div id="toriiWater_row" class="base-row" style="display:none">
@@ -598,11 +598,10 @@ let createView = {
                 <div id="resortInfo_stonePile" class="resort-info-section">
                     <div class="base-info-title">Stone Pile</div>
                     <div class="base-row muted-text">Holds stone.</div>
-                    ${buildingManaRowHtml("stonePile", "Every 10 seconds, uses 100 mana to duplicate one unduplicated stone. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
+                    ${buildingManaRowHtml("stonePile", "Every 10 seconds, uses 100 mana to turn one unduplicated stone into two duplicated stone. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
                     <div id="stonePileDupeProgressWrap" class="base-mini-progress stone-pile-dupe-progress" style="display:none"><div id="stonePileDupeProgressFill" class="base-mini-progress-fill"></div></div>
                     <div id="stonePileDupeIntervalText" class="base-row muted-text" style="display:none">every 10s</div>
                     <div class="base-row">${resortData.resourceIconHtml("stone")} Stone: <span id="stonePileInfoValue"></span></div>
-                    <div id="stonePileUsedStone_row" class="base-row" style="display:none">Used stone: <span id="stonePileUsedStoneValue"></span></div>
                     <div id="stonePileDupedStone_row" class="base-row" style="display:none">Duplicated stone: <span id="stonePileDupedStoneValue"></span></div>
                     <div id="stonePileAllowUnduplicated_row" class="base-row" style="display:none"><label><input type="checkbox" id="stonePileAllowUnduplicated_chk" checked onchange="events.toggleStonePileAllowUnduplicated(this.checked)"> Allow carriers to use unduplicated stone</label></div>
                     ${resortUpgradeRowsHtml("stonePile")}
@@ -669,6 +668,10 @@ let createView = {
                     <div class="base-info-title">Fox Den</div>
                     <div class="base-row muted-text">Plan buildings and send kitsune to deliver materials. Buildings are prioritized over upgrades.</div>
                     <div id="foxDenManaOrders_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenManaOrders_chk" onchange="events.toggleFoxDenManaOrders(this.checked)"> Arrangement of Mana Orders - deliver mana from the Orb when no other gather/build orders remain</label></div>
+                    <div id="foxDenAutoClearRocks_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoClearRocks_chk" onchange="events.toggleFoxDenAutoClearPathRocks(this.checked)"> Assigned Okami will automatically clear the next Rocks</label></div>
+                    <div id="foxDenAutoAddRailings_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoAddRailings_chk" onchange="events.toggleFoxDenAutoAddPathRailings(this.checked)"> Assigned Okami will automatically add Railings on the next path that needs it</label> <span id="foxDenAutoAddRailings_wait" class="muted-text"></span></div>
+                    <div id="foxDenAutoAddStairs_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoAddStairs_chk" onchange="events.toggleFoxDenAutoAddPathStairs(this.checked)"> Assigned Okami will automatically add Stairs on the next path that needs it</label> <span id="foxDenAutoAddStairs_wait" class="muted-text"></span></div>
+                    <div id="foxDenAutoAddLanterns_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoAddLanterns_chk" onchange="events.toggleFoxDenAutoAddPathLanterns(this.checked)"> Assigned Okami will automatically add Lanterns on the next path that needs it</label> <span id="foxDenAutoAddLanterns_wait" class="muted-text"></span></div>
                     <div class="base-row">Resources: <span id="foxDenCarry_resource"></span> per trip</div>
                     <div id="foxDenCarryMana_row" class="base-row" style="display:none">Mana: <span id="foxDenCarry_mana"></span> per trip</div>
                     ${foxDenUnlockRowsHtml()}
@@ -798,7 +801,7 @@ let createView = {
         const slotHtml = function(kind, location, count) {
             let h = "";
             for (let i = 0; i < count; i++) {
-                h += `<div id="spiritSlot_${location}_${kind}_${i}" class="spirit-slot spirit-slot-${kind}" onclick="events.clickSpiritSlot('${kind}', '${location}', ${i})"></div>`;
+                h += `<div id="spiritSlot_${location}_${kind}_${i}" class="spirit-slot spirit-slot-${kind}" data-spirit-kind="${kind}" data-spirit-location="${location}" data-spirit-slot="${i}" onclick="events.clickSpiritSlot('${kind}', '${location}', ${i})"></div>`;
             }
             return h;
         };
@@ -1161,7 +1164,7 @@ let createView = {
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
-            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "toriiWaterReq_row", "okamiInspirationHint",
+            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "toriiWaterReq_row", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10", "bonusSpeedLabel", "bonusSpeedRemaining", "bonusSpeed_x2",
             "offlineProcessingOverlay", "offlineProcessingLabel", "offlineProcessingFill", "offlineProcessingEta", "offlineProcessingSummary", "offlineProcessingDismiss",
             "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenTempReq_row", "innOnsenSoak_row", "innOnsenPondExplain_row", "innMapLabelText", "innGuestsVisitPond_row",
@@ -1174,8 +1177,13 @@ let createView = {
             "hiddenSpringCollectStone_row", "hiddenSpringCollectStone_btn",
             "hiddenSpringManaRow", "hiddenSpringFillMana_btn", "hiddenSpringManaProgressWrap", "hiddenSpringManaFill", "hiddenSpringManaAmount", "hiddenSpringManaCap", "hiddenSpringManaExplain_row",
             "hiddenSpringAllowCarriersMana_row", "hiddenSpringAllowCarriersMana_chk",
-            "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileDupeIntervalText", "stonePileUsedStone_row", "stonePileUsedStoneValue", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
-            "foxDenManaOrders_row", "foxDenManaOrders_chk", "foxDenCarry_resource", "foxDenCarryMana_row", "foxDenCarry_mana",
+            "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileDupeIntervalText", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
+            "foxDenManaOrders_row", "foxDenManaOrders_chk",
+            "foxDenAutoClearRocks_row", "foxDenAutoClearRocks_chk",
+            "foxDenAutoAddRailings_row", "foxDenAutoAddRailings_chk", "foxDenAutoAddRailings_wait",
+            "foxDenAutoAddStairs_row", "foxDenAutoAddStairs_chk", "foxDenAutoAddStairs_wait",
+            "foxDenAutoAddLanterns_row", "foxDenAutoAddLanterns_chk", "foxDenAutoAddLanterns_wait",
+            "foxDenCarry_resource", "foxDenCarryMana_row", "foxDenCarry_mana",
             "mapInnManaProgressWrap", "mapInnManaProgressFill",
             "mapInnWaterProgressWrap", "mapInnWaterProgressFill",
             "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill",
@@ -1540,6 +1548,7 @@ let createView = {
         events.bindPathSegmentSvgHandlers();
         events.bindBaseMapRightClick();
         events.bindBaseBuildingInfoDismiss();
+        events.bindSpiritSlotDrag();
     },
     clearCacheQueue: function() {
         for(let id of idsToCache) {

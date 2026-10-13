@@ -350,7 +350,7 @@ let offline = {
             wood: (base.bambooForest && base.bambooForest.wood) || 0,
             stone: (typeof engine.getTotalStone === "function")
                 ? engine.getTotalStone()
-                : ((base.stonePile && ((base.stonePile.stone || 0) + (base.stonePile.usedStone || 0) + (base.stonePile.dupedStone || 0))) || 0),
+                : ((base.stonePile && ((base.stonePile.stone || 0) + (base.stonePile.dupedStone || 0))) || 0),
             starBeads: data.progress.starBeads || 0,
             credit: market.credit || 0,
             spiritLevels: offline.totalSpiritLevels()

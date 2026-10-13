@@ -35,7 +35,17 @@ let viewData = {
     deathOverlayFilled: false,
     prestigeSelection: [],
     prestigePackError: "",
-    spiritInfoCollapsedCompact: false
+    spiritInfoCollapsedCompact: false,
+    spiritDrag: {
+        pointerId: null,
+        pending: false,
+        active: false,
+        suppressClick: false,
+        spiritId: null,
+        startX: 0,
+        startY: 0,
+        ghostEl: null
+    }
 };
 
 
@@ -971,6 +981,43 @@ let view = {
                 manaChk.checked = !!foxDen.manaOrdersEnabled;
             }
         }
+        const showAutoRocks = !!garden.arrangementOfPathMakingUnlocked && !engine.isMapElementRevealed("hiddenSpring");
+        view.updateVal("foxDenAutoClearRocks_row", showAutoRocks ? "" : "none", "style.display");
+        if (showAutoRocks) {
+            const rocksChk = document.getElementById("foxDenAutoClearRocks_chk");
+            if (rocksChk) {
+                rocksChk.checked = !!foxDen.autoClearPathRocks;
+            }
+        }
+        const showAutoRailings = !!garden.arrangementOfRailingSafetyUnlocked && !engine.allPathSegmentsHaveUpgrade("railing");
+        view.updateVal("foxDenAutoAddRailings_row", showAutoRailings ? "" : "none", "style.display");
+        if (showAutoRailings) {
+            const railingChk = document.getElementById("foxDenAutoAddRailings_chk");
+            if (railingChk) {
+                railingChk.checked = !!foxDen.autoAddPathRailings;
+            }
+        }
+        const showAutoStairs = !!garden.arrangementOfStepBuildingUnlocked && !engine.allPathSegmentsHaveUpgrade("stairs");
+        view.updateVal("foxDenAutoAddStairs_row", showAutoStairs ? "" : "none", "style.display");
+        if (showAutoStairs) {
+            const stairsChk = document.getElementById("foxDenAutoAddStairs_chk");
+            if (stairsChk) {
+                stairsChk.checked = !!foxDen.autoAddPathStairs;
+            }
+        }
+        const showAutoLanterns = !!garden.arrangementOfLanternPlacingUnlocked && !engine.allPathSegmentsHaveUpgrade("lanterns");
+        view.updateVal("foxDenAutoAddLanterns_row", showAutoLanterns ? "" : "none", "style.display");
+        if (showAutoLanterns) {
+            const lanternsChk = document.getElementById("foxDenAutoAddLanterns_chk");
+            if (lanternsChk) {
+                lanternsChk.checked = !!foxDen.autoAddPathLanterns;
+            }
+        }
+        const pathWait = engine.getFoxDenAutoPathWaitInfo();
+        const waitText = pathWait && pathWait.text ? pathWait.text : "";
+        view.updateVal("foxDenAutoAddRailings_wait", pathWait && pathWait.jobType === "addRailing" ? waitText : "");
+        view.updateVal("foxDenAutoAddStairs_wait", pathWait && pathWait.jobType === "addStairs" ? waitText : "");
+        view.updateVal("foxDenAutoAddLanterns_wait", pathWait && pathWait.jobType === "addLanterns" ? waitText : "");
         view.updateVal("foxDenCarry_resource", resortData.getKitsuneCarryCapacity());
         view.updateVal("foxDenCarry_mana", resortData.getManaCarryAmount());
         this.updateResortWorkerControls("foxDen", (foxDen.assignedWorkers || 0) > 0 || engine.getOkami().assignedBuildingKey === "foxDen");
@@ -1888,8 +1935,11 @@ let view = {
         }
         if (buildingKey === "stonePile" && visible) {
             const batch = engine.getStoneDuplicatorBatch();
-            const stoneText = batch.stone === 1 ? "one unduplicated stone" : `${batch.stone} unduplicated stone`;
-            view.updateVal(`${buildingKey}ManaExplain_row`, `Every 10 seconds, uses ${batch.stone === 1 ? "100 mana" : "10 stone and 500 mana"} to duplicate ${stoneText}. Fill Mana weaves Okami to transfer global mana into this reservoir.`);
+            const costText = batch.stone === 1 ? "100 mana" : "10 stone and 500 mana";
+            const resultText = batch.stone === 1
+                ? "one unduplicated stone into two duplicated stone"
+                : `${batch.stone} unduplicated stone into ${batch.stone * 2} duplicated stone`;
+            view.updateVal(`${buildingKey}ManaExplain_row`, `Every 10 seconds, uses ${costText} to turn ${resultText}. Fill Mana weaves Okami to transfer global mana into this reservoir.`);
         }
         const garden = data.progress.base && data.progress.base.garden;
         const showCarrier = visible && buildingKey !== "hiddenSpring" && !!(garden && garden.arrangementOfManaOrdersUnlocked);
@@ -2268,23 +2318,22 @@ let view = {
             return "";
         }
         const lines = [];
-        const cq = rh.constructionQueue || [];
-        for (let i = 0; i < cq.length; i++) {
-            const key = cq[i];
-            const site = rh.constructionSites && rh.constructionSites[key];
-            if (!site || site.status !== "building") {
+        for (let i = 0; i < rh.jobQueue.length; i++) {
+            const jobKey = rh.jobQueue[i];
+            const unlockKey = engine.parseBuildingJobKey(jobKey);
+            if (unlockKey) {
+                const site = rh.constructionSites && rh.constructionSites[unlockKey];
+                if (!site || site.status !== "building") {
+                    continue;
+                }
+                const def = resortData.foxDenUnlockGetDef(unlockKey);
+                let name = "Building " + ((def && def.label) || unlockKey);
+                if (site.paused) {
+                    name += " (paused)";
+                }
+                lines.push(name);
                 continue;
             }
-            const def = resortData.foxDenUnlockGetDef(key);
-            let name = "Building " + ((def && def.label) || key);
-            if (site.paused) {
-                name += " (paused)";
-            }
-            lines.push(name);
-        }
-        const uq = rh.upgradeGatherQueue || [];
-        for (let ui = 0; ui < uq.length; ui++) {
-            const jobKey = uq[ui];
             const job = rh.upgradeGatherJobs && rh.upgradeGatherJobs[jobKey];
             if (!job || job.status !== "gathering") {
                 continue;
@@ -3549,6 +3598,11 @@ let view = {
             view.updateVal("toriiVisitorsWaiting", torii.visitorsWaiting || 0);
             view.updateVal("toriiVisitorsMax", torii.maxVisitors || 2);
             view.updateVal("toriiNextVisitor", !toriiBuilt ? "Not built" : (toriiGateFull ? "Gate full" : `${Math.ceil(Math.max(0, torii.nextVisitorTimerMs || 0) / 1000)}s`));
+            const avgArrivalSec = engine.getToriiAverageVisitorArrivalSeconds();
+            const arrivalGuests = engine.getToriiArrivalGuestCount();
+            view.updateVal("toriiAvgVisitorArrival", toriiBuilt
+                ? ` (avg ${round1(avgArrivalSec)}s for ${arrivalGuests})`
+                : "");
             view.updateVal("toriiNextVisitorProgressWrap", toriiBuilt && !toriiGateFull ? "" : "none", "style.display");
             view.updateVal("toriiNextVisitorProgressFill", `${toriiVisitorPct}%`, "style.width");
             const bowl = engine.isToriiDrinkingBowlUnlocked();
@@ -3676,10 +3730,8 @@ let view = {
             const pile = base.stonePile || {};
             const duplicator = !!pile.stoneDuplicatorUnlocked;
             view.updateVal("stonePileInfoValue", pile.stone || 0, "textContent", "floor");
-            view.updateVal("stonePileUsedStone_row", duplicator ? "" : "none", "style.display");
             view.updateVal("stonePileDupedStone_row", duplicator ? "" : "none", "style.display");
             if (duplicator) {
-                view.updateVal("stonePileUsedStoneValue", pile.usedStone || 0, "textContent", "floor");
                 view.updateVal("stonePileDupedStoneValue", pile.dupedStone || 0, "textContent", "floor");
             }
             view.updateBuildingManaRow("stonePile");
@@ -3817,8 +3869,7 @@ let view = {
         const pile = base.stonePile || {};
         const stoneIcon = resortData.resourceIconHtml("stone");
         if (pile.stoneDuplicatorUnlocked) {
-            const processedStone = (pile.usedStone || 0) + (pile.dupedStone || 0);
-            view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)} | ${intToStringRound(processedStone)}`, "innerHTML");
+            view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)} | ${intToStringRound(Math.floor(pile.dupedStone || 0))}`, "innerHTML");
         } else {
             view.updateVal("stonePileMapValue", `${stoneIcon} ${intToStringRound(pile.stone || 0)}`, "innerHTML");
         }
@@ -4000,9 +4051,9 @@ let view = {
                 btnNode.classList.toggle("upgrade-btn-queue-full", queueBlocked);
             }
         }
-        const queue = rh.upgradeGatherQueue || [];
-        for (let ui = 0; ui < queue.length; ui++) {
-            const jobKey = queue[ui];
+        const jobKeys = Object.keys(rh.upgradeGatherJobs);
+        for (let ui = 0; ui < jobKeys.length; ui++) {
+            const jobKey = jobKeys[ui];
             const parsed = engine.parseUpgradeGatherJobKey(jobKey);
             if (!parsed) {
                 continue;

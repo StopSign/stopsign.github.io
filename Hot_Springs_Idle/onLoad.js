@@ -269,6 +269,26 @@ let onLoad = {
             engine.rollScrollArchivesResearchChoices();
         }
         onLoad.syncKitsuneTotalFromRescues();
+        onLoad.migrateMissingWaterSpirits();
+    },
+
+    /** Restore water spirits when purchase/wishing-well counters are ahead of the spirits array. */
+    migrateMissingWaterSpirits: function() {
+        const hs = data.progress.base.hiddenSpring;
+        const cistern = data.progress.base.cistern;
+        const expected = (hs.waterSpiritsBought || 0) + (cistern.wishingWellBought || 0);
+        let actual = 0;
+        for (let i = 0; i < hs.spirits.length; i++) {
+            if (hs.spirits[i].kind === "water") {
+                actual++;
+            }
+        }
+        while (actual < expected) {
+            if (!engine.assembleWaterSpiritFromWishingWell()) {
+                break;
+            }
+            actual++;
+        }
     },
 
     /** Rescues used to update the map counter without adding workers. Raise the pool to match. */

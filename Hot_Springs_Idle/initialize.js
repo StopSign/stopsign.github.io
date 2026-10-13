@@ -248,15 +248,18 @@ let initials = {
         return {
             foxDen: Object.assign({
                 unlocks: Object.assign({}, resortData.getDefaultFoxDenUnlocksState()),
-                constructionQueue: [],
                 constructionSites: {},
                 constructionCarriers: [],
                 upgradeGatherJobs: {},
-                upgradeGatherQueue: [],
+                jobQueue: [],
                 lastCarrierSpawnMs: 0,
                 assignedWorkers: 0,
                 _reviewWeaveAccumMs: 0,
-                manaOrdersEnabled: false
+                manaOrdersEnabled: false,
+                autoClearPathRocks: false,
+                autoAddPathRailings: false,
+                autoAddPathStairs: false,
+                autoAddPathLanterns: false
             }),
             bambooForest: pb("bambooForest"),
             mapRevealed: Object.assign({}, resortData.defaultMapRevealedState),
@@ -349,7 +352,6 @@ let initials = {
             },
             stonePile: {
                 stone: 0,
-                usedStone: 0,
                 dupedStone: 0,
                 mana: 0,
                 manaCapacity: 4000,
@@ -800,12 +802,17 @@ let initialize = {
         }
         const pile = base.stonePile;
         if (pile) {
-            if (pile.usedStone === undefined) {
-                pile.usedStone = 0;
-            }
+            const legacyUsed = pile.usedStone || 0;
             if (pile.dupedStone === undefined) {
                 pile.dupedStone = 0;
             }
+            if (legacyUsed !== 0 || pile.usedStone !== undefined) {
+                pile.dupedStone = Math.floor((pile.dupedStone || 0) + legacyUsed);
+                delete pile.usedStone;
+            } else {
+                pile.dupedStone = Math.floor(pile.dupedStone || 0);
+            }
+            pile.stone = Math.floor(pile.stone || 0);
             if (pile.mana === undefined) {
                 pile.mana = 0;
             }
@@ -821,6 +828,25 @@ let initialize = {
             if (pile.stoneDuplicatorUnlocked === undefined) {
                 pile.stoneDuplicatorUnlocked = false;
             }
+        }
+        const migrateStoneTaken = function(carriers) {
+            if (!carriers) {
+                return;
+            }
+            for (let i = 0; i < carriers.length; i++) {
+                const st = carriers[i].stoneTaken;
+                if (!st || st.used === undefined) {
+                    continue;
+                }
+                st.duped = (st.duped || 0) + (st.used || 0);
+                delete st.used;
+            }
+        };
+        if (base.foxDen) {
+            migrateStoneTaken(base.foxDen.constructionCarriers);
+        }
+        if (base.market) {
+            migrateStoneTaken(base.market.creditCarriers);
         }
         const garden = base.garden;
         const manaOrderOn = !!(garden && garden.arrangementOfManaOrdersUnlocked);
@@ -1012,11 +1038,10 @@ let initialize = {
         if (!base.foxDen) {
             base.foxDen = Object.assign({
                 unlocks: Object.assign({}, resortData.getDefaultFoxDenUnlocksState()),
-                constructionQueue: [],
                 constructionSites: {},
                 constructionCarriers: [],
                 upgradeGatherJobs: {},
-                upgradeGatherQueue: [],
+                jobQueue: [],
                 lastCarrierSpawnMs: 0,
                 assignedWorkers: 0,
                 _reviewWeaveAccumMs: 0
@@ -1034,9 +1059,6 @@ let initialize = {
                 rh.unlocks[uk] = false;
             }
         }
-        if (!rh.constructionQueue) {
-            rh.constructionQueue = [];
-        }
         if (!rh.constructionSites) {
             rh.constructionSites = {};
         }
@@ -1046,9 +1068,30 @@ let initialize = {
         if (!rh.upgradeGatherJobs) {
             rh.upgradeGatherJobs = {};
         }
-        if (!rh.upgradeGatherQueue) {
-            rh.upgradeGatherQueue = [];
+        if (!rh.jobQueue) {
+            rh.jobQueue = rh.foxDenJobOrder || [];
+            if (!rh.jobQueue.length) {
+                const oldConstruction = rh.constructionQueue || [];
+                for (let cqi = 0; cqi < oldConstruction.length; cqi++) {
+                    const cKey = oldConstruction[cqi];
+                    const site = rh.constructionSites[cKey];
+                    if (site && site.status === "building") {
+                        rh.jobQueue.push(engine.getBuildingJobKey(cKey));
+                    }
+                }
+                const oldUpgrade = rh.upgradeGatherQueue || [];
+                for (let uqi = 0; uqi < oldUpgrade.length; uqi++) {
+                    const uKey = oldUpgrade[uqi];
+                    const uJob = rh.upgradeGatherJobs[uKey];
+                    if (uJob && uJob.status === "gathering") {
+                        rh.jobQueue.push(uKey);
+                    }
+                }
+            }
         }
+        delete rh.constructionQueue;
+        delete rh.upgradeGatherQueue;
+        delete rh.foxDenJobOrder;
         if (rh._reviewWeaveAccumMs === undefined) {
             rh._reviewWeaveAccumMs = 0;
         }
@@ -1057,6 +1100,18 @@ let initialize = {
         }
         if (rh.manaOrdersEnabled === undefined) {
             rh.manaOrdersEnabled = false;
+        }
+        if (rh.autoClearPathRocks === undefined) {
+            rh.autoClearPathRocks = false;
+        }
+        if (rh.autoAddPathRailings === undefined) {
+            rh.autoAddPathRailings = false;
+        }
+        if (rh.autoAddPathStairs === undefined) {
+            rh.autoAddPathStairs = false;
+        }
+        if (rh.autoAddPathLanterns === undefined) {
+            rh.autoAddPathLanterns = false;
         }
         if (rh.assignedWorkers === undefined) {
             rh.assignedWorkers = 0;

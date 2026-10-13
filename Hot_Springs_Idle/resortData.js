@@ -1463,7 +1463,7 @@ var resortData = {
                     getCost: function() {
                         const bought = (data.progress.base.cistern.capacityBought || 0);
                         const mult = Math.pow(1.5, bought);
-                        return { stone: 50 * mult };
+                        return { stone: Math.round(50 * mult) };
                     },
                     weavingTime: 60,
                     weavingTimeIncreaseAdd: 60,
@@ -1816,7 +1816,7 @@ var resortData = {
                 gatherWaterSpirit: {
                     key: "waterSpirit",
                     name: "Gather Water Spirit",
-                    description: "Summon a water spirit for the Hidden Spring.",
+                    description: "Summon a water spirit for the Hidden Spring (or Pond if the spring is full).",
                     weavingTime: 90,
                     weavingTimeIncrease: 3,
                     getWeavingPurchaseIndex: function() {
@@ -1831,7 +1831,8 @@ var resortData = {
                             return false;
                         }
                         const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.waterSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax());
+                        return !!(hs && (hs.waterSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax()
+                            && engine.findSpiritPlacementSlot("water"));
                     },
                     onBuy: function() {
                         engine.assembleSpiritFromPurchase("water");
@@ -2946,15 +2947,20 @@ var resortData = {
                 arrangementOfWaterOrdersUnlocked: false,
                 arrangementOfManaOrdersUnlocked: false,
                 arrangementOfDoubledStoneUnlocked: false,
+                arrangementOfPathMakingUnlocked: false,
+                arrangementOfRailingSafetyUnlocked: false,
+                arrangementOfStepBuildingUnlocked: false,
+                arrangementOfLanternPlacingUnlocked: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
                 autoWeaveIncludePausedWeaves: false,
                 smartHarvestUnlocked: false
             },
             introMuted: "Automation for an easy life, so you can go outside.",
-            upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfAppraisal", "arrangementOfReview",
+            upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfPathMaking", "arrangementOfAppraisal", "arrangementOfReview",
                 "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
-                "arrangementOfTargetPriority", "arrangementOfManaOrders", "arrangementOfDoubledStone",
+                "arrangementOfTargetPriority", "arrangementOfManaOrders", "arrangementOfDoubledStone", "arrangementOfRailingSafety",
+                "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
                 "arrangementOfPaperMoney", "arrangementOfHeatTargeting", "smartHarvest"],
             upgrades: {
@@ -3007,6 +3013,36 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfRemembranceUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfPathMaking: {
+                    key: "arrangement_of_path_making",
+                    name: "Arrangement of Path Making",
+                    description: "Reveal a Fox Den checkbox. When checked, an Okami assigned to the Fox Den automatically clears the next path with rocks, with higher priority than building.",
+                    cost: { stone: 5 },
+                    weavingTime: 40,
+                    weavingTimeIncrease: 1,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !(g && g.arrangementOfPathMakingUnlocked)
+                            && !engine.isMapElementRevealed("hiddenSpring");
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfPathMakingUnlocked = true;
+                        const rh = data.progress.base.foxDen;
+                        if (rh) {
+                            rh.autoClearPathRocks = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return !(g && g.arrangementOfPathMakingUnlocked)
+                            && !engine.isMapElementRevealed("hiddenSpring");
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfPathMakingUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 },
@@ -3467,6 +3503,110 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Arranged"
                 },
+                arrangementOfRailingSafety: {
+                    key: "arrangement_of_railing_safety",
+                    name: "Arrangement of Railing Safety",
+                    description: "Reveal a Fox Den checkbox. When checked, an Okami assigned to the Fox Den automatically adds railings on the next path that needs them, with higher priority than building (after Path Making).",
+                    cost: { stone: 20 },
+                    weavingTime: 120,
+                    weavingTimeIncrease: 1,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isAtelierBuiltFromFoxDen()
+                            && !(g && g.arrangementOfRailingSafetyUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("railing");
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfRailingSafetyUnlocked = true;
+                        const rh = data.progress.base.foxDen;
+                        if (rh) {
+                            rh.autoAddPathRailings = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isAtelierBuiltFromFoxDen()
+                            && !(g && g.arrangementOfRailingSafetyUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("railing");
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfRailingSafetyUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfStepBuilding: {
+                    key: "arrangement_of_step_building",
+                    name: "Arrangement of Step Building",
+                    description: "Reveal a Fox Den checkbox. When checked, an Okami assigned to the Fox Den automatically adds stairs on the next path that needs them, with higher priority than building (after Railing Safety).",
+                    cost: { stone: 40 },
+                    weavingTime: 240,
+                    weavingTimeIncrease: 1,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        const railingReady = !!(g && g.arrangementOfRailingSafetyUnlocked)
+                            || engine.allPathSegmentsHaveUpgrade("railing");
+                        return railingReady
+                            && !(g && g.arrangementOfStepBuildingUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("stairs");
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfStepBuildingUnlocked = true;
+                        const rh = data.progress.base.foxDen;
+                        if (rh) {
+                            rh.autoAddPathStairs = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        const railingReady = !!(g && g.arrangementOfRailingSafetyUnlocked)
+                            || engine.allPathSegmentsHaveUpgrade("railing");
+                        return railingReady
+                            && !(g && g.arrangementOfStepBuildingUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("stairs");
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfStepBuildingUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfLanternPlacing: {
+                    key: "arrangement_of_lantern_placing",
+                    name: "Arrangement of Lantern Placing",
+                    description: "Reveal a Fox Den checkbox. When checked, an Okami assigned to the Fox Den automatically adds lanterns on the next path that needs them, with higher priority than building (after Step Building).",
+                    cost: { stone: 80 },
+                    weavingTime: 480,
+                    weavingTimeIncrease: 1,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        const stairsReady = !!(g && g.arrangementOfStepBuildingUnlocked)
+                            || engine.allPathSegmentsHaveUpgrade("stairs");
+                        return stairsReady
+                            && !(g && g.arrangementOfLanternPlacingUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("lanterns");
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfLanternPlacingUnlocked = true;
+                        const rh = data.progress.base.foxDen;
+                        if (rh) {
+                            rh.autoAddPathLanterns = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        const stairsReady = !!(g && g.arrangementOfStepBuildingUnlocked)
+                            || engine.allPathSegmentsHaveUpgrade("stairs");
+                        return stairsReady
+                            && !(g && g.arrangementOfLanternPlacingUnlocked)
+                            && !engine.allPathSegmentsHaveUpgrade("lanterns");
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfLanternPlacingUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
                 smartHarvest: {
                     key: "smartHarvest",
                     name: "Smart Harvest",
@@ -3506,7 +3646,7 @@ var resortData = {
                 createStoneDuplicator: {
                     key: "create_stone_duplicator",
                     name: "Create Stone Duplicator",
-                    description: "Every 10 seconds, uses 100 mana to duplicate one unduplicated stone.",
+                    description: "Every 10 seconds, uses 100 mana to turn one unduplicated stone into two duplicated stone.",
                     getCost: function() {
                         return { wood: 20, mana: 1750 };
                     },
@@ -3887,7 +4027,7 @@ var resortData = {
                 improveStoneDuplicator: {
                     key: "improve_stone_duplicator",
                     name: "Improve Stone Duplicator",
-                    description: "The duplicator works in batches. Every 10 seconds, 10 stone and 500 mana become 10 used stone and 10 duplicated stone. It skips a tick when fewer than 10 stone are stored.",
+                    description: "The duplicator works in batches. Every 10 seconds, 10 stone and 500 mana become 20 duplicated stone. It skips a tick when fewer than 10 stone are stored.",
                     cost: { credit: 30000 },
                     weavingTime: 600,
                     canBuy: function() {

@@ -426,6 +426,26 @@ let events = {
             return;
         }
         map._rightClickBound = true;
+        map.addEventListener("click", function(e) {
+            if (!e.shiftKey) {
+                return;
+            }
+            const btn = e.target.closest(".base-building-label, .resort-building-map-btn");
+            if (!btn || !btn.id || btn.id.indexOf("baseBuilding_") !== 0) {
+                return;
+            }
+            const key = btn.id.slice("baseBuilding_".length);
+            if (key === "path") {
+                return;
+            }
+            const workerKeys = resortData.workerAssignmentSiteKeys || [];
+            if (workerKeys.indexOf(key) < 0) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            events.shiftClickBaseBuilding(key);
+        }, true);
         map.addEventListener("contextmenu", function(e) {
             const path = e.target.closest(".path-seg-hit");
             if (path) {
@@ -445,16 +465,195 @@ let events = {
                 return;
             }
             e.preventDefault();
-            events.rightClickBaseBuilding(key);
+            events.rightClickBaseBuilding(key, e.shiftKey);
         });
     },
-    rightClickBaseBuilding: function(buildingKey) {
+    bindSpiritSlotDrag: function() {
+        const map = document.getElementById("baseResortMap");
+        if (!map || map._spiritDragBound) {
+            return;
+        }
+        map._spiritDragBound = true;
+        if (!viewData.spiritDrag.ghostEl) {
+            const ghost = document.createElement("div");
+            ghost.id = "spiritDragGhost";
+            ghost.style.position = "fixed";
+            ghost.style.width = "22px";
+            ghost.style.height = "22px";
+            ghost.style.boxSizing = "border-box";
+            ghost.style.pointerEvents = "none";
+            ghost.style.zIndex = "10000";
+            ghost.style.display = "none";
+            ghost.style.alignItems = "center";
+            ghost.style.justifyContent = "center";
+            ghost.style.fontSize = "10px";
+            ghost.style.lineHeight = "1";
+            ghost.style.color = "#fff7ed";
+            ghost.style.textShadow = "0 1px 2px #000";
+            ghost.style.opacity = "0.9";
+            document.body.appendChild(ghost);
+            viewData.spiritDrag.ghostEl = ghost;
+        }
+        map.addEventListener("pointerdown", events.onSpiritSlotPointerDown);
+    },
+    readSpiritSlotTarget: function(el) {
+        const slotEl = el && el.closest ? el.closest(".spirit-slot") : null;
+        if (!slotEl) {
+            return null;
+        }
+        const kind = slotEl.getAttribute("data-spirit-kind");
+        const location = slotEl.getAttribute("data-spirit-location");
+        const slotIndex = parseInt(slotEl.getAttribute("data-spirit-slot"), 10);
+        if (!kind || !location || isNaN(slotIndex)) {
+            return null;
+        }
+        return { el: slotEl, kind: kind, location: location, slotIndex: slotIndex };
+    },
+    getSpiritInSlotTarget: function(target) {
+        if (target.location === "spiritTraining" || target.kind === "any") {
+            return engine.getSpiritAtLocation("spiritTraining", target.slotIndex);
+        }
+        return engine.getSpiritAtLocation(target.location, target.slotIndex, target.kind);
+    },
+    consumeSpiritDragClickSuppress: function() {
+        if (!viewData.spiritDrag.suppressClick) {
+            return false;
+        }
+        viewData.spiritDrag.suppressClick = false;
+        return true;
+    },
+    refreshSpiritSelectionUi: function() {
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        data.progress.selectedBaseBuilding = "spirit";
+        data.progress.selectedResortInfoType = "spirit";
+        data.progress.selectedFireLauncherKey = engine.getFireLauncherKeyForSpirit(spirit);
+        events.refreshBaseBuildingPanels();
+        view.updateSpiritInfo();
+        view.updateResortMapTokens();
+    },
+    onSpiritSlotPointerDown: function(e) {
+        if (e.button !== 0) {
+            return;
+        }
+        const target = events.readSpiritSlotTarget(e.target);
+        if (!target) {
+            return;
+        }
+        const spirit = events.getSpiritInSlotTarget(target);
+        if (!spirit) {
+            return;
+        }
+        const drag = viewData.spiritDrag;
+        drag.pending = true;
+        drag.active = false;
+        drag.pointerId = e.pointerId;
+        drag.spiritId = spirit.id;
+        drag.startX = e.clientX;
+        drag.startY = e.clientY;
+        window.addEventListener("pointermove", events.onSpiritSlotPointerMove);
+        window.addEventListener("pointerup", events.onSpiritSlotPointerUp);
+        window.addEventListener("pointercancel", events.onSpiritSlotPointerUp);
+    },
+    onSpiritSlotPointerMove: function(e) {
+        const drag = viewData.spiritDrag;
+        if (!drag.pending && !drag.active) {
+            return;
+        }
+        if (drag.pointerId !== null && e.pointerId !== drag.pointerId) {
+            return;
+        }
+        const dx = e.clientX - drag.startX;
+        const dy = e.clientY - drag.startY;
+        if (!drag.active) {
+            if ((dx * dx + dy * dy) < 25) {
+                return;
+            }
+            const spirit = engine.getSpiritById(drag.spiritId);
+            if (!spirit) {
+                events.endSpiritSlotDrag();
+                return;
+            }
+            drag.active = true;
+            data.progress.selectedSpiritId = spirit.id;
+            events.refreshSpiritSelectionUi();
+            const ghost = drag.ghostEl;
+            ghost.style.display = "flex";
+            ghost.style.backgroundColor = engine.getSpiritColor(spirit);
+            ghost.style.border = spirit.kind === "earth" ? "1px solid #8a5a2b"
+                : (spirit.kind === "water" ? "1px solid #4da3ff"
+                    : (spirit.kind === "fire" ? "1px solid #ff8a3d"
+                        : (spirit.kind === "plant" ? "1px solid #4a9a4a" : "1px solid #fff")));
+            ghost.textContent = String(spirit.level || 1);
+        }
+        const ghost = drag.ghostEl;
+        ghost.style.left = (e.clientX - 11) + "px";
+        ghost.style.top = (e.clientY - 11) + "px";
+        e.preventDefault();
+    },
+    onSpiritSlotPointerUp: function(e) {
+        const drag = viewData.spiritDrag;
+        if (drag.pointerId !== null && e.pointerId !== drag.pointerId) {
+            return;
+        }
+        if (!drag.active) {
+            events.endSpiritSlotDrag();
+            return;
+        }
+        const dropEl = document.elementFromPoint(e.clientX, e.clientY);
+        const target = events.readSpiritSlotTarget(dropEl);
+        const spirit = engine.getSpiritById(drag.spiritId);
+        let moved = false;
+        if (spirit && target) {
+            const sameKindOk = target.kind === "any" || target.kind === spirit.kind;
+            if (sameKindOk) {
+                data.progress.selectedSpiritId = spirit.id;
+                moved = !!engine.moveSelectedSpiritTo(target.location, target.slotIndex);
+            }
+        }
+        events.endSpiritSlotDrag();
+        drag.suppressClick = true;
+        setTimeout(function() {
+            drag.suppressClick = false;
+        }, 500);
+        if (moved) {
+            events.refreshSpiritSelectionUi();
+        }
+    },
+    endSpiritSlotDrag: function() {
+        const drag = viewData.spiritDrag;
+        drag.pending = false;
+        drag.active = false;
+        drag.pointerId = null;
+        drag.spiritId = null;
+        if (drag.ghostEl) {
+            drag.ghostEl.style.display = "none";
+            drag.ghostEl.textContent = "";
+        }
+        window.removeEventListener("pointermove", events.onSpiritSlotPointerMove);
+        window.removeEventListener("pointerup", events.onSpiritSlotPointerUp);
+        window.removeEventListener("pointercancel", events.onSpiritSlotPointerUp);
+    },
+    shiftClickBaseBuilding: function(buildingKey) {
+        const alreadySelected = data.progress.selectedBaseBuilding === buildingKey && !data.progress.selectedSpiritId;
+        if (!alreadySelected) {
+            events.selectBaseBuilding(buildingKey);
+        }
+        events.adjustWorkers(buildingKey, "one_inc");
+    },
+    rightClickBaseBuilding: function(buildingKey, shiftKey) {
         const alreadySelected = data.progress.selectedBaseBuilding === buildingKey && !data.progress.selectedSpiritId;
         if (!alreadySelected) {
             events.selectBaseBuilding(buildingKey);
         }
         if (buildingKey === "hiddenSpring") {
             events.startCollectStone();
+            return;
+        }
+        if (shiftKey) {
+            const workerKeys = resortData.workerAssignmentSiteKeys || [];
+            if (workerKeys.indexOf(buildingKey) >= 0) {
+                events.adjustWorkers(buildingKey, "one_dec");
+            }
             return;
         }
         const keys = resortData.okamiAssignableSiteKeys || [];
@@ -968,6 +1167,9 @@ let events = {
         view.syncSpiritInfoCompactCollapse();
     },
     clickSpiritTrainingSlot: function() {
+        if (events.consumeSpiritDragClickSuppress()) {
+            return;
+        }
         if (!engine.isSpiritTrainingSpotBought()) {
             return;
         }
@@ -1011,6 +1213,9 @@ let events = {
         refresh();
     },
     clickSpiritSlot: function(kind, location, slotIndex) {
+        if (events.consumeSpiritDragClickSuppress()) {
+            return;
+        }
         if (kind !== "earth" && kind !== "water" && kind !== "fire" && kind !== "plant") {
             return;
         }
@@ -1091,6 +1296,9 @@ let events = {
         events.clickFireLauncher(platformKey);
     },
     clickFireLauncherSlot: function(platformKey) {
+        if (events.consumeSpiritDragClickSuppress()) {
+            return;
+        }
         if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
             return;
         }
@@ -1193,6 +1401,30 @@ let events = {
         const rh = data.progress.base && data.progress.base.foxDen;
         if (rh) {
             rh.manaOrdersEnabled = !!checked;
+        }
+    },
+    toggleFoxDenAutoClearPathRocks: function(checked) {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh) {
+            rh.autoClearPathRocks = !!checked;
+        }
+    },
+    toggleFoxDenAutoAddPathRailings: function(checked) {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh) {
+            rh.autoAddPathRailings = !!checked;
+        }
+    },
+    toggleFoxDenAutoAddPathStairs: function(checked) {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh) {
+            rh.autoAddPathStairs = !!checked;
+        }
+    },
+    toggleFoxDenAutoAddPathLanterns: function(checked) {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh) {
+            rh.autoAddPathLanterns = !!checked;
         }
     },
     startFillMana: function(buildingKey) {

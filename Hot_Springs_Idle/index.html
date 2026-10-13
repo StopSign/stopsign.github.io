@@ -102,7 +102,7 @@
                     <button id="baseBuilding_hiddenSpring" class="base-building-label resort-building-label resort-building-hidden-spring map-building-locked" onclick="events.selectBaseBuilding('hiddenSpring')"><img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false"><span class="resort-building-label-text" style="font-size:15px">Hidden Spring</span></button>
                     <div id="mapHiddenSpringManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-hidden-spring-mana" style="display:none"><div id="mapHiddenSpringManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
                     <div id="spiritSlots_spiritTraining" class="spirit-slot-grid spirit-slot-grid-training" style="display:none">
-                        <div id="spiritSlot_spiritTraining_any_0" class="spirit-slot spirit-slot-training" onclick="events.clickSpiritTrainingSlot()"></div>
+                        <div id="spiritSlot_spiritTraining_any_0" class="spirit-slot spirit-slot-training" data-spirit-kind="any" data-spirit-location="spiritTraining" data-spirit-slot="0" onclick="events.clickSpiritTrainingSlot()"></div>
                     </div>
                     <div id="spiritSlots_earth" class="spirit-slot-grid spirit-slot-grid-earth"></div>
                     <div id="spiritSlots_water" class="spirit-slot-grid spirit-slot-grid-water" style="display:none"></div>
@@ -218,19 +218,19 @@
                     <div id="foxDenMapSlotPool"></div>
                     <div id="pebbleMapPool"></div>
                     <div id="fireLauncher_pathMid_wrap" class="fire-launcher-wrap fire-launcher-pathMid" style="display:none" onclick="events.clickFireLauncher('pathMid')">
-                        <div id="spiritSlot_fireLauncher_pathMid_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathMid')">
+                        <div id="spiritSlot_fireLauncher_pathMid_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" data-spirit-kind="fire" data-spirit-location="fireLauncher_pathMid" data-spirit-slot="0" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathMid')">
                             <div id="fireLauncher_pathMid_range" class="fire-launcher-range"></div>
                         </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_pathMid_emberFill" class="fire-launcher-ember-fill"></div></div>
                     </div>
                     <div id="fireLauncher_bendTop_wrap" class="fire-launcher-wrap fire-launcher-bendTop" style="display:none" onclick="events.clickFireLauncher('bendTop')">
-                        <div id="spiritSlot_fireLauncher_bendTop_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('bendTop')">
+                        <div id="spiritSlot_fireLauncher_bendTop_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" data-spirit-kind="fire" data-spirit-location="fireLauncher_bendTop" data-spirit-slot="0" onclick="event.stopPropagation(); events.clickFireLauncherSlot('bendTop')">
                             <div id="fireLauncher_bendTop_range" class="fire-launcher-range"></div>
                         </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_bendTop_emberFill" class="fire-launcher-ember-fill"></div></div>
                     </div>
                     <div id="fireLauncher_pathLower_wrap" class="fire-launcher-wrap fire-launcher-pathLower" style="display:none" onclick="events.clickFireLauncher('pathLower')">
-                        <div id="spiritSlot_fireLauncher_pathLower_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathLower')">
+                        <div id="spiritSlot_fireLauncher_pathLower_0" class="spirit-slot spirit-slot-fire fire-launcher-slot" data-spirit-kind="fire" data-spirit-location="fireLauncher_pathLower" data-spirit-slot="0" onclick="event.stopPropagation(); events.clickFireLauncherSlot('pathLower')">
                             <div id="fireLauncher_pathLower_range" class="fire-launcher-range"></div>
                         </div>
                         <div class="fire-launcher-ember-track"><div id="fireLauncher_pathLower_emberFill" class="fire-launcher-ember-fill"></div></div>
@@ -359,6 +359,11 @@
                 <div class="options-row options-separator"></div>
                 <label class="options-row"><input type="radio" id="offlineModeCatchUp" name="offlineProgressMode" value="catchUp" onchange="events.setOfflineProgressMode('catchUp')" checked> Keep game running offline (100% speed up to 24hrs)</label>
                 <label class="options-row"><input type="radio" id="offlineModePauseBonus" name="offlineProgressMode" value="pauseBonus" onchange="events.setOfflineProgressMode('pauseBonus')"> Pause game while offline, gain 1 minute of x2 speed every 5 minutes, up to 6 hours bonus</label>
+                <div class="options-row options-separator"></div>
+                <div class="options-row">Hotkeys</div>
+                <div class="options-row muted-text">Right-click a building: assign/unassign the Okami</div>
+                <div class="options-row muted-text">Shift+click a building: assign 1 Kitsune</div>
+                <div class="options-row muted-text">Shift+right-click a building: unassign 1 Kitsune</div>
             </div>
         </div>
     </div>

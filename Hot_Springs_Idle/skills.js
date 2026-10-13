@@ -1210,7 +1210,7 @@ const SKILL_DEFINITION_ROWS = [
         rewardText: function(sk) {
             return `Reward: +6% ego damage per skill level vs an intruder you have already attacked.`;
         },
-        triggerText: "Trigger: each attack against an intruder below 50% Aud.",
+        triggerText: "Trigger: each attack against an intruder you have already attacked.",
         getEffect: function(sk) {
             return { damageBonusFraction: (sk.level || 0) * 0.06 };
         },
