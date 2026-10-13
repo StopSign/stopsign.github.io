@@ -1129,6 +1129,58 @@ let initialize = {
                 site.paused = false;
             }
         }
+        initialize.roundUpgradeGatherStoneOnce();
+    },
+    /** One-time: round fractional stone already on upgrade gather jobs / inbound carriers. */
+    roundUpgradeGatherStoneOnce: function() {
+        if (data.progress.roundedUpgradeStoneOnce) {
+            return;
+        }
+        data.progress.roundedUpgradeStoneOnce = true;
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (!rh) {
+            return;
+        }
+        const jobs = rh.upgradeGatherJobs || {};
+        const jobKeys = Object.keys(jobs);
+        for (let i = 0; i < jobKeys.length; i++) {
+            const jobKey = jobKeys[i];
+            const job = jobs[jobKey];
+            if (!job) {
+                continue;
+            }
+            if (job.required && job.required.stone) {
+                job.required.stone = Math.round(job.required.stone);
+            }
+            if (job.delivered && job.delivered.stone) {
+                job.delivered.stone = Math.round(job.delivered.stone);
+            }
+            if (typeof engine !== "undefined" && engine.checkUpgradeGatherJobComplete) {
+                engine.checkUpgradeGatherJobComplete(jobKey);
+            }
+        }
+        const carriers = rh.constructionCarriers || [];
+        for (let ci = 0; ci < carriers.length; ci++) {
+            const c = carriers[ci];
+            if (!c || c.resourceType !== "stone") {
+                continue;
+            }
+            const jobKey = c.jobKey || "";
+            if (jobKey.indexOf("upgrade:") !== 0) {
+                continue;
+            }
+            if (c.stoneTaken) {
+                const d = Math.round(c.stoneTaken.duped || 0);
+                const u = Math.round(c.stoneTaken.used || 0);
+                const r = Math.round(c.stoneTaken.raw || 0);
+                c.stoneTaken.duped = d + u;
+                c.stoneTaken.raw = r;
+                delete c.stoneTaken.used;
+                c.amount = d + u + r;
+            } else {
+                c.amount = Math.round(c.amount || 0);
+            }
+        }
     },
     initializeMapRevealed: function() {
         const base = data.progress.base;

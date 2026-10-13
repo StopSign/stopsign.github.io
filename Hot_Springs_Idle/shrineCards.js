@@ -13,7 +13,7 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         category: "buff",
         rarity: { common: -1, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { manaRegenAdd: 0.5 };
+            if (rarity === "common") return { manaRegenAdd: 0.05 };
             if (rarity === "rare") return { manaRegenAdd: 0.15 };
             if (rarity === "epic") return { manaRegenAdd: 0.40 };
             return {};
