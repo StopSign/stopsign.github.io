@@ -58,6 +58,8 @@ const changelog = {
     }
 };
 
+changelog.addSection("Rounded Stone patch", "0.1.4",
+    `* Fixed a bug where stone would be fractional`);
 changelog.addSection("Addressing Bugs and Suggestions", "0.1.3",
     `Big:
     * Able to gain bonus time instead of forcing offline calculation in Options. It's a bad ratio, but available for those who want to be there for all of the progress.
