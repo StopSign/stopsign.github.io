@@ -25,8 +25,8 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-let isDebug = false; //SET FOR COMMIT
-// let isDebug = true;
+// let isDebug = false; //SET FOR COMMIT
+let isDebug = true;
 let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
@@ -348,7 +348,8 @@ let initials = {
                 spiritIdCounter: 1,
                 spirits: [],
                 pebbleGlobalCooldownMs: 0,
-                dropletGlobalCooldownMs: 0
+                dropletGlobalCooldownMs: 0,
+                equalDropletSpacing: false
             },
             stonePile: {
                 stone: 0,
@@ -882,7 +883,8 @@ let initialize = {
             spiritIdCounter: 1,
             spirits: [],
             pebbleGlobalCooldownMs: 0,
-            dropletGlobalCooldownMs: 0
+            dropletGlobalCooldownMs: 0,
+            equalDropletSpacing: false
         };
         if (!base.hiddenSpring) {
             base.hiddenSpring = JSON.parse(JSON.stringify(def));

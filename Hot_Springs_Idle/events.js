@@ -1639,6 +1639,16 @@ let events = {
         }
         data.progress.base.mine.prioritizeOre = !!checked;
     },
+    toggleEqualDropletSpacing: function(checked) {
+        if (!engine.isArrangementOfRhythmicDropletsUnlocked()) {
+            return;
+        }
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        if (!hs) {
+            return;
+        }
+        hs.equalDropletSpacing = !!checked;
+    },
     toggleSpiritPrioritizeOre: function(checked) {
         if (!engine.isArrangementOfPriorityUnlocked()) {
             return;

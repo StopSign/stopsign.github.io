@@ -1231,11 +1231,27 @@ button {
     user-select: none;
 }
 
+#tabPane_leveling {
+    max-height: 720px;
+    overflow-y: auto;
+}
+
+#tabPane_skills {
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 0;
+    overflow: hidden;
+    flex-direction: column;
+}
+
 #skillsList.skills-tab-layout {
     display: grid;
     grid-template-columns: 40% 60%;
+    grid-template-rows: minmax(0, 1fr);
     gap: 8px;
-    align-items: start;
+    align-items: stretch;
+    flex: 1 1 auto;
+    min-height: 0;
 }
 
 .skills-list-column {
@@ -1243,8 +1259,9 @@ button {
     flex-direction: column;
     gap: 3px;
     min-width: 0;
-    overflow-y:auto;
-    max-height: 590px;
+    min-height: 0;
+    overflow-y: auto;
+    max-height: 100%;
 }
 
 .skills-info-column {
@@ -1252,6 +1269,9 @@ button {
     flex-direction: column;
     gap: 8px;
     min-width: 0;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
 }
 
 .skill-sort-radios {

@@ -489,6 +489,7 @@ let createView = {
                         <div class="base-row">Water volume: <span id="spiritInfoWaterVolume"></span></div>
                         <div class="base-row">Heat: <span id="spiritInfoHeat"></span></div>
                         <div class="base-row">Essence: <span id="spiritInfoEssence"></span></div>
+                        <div id="spiritInfoEqualSpacingRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoEqualSpacing_chk" onchange="events.toggleEqualDropletSpacing(this.checked)"> Create droplets with equal spacing</label></div>
                         <div id="spiritInfoDropletEtas" class="base-row" style="display:none"></div>
                     </div>
                     <div id="spiritInfoFireExtras" style="display:none">
@@ -682,6 +683,7 @@ let createView = {
                     <div class="base-row">Stored water: <span id="cisternInfoWater"></span></div>
                     <div class="base-row">Temperature: <span id="cisternInfoTemperature"></span></div>
                     <div id="cisternInfoEssence_row" class="base-row" style="display:none">Essence: <span id="cisternInfoEssence"></span></div>
+                    <div id="cisternInfoEssenceNote" class="base-row muted-text" style="display:none">When droplets arrive, any extra temperature above 100 becomes Essence. That amount is not multiplied by the droplet's capacity.</div>
                     <div class="base-row">Capacity: <span id="cisternInfoCapacity"></span></div>
                     <div id="cisternWishingWell_row" class="base-row" style="display:none">Wishing well: +<span id="cisternWishingWellCoins"></span> coins/s</div>
                     <div id="cisternWaterCarry_row" class="base-row" style="display:none">Water carry: <span id="cisternWaterCarry"></span>L per trip</div>
@@ -1125,7 +1127,8 @@ let createView = {
                 viewData.cached[paneId] = document.getElementById(paneId);
             }
             const shouldShow = (tabs.indexOf(key) >= 0) && key === tab;
-            view.updateVal(paneId, shouldShow ? "block" : "none", "style.display");
+            const paneDisplay = !shouldShow ? "none" : (key === "skills" ? "flex" : "block");
+            view.updateVal(paneId, paneDisplay, "style.display");
         }
     },
 
@@ -1156,10 +1159,10 @@ let createView = {
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
             "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingNote", "spiritTrainingMinManaText", "spiritTrainingDurationText", "spiritTrainingCostText", "spiritTrainingExpText", "spiritTrainingGainText", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
-            "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoDropletEtas", "spiritInfoFireNote",
+            "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
-            "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence_row", "cisternInfoEssence", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
+            "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence_row", "cisternInfoEssence", "cisternInfoEssenceNote", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
             "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",

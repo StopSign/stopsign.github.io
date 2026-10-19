@@ -65,6 +65,7 @@ let view = {
             view.updateCisternCarriers();
             view.updateInnCarriers();
             view.updateMarketCarriers();
+            view.updatePathTokenPositions();
         }
         view.updateBuyableUpgradesOverlay(false);
 
@@ -2865,13 +2866,10 @@ let view = {
             const pAmtId = `pebbleTokenAmt_${pi}`;
             view.updateVal(pid, pebble ? "" : "none", "style.display");
             view.updateVal(pAmtId, pebble ? "" : "none", "style.display");
-            if (pebble && engine.getResortPathPosition) {
-                const pos = engine.getResortPathPosition(pebble.pathProgress || 0);
-                view.updateVal(pid, view.gpuTranslate(pos.x - 4, pos.y - 4), "style.transform");
+            if (pebble) {
                 view.updateVal(pid, engine.earthSpiritColors[pebble.colorIndex || 0], "style.backgroundColor");
                 view.updateVal(pid, engine.earthSpiritColors[pebble.colorIndex || 0], "style.borderColor");
-                view.updateVal(pAmtId, pebble ? engine.formatPebblePayloadLabel(pebble) : "", "textContent");
-                view.updateVal(pAmtId, view.gpuTranslate(pos.x, pos.y + 8, "translateX(-50%)"), "style.transform");
+                view.updateVal(pAmtId, engine.formatPebblePayloadLabel(pebble), "textContent");
             }
         }
         const droplets = base.droplets || [];
@@ -2883,9 +2881,7 @@ let view = {
             view.updateVal(did, droplet ? "" : "none", "style.display");
             view.updateVal(dAmtBelow, droplet ? "" : "none", "style.display");
             view.updateVal(dAmtTop, droplet ? "" : "none", "style.display");
-            if (droplet && engine.getResortPathPosition) {
-                const dpos = engine.getResortPathPosition(droplet.pathProgress || 0);
-                view.updateVal(did, view.gpuTranslate(dpos.x - 5, dpos.y - 5), "style.transform");
+            if (droplet) {
                 const innerId = `dropletTokenInner_${di}`;
                 let fill = "#4a9fd4";
                 if (droplet.hitFlashAt) {
@@ -2900,13 +2896,7 @@ let view = {
                 }
                 view.updateVal(innerId, fill, "style.backgroundColor");
                 view.updateVal(dAmtBelow, `${intToStringRound(droplet.waterVolume || 0)}L`, "textContent");
-                view.updateVal(dAmtBelow, view.gpuTranslate(dpos.x, dpos.y + 10, "translateX(-50%)"), "style.transform");
-                const essDisp = round2(droplet.essence || 0);
-                const topLabel = essDisp > 1
-                    ? `${essDisp}E`
-                    : `${round1(droplet.heat || 0)}C`;
-                view.updateVal(dAmtTop, topLabel, "textContent");
-                view.updateVal(dAmtTop, view.gpuTranslate(dpos.x, dpos.y - 18, "translateX(-50%)"), "style.transform");
+                view.updateVal(dAmtTop, `${round1(droplet.heat || 0)}C`, "textContent");
             }
         }
         view.updateFireLauncherMap();
@@ -2971,8 +2961,9 @@ let view = {
                 viewData.fireLauncherAoeLastId[ai] = null;
                 continue;
             }
-            const diam = (pulse.rangePx || 0) * 2;
-            view.updateVal(aid, view.gpuTranslate(pulse.x, pulse.y, "translate(-50%, -50%)"), "style.transform");
+            const diam = Math.round(pulse.rangePx || 0) * 2;
+            const pulseCenter = engine.getFireLauncherSlotCenter(pulse.platformKey);
+            view.updateVal(aid, view.gpuTranslate(pulseCenter.x, pulseCenter.y, "translate(-50%, -50%)"), "style.transform");
             view.updateVal(aid, `${diam}px`, "style.width");
             view.updateVal(aid, `${diam}px`, "style.height");
             const el = viewData.cached[aid];
@@ -3319,6 +3310,16 @@ let view = {
             }
         } else if (kind === "water") {
             view.updateVal("spiritInfoPebbleEtas", "none", "style.display");
+            const atHiddenSpringWater = (spirit.location || "hiddenSpring") === "hiddenSpring";
+            const spacingUnlocked = engine.isArrangementOfRhythmicDropletsUnlocked();
+            view.updateVal("spiritInfoEqualSpacingRow", spacingUnlocked && atHiddenSpringWater ? "" : "none", "style.display");
+            if (spacingUnlocked && atHiddenSpringWater) {
+                const spacingChk = viewData.cached.spiritInfoEqualSpacing_chk;
+                if (spacingChk) {
+                    const hsSpacing = data.progress.base.hiddenSpring;
+                    spacingChk.checked = !!(hsSpacing && hsSpacing.equalDropletSpacing);
+                }
+            }
             if (spirit.location === "pond") {
                 view.updateVal("spiritInfoWaterVolume", "-");
                 view.updateVal("spiritInfoHeat", "-");
@@ -3434,8 +3435,9 @@ let view = {
             if (engine.canSpiritTrain(spirit)) {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
                 const ms = spirit.trainingTimerMs || 0;
-                const pct = Math.max(0, Math.min(100, (ms / 60000) * 100));
-                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/60s)`);
+                const durationMs = Math.max(1, engine.getSpiritTrainingDurationMs());
+                const pct = Math.max(0, Math.min(100, (ms / durationMs) * 100));
+                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/${roundNearestDecimals(durationMs / 1000, 2)}s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
@@ -3797,6 +3799,7 @@ let view = {
             view.updateVal("cisternInfoTemperature", `${round1Fixed(cistern.temperature || 0)}C`);
             const launcherBuilt = !!((base.atelier && base.atelier.fireLaunchersBought) >= 1);
             view.updateVal("cisternInfoEssence_row", launcherBuilt ? "" : "none", "style.display");
+            view.updateVal("cisternInfoEssenceNote", launcherBuilt ? "" : "none", "style.display");
             if (launcherBuilt) {
                 view.updateVal("cisternInfoEssence", round2(cistern.essence || 0));
             }
@@ -5801,6 +5804,73 @@ let view = {
     gpuTranslate: function(x, y, extra) {
         const t = `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)`;
         return extra ? `${t} ${extra}` : t;
+    },
+    gpuTranslateSubpixel: function(x, y, extra) {
+        const t = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+        return extra ? `${t} ${extra}` : t;
+    },
+    pathTokenVisualProgress: function(token) {
+        const current = token.pathProgress || 0;
+        if (data.gameSettings && data.gameSettings.stop) {
+            return current;
+        }
+        const prev = token.prevPathProgress;
+        if (prev === undefined || prev === null) {
+            return current;
+        }
+        let a = 1;
+        const tps = data.gameSettings && data.gameSettings.ticksPerSecond;
+        if (typeof lastTickTime === "number" && lastTickTime > 0 && tps) {
+            const tickInterval = 1000 / tps;
+            a = Math.max(0, Math.min(1, (performance.now() - lastTickTime) / tickInterval));
+        } else if (data.gameSettings && data.gameSettings.renderAlpha !== undefined && data.gameSettings.renderAlpha !== null) {
+            a = data.gameSettings.renderAlpha;
+        }
+        return prev + ((current - prev) * a);
+    },
+    updatePathTokenPositions: function() {
+        const base = data.progress && data.progress.base;
+        if (!base || !engine.getResortPathPosition) {
+            return;
+        }
+        const paused = !!(data.gameSettings && data.gameSettings.stop);
+        const pebbles = base.pebbles || [];
+        for (let pi = 0; pi < 12; pi++) {
+            const pebble = pebbles[pi];
+            const pid = `pebbleToken_${pi}`;
+            const pAmtId = `pebbleTokenAmt_${pi}`;
+            view.updateVal(pid, pebble ? "" : "none", "style.display");
+            view.updateVal(pAmtId, pebble ? "" : "none", "style.display");
+            if (!pebble) {
+                continue;
+            }
+            if (paused) {
+                pebble.prevPathProgress = pebble.pathProgress || 0;
+            }
+            const pos = engine.getResortPathPosition(view.pathTokenVisualProgress(pebble));
+            view.updateVal(pid, view.gpuTranslateSubpixel(pos.x - 4, pos.y - 4), "style.transform");
+            view.updateVal(pAmtId, view.gpuTranslateSubpixel(pos.x, pos.y + 8, "translateX(-50%)"), "style.transform");
+        }
+        const droplets = base.droplets || [];
+        for (let di = 0; di < 12; di++) {
+            const droplet = droplets[di];
+            const did = `dropletToken_${di}`;
+            const dAmtBelow = `dropletTokenAmtBelow_${di}`;
+            const dAmtTop = `dropletTokenAmtTop_${di}`;
+            view.updateVal(did, droplet ? "" : "none", "style.display");
+            view.updateVal(dAmtBelow, droplet ? "" : "none", "style.display");
+            view.updateVal(dAmtTop, droplet ? "" : "none", "style.display");
+            if (!droplet) {
+                continue;
+            }
+            if (paused) {
+                droplet.prevPathProgress = droplet.pathProgress || 0;
+            }
+            const dpos = engine.getResortPathPosition(view.pathTokenVisualProgress(droplet));
+            view.updateVal(did, view.gpuTranslateSubpixel(dpos.x - 5, dpos.y - 5), "style.transform");
+            view.updateVal(dAmtBelow, view.gpuTranslateSubpixel(dpos.x, dpos.y + 10, "translateX(-50%)"), "style.transform");
+            view.updateVal(dAmtTop, view.gpuTranslateSubpixel(dpos.x, dpos.y - 18, "translateX(-50%)"), "style.transform");
+        }
     },
     updateVal: function(id, newVal, type="textContent", sigFigs) {
         const el = viewData.cached[id];

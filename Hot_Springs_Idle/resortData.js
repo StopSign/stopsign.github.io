@@ -2938,6 +2938,7 @@ var resortData = {
                 arrangementOfTraderResponsibilityUnlocked: false,
                 arrangementOfPaperMoneyUnlocked: false,
                 arrangementOfHotWaterUnlocked: false,
+                arrangementOfRhythmicDropletsUnlocked: false,
                 arrangementOfThirstUnlocked: false,
                 arrangementOfViscosityUnlocked: false,
                 arrangementOfTargetPriorityUnlocked: false,
@@ -2959,6 +2960,7 @@ var resortData = {
             introMuted: "Automation for an easy life, so you can go outside.",
             upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfPathMaking", "arrangementOfAppraisal", "arrangementOfReview",
                 "arrangementOfViscosity", "arrangementOfWaterOrders", "arrangementOfDigging",  "arrangementOfShopping",  "arrangementOfHotWater",
+                "arrangementOfRhythmicDroplets",
                 "arrangementOfTargetPriority", "arrangementOfManaOrders", "arrangementOfDoubledStone", "arrangementOfRailingSafety",
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
@@ -3335,6 +3337,37 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfHotWaterUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfRhythmicDroplets: {
+                    key: "arrangement_of_rhythmic_droplets",
+                    name: "Arrangement of Rhythmic Droplets",
+                    description: "Unlocks a checkbox on water spirits at the Hidden Spring. While checked, droplets spawn at equal intervals of the path travel time.",
+                    cost: { stone: 1500 },
+                    weavingTime: 750,
+                    canBuy: function() {
+                        const a = data.progress.base.atelier;
+                        const g = data.progress.base.garden;
+                        return (a && (a.fireLaunchersBought || 0) >= 1)
+                            && !(g && g.arrangementOfRhythmicDropletsUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfRhythmicDropletsUnlocked = true;
+                        const hs = data.progress.base.hiddenSpring;
+                        if (hs && hs.equalDropletSpacing === undefined) {
+                            hs.equalDropletSpacing = false;
+                        }
+                    },
+                    rowVisible: function() {
+                        const a = data.progress.base.atelier;
+                        const g = data.progress.base.garden;
+                        return (a && (a.fireLaunchersBought || 0) >= 1)
+                            && !(g && g.arrangementOfRhythmicDropletsUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfRhythmicDropletsUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 },

@@ -5014,6 +5014,37 @@ let engine = {
         const garden = data.progress.base && data.progress.base.garden;
         return !!(garden && garden.arrangementOfHeatTargetingUnlocked);
     },
+    isArrangementOfRhythmicDropletsUnlocked: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        return !!(garden && garden.arrangementOfRhythmicDropletsUnlocked);
+    },
+    isEqualDropletSpacingEnabled: function() {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        return engine.isArrangementOfRhythmicDropletsUnlocked() && !!(hs && hs.equalDropletSpacing);
+    },
+    getHiddenSpringWaterSpirits: function() {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        if (!hs || !hs.spirits) {
+            return [];
+        }
+        const list = [];
+        for (let i = 0; i < hs.spirits.length; i++) {
+            const spirit = hs.spirits[i];
+            if (spirit.kind === "water" && (spirit.location || "hiddenSpring") === "hiddenSpring") {
+                list.push(spirit);
+            }
+        }
+        list.sort(engine.compareSpiritSpawnPriority);
+        return list;
+    },
+    getEqualDropletSpacingIntervalMs: function(count) {
+        const n = count || 0;
+        if (n <= 0) {
+            return 0;
+        }
+        const tSec = engine.estimatePathTravelSeconds(0, engine.getDropletTravelSpeedOpts());
+        return (tSec * 1000) / n;
+    },
     isArrangementOfDiggingUnlocked: function() {
         const garden = data.progress.base && data.progress.base.garden;
         return !!(garden && garden.arrangementOfDiggingUnlocked);
@@ -5126,6 +5157,28 @@ let engine = {
             };
         }
         const hs = data.progress.base.hiddenSpring;
+        if (engine.isEqualDropletSpacingEnabled() && (spirit.location || "hiddenSpring") === "hiddenSpring") {
+            const ordered = engine.getHiddenSpringWaterSpirits();
+            const n = ordered.length;
+            let index = -1;
+            for (let i = 0; i < n; i++) {
+                if (ordered[i].id === spirit.id) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index > 0 && n > 1) {
+                const intervalMs = engine.getEqualDropletSpacingIntervalMs(n);
+                const elapsed = hs.equalSpacingElapsedMs || 0;
+                const cycleId = hs.equalSpacingCycleId || 0;
+                const spawnedThisCycle = cycleId > 0 && spirit.equalSpacingCycleId === cycleId;
+                const phaseReady = !!(hs.equalSpacingCycleActive) && !spawnedThisCycle && elapsed >= index * intervalMs;
+                if (!phaseReady) {
+                    return { text: "waiting for spacing", pct: 100 };
+                }
+            }
+            return { text: "forming droplet", pct: 100 };
+        }
         const ready = engine.getWaterSpiritsReadyToSpawnDroplets();
         if (!ready.length || ready[0].id !== spirit.id || hs.dropletGlobalCooldownMs > 0) {
             return { text: "Waiting for room", pct: 0 };
@@ -5341,6 +5394,26 @@ let engine = {
         }
         return { x: 0, y: 0 };
     },
+    getFireLauncherSlotCenter: function(platformKey) {
+        const fallback = engine.getFireLauncherPlatformMapPos(platformKey);
+        if (typeof document === "undefined") {
+            return fallback;
+        }
+        const slot = document.getElementById("spiritSlot_fireLauncher_" + platformKey + "_0");
+        const map = document.getElementById("baseResortMap");
+        if (!slot || !map) {
+            return fallback;
+        }
+        const sr = slot.getBoundingClientRect();
+        const mr = map.getBoundingClientRect();
+        if (sr.width <= 0 || sr.height <= 0) {
+            return fallback;
+        }
+        return {
+            x: (sr.left + sr.width / 2) - mr.left,
+            y: (sr.top + sr.height / 2) - mr.top
+        };
+    },
     getDropletMapPosition: function(droplet) {
         if (!droplet) {
             return null;
@@ -5539,7 +5612,7 @@ let engine = {
     },
     spawnFireLauncherAoePulse: function(platformKey, rangePx) {
         const fl = data.progress.base.fireLaunchers;
-        const pos = engine.getFireLauncherPlatformMapPos(platformKey);
+        const pos = engine.getFireLauncherSlotCenter(platformKey);
         fl.aoePulses.push({
             id: (fl.aoePulseIdCounter || 1),
             platformKey: platformKey,
@@ -5608,9 +5681,12 @@ let engine = {
             if (state.attackTimerMs < (def.intervalMs || 1000)) {
                 continue;
             }
-            const pos = engine.getFireLauncherPlatformMapPos(pk);
+            const pos = def.attackType === "aoe"
+                ? engine.getFireLauncherSlotCenter(pk)
+                : engine.getFireLauncherPlatformMapPos(pk);
             if (def.attackType === "aoe") {
-                const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, rangePx);
+                const roundedRange = Math.round(rangePx);
+                const inRange = engine.getDropletsInPixelRange(pos.x, pos.y, roundedRange);
                 if (!inRange.length) {
                     continue;
                 }
@@ -5620,7 +5696,7 @@ let engine = {
                     engine.applyFireLauncherHeat(inRange[ri], heatPerStrike);
                     engine.grantFireLauncherStrikeExp(pk, heatPerStrike);
                 }
-                engine.spawnFireLauncherAoePulse(pk, rangePx);
+                engine.spawnFireLauncherAoePulse(pk, roundedRange);
             } else {
                 const durationMs = engine.getFireLauncherProjectileDurationMs(def);
                 const pick = engine.pickFireLauncherTarget(pk, def, pos, durationMs);
@@ -6499,7 +6575,8 @@ let engine = {
             payloadStone: loadStone,
             payloadOre: loadOre,
             colorIndex: spirit ? (spirit.colorIndex || 0) : 0,
-            pathProgress: 0
+            pathProgress: 0,
+            prevPathProgress: 0
         });
         base.pebbleIdCounter = (base.pebbleIdCounter || 1) + 1;
         return true;
@@ -6516,7 +6593,8 @@ let engine = {
         const next = [];
         for (let i = 0; i < pebbles.length; i++) {
             const pebble = pebbles[i];
-            pebble.pathProgress = engine.advancePathProgress(pebble.pathProgress || 0, dtSec, 1, speedOpts);
+            pebble.prevPathProgress = pebble.pathProgress || 0;
+            pebble.pathProgress = engine.advancePathProgress(pebble.prevPathProgress, dtSec, 1, speedOpts);
             if (pebble.pathProgress >= distance) {
                 const stoneAmt = engine.getPebblePayloadStone(pebble);
                 const oreAmt = engine.getPebblePayloadOre(pebble);
@@ -6621,8 +6699,9 @@ let engine = {
                     }
                 }
             }
-            engine.addWaterToCistern(dropletVol, dropletHeat);
-            const essenceGain = d.essence || 0;
+            const deliveredHeat = Math.min(dropletHeat, 100);
+            engine.addWaterToCistern(dropletVol, deliveredHeat);
+            const essenceGain = Math.max(0, dropletHeat - 100) + (d.essence || 0);
             cistern.essence = (cistern.essence || 0) + essenceGain;
             if (essenceGain > 0) {
                 data.progress.essenceMade = (data.progress.essenceMade || 0) + essenceGain;
@@ -6665,7 +6744,8 @@ let engine = {
             waterVolume: volume,
             heat: 50,
             essence: 0,
-            pathProgress: 0
+            pathProgress: 0,
+            prevPathProgress: 0
         });
         base.dropletIdCounter = (base.dropletIdCounter || 1) + 1;
         return true;
@@ -6678,11 +6758,7 @@ let engine = {
                 continue;
             }
             const add = Math.max(0, amount || 0);
-            const heat = d.heat || 0;
-            const room = Math.max(0, 100 - heat);
-            const toHeat = Math.min(room, add);
-            d.heat = heat + toHeat;
-            d.essence = (d.essence || 0) + (add - toHeat);
+            d.heat = (d.heat || 0) + add;
             return true;
         }
         return false;
@@ -6701,12 +6777,61 @@ let engine = {
             }
             spirit.dropletCooldownMs = Math.max(0, (spirit.dropletCooldownMs || 0) - tickMs);
         }
+        if (engine.isEqualDropletSpacingEnabled()) {
+            engine.updateEqualDropletSpacing(hs, formMs, tickMs);
+            return;
+        }
         const ready = engine.getWaterSpiritsReadyToSpawnDroplets();
         if (ready.length && hs.dropletGlobalCooldownMs <= 0) {
             const spirit = ready[0];
             if (engine.createDropletForSpirit(spirit.id)) {
                 spirit.dropletCooldownMs = formMs;
                 hs.dropletGlobalCooldownMs = engine.waterDropletGlobalGapMs;
+            }
+        }
+    },
+    updateEqualDropletSpacing: function(hs, formMs, tickMs) {
+        const ordered = engine.getHiddenSpringWaterSpirits();
+        const n = ordered.length;
+        if (!n) {
+            return;
+        }
+        if (hs.equalSpacingCycleActive) {
+            hs.equalSpacingElapsedMs = (hs.equalSpacingElapsedMs || 0) + tickMs;
+        }
+        const intervalMs = engine.getEqualDropletSpacingIntervalMs(n);
+        for (let i = 0; i < n; i++) {
+            const spirit = ordered[i];
+            if (engine.getDropletForSpirit(spirit.id)) {
+                continue;
+            }
+            if ((spirit.dropletCooldownMs || 0) > 0) {
+                continue;
+            }
+            if (i === 0) {
+                const nextId = (hs.equalSpacingCycleId || 0) + 1;
+                if (engine.createDropletForSpirit(spirit.id)) {
+                    hs.equalSpacingCycleId = nextId;
+                    hs.equalSpacingElapsedMs = 0;
+                    hs.equalSpacingCycleActive = true;
+                    spirit.dropletCooldownMs = formMs;
+                    spirit.equalSpacingCycleId = nextId;
+                }
+                continue;
+            }
+            if (!hs.equalSpacingCycleActive) {
+                continue;
+            }
+            const cycleId = hs.equalSpacingCycleId || 0;
+            if (spirit.equalSpacingCycleId === cycleId) {
+                continue;
+            }
+            if ((hs.equalSpacingElapsedMs || 0) < i * intervalMs) {
+                continue;
+            }
+            if (engine.createDropletForSpirit(spirit.id)) {
+                spirit.dropletCooldownMs = formMs;
+                spirit.equalSpacingCycleId = cycleId;
             }
         }
     },
@@ -6726,7 +6851,8 @@ let engine = {
             if (heat > 0) {
                 d.heat = Math.max(0, heat - (heat * 0.02 * sec));
             }
-            d.pathProgress = engine.advancePathProgress(d.pathProgress || 0, sec, 1, speedOpts);
+            d.prevPathProgress = d.pathProgress || 0;
+            d.pathProgress = engine.advancePathProgress(d.prevPathProgress, sec, 1, speedOpts);
             if (d.pathProgress >= distance) {
                 engine.completeDropletDelivery(d);
             } else {
@@ -9208,7 +9334,7 @@ let engine = {
             engine.applyInstantSameBuildingGatherForJob(queue[i]);
         }
     },
-    getFoxDenResourcePriority: function(site, jobKey) {
+    getFoxDenResourcePriority: function(site, jobKey, allowed) {
         if (!site || !site.required) {
             return null;
         }
@@ -9218,6 +9344,9 @@ let engine = {
         let best = null;
         for (let i = 0; i < types.length; i++) {
             const t = types[i];
+            if (allowed && !allowed[t]) {
+                continue;
+            }
             if (engine.isSameBuildingGatherResource(t, deliverMapKey)) {
                 continue;
             }
@@ -9268,14 +9397,14 @@ let engine = {
         const workerSpeed = engine.getFoxDenCarrierSpeed({ isOkami: false });
         return { spawnOkami: okamiSpeed >= workerSpeed };
     },
-    getFoxDenSpawnTargetForJobKey: function(rh, jobKey) {
+    getFoxDenSpawnTargetForJobKey: function(rh, jobKey, allowed) {
         const unlockKey = engine.parseBuildingJobKey(jobKey);
         if (unlockKey) {
             const site = rh.constructionSites[unlockKey];
             if (!site || site.status !== "building" || site.paused) {
                 return null;
             }
-            const priority = engine.getFoxDenResourcePriority(site, jobKey);
+            const priority = engine.getFoxDenResourcePriority(site, jobKey, allowed);
             if (!priority) {
                 return null;
             }
@@ -9292,7 +9421,7 @@ let engine = {
         if (!job || job.status !== "gathering" || job.paused) {
             return null;
         }
-        const priority = engine.getFoxDenResourcePriority(job, jobKey);
+        const priority = engine.getFoxDenResourcePriority(job, jobKey, allowed);
         if (!priority) {
             return null;
         }
@@ -9305,11 +9434,18 @@ let engine = {
             amount: priority.amount
         };
     },
-    getFoxDenSpawnTarget: function(rh) {
-        for (let oi = 0; oi < rh.jobQueue.length; oi++) {
-            const target = engine.getFoxDenSpawnTargetForJobKey(rh, rh.jobQueue[oi]);
-            if (target) {
-                return target;
+    getFoxDenSpawnTarget: function(rh, resourceFilter) {
+        const manaOnly = resourceFilter === "mana";
+        const allowed = resourceFilter && typeof resourceFilter === "object" ? resourceFilter : null;
+        if (!manaOnly) {
+            for (let oi = 0; oi < rh.jobQueue.length; oi++) {
+                const target = engine.getFoxDenSpawnTargetForJobKey(rh, rh.jobQueue[oi], allowed);
+                if (target) {
+                    return target;
+                }
+            }
+            if (allowed) {
+                return null;
             }
         }
         return engine.getFoxDenManaSpawnTarget(rh);
@@ -9583,13 +9719,13 @@ let engine = {
         }
         rh.constructionCarriers = [];
     },
-    trySpawnFoxDenCarrier: function() {
+    trySpawnFoxDenCarrier: function(resourceFilter) {
         const rh = data.progress.base.foxDen;
         const wf = engine.getFoxDenFreeWorkforce(rh);
         if (wf.freeWorkers <= 0 && !wf.okamiFree) {
             return false;
         }
-        const target = engine.getFoxDenSpawnTarget(rh);
+        const target = engine.getFoxDenSpawnTarget(rh, resourceFilter);
         if (!target) {
             return false;
         }
@@ -9627,7 +9763,7 @@ let engine = {
             engine.applyDirtRoadOnSpawn(manaCarrier, engine.getConstructionSourceBuildingKey("mana"), target.mapKey);
             rh.constructionCarriers.push(manaCarrier);
             rh.carrierIdCounter = (rh.carrierIdCounter || 1) + 1;
-            return true;
+            return "mana";
         }
         const site = target.site;
         const delivered = (site.delivered && site.delivered[resourceType]) || 0;
@@ -9661,7 +9797,7 @@ let engine = {
         engine.applyDirtRoadOnSpawn(gatherCarrier, engine.getConstructionSourceBuildingKey(resourceType), target.mapKey);
         rh.constructionCarriers.push(gatherCarrier);
         rh.carrierIdCounter = (rh.carrierIdCounter || 1) + 1;
-        return true;
+        return resourceType;
     },
     updateFoxDenConstruction: function(tickMs) {
         const rh = data.progress.base.foxDen;
@@ -9717,10 +9853,43 @@ let engine = {
         rh.constructionCarriers = next;
         engine.tryFoxDenOkamiAutoPathJobs();
         engine.updateArrangementOfReview(tickMs);
-        rh._sinceLastCarrierMs = (rh._sinceLastCarrierMs || 0) + tickMs;
         const minGap = (resortData.foxDenCarrierSpawnMinMs !== undefined) ? resortData.foxDenCarrierSpawnMinMs : 500;
+        const materialKeys = ["wood", "stone", "bars", "ore"];
+        if (!rh._carrierGapMsByResource) {
+            rh._carrierGapMsByResource = {};
+        }
+        const gapByResource = rh._carrierGapMsByResource;
+        for (let gi = 0; gi < materialKeys.length; gi++) {
+            const resKey = materialKeys[gi];
+            if (gapByResource[resKey] === undefined) {
+                gapByResource[resKey] = rh._sinceLastCarrierMs || 0;
+            }
+            gapByResource[resKey] += tickMs;
+        }
+        let keepSpawningMaterials = true;
+        while (keepSpawningMaterials) {
+            const allowed = {};
+            let anyReady = false;
+            for (let gi = 0; gi < materialKeys.length; gi++) {
+                const resKey = materialKeys[gi];
+                if ((gapByResource[resKey] || 0) >= minGap) {
+                    allowed[resKey] = true;
+                    anyReady = true;
+                }
+            }
+            if (!anyReady) {
+                break;
+            }
+            const spawnedRes = engine.trySpawnFoxDenCarrier(allowed);
+            if (!spawnedRes || !allowed[spawnedRes]) {
+                keepSpawningMaterials = false;
+            } else {
+                gapByResource[spawnedRes] = 0;
+            }
+        }
+        rh._sinceLastCarrierMs = (rh._sinceLastCarrierMs || 0) + tickMs;
         if (rh._sinceLastCarrierMs >= minGap) {
-            if (engine.trySpawnFoxDenCarrier()) {
+            if (engine.trySpawnFoxDenCarrier("mana")) {
                 rh._sinceLastCarrierMs = 0;
             }
         }
