@@ -1081,7 +1081,7 @@ let engine = {
                 difficulty: (map.baseDifficulty || 1) * cr.ratio * (tierMult.combat || 1),
                 remainingEnemies: rem,
                 coins: engine.coinsAwardFromIntruderGain(cr.perIntruderGain),
-                exp: engine.expAwardFromIntruderExpBase(cr.expBasePerIntruder),
+                exp: engine.expDisplayFromIntruderExpBase(cr.expBasePerIntruder),
                 shardInfo: shardInfo
             });
         }
@@ -1471,9 +1471,10 @@ let engine = {
         }
         if (typeof view !== "undefined" && view.spawnKillRewardFloater) {
             const pos = engine.getKillFloaterScreenPosition(intruder);
+            const expDisplay = expGain * engine.getLevelingExpCardMultiplier();
             const parts = [
                 `${intToStringRound(coinsGain)} coins`,
-                `+${round1(expGain)} exp`
+                `+${round1(expDisplay)} exp`
             ];
             if (shardDrop) {
                 parts.push(`+${shardDrop.gain} ${shardDrop.name}`);
@@ -1501,6 +1502,10 @@ let engine = {
     expAwardFromIntruderExpBase: function(expBase) {
         const b = expBase !== undefined ? expBase : 1;
         return b * engine.getCharacterExpMultiplier();
+    },
+    /** Wave/floater display: skill/Soul award × Leveling Exp shrine card (matches `addCloneLevelExp`). */
+    expDisplayFromIntruderExpBase: function(expBase) {
+        return engine.expAwardFromIntruderExpBase(expBase) * engine.getLevelingExpCardMultiplier();
     },
     /** Matches `onIntruderKilled`: nickelAndDime flat + extortion coins multiplier over stored zone gain. */
     coinsAwardFromIntruderGain: function(storedGain) {
@@ -5077,7 +5082,7 @@ let engine = {
         for (let i = 0; i < spirits.length; i++) {
             const s = spirits[i];
             if (s.kind === "fire" && s.location === "bonfire") {
-                total += s.spiritPower || engine.getSpiritPowerForLevel(s.level || 1);
+                total += engine.getEffectiveSpiritPower(s);
             }
         }
         return total;
@@ -6107,6 +6112,42 @@ let engine = {
             return 0;
         }
         return (spirit.spiritPower || 0) + (spirit.training || 0);
+    },
+    /** Assumed continuous forge exp/s when always smelting (batch × 3 / 60s). */
+    getAtelierForgeExpPerSec: function(spirit) {
+        const batch = engine.getForgeSmeltBatch(spirit);
+        return (batch * 3) / 60;
+    },
+    /** Exp granted per droplet hit on a fire launcher. */
+    getFireLauncherExpPerDroplet: function(platformKey) {
+        return engine.getFireLauncherHeatPerStrike(platformKey) / 5;
+    },
+    /** Assumed continuous exp/s while always firing (one droplet hit per interval). */
+    getFireLauncherExpPerSec: function(platformKey) {
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        const intervalMs = (def && def.intervalMs) || 1000;
+        if (intervalMs <= 0) {
+            return 0;
+        }
+        return engine.getFireLauncherExpPerDroplet(platformKey) / (intervalMs / 1000);
+    },
+    /** Assumed continuous droplet delivery exp/s: volume / full-path travel time. */
+    getWaterSpiritDropletExpPerSec: function(spirit) {
+        const volume = engine.getWaterDropletVolumeForSpirit(spirit);
+        const travelSec = engine.estimatePathTravelSeconds(0, engine.getDropletTravelSpeedOpts());
+        if (!(travelSec > 0)) {
+            return 0;
+        }
+        return volume / travelSec;
+    },
+    /** Assumed continuous training-spot exp/s from card effects. */
+    getSpiritTrainingExpPerSec: function() {
+        const trainFx = engine.getSpiritTrainingCardEffects();
+        const durationMs = trainFx.durationMs || 0;
+        if (durationMs <= 0) {
+            return 0;
+        }
+        return (trainFx.exp || 0) / (durationMs / 1000);
     },
     isSpiritAtTrainingSpot: function(spirit) {
         return !!(spirit && spirit.location === "spiritTraining");

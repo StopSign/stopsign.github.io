@@ -217,7 +217,7 @@ let createView = {
                     <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="55" onchange="events.setBonfireFireTendingCap(this.value)">
                     <span class="muted-text">Assigned carriers skip trips when heat is at or above this value.</span>
                 </div>
-                <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power: <span id="bonfireFireSpiritPower">0</span></div>
+                <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power (base + training): <span id="bonfireFireSpiritPower">0</span></div>
                 <div id="bonfireFireSpiritHeat_row" class="base-row muted-text" style="display:none"></div>
                 <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Wood carry</span>: <span id="bonfireWoodCarry"></span> per trip</div>
                 <div id="bonfireHeatPerFuel_row" class="base-row" style="display:none">1 wood gives <span id="bonfireHeatPerWood"></span> heat<span id="bonfireHeatPerCoalPart" style="display:none"> | 1 coal gives <span id="bonfireHeatPerCoal"></span> heat</span></div>
@@ -479,7 +479,7 @@ let createView = {
                     <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(×1.8/lvl)</span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
-                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore <span class="muted-text">floor(√spirit power), +20% per Pebble Pay, rounded up</span></div>
+                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore <span class="muted-text">floor(√effective spirit power), +20% per Pebble Pay, rounded up</span></div>
                         <div id="spiritInfoPebbleEtas" class="base-row" style="display:none"></div>
                         <div class="base-row muted-text">The Earth Spirit can be assigned to the Mine to get Exp and valuable resources, or it can be assigned to the Hidden Spring to create pebbles along the path and send the resources to the resort.</div>
                         <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
@@ -504,7 +504,7 @@ let createView = {
                     <div id="spiritInfoPlantExtras" style="display:none">
                         <div class="base-row">Bamboo column: <span id="spiritInfoPlantColumn"></span></div>
                         <div class="base-row" id="spiritInfoPlantChipsBonus"></div>
-                        <div class="base-row muted-text">Plant spirits gain 1 exp each time a chip regrows in their assigned bamboo column. They add their spirit power to the base chips of the bamboo.</div>
+                        <div class="base-row muted-text">Plant spirits gain 1 exp each time a chip regrows in their assigned bamboo column. They add their effective spirit power (base + training) to the base chips of the bamboo.</div>
                     </div>
                     <div id="spiritInfoTaskWrap">
                         <div id="spiritInfoTaskText" class="base-row base-gap-top"></div>
@@ -714,6 +714,7 @@ let createView = {
                     <div class="base-row">Ember cost: <span id="fireLauncherInfoEmberCost"></span></div>
                     <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span><span id="fireLauncherInfoHeatBonus" class="muted-text"></span></div>
                     <div class="base-row">Exp per droplet: <span id="fireLauncherInfoExp"></span></div>
+                    <div class="base-row">Exp/s: <span id="fireLauncherInfoExpPerSec"></span> <span class="muted-text">(assumes always firing, per droplet hit)</span></div>
                     <div class="base-row">Assigned: <span id="fireLauncherInfoSpirit"></span></div>
                     <div id="fireLauncherTargetPriority_row" class="base-row fire-launcher-target-radios" style="display:none">
                         Target:
@@ -911,7 +912,11 @@ let createView = {
         const skillsList = document.getElementById("skillsList");
         const tipsUnlocked = engine.isSkillTipsUnlocked();
         const tipsHiddenStyle = tipsUnlocked ? "" : " style=\"display:none\"";
-        let col = `<div id="skillsListColumn" class="skills-list-column"><div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>`;
+        let col = `<div id="skillsListColumn" class="skills-list-column">
+            <div id="skillsListSearchRow" class="skills-list-search-row">
+                <input type="search" id="skillsListSearch" class="skills-list-search" placeholder="Search skills…" autocomplete="off" spellcheck="false" oninput="events.setSkillListSearch(this.value)">
+            </div>
+            <div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>`;
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const key = skills.keysInOrder[i];
             const skill = data.progress.skills[key];
@@ -974,7 +979,7 @@ let createView = {
         skillsList.className = "skills-tab-layout";
         skillsList.innerHTML = col + `<div class="skills-info-column">${sortRadios}${aside}</div>`;
         createView.queueCache(
-            "skillsListColumn", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards", "skillInfoPanel",
+            "skillsListColumn", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards", "skillInfoPanel",
             "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
@@ -1207,7 +1212,7 @@ let createView = {
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
             "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoEmbersRequire", "fireLauncherInfoRange", "fireLauncherInfoRangeBonus", "fireLauncherInfoInterval",
-            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoHeatBonus", "fireLauncherInfoExp", "fireLauncherInfoSpirit",
+            "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoHeatBonus", "fireLauncherInfoExp", "fireLauncherInfoExpPerSec", "fireLauncherInfoSpirit",
             "fireLauncherUpgrades_pathMid", "fireLauncherUpgrades_pathLower", "fireLauncherUpgrades_bendTop",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",
             "fireLauncherTarget_coldest", "fireLauncherTarget_hottest", "fireLauncherTarget_coldest_label", "fireLauncherTarget_hottest_label",

@@ -2,6 +2,7 @@ let viewData = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
     prevValues: {},
     scheduled: [],
+    skillListSearch: "",
     layout: {
         battlefieldHeightPx: 718,
         battlefieldWidthPx: 688,
@@ -3010,7 +3011,8 @@ let view = {
             : `${round2(heatPerStrike)}C`;
         view.updateVal("fireLauncherInfoHeat", heatText);
         view.updateVal("fireLauncherInfoHeatBonus", heatBonusPct > 0 ? ` (+${heatBonusPct}%)` : "");
-        view.updateVal("fireLauncherInfoExp", round2(heatPerStrike / 5));
+        view.updateVal("fireLauncherInfoExp", round2(engine.getFireLauncherExpPerDroplet(key)));
+        view.updateVal("fireLauncherInfoExpPerSec", round2(engine.getFireLauncherExpPerSec(key)));
         view.updateVal("fireLauncherInfoSpirit", spirit
             ? `${engine.getSpiritDisplayName(spirit)} (Lv ${spirit.level || 1})`
             : "Unassigned");
@@ -3335,13 +3337,14 @@ let view = {
                     : "playing at pond (pond is empty)");
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
+                const waterExpPerSec = round2(engine.getWaterSpiritDropletExpPerSec(spirit));
                 const spiritDroplets = engine.getDropletsForSpirit(spirit.id);
                 if (spiritDroplets.length > 0) {
                     const droplet = spiritDroplets[0];
                     view.updateVal("spiritInfoWaterVolume", `${round2(droplet.waterVolume || 0)}L`);
                     view.updateVal("spiritInfoHeat", `${round1Fixed(droplet.heat || 0)}C`);
                     view.updateVal("spiritInfoEssence", round2(droplet.essence || 0));
-                    view.updateVal("spiritInfoTaskText", "droplet active");
+                    view.updateVal("spiritInfoTaskText", `droplet active (+${waterExpPerSec} exp/s)`);
                     view.updateVal("spiritInfoTaskFill", "100%", "style.width");
                     const dEtaLines = [];
                     for (let dei = 0; dei < spiritDroplets.length; dei++) {
@@ -3361,7 +3364,7 @@ let view = {
                     view.updateVal("spiritInfoHeat", "-");
                     view.updateVal("spiritInfoEssence", "-");
                     const task = engine.getWaterSpiritDropletTaskInfo(spirit);
-                    view.updateVal("spiritInfoTaskText", task.text);
+                    view.updateVal("spiritInfoTaskText", `${task.text} (+${waterExpPerSec} exp/s)`);
                     view.updateVal("spiritInfoTaskFill", `${task.pct}%`, "style.width");
                     view.updateVal("spiritInfoDropletEtas", "none", "style.display");
                     view.updateVal("spiritInfoDropletEtas", "", "innerHTML");
@@ -3378,6 +3381,7 @@ let view = {
                 const embers = state ? (state.embers || 0) : 0;
                 const regenRate = (engine.getEffectiveSpiritPower(spirit) || 1)
                     * engine.getFireLauncherEmberRegenMult(launcherKey);
+                const launcherExpPerSec = round2(engine.getFireLauncherExpPerSec(launcherKey));
                 data.progress.selectedFireLauncherKey = launcherKey;
                 view.updateVal("spiritInfoFireLauncherExtras", "", "style.display");
                 view.updateVal("spiritInfoFireLauncherName", def ? def.name : "Fire Launcher");
@@ -3395,20 +3399,22 @@ let view = {
                     view.updateVal("spiritInfoFireLauncherStats", "");
                 }
                 view.updateVal("spiritInfoFireNote", def
-                    ? `Powering ${def.name} (+${round2(regenRate)} embers/s).`
+                    ? `Powering ${def.name} (+${round2(regenRate)} embers/s, +${launcherExpPerSec} exp/s). Exp/s assumes always firing, per droplet hit.`
                     : "Assigned to fire launcher.");
-                view.updateVal("spiritInfoTaskText", `charging embers (${round1Fixed(embers)}/${maxEmbers})`);
+                view.updateVal("spiritInfoTaskText", `charging embers (${round1Fixed(embers)}/${maxEmbers}) · +${launcherExpPerSec} exp/s`);
                 const pct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
                 const batchSize = engine.getForgeSmeltBatch(spirit);
                 const forgeLevel = engine.getLargerForgeBought();
+                const forgeExpPerSec = round2(engine.getAtelierForgeExpPerSec(spirit));
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
+                const effPower = round2(engine.getEffectiveSpiritPower(spirit) || 1);
                 const forgeNote = forgeLevel > 0
-                    ? `Smelting ceil(√spirit power × ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s. +50% per Larger Forge, rounded up. Exp = bars × 3.`
-                    : `Smelting floor(√spirit power) = ${batchSize} ore into bars every 60s. Exp = bars × 3.`;
+                    ? `Smelting ceil(√effective power × ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s (effective power ${effPower}). +50% per Larger Forge, rounded up. Exp = bars × 3.`
+                    : `Smelting floor(√effective power) = ${batchSize} ore into bars every 60s (effective power ${effPower}). Exp = bars × 3.`;
                 view.updateVal("spiritInfoFireNote", forgeNote);
-                view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s)`);
+                view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s, +${forgeExpPerSec} exp/s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "bonfire") {
                 const excessHeat = engine.getBonfireExcessHeatForExp();
@@ -3432,16 +3438,29 @@ let view = {
         if (atTraining) {
             view.updateVal("spiritInfoTaskWrap", "", "style.display");
             view.updateVal("spiritInfoFireNote", "");
+            const trainExpPerSec = round2(engine.getSpiritTrainingExpPerSec());
+            const taskEl = viewData.cached.spiritInfoTaskText;
             if (engine.canSpiritTrain(spirit)) {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
                 const ms = spirit.trainingTimerMs || 0;
                 const durationMs = Math.max(1, engine.getSpiritTrainingDurationMs());
                 const pct = Math.max(0, Math.min(100, (ms / durationMs) * 100));
-                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/${roundNearestDecimals(durationMs / 1000, 2)}s)`);
+                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/${roundNearestDecimals(durationMs / 1000, 2)}s, +${trainExpPerSec} exp/s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
+                if (taskEl) {
+                    taskEl.classList.remove("muted-text");
+                }
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
-                view.updateVal("spiritInfoTaskText", "");
+                view.updateVal("spiritInfoTaskText", `+${trainExpPerSec} exp/s (waiting — need mana and training below spirit power)`);
+                if (taskEl) {
+                    taskEl.classList.add("muted-text");
+                }
+            }
+        } else {
+            const taskEl = viewData.cached.spiritInfoTaskText;
+            if (taskEl) {
+                taskEl.classList.remove("muted-text");
             }
         }
     },
@@ -4312,13 +4331,45 @@ let view = {
             viewData.prevValues.historyHtml = html;
         }
     },
+    stripHtmlForSearch: function(html) {
+        return String(html == null ? "" : html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    },
+    skillMatchesListSearch: function(skillKey, queryLower) {
+        if (!queryLower) {
+            return true;
+        }
+        const skill = data.progress.skills && data.progress.skills[skillKey];
+        if (!skill) {
+            return false;
+        }
+        const name = String(skill.name || "").toLowerCase();
+        if (name.indexOf(queryLower) >= 0) {
+            return true;
+        }
+        const current = view.stripHtmlForSearch(skills.skillEffectUiSummary(skillKey, skill)).toLowerCase();
+        if (current.indexOf(queryLower) >= 0) {
+            return true;
+        }
+        const reward = view.stripHtmlForSearch(skills.getSkillRewardText(skillKey, skill)).toLowerCase();
+        if (reward.indexOf(queryLower) >= 0) {
+            return true;
+        }
+        const trigger = view.stripHtmlForSearch(skills.getSkillTriggerDescription(skillKey)).toLowerCase();
+        return trigger.indexOf(queryLower) >= 0;
+    },
     /** Show/hide static skill cards for the active Skills sub-tab; toggle empty-state row. */
     updateSkillsListVisibility: function(selectedTab) {
         const tab = selectedTab !== undefined && selectedTab !== null ? selectedTab : (data.progress.selectedSkillsTab || "combat");
         const list = skills.getSkillKeysByCategory(data.progress.skills, tab);
+        const queryLower = String(viewData.skillListSearch || "").trim().toLowerCase();
         const visible = {};
+        let shownCount = 0;
         for (let i = 0; i < list.length; i++) {
-            visible[list[i]] = true;
+            const k = list[i];
+            if (view.skillMatchesListSearch(k, queryLower)) {
+                visible[k] = true;
+                shownCount++;
+            }
         }
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const k = skills.keysInOrder[i];
@@ -4332,11 +4383,15 @@ let view = {
         if (!emptyEl) {
             return;
         }
-        if (list.length > 0) {
+        if (shownCount > 0) {
             emptyEl.style.display = "none";
             return;
         }
         emptyEl.style.display = "block";
+        if (list.length > 0 && queryLower) {
+            emptyEl.textContent = `No skills match “${String(viewData.skillListSearch || "").trim()}”.`;
+            return;
+        }
         const currentCls = data.progress.currentClassKey || "none";
         const hasActiveClass = ["condescend", "scold", "mock"].indexOf(currentCls) >= 0;
         let msg = "";
@@ -4466,9 +4521,18 @@ let view = {
                 column.appendChild(wrap);
             }
         }
+        const searchRow = viewData.cached.skillsListSearchRow;
         const emptyEl = viewData.cached.skillsListEmpty;
+        if (searchRow) {
+            column.insertBefore(searchRow, column.firstChild);
+        }
         if (emptyEl) {
-            column.insertBefore(emptyEl, column.firstChild);
+            const afterSearch = searchRow && searchRow.nextSibling;
+            if (afterSearch) {
+                column.insertBefore(emptyEl, afterSearch);
+            } else {
+                column.appendChild(emptyEl);
+            }
         }
     },
     syncSelectedSkillDetailKey: function(tab) {

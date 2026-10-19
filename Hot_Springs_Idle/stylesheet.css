@@ -1264,6 +1264,26 @@ button {
     max-height: 100%;
 }
 
+.skills-list-search-row {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 0 0 4px;
+    background: #101621;
+}
+
+.skills-list-search {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 5px 8px;
+    font: inherit;
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--input-bg, transparent);
+    color: inherit;
+}
+
 .skills-info-column {
     display: flex;
     flex-direction: column;

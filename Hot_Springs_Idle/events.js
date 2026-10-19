@@ -267,6 +267,10 @@ let events = {
         data.progress.skillListSort = mode;
         view.applySkillListSort();
     },
+    setSkillListSearch: function(raw) {
+        viewData.skillListSearch = String(raw == null ? "" : raw);
+        view.updateSkillsListVisibility(data.progress.selectedSkillsTab || "combat");
+    },
     setSkillGrouping: function(inputEl, commit) {
         const key = data.progress.selectedSkillDetailKey;
         const sk = key && data.progress.skills && data.progress.skills[key];
