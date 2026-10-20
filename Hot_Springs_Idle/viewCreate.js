@@ -995,13 +995,11 @@ let createView = {
                 <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
                     ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
                     onclick="events.selectEquippedSlotSkill('${column}', ${index}, event)">
-                    <div class="skill-equip-slot-head">
-                        <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
-                        <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact" onclick="event.stopPropagation()">
-                            <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
-                            <button id="${idPrefix}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'silver')">☆</button>
-                            <button id="${idPrefix}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'gold')">☆</button>
-                        </div>
+                    <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
+                    <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact skill-equip-slot-stars" onclick="event.stopPropagation()">
+                        <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
+                        <button id="${idPrefix}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'silver')">☆</button>
+                        <button id="${idPrefix}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'gold')">☆</button>
                     </div>
                     <div class="skill-equip-slot-meta" id="${idPrefix}_meta"></div>
                     <div class="skill-row-bars">
@@ -1046,6 +1044,7 @@ let createView = {
         const equippedInfo = `
             <aside id="skillInfoPanel" class="skill-info-aside skills-equipped-info-panel" style="display:none">
                 <div class="skill-info-title-row">
+                    <button type="button" id="skillInfo_unequipBtn" class="tab-button skills-unequip-btn-inline" onclick="events.unequipSelectedSkill()">Unequip</button>
                     <div id="skillInfo_title" class="skill-info-title"></div>
                     <label class="skill-grouping-label">Grouping: <input type="number" id="skillInfo_grouping" class="skill-grouping-input" min="0" max="99" step="1" inputmode="numeric" value="0" oninput="events.setSkillGrouping(this)" onchange="events.setSkillGrouping(this, true)"></label>
                 </div>
@@ -1063,9 +1062,6 @@ let createView = {
                 <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Exp mult from Skills: <span id="skillInfo_integration_mult"></span></div>
                 <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
                 <div id="skillInfo_flavor" class="skill-info-flavor"></div>
-                <div class="skills-unequip-row">
-                    <button type="button" id="skillInfo_unequipBtn" class="tab-button" onclick="events.unequipSelectedSkill()">Unequip</button>
-                </div>
             </aside>`;
 
         const libraryInfo = `
@@ -1132,9 +1128,10 @@ let createView = {
                 <div id="skillsEquippedInfoWrap" class="skills-equipped-info-wrap">${equippedInfo}</div>
             </div>
             <div id="skillsLibraryPane" class="skills-library-pane" style="display:none">
-                <div id="skillsLibraryTalentTotal" class="base-row skills-library-talent-total">Total Talent Level: <span id="skillsTotalTalentLevel">0</span></div>
                 ${createView._buildSkillSlotColumnsHtml("library", true)}
                 <div id="skillsLibraryListArea" class="skills-library-list-area">
+                    <div class="skills-library-separator"></div>
+                    <div id="skillsLibraryResearchedTitle" class="skills-library-researched-title">Researched Skills</div>
                     <div id="skillsListSearchRow" class="skills-list-search-row">
                         <input type="search" id="skillsListSearch" class="skills-list-search" placeholder="Search skills…" autocomplete="off" spellcheck="false" oninput="events.setSkillListSearch(this.value)">
                     </div>
@@ -1151,7 +1148,7 @@ let createView = {
 
         const cacheIds = [
             "skillsEquippedPane", "skillsLibraryPane", "skillsEquippedEmptyCta", "skillsEquippedInfoWrap",
-            "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryTalentTotal", "skillsTotalTalentLevel",
+            "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryResearchedTitle",
             "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColLeft", "skillsLibraryColRight",
             "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
             "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards",
@@ -1166,7 +1163,7 @@ let createView = {
             "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
             "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
             "libSkillInfo_equipError", "libSkillInfo_equipBtn",
-            "combatStarsInventory", "combatStarsCounts", "unequipChargesText",
+            "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel", "unequipChargesText",
             "skillSubTab_equipped", "skillSubTab_library"
         ];
         createView.queueCache.apply(createView, cacheIds);

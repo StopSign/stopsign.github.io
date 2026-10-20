@@ -8,48 +8,45 @@ function loop() {
     }
 
     const now = performance.now();
-    if (now - lastRealSecondTime >= 1000) {
-        driver.realSecondPassed();
-        lastRealSecondTime += 1000;
-    }
-
     if (lastTickTime === 0) lastTickTime = now;
 
     const tickInterval = 1000 / data.gameSettings.ticksPerSecond;
-
-    const maxElapsed = 2000; // ms (2 seconds max catch-up)
     let elapsed = now - lastTickTime;
-    if (elapsed > maxElapsed) {
-        lastTickTime = now - maxElapsed;
-        elapsed = maxElapsed;
+
+    // Huge in-memory gap (e.g. OS sleep): use offline rules, do not live-sim or wall-advance.
+    const liveGapMs = (typeof LIVE_OFFLINE_GAP_MS !== "undefined") ? LIVE_OFFLINE_GAP_MS : (3 * 60 * 1000);
+    if (elapsed >= liveGapMs) {
+        lastTickTime = now;
+        lastRealSecondTime = now;
+        driver.handleLiveOfflineGap(elapsed);
+        timerId = setTimeout(runMessage, 20);
+        return;
     }
 
-    let ticksAvailable = Math.floor(elapsed / tickInterval);
-    let didSomething = false;
-
-    const maxTicksPerLoop = 40;
-    let ticksProcessed = Math.min(ticksAvailable, maxTicksPerLoop);
-
-    if (ticksAvailable > maxTicksPerLoop) {
-        const extraTicks = ticksAvailable - maxTicksPerLoop;
-        data.currentGameState.bonusTime += extraTicks * tickInterval;
-        const bonusCap = (typeof BONUS_TIME_CAP_MS !== "undefined") ? BONUS_TIME_CAP_MS : (6 * 60 * 60 * 1000);
-        if (data.currentGameState.bonusTime > bonusCap) {
-            data.currentGameState.bonusTime = bonusCap;
+    // Wall-clock seconds: toast once per wake; advance autosave by whole seconds elapsed.
+    if (now - lastRealSecondTime >= 1000) {
+        const wholeSeconds = Math.floor((now - lastRealSecondTime) / 1000);
+        lastRealSecondTime += wholeSeconds * 1000;
+        driver.realSecondPassed();
+        timeSinceLastSave += wholeSeconds;
+        while (timeSinceLastSave >= 20) {
+            timeSinceLastSave -= 20;
+            saving.save();
         }
     }
 
-    if (ticksProcessed > 0) {
-        lastTickTime += ticksProcessed * tickInterval;
+    let ticksAvailable = Math.floor(elapsed / tickInterval);
+
+    if (ticksAvailable > 0) {
+        lastTickTime += ticksAvailable * tickInterval;
 
         const effectiveSpeed = data.gameSettings.gameSpeed * data.gameSettings.bonusSpeed;
         const upgradeMultiplier = 1;
-        const exactTicks = (ticksProcessed * effectiveSpeed * upgradeMultiplier) + (tickResidue || 0);
+        const exactTicks = (ticksAvailable * effectiveSpeed * upgradeMultiplier) + (tickResidue || 0);
         const totalTicksToRun = Math.floor(exactTicks);
         tickResidue = exactTicks - totalTicksToRun;
 
         for (let i = 0; i < totalTicksToRun; i++) {
-            didSomething = true;
             engine.gameTick();
             if (data.gameSettings.ticksForSeconds >= data.gameSettings.ticksPerSecond) {
                 data.gameSettings.ticksForSeconds = 0;
@@ -57,7 +54,7 @@ function loop() {
             }
         }
         if (data.gameSettings.bonusSpeed > 1) {
-            const processedElapsed = ticksProcessed * tickInterval;
+            const processedElapsed = ticksAvailable * tickInterval;
             const bonusTimeConsumed = processedElapsed * data.gameSettings.gameSpeed * (data.gameSettings.bonusSpeed - 1);
             data.currentGameState.bonusTime -= bonusTimeConsumed;
             if (data.currentGameState.bonusTime <= 0) {

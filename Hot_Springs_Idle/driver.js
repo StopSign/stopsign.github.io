@@ -1,6 +1,8 @@
 //Contains the timing functions for UI and the game
 
 let driver = {
+    _rafScheduled: false,
+
     startGame: async function() {
         // load calls recalcInterval, which will start the callbacks
         await saving.load();
@@ -41,17 +43,68 @@ let driver = {
             }
         }
     },
+    /** Apply cold-start offline rules to a large in-memory gap (e.g. OS sleep). */
+    handleLiveOfflineGap: function(gapMs) {
+        if (!gapMs || gapMs < LIVE_OFFLINE_GAP_MS) {
+            return;
+        }
+        if (!data.currentGameState) {
+            return;
+        }
+        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
+            return;
+        }
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+            return;
+        }
+        if (typeof offline === "undefined") {
+            return;
+        }
+        offline.ensureState();
+        if (offline.isPauseBonusMode()) {
+            data.currentGameState.pendingOfflineMs = 0;
+            const gained = offline.convertOfflineMsToBonus(gapMs);
+            if (gained > 0) {
+                offline.showBonusGainMessage(gained);
+                console.log(`Live gap: banked ${offline.formatDuration(gained)} bonus time.`);
+            }
+            if (typeof view !== "undefined" && view.updateDebugSpeedButtons) {
+                view.updateDebugSpeedButtons();
+            }
+            return;
+        }
+        offline.addPendingOfflineMs(gapMs);
+        console.log(`Live gap: ${((data.currentGameState.pendingOfflineMs || 0) / 1000).toFixed(1)}s pending offline to process.`);
+        offline.process().then(function() {
+            if (typeof view !== "undefined" && view.updateDebugSpeedButtons) {
+                view.updateDebugSpeedButtons();
+            }
+        });
+    },
     runMessage: function () {
         postMessage({ type: 'update' });
     },
+    scheduleAnimationTick: function() {
+        if (driver._rafScheduled) {
+            return;
+        }
+        driver._rafScheduled = true;
+        requestAnimationFrame(driver.animationTick);
+    },
     animationTick: function(currentTime) {
+        driver._rafScheduled = false;
+
         if (isProcessingOffline || data.gameSettings.stopAll) {
             lastAnimationTime = currentTime;
             if (!isProcessingOffline) {
                 return;
             }
             // Keep RAF alive so the page stays responsive; skip view work while processing.
-            requestAnimationFrame(driver.animationTick);
+            driver.scheduleAnimationTick();
+            return;
+        }
+
+        if (document.hidden) {
             return;
         }
 
@@ -75,19 +128,36 @@ let driver = {
 
         if (timeAccumulators.view1 >= 1000) {
             timeAccumulators.view1 %= 1000;
-            timeSinceLastSave++
-            if(timeSinceLastSave >= 20) {
-                timeSinceLastSave = 0;
-                saving.save();
-            }
             if (!prestigePaused) {
                 view.updateViewOnSecond();
             }
         }
 
-        requestAnimationFrame(driver.animationTick);
+        driver.scheduleAnimationTick();
+    },
+    registerLifecycleHooks: function() {
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                if (typeof saving !== "undefined" && saving.save) {
+                    saving.save();
+                }
+                return;
+            }
+            lastAnimationTime = 0;
+            if (!(data.gameSettings && data.gameSettings.stopAll)) {
+                driver.scheduleAnimationTick();
+            }
+        });
+        const saveBestEffort = function() {
+            if (typeof saving !== "undefined" && saving.save) {
+                saving.save();
+            }
+        };
+        window.addEventListener("pagehide", saveBestEffort);
+        window.addEventListener("beforeunload", saveBestEffort);
     },
     initTimingSystem: async function() {
+        driver.registerLifecycleHooks();
         driver.checkOfflineProgress();
 
         if (typeof offline !== "undefined" && offline.isPauseBonusMode && offline.isPauseBonusMode()) {
@@ -109,8 +179,10 @@ let driver = {
             command: 'start'
         });
 
-        // Start the main thread's rendering loop.
-        requestAnimationFrame(driver.animationTick);
+        // Start the main thread's rendering loop (paused while hidden).
+        if (!document.hidden) {
+            driver.scheduleAnimationTick();
+        }
     },
     secondPassed: function() {
         data.currentGameState.secondsPassed++;

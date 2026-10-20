@@ -4,6 +4,8 @@ const OFFLINE_HOUR_MS = 60 * 60 * 1000;
 const OFFLINE_MIN_PROCESS_MS = 60 * 1000;
 const OFFLINE_TICK_BUDGET_MS = 12;
 const BONUS_TIME_CAP_MS = 6 * 60 * 60 * 1000;
+/** In-memory wall gap at/above this uses offline rules instead of live tick catch-up. */
+const LIVE_OFFLINE_GAP_MS = 3 * 60 * 1000;
 
 let offline = {
     totalToProcessMs: 0,

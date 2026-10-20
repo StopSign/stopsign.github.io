@@ -18,6 +18,11 @@ let viewData = {
     guestRowByGuestId: {},
     guestRowFreeSlots: [],
     guestLogSnapshots: [],
+    pebbleTokenById: {},
+    pebbleTokenFreeSlots: [],
+    dropletTokenById: {},
+    dropletTokenFreeSlots: [],
+    pathTokenPoolsReady: false,
     menuCacheByTab: {},
     pathSegmentHoverIndex: null,
     lastMapBuildingSelection: "",
@@ -447,10 +452,10 @@ let view = {
         const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
         view.updateVal("combatStarsInventory", "", "style.display");
         view.updateVal("combatStarsCounts", starLine, "innerHTML");
+        view.updateVal("skillsTotalTalentLevel", String(skills.getTotalTalentLevel()));
         if (skillsTabNow === "library") {
             view.updateVal("skillsEquippedPane", "none", "style.display");
             view.updateVal("skillsLibraryPane", "", "style.display");
-            view.updateVal("skillsTotalTalentLevel", String(skills.getTotalTalentLevel()));
             view.updateSkillsListVisibility("library");
             view.syncSelectedSkillDetailKey("library");
             view.applySkillDetailSelectionHighlight();
@@ -2868,8 +2873,11 @@ let view = {
             view.updateSpiritSlotAppearance(atelierSlotId, aSpirit, selectedSpiritId);
         }
         const pebbles = base.pebbles || [];
+        const pebbleSlots = view.syncPathTokenPool(
+            pebbles, viewData.pebbleTokenById, viewData.pebbleTokenFreeSlots, "pebbleIdCounter"
+        );
         for (let pi = 0; pi < 12; pi++) {
-            const pebble = pebbles[pi];
+            const pebble = pebbleSlots[pi];
             const pid = `pebbleToken_${pi}`;
             const pAmtId = `pebbleTokenAmt_${pi}`;
             view.updateVal(pid, pebble ? "" : "none", "style.display");
@@ -2881,8 +2889,11 @@ let view = {
             }
         }
         const droplets = base.droplets || [];
+        const dropletSlots = view.syncPathTokenPool(
+            droplets, viewData.dropletTokenById, viewData.dropletTokenFreeSlots, "dropletIdCounter"
+        );
         for (let di = 0; di < 12; di++) {
-            const droplet = droplets[di];
+            const droplet = dropletSlots[di];
             const did = `dropletToken_${di}`;
             const dAmtBelow = `dropletTokenAmtBelow_${di}`;
             const dAmtTop = `dropletTokenAmtTop_${di}`;
@@ -4477,7 +4488,10 @@ let view = {
                         }
                         if (filledEl) {
                             filledEl.style.display = "";
-                            filledEl.className = `skill-equip-slot-filled skill-equip-slot-filled--${slotCat || "any"}`;
+                            const filledCls = `skill-equip-slot-filled skill-equip-slot-filled--${slotCat || "any"}`;
+                            if (filledEl.className !== filledCls) {
+                                filledEl.className = filledCls;
+                            }
                         }
                         if (slotEl) {
                             slotEl.classList.toggle("skill-equip-slot--selected", data.progress.selectedSkillDetailKey === key);
@@ -4515,7 +4529,7 @@ let view = {
         }
         view.updateVal("skillsEquippedEmptyCta", anyFilled ? "none" : "", "style.display");
     },
-    /** Show/hide library researched skill rows; lay out in 2 columns. */
+    /** Show/hide library researched skill rows; lay out in 2 columns. Only reparents when order changes. */
     updateSkillsListVisibility: function(selectedTab) {
         const tab = selectedTab !== undefined && selectedTab !== null ? selectedTab : (data.progress.selectedSkillsTab || "equipped");
         if (tab !== "library") {
@@ -4539,33 +4553,57 @@ let view = {
         }
         const leftCol = viewData.cached.skillsLibraryColLeft;
         const rightCol = viewData.cached.skillsLibraryColRight;
-        for (let i = 0; i < skills.keysInOrder.length; i++) {
-            const k = skills.keysInOrder[i];
-            const wrap = viewData.cached[`skill_wrap_${k}`];
-            if (wrap) {
-                wrap.style.display = "none";
-            }
-        }
-        if (leftCol && rightCol) {
-            for (let oi = 0; oi < orderedVisible.length; oi++) {
-                const k = orderedVisible[oi];
+        const orderSig = orderedVisible.join(",");
+        const needReorder = viewData.libraryListOrderSig !== orderSig;
+        if (needReorder) {
+            viewData.libraryListOrderSig = orderSig;
+            for (let i = 0; i < skills.keysInOrder.length; i++) {
+                const k = skills.keysInOrder[i];
                 const wrap = viewData.cached[`skill_wrap_${k}`];
-                if (!wrap) {
+                if (wrap) {
+                    wrap.style.display = "none";
+                }
+            }
+            if (leftCol && rightCol) {
+                for (let oi = 0; oi < orderedVisible.length; oi++) {
+                    const k = orderedVisible[oi];
+                    const wrap = viewData.cached[`skill_wrap_${k}`];
+                    if (!wrap) {
+                        continue;
+                    }
+                    const targetCol = (oi % 2 === 0) ? leftCol : rightCol;
+                    if (wrap.parentElement !== targetCol) {
+                        targetCol.appendChild(wrap);
+                    }
+                    wrap.style.display = "";
+                }
+            }
+        } else {
+            for (let oi = 0; oi < orderedVisible.length; oi++) {
+                const wrap = viewData.cached[`skill_wrap_${orderedVisible[oi]}`];
+                if (wrap && wrap.style.display === "none") {
+                    wrap.style.display = "";
+                }
+            }
+            for (let i = 0; i < skills.keysInOrder.length; i++) {
+                const k = skills.keysInOrder[i];
+                if (visibleSet[k]) {
                     continue;
                 }
-                wrap.style.display = "";
-                const skill = data.progress.skills[k];
-                const def = skills._byKey[k];
-                view.updateVal(`skill_${k}_name`, skill ? skill.name : k);
-                view.updateVal(`skill_${k}_talent_only`, skill ? `Talent ${skill.talentLevel}` : "");
-                view.updateVal(`skill_${k}_class_tag`, (def && def.category === "class") ? "" : "none", "style.display");
-                view.updateVal(`skill_${k}_equipped_badge`, skills.isSkillEquipped(k) ? "" : "none", "style.display");
-                if (oi % 2 === 0) {
-                    leftCol.appendChild(wrap);
-                } else {
-                    rightCol.appendChild(wrap);
+                const wrap = viewData.cached[`skill_wrap_${k}`];
+                if (wrap && wrap.style.display !== "none") {
+                    wrap.style.display = "none";
                 }
             }
+        }
+        for (let oi = 0; oi < orderedVisible.length; oi++) {
+            const k = orderedVisible[oi];
+            const skill = data.progress.skills[k];
+            const def = skills._byKey[k];
+            view.updateVal(`skill_${k}_name`, skill ? skill.name : k);
+            view.updateVal(`skill_${k}_talent_only`, skill ? `Talent ${skill.talentLevel}` : "");
+            view.updateVal(`skill_${k}_class_tag`, (def && def.category === "class") ? "" : "none", "style.display");
+            view.updateVal(`skill_${k}_equipped_badge`, skills.isSkillEquipped(k) ? "" : "none", "style.display");
         }
         view.applySkillListSortRadiosOnly();
         const emptyEl = viewData.cached.skillsListEmpty;
@@ -6060,6 +6098,58 @@ let view = {
             view.setGpuPosById(pid, x - half, y - half, true);
         }
     },
+    ensurePathTokenPools: function() {
+        if (viewData.pathTokenPoolsReady) {
+            return;
+        }
+        for (let i = 0; i < 12; i++) {
+            viewData.pebbleTokenFreeSlots.push(i);
+            viewData.dropletTokenFreeSlots.push(i);
+        }
+        viewData.pathTokenPoolsReady = true;
+    },
+    // Bind DOM token slots by stable item id so array compaction on completion
+    // does not reassign labels/colors across remaining path tokens mid-frame.
+    syncPathTokenPool: function(items, byId, freeSlots, idCounterKey) {
+        view.ensurePathTokenPools();
+        const base = data.progress && data.progress.base;
+        const activeIds = {};
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item) {
+                continue;
+            }
+            if (item.id == null && base) {
+                item.id = base[idCounterKey] || 1;
+                base[idCounterKey] = (base[idCounterKey] || 1) + 1;
+            }
+            activeIds[String(item.id)] = true;
+        }
+        for (const idKey in byId) {
+            if (!activeIds[idKey]) {
+                freeSlots.push(byId[idKey]);
+                delete byId[idKey];
+            }
+        }
+        const slots = new Array(12);
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (!item) {
+                continue;
+            }
+            const idKey = String(item.id);
+            let slot = byId[idKey];
+            if (slot === undefined) {
+                slot = freeSlots.length ? freeSlots.pop() : undefined;
+                if (slot === undefined) {
+                    continue;
+                }
+                byId[idKey] = slot;
+            }
+            slots[slot] = item;
+        }
+        return slots;
+    },
     updatePathTokenPositions: function() {
         const base = data.progress && data.progress.base;
         if (!base || !engine.getResortPathPosition) {
@@ -6067,8 +6157,11 @@ let view = {
         }
         const paused = !!(data.gameSettings && data.gameSettings.stop);
         const pebbles = base.pebbles || [];
+        const pebbleSlots = view.syncPathTokenPool(
+            pebbles, viewData.pebbleTokenById, viewData.pebbleTokenFreeSlots, "pebbleIdCounter"
+        );
         for (let pi = 0; pi < 12; pi++) {
-            const pebble = pebbles[pi];
+            const pebble = pebbleSlots[pi];
             const pid = `pebbleToken_${pi}`;
             const pAmtId = `pebbleTokenAmt_${pi}`;
             const show = !!pebble;
@@ -6085,8 +6178,11 @@ let view = {
             view.setGpuPosById(pAmtId, pos.x, pos.y + 8, true);
         }
         const droplets = base.droplets || [];
+        const dropletSlots = view.syncPathTokenPool(
+            droplets, viewData.dropletTokenById, viewData.dropletTokenFreeSlots, "dropletIdCounter"
+        );
         for (let di = 0; di < 12; di++) {
-            const droplet = droplets[di];
+            const droplet = dropletSlots[di];
             const did = `dropletToken_${di}`;
             const dAmtBelow = `dropletTokenAmtBelow_${di}`;
             const dAmtTop = `dropletTokenAmtTop_${di}`;

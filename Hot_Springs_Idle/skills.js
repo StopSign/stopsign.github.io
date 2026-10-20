@@ -1731,6 +1731,14 @@ let skills = {
 
     SLOT_COLUMNS: ["offense", "defense", "utility", "any"],
     UNEQUIP_CHARGE_MS: 30 * 60 * 1000,
+    UNEQUIP_CHARGE_MS_DEBUG: 5 * 1000,
+
+    getUnequipChargeMs: function() {
+        if (typeof isDebug !== "undefined" && isDebug) {
+            return skills.UNEQUIP_CHARGE_MS_DEBUG;
+        }
+        return skills.UNEQUIP_CHARGE_MS;
+    },
 
     getDefaultSkillEquip: function() {
         return {
@@ -1979,7 +1987,7 @@ let skills = {
         if (spendCharge) {
             eq.unequipCharges = Math.max(0, (eq.unequipCharges || 0) - 1);
             if (eq.unequipCharges < eq.unequipChargesMax && !eq.unequipChargeReadyAt) {
-                eq.unequipChargeReadyAt = Date.now() + skills.UNEQUIP_CHARGE_MS;
+                eq.unequipChargeReadyAt = Date.now() + skills.getUnequipChargeMs();
             }
         }
         return { ok: true, skillKey: skillKey };
@@ -2060,8 +2068,9 @@ let skills = {
             eq.unequipChargeReadyAt = 0;
             return;
         }
+        const chargeMs = skills.getUnequipChargeMs();
         if (!eq.unequipChargeReadyAt) {
-            eq.unequipChargeReadyAt = now + skills.UNEQUIP_CHARGE_MS;
+            eq.unequipChargeReadyAt = now + chargeMs;
             return;
         }
         while (eq.unequipCharges < eq.unequipChargesMax && now >= eq.unequipChargeReadyAt) {
@@ -2070,7 +2079,7 @@ let skills = {
                 eq.unequipChargeReadyAt = 0;
                 break;
             }
-            eq.unequipChargeReadyAt += skills.UNEQUIP_CHARGE_MS;
+            eq.unequipChargeReadyAt += chargeMs;
         }
     },
 

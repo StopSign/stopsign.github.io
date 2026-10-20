@@ -265,10 +265,12 @@ let events = {
             return;
         }
         data.progress.skillListSort = mode;
+        viewData.libraryListOrderSig = null;
         view.applySkillListSort();
     },
     setSkillListSearch: function(raw) {
         viewData.skillListSearch = String(raw == null ? "" : raw);
+        viewData.libraryListOrderSig = null;
         view.updateSkillsListVisibility("library");
     },
     setSkillGrouping: function(inputEl, commit) {
@@ -306,6 +308,7 @@ let events = {
         data.progress.selectedSkillsTab = t;
         data.progress.selectedSkillDetailKey = "";
         viewData.libraryInfoOverlaySide = "right";
+        viewData.libraryListOrderSig = null;
         view.updateSkillsTab();
         createView.updateLayoutMeasurements();
     },

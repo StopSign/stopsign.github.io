@@ -1330,11 +1330,15 @@ button {
     gap: 6px;
 }
 
+.skills-equipped-pane > .skills-slot-columns {
+    flex: 1 1 0;
+}
+
 .skills-slot-columns {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
-    flex: 2 1 0;
+    flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
     align-content: start;
@@ -1411,18 +1415,16 @@ button {
 .skill-equip-slot-filled--defense { border-left: 3px solid #7CFF9A; padding-left: 4px; }
 .skill-equip-slot-filled--utility { border-left: 3px solid #7EB6FF; padding-left: 4px; }
 
-.skill-equip-slot-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 4px;
-}
-
 .skill-equip-slot-name {
     font-size: 11px;
     font-weight: 700;
     line-height: 1.25;
     word-break: break-word;
+}
+
+.skill-equip-slot-stars.skill-stars-controls {
+    margin: 2px 0 0;
+    justify-content: flex-start;
 }
 
 .skill-equip-slot-meta,
@@ -1449,20 +1451,40 @@ button {
     box-sizing: border-box;
 }
 
-.skills-unequip-row,
+.skills-unequip-btn-inline {
+    flex-shrink: 0;
+    margin: 0;
+    padding: 2px 8px;
+    font-size: 11px;
+}
+
 .skills-equip-row {
     margin-top: 10px;
+}
+
+.skills-total-talent-level {
+    font-size: 12px;
+    font-weight: 600;
+    color: #bac2de;
+}
+
+.skills-library-separator {
+    height: 0;
+    border-top: 1px solid rgba(186, 194, 222, 0.28);
+    margin: 4px 0 6px;
+}
+
+.skills-library-researched-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 4px;
 }
 
 .skills-equip-error {
     color: #ff4d4d;
     font-size: 11px;
     margin: 8px 0 4px;
-}
-
-.skills-library-talent-total {
-    font-size: 12px;
-    font-weight: 600;
 }
 
 .skills-library-list-area {
