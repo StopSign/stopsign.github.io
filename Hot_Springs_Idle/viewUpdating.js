@@ -69,7 +69,9 @@ let view = {
             view.updatePathTokenPositions();
             view.updateFireLauncherProjectilePositions();
         }
-        view.updateBuyableUpgradesOverlay(false);
+        if (events._buyableTooltipOpen) {
+            view.updateBuyableUpgradesOverlay(true);
+        }
 
         view.updateScheduled(); //Updates UI things that were scheduled from data code
     },
@@ -82,7 +84,9 @@ let view = {
         view.updateGlobals();
     },
     updateViewOnSecond: function() { //Updates once a second
-
+        if (!events._buyableTooltipOpen) {
+            view.updateBuyableUpgradesOverlay(false);
+        }
     },
     updateEtaText: function(id, remain, rate) {
         if (rate > 0 && remain > 0) {
@@ -3511,7 +3515,9 @@ let view = {
             viewData.mineBlockRenderCache[i] = { height: heightStr, className: className };
         }
     },
-    updateBuyableUpgradesOverlay: function(forceList) {
+    // includeTip=true: refresh count + tip list (hover / RAF while open).
+    // includeTip=false: count + wrap visibility only (1 Hz while tip closed).
+    updateBuyableUpgradesOverlay: function(includeTip) {
         if (!data.progress || !data.progress.base) {
             return;
         }
@@ -3523,7 +3529,7 @@ let view = {
         }
         const list = engine.listBuyableUpgrades();
         view.updateVal("baseBuyableCount", list.length);
-        if (!forceList && !events._buyableTooltipOpen) {
+        if (!includeTip) {
             return;
         }
         const tip = viewData.cached.baseBuyableTooltipList || document.getElementById("baseBuyableTooltipList");
