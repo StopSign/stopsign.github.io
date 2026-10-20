@@ -507,9 +507,20 @@ let initials = {
                 active: null,
                 paused: null
             },
-            selectedSkillsTab: "combat",
+            selectedSkillsTab: "equipped",
             skillListSort: "oldest",
             selectedSkillDetailKey: "",
+            skillEquip: {
+                slots: {
+                    offense: [null],
+                    defense: [null],
+                    utility: [null],
+                    any: [null]
+                },
+                unequipCharges: 1,
+                unequipChargesMax: 1,
+                unequipChargeReadyAt: 0
+            },
             selectedStatsTab: "combat",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,

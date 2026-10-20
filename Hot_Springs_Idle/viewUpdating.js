@@ -423,38 +423,37 @@ let view = {
         view.updateBasePanel();
     },
     updateSkillsTab: function() {
-        const currentClsMenu = data.progress.currentClassKey || "none";
-        const hasActiveClassMenu = ["condescend", "scold", "mock"].indexOf(currentClsMenu) >= 0;
-        let skillsTabNow = data.progress.selectedSkillsTab || "combat";
-        if (skillsTabNow === "resort") {
-            skillsTabNow = "combat";
-        }
-        if (skillsTabNow === "foraging") {
-            skillsTabNow = "combat";
-        }
-        if (skillsTabNow === "class" && !hasActiveClassMenu) {
-            skillsTabNow = "combat";
+        skills.ensureSkillEquip();
+        skills.tickUnequipCharges(Date.now());
+        let skillsTabNow = data.progress.selectedSkillsTab || "equipped";
+        if (skillsTabNow !== "equipped" && skillsTabNow !== "library") {
+            skillsTabNow = "equipped";
         }
         data.progress.selectedSkillsTab = skillsTabNow;
         if (typeof data.progress.selectedSkillDetailKey !== "string") {
             data.progress.selectedSkillDetailKey = "";
         }
         view.updateSkillSubTabs();
-        view.updateSkillsListVisibility(skillsTabNow);
-        view.syncSelectedSkillDetailKey(skillsTabNow);
-        view.applySkillDetailSelectionHighlight();
-        const skillKeys = skills.getSkillKeysByCategory(data.progress.skills, skillsTabNow);
-        for (let i = 0; i < skillKeys.length; i++) {
-            view.updateSkillRowCompact(skillKeys[i]);
-        }
-        view.updateSkillInfoPanel();
-        view.updateVal("skillSubTab_class", hasActiveClassMenu ? "" : "none", "style.display");
-        const showStarInventory = skillsTabNow === "combat" || skillsTabNow === "class";
+        view.updateSkillEquipSlots();
+        view.updateUnequipChargesText();
         const starPool = data.progress.stars;
         const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
-        view.updateVal("combatStarsInventory", showStarInventory ? "" : "none", "style.display");
-        if (showStarInventory) {
-            view.updateVal("combatStarsCounts", starLine, "innerHTML");
+        view.updateVal("combatStarsInventory", "", "style.display");
+        view.updateVal("combatStarsCounts", starLine, "innerHTML");
+        if (skillsTabNow === "library") {
+            view.updateVal("skillsEquippedPane", "none", "style.display");
+            view.updateVal("skillsLibraryPane", "", "style.display");
+            view.updateVal("skillsTotalTalentLevel", String(skills.getTotalTalentLevel()));
+            view.updateSkillsListVisibility("library");
+            view.syncSelectedSkillDetailKey("library");
+            view.applySkillDetailSelectionHighlight();
+            view.updateLibrarySkillInfoPanel();
+        } else {
+            view.updateVal("skillsEquippedPane", "", "style.display");
+            view.updateVal("skillsLibraryPane", "none", "style.display");
+            view.syncSelectedSkillDetailKey("equipped");
+            view.applySkillDetailSelectionHighlight();
+            view.updateSkillInfoPanel();
         }
     },
     updateLevelingTab: function() {
@@ -4330,7 +4329,11 @@ let view = {
         if (name.indexOf(queryLower) >= 0) {
             return true;
         }
-        const current = view.stripHtmlForSearch(skills.skillEffectUiSummary(skillKey, skill)).toLowerCase();
+        const slotCat = skills.getSlotCategory(skillKey);
+        if (slotCat && (slotCat.indexOf(queryLower) >= 0 || queryLower === slotCat)) {
+            return true;
+        }
+        const current = view.stripHtmlForSearch(skills.skillEffectUiSummary(skillKey, skill, { ignoreEquip: true })).toLowerCase();
         if (current.indexOf(queryLower) >= 0) {
             return true;
         }
@@ -4341,93 +4344,18 @@ let view = {
         const trigger = view.stripHtmlForSearch(skills.getSkillTriggerDescription(skillKey)).toLowerCase();
         return trigger.indexOf(queryLower) >= 0;
     },
-    /** Show/hide static skill cards for the active Skills sub-tab; toggle empty-state row. */
-    updateSkillsListVisibility: function(selectedTab) {
-        const tab = selectedTab !== undefined && selectedTab !== null ? selectedTab : (data.progress.selectedSkillsTab || "combat");
-        const list = skills.getSkillKeysByCategory(data.progress.skills, tab);
-        const queryLower = String(viewData.skillListSearch || "").trim().toLowerCase();
-        const visible = {};
-        let shownCount = 0;
-        for (let i = 0; i < list.length; i++) {
-            const k = list[i];
-            if (view.skillMatchesListSearch(k, queryLower)) {
-                visible[k] = true;
-                shownCount++;
-            }
-        }
-        for (let i = 0; i < skills.keysInOrder.length; i++) {
-            const k = skills.keysInOrder[i];
-            const wrap = viewData.cached[`skill_wrap_${k}`];
-            if (wrap) {
-                wrap.style.display = visible[k] ? "" : "none";
-            }
-        }
-        view.applySkillListSort();
-        const emptyEl = viewData.cached.skillsListEmpty;
-        if (!emptyEl) {
-            return;
-        }
-        if (shownCount > 0) {
-            emptyEl.style.display = "none";
-            return;
-        }
-        emptyEl.style.display = "block";
-        if (list.length > 0 && queryLower) {
-            emptyEl.textContent = `No skills match “${String(viewData.skillListSearch || "").trim()}”.`;
-            return;
-        }
-        const currentCls = data.progress.currentClassKey || "none";
-        const hasActiveClass = ["condescend", "scold", "mock"].indexOf(currentCls) >= 0;
-        let msg = "";
-        if (tab === "class") {
-            msg = hasActiveClass ? "Buy class skills in the Scroll Archives." : "Choose a class at the Bonfire to see class skills here.";
-        } else if (tab === "foraging") {
-            msg = "No foraging skills unlocked yet. Visit the Scroll Archives in Base.";
-        } else {
-            msg = "No combat skills unlocked yet. Visit the Scroll Archives in Base.";
-        }
-        emptyEl.textContent = msg;
-    },
-    applySkillListSort: function() {
-        const column = viewData.cached.skillsListColumn;
-        if (!column) {
-            return;
-        }
+    getSortedLibrarySkillKeys: function() {
         const sortMode = data.progress.skillListSort;
         const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "shards"
             ? sortMode
             : "oldest";
-        const oldestRadio = viewData.cached.skillSortOldest;
-        const talentRadio = viewData.cached.skillSortTalent;
-        const alphaRadio = viewData.cached.skillSortAlpha;
-        const tipsRadio = viewData.cached.skillSortTips;
-        const groupingRadio = viewData.cached.skillSortGrouping;
-        const shardsRadio = viewData.cached.skillSortShards;
-        if (oldestRadio) {
-            oldestRadio.checked = sort === "oldest";
-        }
-        if (talentRadio) {
-            talentRadio.checked = sort === "talent";
-        }
-        if (alphaRadio) {
-            alphaRadio.checked = sort === "alpha";
-        }
-        if (tipsRadio) {
-            tipsRadio.checked = sort === "tips";
-        }
-        if (groupingRadio) {
-            groupingRadio.checked = sort === "grouping";
-        }
-        if (shardsRadio) {
-            shardsRadio.checked = sort === "shards";
-        }
         const unlocked = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.unlockedSkills) || {};
         const unlockIndex = {};
         const unlockKeys = Object.keys(unlocked);
         for (let ui = 0; ui < unlockKeys.length; ui++) {
             unlockIndex[unlockKeys[ui]] = ui;
         }
-        const keys = skills.keysInOrder.slice();
+        const keys = skills.getLibrarySkillKeys().slice();
         keys.sort(function(a, b) {
             const sa = data.progress.skills[a];
             const sb = data.progress.skills[b];
@@ -4483,60 +4411,213 @@ let view = {
             const nb = (sb && sb.name) || b;
             return na.localeCompare(nb);
         });
-        const current = [];
-        for (let ci = 0; ci < column.children.length; ci++) {
-            const child = column.children[ci];
-            if (child.id && child.id.indexOf("skill_wrap_") === 0) {
-                current.push(child.getAttribute("data-skill-key"));
-            }
-        }
-        let same = current.length === keys.length;
-        for (let si = 0; same && si < keys.length; si++) {
-            if (current[si] !== keys[si]) {
-                same = false;
-            }
-        }
-        if (same) {
+        return keys;
+    },
+    flashSkillEquipFail: function(el) {
+        if (!el) {
             return;
         }
-        for (let ki = 0; ki < keys.length; ki++) {
-            const wrap = viewData.cached[`skill_wrap_${keys[ki]}`];
-            if (wrap) {
-                column.appendChild(wrap);
+        el.classList.remove("skill-equip-fail-flash");
+        void el.offsetWidth;
+        el.classList.add("skill-equip-fail-flash");
+        setTimeout(function() {
+            el.classList.remove("skill-equip-fail-flash");
+        }, 450);
+    },
+    updateUnequipChargesText: function() {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return;
+        }
+        let text = `Unequip Skill Charges: ${eq.unequipCharges}/${eq.unequipChargesMax}`;
+        if (eq.unequipCharges < eq.unequipChargesMax && eq.unequipChargeReadyAt) {
+            const msLeft = Math.max(0, eq.unequipChargeReadyAt - Date.now());
+            const totalSec = Math.ceil(msLeft / 1000);
+            const mm = Math.floor(totalSec / 60);
+            const ss = totalSec % 60;
+            const ssStr = ss < 10 ? `0${ss}` : String(ss);
+            text += ` (next in ${mm}:${ssStr})`;
+        }
+        view.updateVal("unequipChargesText", text);
+    },
+    updateSkillEquipSlots: function() {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return;
+        }
+        let anyFilled = false;
+        const views = ["equipped", "library"];
+        for (let vi = 0; vi < views.length; vi++) {
+            const viewName = views[vi];
+            const compact = viewName === "library";
+            for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+                const column = skills.SLOT_COLUMNS[c];
+                const arr = eq.slots[column] || [];
+                for (let i = 0; i < arr.length; i++) {
+                    const key = arr[i];
+                    const idPrefix = `skillSlot_${viewName}_${column}_${i}`;
+                    const emptyEl = viewData.cached[`${idPrefix}_empty`];
+                    const filledEl = viewData.cached[`${idPrefix}_filled`];
+                    const slotEl = viewData.cached[idPrefix];
+                    if (key) {
+                        anyFilled = true;
+                        const skill = data.progress.skills[key];
+                        const slotCat = skills.getSlotCategory(key);
+                        if (emptyEl) {
+                            emptyEl.style.display = "none";
+                        }
+                        if (filledEl) {
+                            filledEl.style.display = "";
+                            filledEl.className = `skill-equip-slot-filled skill-equip-slot-filled--${slotCat || "any"}`;
+                        }
+                        if (slotEl) {
+                            slotEl.classList.toggle("skill-equip-slot--selected", data.progress.selectedSkillDetailKey === key);
+                        }
+                        view.updateVal(`${idPrefix}_name`, skill ? skill.name : key);
+                        if (compact) {
+                            view.updateVal(`${idPrefix}_talent`, skill ? `Talent ${skill.talentLevel}` : "");
+                        } else {
+                            view.updateVal(`${idPrefix}_meta`, skill ? `Lvl ${skill.level} · Talent ${skill.talentLevel}` : "");
+                            const expPct = skill ? Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100)) : 0;
+                            const talPct = skill ? Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100)) : 0;
+                            view.updateVal(`${idPrefix}_exp_fill`, `${expPct}%`, "style.width");
+                            view.updateVal(`${idPrefix}_talent_fill`, `${talPct}%`, "style.width");
+                            const stars = (skill && skill.stars) || {};
+                            view.updateVal(`${idPrefix}_star_bronze`, stars.bronze ? "★" : "☆");
+                            view.updateVal(`${idPrefix}_star_silver`, stars.silver ? "★" : "☆");
+                            view.updateVal(`${idPrefix}_star_gold`, stars.gold ? "★" : "☆");
+                            view.updateVal(`${idPrefix}_star_bronze`, !!stars.bronze, "classList.toggle", "skill-star-filled");
+                            view.updateVal(`${idPrefix}_star_silver`, !!stars.silver, "classList.toggle", "skill-star-filled");
+                            view.updateVal(`${idPrefix}_star_gold`, !!stars.gold, "classList.toggle", "skill-star-filled");
+                        }
+                    } else {
+                        if (emptyEl) {
+                            emptyEl.style.display = "";
+                        }
+                        if (filledEl) {
+                            filledEl.style.display = "none";
+                        }
+                        if (slotEl) {
+                            slotEl.classList.remove("skill-equip-slot--selected");
+                        }
+                    }
+                }
             }
         }
-        const searchRow = viewData.cached.skillsListSearchRow;
-        const emptyEl = viewData.cached.skillsListEmpty;
-        if (searchRow) {
-            column.insertBefore(searchRow, column.firstChild);
+        view.updateVal("skillsEquippedEmptyCta", anyFilled ? "none" : "", "style.display");
+    },
+    /** Show/hide library researched skill rows; lay out in 2 columns. */
+    updateSkillsListVisibility: function(selectedTab) {
+        const tab = selectedTab !== undefined && selectedTab !== null ? selectedTab : (data.progress.selectedSkillsTab || "equipped");
+        if (tab !== "library") {
+            return;
         }
-        if (emptyEl) {
-            const afterSearch = searchRow && searchRow.nextSibling;
-            if (afterSearch) {
-                column.insertBefore(emptyEl, afterSearch);
-            } else {
-                column.appendChild(emptyEl);
+        const list = skills.getLibrarySkillKeys();
+        const queryLower = String(viewData.skillListSearch || "").trim().toLowerCase();
+        const visibleSet = {};
+        for (let i = 0; i < list.length; i++) {
+            const k = list[i];
+            if (view.skillMatchesListSearch(k, queryLower)) {
+                visibleSet[k] = true;
+            }
+        }
+        const sortedAll = view.getSortedLibrarySkillKeys();
+        const orderedVisible = [];
+        for (let s = 0; s < sortedAll.length; s++) {
+            if (visibleSet[sortedAll[s]]) {
+                orderedVisible.push(sortedAll[s]);
+            }
+        }
+        const leftCol = viewData.cached.skillsLibraryColLeft;
+        const rightCol = viewData.cached.skillsLibraryColRight;
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const k = skills.keysInOrder[i];
+            const wrap = viewData.cached[`skill_wrap_${k}`];
+            if (wrap) {
+                wrap.style.display = "none";
+            }
+        }
+        if (leftCol && rightCol) {
+            for (let oi = 0; oi < orderedVisible.length; oi++) {
+                const k = orderedVisible[oi];
+                const wrap = viewData.cached[`skill_wrap_${k}`];
+                if (!wrap) {
+                    continue;
+                }
+                wrap.style.display = "";
+                const skill = data.progress.skills[k];
+                const def = skills._byKey[k];
+                view.updateVal(`skill_${k}_name`, skill ? skill.name : k);
+                view.updateVal(`skill_${k}_talent_only`, skill ? `Talent ${skill.talentLevel}` : "");
+                view.updateVal(`skill_${k}_class_tag`, (def && def.category === "class") ? "" : "none", "style.display");
+                view.updateVal(`skill_${k}_equipped_badge`, skills.isSkillEquipped(k) ? "" : "none", "style.display");
+                if (oi % 2 === 0) {
+                    leftCol.appendChild(wrap);
+                } else {
+                    rightCol.appendChild(wrap);
+                }
+            }
+        }
+        view.applySkillListSortRadiosOnly();
+        const emptyEl = viewData.cached.skillsListEmpty;
+        if (!emptyEl) {
+            return;
+        }
+        if (orderedVisible.length > 0) {
+            emptyEl.style.display = "none";
+            return;
+        }
+        emptyEl.style.display = "block";
+        if (list.length > 0 && queryLower) {
+            emptyEl.textContent = `No skills match “${String(viewData.skillListSearch || "").trim()}”.`;
+            return;
+        }
+        emptyEl.textContent = "No classified skills researched yet. Visit the Scroll Archives in Base.";
+    },
+// Temporary patch fragment — applied by script then deleted.
+    applySkillListSortRadiosOnly: function() {
+        const sortMode = data.progress.skillListSort;
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "shards"
+            ? sortMode
+            : "oldest";
+        const map = {
+            oldest: viewData.cached.skillSortOldest,
+            talent: viewData.cached.skillSortTalent,
+            alpha: viewData.cached.skillSortAlpha,
+            tips: viewData.cached.skillSortTips,
+            grouping: viewData.cached.skillSortGrouping,
+            shards: viewData.cached.skillSortShards
+        };
+        const keys = Object.keys(map);
+        for (let i = 0; i < keys.length; i++) {
+            const radio = map[keys[i]];
+            if (radio) {
+                radio.checked = keys[i] === sort;
             }
         }
     },
+    applySkillListSort: function() {
+        view.applySkillListSortRadiosOnly();
+        if ((data.progress.selectedSkillsTab || "equipped") === "library") {
+            view.updateSkillsListVisibility("library");
+        }
+    },
     syncSelectedSkillDetailKey: function(tab) {
-        const t = tab !== undefined && tab !== null ? tab : (data.progress.selectedSkillsTab || "combat");
-        const list = skills.getSkillKeysByCategory(data.progress.skills, t);
-        if (!list.length) {
-            data.progress.selectedSkillDetailKey = "";
-            return;
-        }
+        const t = tab !== undefined && tab !== null ? tab : (data.progress.selectedSkillsTab || "equipped");
         const sel = data.progress.selectedSkillDetailKey;
-        // Keep the explicit "no selection" state so the panel can be hidden.
-        if (sel === undefined || sel === null) {
+        if (sel === "" || sel === undefined || sel === null) {
             data.progress.selectedSkillDetailKey = "";
             return;
         }
-        if (sel === "") {
+        if (t === "equipped") {
+            if (!skills.isSkillEquipped(sel)) {
+                data.progress.selectedSkillDetailKey = "";
+            }
             return;
         }
+        const list = skills.getLibrarySkillKeys();
         if (list.indexOf(sel) < 0) {
-            data.progress.selectedSkillDetailKey = list[0];
+            data.progress.selectedSkillDetailKey = "";
         }
     },
     applySkillDetailSelectionHighlight: function() {
@@ -4548,81 +4629,48 @@ let view = {
                 wrap.classList.toggle("skill-row--selected", k === sel);
             }
         }
+        const eq = skills.ensureSkillEquip();
+        if (eq) {
+            const views = ["equipped", "library"];
+            for (let vi = 0; vi < views.length; vi++) {
+                for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+                    const column = skills.SLOT_COLUMNS[c];
+                    const arr = eq.slots[column] || [];
+                    for (let i = 0; i < arr.length; i++) {
+                        const slotEl = viewData.cached[`skillSlot_${views[vi]}_${column}_${i}`];
+                        if (slotEl) {
+                            slotEl.classList.toggle("skill-equip-slot--selected", !!arr[i] && arr[i] === sel);
+                        }
+                    }
+                }
+            }
+        }
     },
-    /** Left column: name row, stars + lvl/talent row, stacked exp/talent bars. */
-    updateSkillRowCompact: function(skillKey) {
-        const skill = data.progress.skills[skillKey];
-        if (!skill) {
+    updateLibraryInfoOverlaySide: function() {
+        const panel = viewData.cached.skillInfoPanelLibrary;
+        if (!panel) {
             return;
         }
-        const expPct = Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100));
-        const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
-        view.updateVal(`skill_${skillKey}_name`, skill.name);
-        view.updateVal(`skill_${skillKey}_lvl_talent`, `Lvl ${skill.level} · Talent ${skill.talentLevel}`);
-        view.updateVal(`skill_${skillKey}_exp_fill`, `${expPct}%`, "style.width");
-        view.updateVal(`skill_${skillKey}_talent_fill`, `${talPct}%`, "style.width");
-        const cat = skill.category || "combat";
-        const starEligible = (cat === "combat" || cat === "class");
-        view.updateVal(`skill_${skillKey}_stars_controls`, starEligible ? "" : "none", "style.display");
-        if (starEligible) {
-            const stars = skill.stars || {};
-            view.updateVal(`skill_${skillKey}_star_bronze`, stars.bronze ? "★" : "☆");
-            view.updateVal(`skill_${skillKey}_star_silver`, stars.silver ? "★" : "☆");
-            view.updateVal(`skill_${skillKey}_star_gold`, stars.gold ? "★" : "☆");
-            view.updateVal(`skill_${skillKey}_star_bronze`, !!stars.bronze, "classList.toggle", "skill-star-filled");
-            view.updateVal(`skill_${skillKey}_star_silver`, !!stars.silver, "classList.toggle", "skill-star-filled");
-            view.updateVal(`skill_${skillKey}_star_gold`, !!stars.gold, "classList.toggle", "skill-star-filled");
-        }
+        const side = viewData.libraryInfoOverlaySide || "right";
+        panel.classList.toggle("skills-library-info-overlay--left", side === "left");
+        panel.classList.toggle("skills-library-info-overlay--right", side === "right");
     },
-    /** Right column: detail for data.progress.selectedSkillDetailKey (generic ids). */
+    /** Equipped tab: full detail for selected equipped skill. */
     updateSkillInfoPanel: function() {
-        const tab = data.progress.selectedSkillsTab || "combat";
-        const list = skills.getSkillKeysByCategory(data.progress.skills, tab);
         if (data.progress.selectedSkillDetailKey === undefined || data.progress.selectedSkillDetailKey === null) {
             data.progress.selectedSkillDetailKey = "";
         }
-        if (!list.length) {
-            view.updateVal("skillInfoPanel", "none", "style.display");
-            view.updateVal("skillInfo_title", "");
-            view.updateVal("skillInfo_current", "", "innerHTML");
-            view.updateVal("skillInfo_current_wrap", "none", "style.display");
-            view.updateVal("skillInfo_reward", "", "innerHTML");
-            view.updateVal("skillInfo_trigger", "");
-            view.updateVal("skillInfo_exp_on_trigger", "");
-            view.updateVal("skillInfo_initial_exp_shards", "");
-            view.updateVal("skillInfo_exp_mults", "");
-            view.updateVal("skillInfo_exp_text", "");
-            view.updateVal("skillInfo_exp_fill", "0%", "style.width");
-            view.updateVal("skillInfo_talent_text", "");
-            view.updateVal("skillInfo_talent_fill", "0%", "style.width");
-            view.updateVal("skillInfo_star_effect_row", "none", "style.display");
-            view.updateVal("skillInfo_tips_row", "none", "style.display");
-            view.updateVal("skillInfo_combined_mults", "");
-            view.updateVal("skillInfo_integration_row", "none", "style.display");
-            view.updateVal("skillInfo_integration_mult", "");
-            view.updateVal("skillInfo_flavor", "");
-            return;
-        }
         const skillKey = data.progress.selectedSkillDetailKey;
-        if (!skillKey) {
+        if (!skillKey || !skills.isSkillEquipped(skillKey)) {
             view.updateVal("skillInfoPanel", "none", "style.display");
-            view.updateVal("skillInfo_title", "");
-            view.updateVal("skillInfo_current", "", "innerHTML");
-            view.updateVal("skillInfo_current_wrap", "none", "style.display");
-            view.updateVal("skillInfo_integration_row", "none", "style.display");
-            view.updateVal("skillInfo_flavor", "");
-            return;
-        }
-        if (list.indexOf(skillKey) < 0) {
-            view.updateVal("skillInfoPanel", "none", "style.display");
-            view.updateVal("skillInfo_current", "", "innerHTML");
-            view.updateVal("skillInfo_current_wrap", "none", "style.display");
-            view.updateVal("skillInfo_integration_row", "none", "style.display");
-            view.updateVal("skillInfo_flavor", "");
             return;
         }
         view.updateVal("skillInfoPanel", "", "style.display");
         const skill = data.progress.skills[skillKey];
+        if (!skill) {
+            view.updateVal("skillInfoPanel", "none", "style.display");
+            return;
+        }
         const parts = skills.skillExpGainParts(skill);
         const intMultOthers = typeof skills.getOtherSkillExpMultiplier === "function"
             ? skills.getOtherSkillExpMultiplier(skillKey)
@@ -4671,15 +4719,44 @@ let view = {
         } else {
             view.updateVal("skillInfo_integration_row", "none", "style.display");
         }
-        // Combined includes Echo Chamber / Study Group for other skills; each is excluded from its own bonus.
         view.updateVal("skillInfo_combined_mults", `×${(parts.combinedMult * intMultOthers).toFixed(4)}`);
         view.updateVal("skillInfo_flavor", skills.getSkillFlavorText(skillKey), "innerHTML");
     },
+    updateLibrarySkillInfoPanel: function() {
+        const skillKey = data.progress.selectedSkillDetailKey;
+        if (!skillKey || skills.getLibrarySkillKeys().indexOf(skillKey) < 0) {
+            view.updateVal("skillInfoPanelLibrary", "none", "style.display");
+            return;
+        }
+        const skill = data.progress.skills[skillKey];
+        if (!skill) {
+            view.updateVal("skillInfoPanelLibrary", "none", "style.display");
+            return;
+        }
+        view.updateVal("skillInfoPanelLibrary", "", "style.display");
+        view.updateLibraryInfoOverlaySide();
+        const parts = skills.skillExpGainParts(skill);
+        const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
+        const tipsVal = skill.tips || 0;
+        view.updateVal("libSkillInfo_title", skill.name);
+        const groupingInput = viewData.cached.libSkillInfo_grouping;
+        if (groupingInput && document.activeElement !== groupingInput) {
+            const grouping = Math.max(0, Math.min(99, Math.floor(Number(skill.grouping) || 0)));
+            if (groupingInput.value !== String(grouping)) {
+                groupingInput.value = String(grouping);
+            }
+        }
+        view.updateVal("libSkillInfo_reward", skills.getSkillRewardText(skillKey, skill), "innerHTML");
+        view.updateVal("libSkillInfo_trigger", skills.getSkillTriggerDescription(skillKey), "innerHTML");
+        view.updateVal("libSkillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
+        view.updateVal("libSkillInfo_talent_fill", `${talPct}%`, "style.width");
+        view.updateVal("libSkillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
+        view.updateVal("libSkillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
+    },
     updateSkillSubTabs: function() {
-        const tab = data.progress.selectedSkillsTab || "combat";
-        view.updateVal("skillSubTab_combat", tab === "combat" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
-        view.updateVal("skillSubTab_foraging", "none", "style.display");
-        view.updateVal("skillSubTab_class", tab === "class" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        const tab = data.progress.selectedSkillsTab || "equipped";
+        view.updateVal("skillSubTab_equipped", tab === "equipped" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("skillSubTab_library", tab === "library" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
     },
     updatePlayerBattleBars: function() {
         const p = data.battle.player;

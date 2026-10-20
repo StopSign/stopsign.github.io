@@ -269,7 +269,7 @@ let events = {
     },
     setSkillListSearch: function(raw) {
         viewData.skillListSearch = String(raw == null ? "" : raw);
-        view.updateSkillsListVisibility(data.progress.selectedSkillsTab || "combat");
+        view.updateSkillsListVisibility("library");
     },
     setSkillGrouping: function(inputEl, commit) {
         const key = data.progress.selectedSkillDetailKey;
@@ -302,40 +302,224 @@ let events = {
         }
     },
     switchSkillsTab: function(tabKey) {
-        const valid = ["combat", "foraging", "class"];
-        let t = valid.indexOf(tabKey) >= 0 ? tabKey : "combat";
-        if (t === "foraging" && !events.foragingSkillsUnlocked()) {
-            t = "combat";
-        }
+        const t = tabKey === "library" ? "library" : "equipped";
         data.progress.selectedSkillsTab = t;
-        view.updateSkillsListVisibility(t);
-        // User changed sub-tab: clear selection so the right panel is hidden.
         data.progress.selectedSkillDetailKey = "";
-        view.applySkillDetailSelectionHighlight();
-        view.updateSkillInfoPanel();
+        viewData.libraryInfoOverlaySide = "right";
+        view.updateSkillsTab();
         createView.updateLayoutMeasurements();
     },
-    /** Skills tab: show detail in right panel; star row clicks do not select. */
-    selectSkillForDetail: function(skillKey, ev) {
+    selectEquippedSlotSkill: function(column, index, ev) {
         if (ev && ev.target && ev.target.closest && ev.target.closest(".skill-stars-controls")) {
             return;
         }
-        if (!skills.isSkillUnlocked(skillKey)) {
+        const eq = skills.ensureSkillEquip();
+        const key = eq && eq.slots[column] && eq.slots[column][index];
+        if (!key) {
             return;
         }
-        const tab = data.progress.selectedSkillsTab || "combat";
-        const list = skills.getSkillKeysByCategory(data.progress.skills, tab);
-        if (list.indexOf(skillKey) < 0) {
+        if (data.progress.selectedSkillDetailKey === key) {
+            data.progress.selectedSkillDetailKey = "";
+        } else {
+            data.progress.selectedSkillDetailKey = key;
+        }
+        view.applySkillDetailSelectionHighlight();
+        if ((data.progress.selectedSkillsTab || "equipped") === "library") {
+            view.updateLibrarySkillInfoPanel();
+        } else {
+            view.updateSkillInfoPanel();
+        }
+    },
+    selectLibrarySkillForDetail: function(skillKey, ev) {
+        if (!skills.isSkillUnlocked(skillKey) || !skills.getSlotCategory(skillKey)) {
             return;
         }
-        // Clicking the selected skill again toggles it off.
+        const wrap = viewData.cached[`skill_wrap_${skillKey}`];
+        const leftCol = viewData.cached.skillsLibraryColLeft;
+        if (wrap && leftCol && wrap.parentElement === leftCol) {
+            viewData.libraryInfoOverlaySide = "right";
+        } else {
+            viewData.libraryInfoOverlaySide = "left";
+        }
         if (data.progress.selectedSkillDetailKey === skillKey) {
             data.progress.selectedSkillDetailKey = "";
         } else {
             data.progress.selectedSkillDetailKey = skillKey;
         }
         view.applySkillDetailSelectionHighlight();
-        view.updateSkillInfoPanel();
+        view.updateLibrarySkillInfoPanel();
+        view.updateVal("libSkillInfo_equipError", "none", "style.display");
+        view.updateVal("libSkillInfo_equipError", "");
+    },
+    equipSelectedLibrarySkill: function() {
+        const key = data.progress.selectedSkillDetailKey;
+        const errEl = viewData.cached.libSkillInfo_equipError;
+        const btn = viewData.cached.libSkillInfo_equipBtn;
+        const showErr = function(msg) {
+            view.updateVal("libSkillInfo_equipError", "", "style.display");
+            view.updateVal("libSkillInfo_equipError", msg);
+            view.flashSkillEquipFail(btn);
+        };
+        if (!key) {
+            return;
+        }
+        const result = skills.tryAutoEquip(key);
+        if (result.ok) {
+            view.updateVal("libSkillInfo_equipError", "none", "style.display");
+            view.updateVal("libSkillInfo_equipError", "");
+            view.updateSkillsTab();
+            return;
+        }
+        if (result.reason === "already") {
+            showErr("Already equipped");
+            return;
+        }
+        const cat = result.category || skills.getSlotCategory(key) || "offense";
+        const article = skills.categoryArticle(cat);
+        const label = cat.charAt(0).toUpperCase() + cat.slice(1);
+        showErr(`Unequip ${article} ${label} skill first`);
+    },
+    unequipSelectedSkill: function() {
+        const key = data.progress.selectedSkillDetailKey;
+        if (!key) {
+            return;
+        }
+        const result = skills.unequipSkillByKey(key, true);
+        if (!result.ok) {
+            view.flashSkillEquipFail(viewData.cached.skillInfo_unequipBtn);
+            return;
+        }
+        data.progress.selectedSkillDetailKey = "";
+        view.updateSkillsTab();
+    },
+    toggleEquippedSlotStar: function(column, index, starType) {
+        const eq = skills.ensureSkillEquip();
+        const key = eq && eq.slots[column] && eq.slots[column][index];
+        if (!key) {
+            return;
+        }
+        events.toggleSkillStar(key, starType);
+    },
+    skillEquipDragStart: function(ev, viewName, column, index) {
+        if (!ev || !ev.dataTransfer) {
+            return;
+        }
+        const eq = skills.ensureSkillEquip();
+        const key = eq && eq.slots[column] && eq.slots[column][index];
+        if (!key) {
+            ev.preventDefault();
+            return;
+        }
+        const payload = JSON.stringify({ type: "slot", viewName: viewName, column: column, index: index, skillKey: key });
+        ev.dataTransfer.setData("text/plain", payload);
+        ev.dataTransfer.effectAllowed = "move";
+        viewData.skillDragPayload = payload;
+    },
+    librarySkillDragStart: function(ev, skillKey) {
+        if (!ev || !ev.dataTransfer) {
+            return;
+        }
+        if (!skills.getSlotCategory(skillKey)) {
+            ev.preventDefault();
+            return;
+        }
+        const payload = JSON.stringify({ type: "library", skillKey: skillKey });
+        ev.dataTransfer.setData("text/plain", payload);
+        ev.dataTransfer.effectAllowed = "copyMove";
+        viewData.skillDragPayload = payload;
+    },
+    skillSlotDragOver: function(ev) {
+        if (!ev) {
+            return;
+        }
+        ev.preventDefault();
+        if (ev.dataTransfer) {
+            ev.dataTransfer.dropEffect = "move";
+        }
+        const slot = ev.currentTarget;
+        if (slot && slot.classList) {
+            slot.classList.add("skill-equip-slot--dragover");
+        }
+    },
+    skillSlotDragLeave: function(ev) {
+        const slot = ev && ev.currentTarget;
+        if (slot && slot.classList) {
+            slot.classList.remove("skill-equip-slot--dragover");
+        }
+    },
+    skillSlotDrop: function(ev) {
+        if (!ev) {
+            return;
+        }
+        ev.preventDefault();
+        const slot = ev.currentTarget;
+        if (slot && slot.classList) {
+            slot.classList.remove("skill-equip-slot--dragover");
+        }
+        const toCol = slot && slot.getAttribute("data-column");
+        const toIndex = slot ? parseInt(slot.getAttribute("data-index"), 10) : -1;
+        let raw = (ev.dataTransfer && ev.dataTransfer.getData("text/plain")) || viewData.skillDragPayload || "";
+        viewData.skillDragPayload = null;
+        let payload = null;
+        try {
+            payload = JSON.parse(raw);
+        } catch (e) {
+            payload = null;
+        }
+        if (!payload || !toCol || !(toIndex >= 0)) {
+            view.flashSkillEquipFail(slot);
+            return;
+        }
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return;
+        }
+        if (payload.type === "library") {
+            const key = payload.skillKey;
+            if (skills.isSkillEquipped(key)) {
+                view.flashSkillEquipFail(slot);
+                view.updateVal("libSkillInfo_equipError", "", "style.display");
+                view.updateVal("libSkillInfo_equipError", "Already equipped");
+                return;
+            }
+            if (eq.slots[toCol][toIndex]) {
+                view.flashSkillEquipFail(slot);
+                return;
+            }
+            const res = skills.equipSkillToSlot(key, toCol, toIndex);
+            if (!res.ok) {
+                view.flashSkillEquipFail(slot);
+                return;
+            }
+            view.updateSkillsTab();
+            return;
+        }
+        if (payload.type === "slot") {
+            const fromCol = payload.column;
+            const fromIndex = payload.index;
+            if (fromCol === toCol && fromIndex === toIndex) {
+                return;
+            }
+            const targetKey = eq.slots[toCol][toIndex];
+            if (!targetKey) {
+                const moved = skills.moveSkillToEmptySlot(fromCol, fromIndex, toCol, toIndex);
+                if (!moved.ok) {
+                    view.flashSkillEquipFail(slot);
+                    return;
+                }
+            } else {
+                const swapped = skills.swapSkillSlots(fromCol, fromIndex, toCol, toIndex);
+                if (!swapped.ok) {
+                    view.flashSkillEquipFail(slot);
+                    return;
+                }
+            }
+            view.updateSkillsTab();
+        }
+    },
+    /** Legacy name kept for any leftover callers. */
+    selectSkillForDetail: function(skillKey, ev) {
+        events.selectLibrarySkillForDetail(skillKey, ev);
     },
     selectScrollResearchChoice: function(choiceIndex) {
         const lib = data.progress.base.scrollArchives;
@@ -2212,6 +2396,9 @@ let events = {
         if (!sk || (cat !== "combat" && cat !== "class")) {
             return;
         }
+        if (!skills.isSkillEquipped(skillKey)) {
+            return;
+        }
         if (!sk.stars) {
             sk.stars = { bronze: false, silver: false, gold: false };
         }
@@ -2219,23 +2406,24 @@ let events = {
         if (currentlyAssigned) {
             sk.stars[starType] = false;
             data.progress.stars[starType]++;
-            if (typeof view !== "undefined") {
-                view.updateSkillRowCompact(skillKey);
-                if (data.progress.selectedSkillDetailKey === skillKey) {
+        } else {
+            if (data.progress.stars[starType] <= 0) {
+                return;
+            }
+            data.progress.stars[starType]--;
+            sk.stars[starType] = true;
+        }
+        if (typeof view !== "undefined") {
+            view.updateSkillEquipSlots();
+            const starPool = data.progress.stars;
+            const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
+            view.updateVal("combatStarsCounts", starLine, "innerHTML");
+            if (data.progress.selectedSkillDetailKey === skillKey) {
+                if ((data.progress.selectedSkillsTab || "equipped") === "library") {
+                    view.updateLibrarySkillInfoPanel();
+                } else {
                     view.updateSkillInfoPanel();
                 }
-            }
-            return;
-        }
-        if (data.progress.stars[starType] <= 0) {
-            return;
-        }
-        data.progress.stars[starType]--;
-        sk.stars[starType] = true;
-        if (typeof view !== "undefined") {
-            view.updateSkillRowCompact(skillKey);
-            if (data.progress.selectedSkillDetailKey === skillKey) {
-                view.updateSkillInfoPanel();
             }
         }
     }

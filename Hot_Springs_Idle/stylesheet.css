@@ -1289,6 +1289,18 @@ button {
     flex-direction: column;
 }
 
+.skills-stars-charges-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
+}
+
+.skills-unequip-charges {
+    font-size: 12px;
+    color: #bac2de;
+}
+
 #skillsList.skills-tab-layout {
     display: grid;
     grid-template-columns: 40% 60%;
@@ -1297,6 +1309,250 @@ button {
     align-items: stretch;
     flex: 1 1 auto;
     min-height: 0;
+}
+
+#skillsList.skills-tab-layout--equip {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+}
+
+.skills-equipped-pane,
+.skills-library-pane {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 6px;
+}
+
+.skills-slot-columns {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    flex: 2 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    align-content: start;
+}
+
+.skills-slot-columns--compact {
+    flex: 0 0 auto;
+    max-height: 33%;
+    overflow-y: auto;
+}
+
+.skills-slot-column {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.skills-slot-column-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    padding: 2px 0;
+}
+
+.skills-slot-column--offense .skills-slot-column-title { color: #ff4d4d; }
+.skills-slot-column--defense .skills-slot-column-title { color: #7CFF9A; }
+.skills-slot-column--utility .skills-slot-column-title { color: #7EB6FF; }
+.skills-slot-column--any .skills-slot-column-title { color: #A78BFA; }
+
+.skill-equip-slot {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 6px;
+    min-height: 52px;
+    background: rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+.skill-equip-slot--offense { border-color: #ff4d4d; }
+.skill-equip-slot--defense { border-color: #7CFF9A; }
+.skill-equip-slot--utility { border-color: #7EB6FF; }
+.skill-equip-slot--any { border-color: #A78BFA; }
+
+.skill-equip-slot--dragover {
+    outline: 2px solid #f9e2af;
+    outline-offset: 1px;
+}
+
+.skill-equip-slot--selected {
+    background: rgba(79, 158, 255, 0.12);
+}
+
+.skill-equip-slot-empty {
+    font-size: 11px;
+    color: rgba(186, 194, 222, 0.55);
+    text-align: center;
+    padding: 10px 4px;
+    border: 1px dashed rgba(148, 163, 184, 0.35);
+    border-radius: 3px;
+}
+
+.skill-equip-slot--offense .skill-equip-slot-empty { border-color: rgba(255, 77, 77, 0.45); }
+.skill-equip-slot--defense .skill-equip-slot-empty { border-color: rgba(124, 255, 154, 0.45); }
+.skill-equip-slot--utility .skill-equip-slot-empty { border-color: rgba(126, 182, 255, 0.45); }
+.skill-equip-slot--any .skill-equip-slot-empty { border-color: rgba(167, 139, 250, 0.45); }
+
+.skill-equip-slot-filled {
+    cursor: grab;
+    user-select: none;
+}
+
+.skill-equip-slot-filled--offense { border-left: 3px solid #ff4d4d; padding-left: 4px; }
+.skill-equip-slot-filled--defense { border-left: 3px solid #7CFF9A; padding-left: 4px; }
+.skill-equip-slot-filled--utility { border-left: 3px solid #7EB6FF; padding-left: 4px; }
+
+.skill-equip-slot-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.skill-equip-slot-name {
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.skill-equip-slot-meta,
+.skill-equip-slot-talent {
+    font-size: 10px;
+    color: #bac2de;
+    margin-top: 2px;
+}
+
+.skills-equipped-empty-cta {
+    font-size: 12px;
+    text-align: center;
+    padding: 2px 0 4px;
+}
+
+.skills-equipped-info-wrap {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.skills-equipped-info-panel {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.skills-unequip-row,
+.skills-equip-row {
+    margin-top: 10px;
+}
+
+.skills-equip-error {
+    color: #ff4d4d;
+    font-size: 11px;
+    margin: 8px 0 4px;
+}
+
+.skills-library-talent-total {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.skills-library-list-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 6px;
+}
+
+.skills-library-two-col {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.skills-library-col {
+    min-height: 0;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.skills-library-info-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: calc(50% - 4px);
+    z-index: 3;
+    overflow-y: auto;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.45);
+}
+
+.skills-library-info-overlay--right {
+    right: 0;
+    left: auto;
+}
+
+.skills-library-info-overlay--left {
+    left: 0;
+    right: auto;
+}
+
+.skill-library-row-tags {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.skill-equipped-badge,
+.skill-class-tag {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 1px 4px;
+    border-radius: 3px;
+    line-height: 1.2;
+}
+
+.skill-equipped-badge {
+    background: rgba(79, 158, 255, 0.25);
+    color: #93c5fd;
+}
+
+.skill-class-tag {
+    background: rgba(250, 204, 21, 0.2);
+    color: #facc15;
+}
+
+.skill-row--slot-offense {
+    border-color: rgba(255, 77, 77, 0.65);
+}
+
+.skill-row--slot-defense {
+    border-color: rgba(124, 255, 154, 0.65);
+}
+
+.skill-row--slot-utility {
+    border-color: rgba(126, 182, 255, 0.65);
+}
+
+@keyframes skillEquipFailFlash {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-3px); background-color: rgba(255, 77, 77, 0.25); }
+    40% { transform: translateX(3px); background-color: rgba(255, 77, 77, 0.35); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+}
+
+.skill-equip-fail-flash {
+    animation: skillEquipFailFlash 0.4s ease;
 }
 
 .skills-list-column {

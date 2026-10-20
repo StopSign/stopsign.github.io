@@ -82,7 +82,11 @@ let createView = {
     createInfoButtons: function() {
         createView.createInfoButton(
             "tabPane_skills",
-            "Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively)."
+            "<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</p>"
+            + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot. The Equipped and Library slot columns stay in sync.</p>"
+            + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a specific slot equips into that slot only if it is empty and compatible. Invalid drops do nothing.</p>"
+            + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
+            + "<p><strong>Unequip:</strong> Costs one Unequip Skill Charge. Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept. Charges refill one every 30 minutes (including while offline).</p>"
         );
     },
     waveInfoZoneSlotCount: 12,
@@ -968,55 +972,79 @@ let createView = {
             engine.cacheMapBuildingPositions();
         }
     },
-    /** One-time on load: 40% skill rows + 60% Skill Info panel. Visibility via view.updateSkillsListVisibility. */
+    _skillSlotColumnLabel: function(col) {
+        if (col === "offense") return "Offense";
+        if (col === "defense") return "Defense";
+        if (col === "utility") return "Utility";
+        return "Any";
+    },
+    _buildSkillEquipSlotHtml: function(viewName, column, index, compact) {
+        const idPrefix = `skillSlot_${viewName}_${column}_${index}`;
+        const catClass = `skill-equip-slot--${column}`;
+        let filled = "";
+        if (compact) {
+            filled = `
+                <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
+                    onclick="events.selectEquippedSlotSkill('${column}', ${index}, event)">
+                    <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
+                    <div class="skill-equip-slot-talent" id="${idPrefix}_talent"></div>
+                </div>`;
+        } else {
+            filled = `
+                <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
+                    onclick="events.selectEquippedSlotSkill('${column}', ${index}, event)">
+                    <div class="skill-equip-slot-head">
+                        <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
+                        <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact" onclick="event.stopPropagation()">
+                            <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
+                            <button id="${idPrefix}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'silver')">☆</button>
+                            <button id="${idPrefix}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'gold')">☆</button>
+                        </div>
+                    </div>
+                    <div class="skill-equip-slot-meta" id="${idPrefix}_meta"></div>
+                    <div class="skill-row-bars">
+                        <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="${idPrefix}_exp_fill" class="prog-fill prog-fill-skill"></div></div>
+                        <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="${idPrefix}_talent_fill" class="prog-fill prog-fill-talent"></div></div>
+                    </div>
+                </div>`;
+        }
+        return `
+            <div id="${idPrefix}" class="skill-equip-slot ${catClass}" data-column="${column}" data-index="${index}" data-view="${viewName}"
+                ondragover="events.skillSlotDragOver(event)" ondragleave="events.skillSlotDragLeave(event)" ondrop="events.skillSlotDrop(event)">
+                <div id="${idPrefix}_empty" class="skill-equip-slot-empty">Empty</div>
+                ${filled}
+            </div>`;
+    },
+    _buildSkillSlotColumnsHtml: function(viewName, compact) {
+        const cols = skills.SLOT_COLUMNS;
+        let html = `<div id="skillsSlots_${viewName}" class="skills-slot-columns${compact ? " skills-slot-columns--compact" : ""}">`;
+        for (let c = 0; c < cols.length; c++) {
+            const col = cols[c];
+            const count = ((data.progress.skillEquip && data.progress.skillEquip.slots && data.progress.skillEquip.slots[col]) || [null]).length;
+            html += `<div class="skills-slot-column skills-slot-column--${col}" data-column="${col}">`;
+            html += `<div class="skills-slot-column-title">${createView._skillSlotColumnLabel(col)}</div>`;
+            for (let i = 0; i < count; i++) {
+                html += createView._buildSkillEquipSlotHtml(viewName, col, i, compact);
+            }
+            html += `</div>`;
+        }
+        html += `</div>`;
+        return html;
+    },
+    /** One-time on load: Equipped + Library skill panes. */
     createSkillElements: function() {
         const skillsList = document.getElementById("skillsList");
+        if (!skillsList) {
+            return;
+        }
+        skills.ensureSkillEquip();
         const tipsUnlocked = engine.isSkillTipsUnlocked();
         const tipsHiddenStyle = tipsUnlocked ? "" : " style=\"display:none\"";
-        let col = `<div id="skillsListColumn" class="skills-list-column">
-            <div id="skillsListSearchRow" class="skills-list-search-row">
-                <input type="search" id="skillsListSearch" class="skills-list-search" placeholder="Search skills…" autocomplete="off" spellcheck="false" oninput="events.setSkillListSearch(this.value)">
-            </div>
-            <div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>`;
-        for (let i = 0; i < skills.keysInOrder.length; i++) {
-            const key = skills.keysInOrder[i];
-            const skill = data.progress.skills[key];
-            col += `
-                <div class="skill-row skill-block" id="skill_wrap_${key}" data-skill-key="${key}" onclick="events.selectSkillForDetail('${key}', event)">
-                    <div class="skill-row-head">
-                        <div class="skill-row-head-left">
-                            <div class="skill-row-name" id="skill_${key}_name">${skill.name}</div>
-                            <div class="skill-row-lvl-talent" id="skill_${key}_lvl_talent">Lvl ${skill.level} · Talent ${skill.talentLevel}</div>
-                        </div>
-                        <div id="skill_${key}_stars_controls" class="skill-stars-controls skill-stars-row-compact skill-row-stars-right" onclick="event.stopPropagation()">
-                            <button id="skill_${key}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleSkillStar('${key}', 'bronze')">☆</button>
-                            <button id="skill_${key}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleSkillStar('${key}', 'silver')">☆</button>
-                            <button id="skill_${key}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleSkillStar('${key}', 'gold')">☆</button>
-                        </div>
-                    </div>
-                    <div class="skill-row-bars">
-                        <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="skill_${key}_exp_fill" class="prog-fill prog-fill-skill"></div></div>
-                        <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="skill_${key}_talent_fill" class="prog-fill prog-fill-talent"></div></div>
-                    </div>
-                </div>
-            `;
-        }
-        col += `</div>`;
-        const sortRadios = `
-            <div id="skillSortRadios" class="skill-sort-radios">
-                <div class="skill-sort-row">
-                    <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
-                </div>
-                <div class="skill-sort-row">
-                    <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Sort by Tips</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Sort by Grouping</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortShards" value="shards" onchange="events.setSkillListSort('shards')"> Sort by Shards</label>
-                </div>
-            </div>`;
-        const aside = `
-            <aside id="skillInfoPanel" class="skill-info-aside">
+
+        const equippedInfo = `
+            <aside id="skillInfoPanel" class="skill-info-aside skills-equipped-info-panel" style="display:none">
                 <div class="skill-info-title-row">
                     <div id="skillInfo_title" class="skill-info-title"></div>
                     <label class="skill-grouping-label">Grouping: <input type="number" id="skillInfo_grouping" class="skill-grouping-input" min="0" max="99" step="1" inputmode="numeric" value="0" oninput="events.setSkillGrouping(this)" onchange="events.setSkillGrouping(this, true)"></label>
@@ -1035,26 +1063,140 @@ let createView = {
                 <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Exp mult from Skills: <span id="skillInfo_integration_mult"></span></div>
                 <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
                 <div id="skillInfo_flavor" class="skill-info-flavor"></div>
-            </aside>
-        `;
-        skillsList.className = "skills-tab-layout";
-        skillsList.innerHTML = col + `<div class="skills-info-column">${sortRadios}${aside}</div>`;
-        createView.queueCache(
-            "skillsListColumn", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty", "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards", "skillInfoPanel",
-            "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current", "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
+                <div class="skills-unequip-row">
+                    <button type="button" id="skillInfo_unequipBtn" class="tab-button" onclick="events.unequipSelectedSkill()">Unequip</button>
+                </div>
+            </aside>`;
+
+        const libraryInfo = `
+            <aside id="skillInfoPanelLibrary" class="skill-info-aside skills-library-info-overlay" style="display:none">
+                <div class="skill-info-title-row">
+                    <div id="libSkillInfo_title" class="skill-info-title"></div>
+                    <label class="skill-grouping-label">Grouping: <input type="number" id="libSkillInfo_grouping" class="skill-grouping-input" min="0" max="99" step="1" inputmode="numeric" value="0" oninput="events.setSkillGrouping(this)" onchange="events.setSkillGrouping(this, true)"></label>
+                </div>
+                <div class="skill-reward" id="libSkillInfo_reward"></div>
+                <div class="skill-trigger" id="libSkillInfo_trigger"></div>
+                <div class="prog-label-row">Talent: <span id="libSkillInfo_talent_text"></span></div>
+                <div class="prog-track skill-prog-mini skill-info-prog"><div id="libSkillInfo_talent_fill" class="prog-fill prog-fill-talent"></div></div>
+                <div id="libSkillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsHiddenStyle}>Tips: <span id="libSkillInfo_tips_text"></span></div>
+                <div id="libSkillInfo_equipError" class="skills-equip-error" style="display:none"></div>
+                <div class="skills-equip-row">
+                    <button type="button" id="libSkillInfo_equipBtn" class="tab-button" onclick="events.equipSelectedLibrarySkill()">Equip</button>
+                </div>
+            </aside>`;
+
+        let libraryRows = "";
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const key = skills.keysInOrder[i];
+            const skill = data.progress.skills[key];
+            const def = skills._byKey[key];
+            const slotCat = def && def.slotCategory ? def.slotCategory : "";
+            const isClass = (def && def.category === "class") || (skill && skill.category === "class");
+            const borderClass = slotCat ? `skill-row--slot-${slotCat}` : "";
+            libraryRows += `
+                <div class="skill-row skill-block skill-library-row ${borderClass}" id="skill_wrap_${key}" data-skill-key="${key}" draggable="true"
+                    ondragstart="events.librarySkillDragStart(event, '${key}')"
+                    onclick="events.selectLibrarySkillForDetail('${key}', event)" style="display:none">
+                    <div class="skill-row-head">
+                        <div class="skill-row-head-left">
+                            <div class="skill-row-name" id="skill_${key}_name">${skill.name}</div>
+                            <div class="skill-row-lvl-talent" id="skill_${key}_talent_only">Talent ${skill.talentLevel}</div>
+                        </div>
+                        <div class="skill-library-row-tags">
+                            <span id="skill_${key}_class_tag" class="skill-class-tag" style="${isClass ? "" : "display:none"}">Class</span>
+                            <span id="skill_${key}_equipped_badge" class="skill-equipped-badge" style="display:none">Equipped</span>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        const sortRadios = `
+            <div id="skillSortRadios" class="skill-sort-radios">
+                <div class="skill-sort-row">
+                    <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
+                </div>
+                <div class="skill-sort-row">
+                    <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Sort by Tips</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Sort by Grouping</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortShards" value="shards" onchange="events.setSkillListSort('shards')"> Sort by Shards</label>
+                </div>
+            </div>`;
+
+        skillsList.className = "skills-tab-layout skills-tab-layout--equip";
+        skillsList.innerHTML = `
+            <div id="skillsEquippedPane" class="skills-equipped-pane">
+                ${createView._buildSkillSlotColumnsHtml("equipped", false)}
+                <div id="skillsEquippedEmptyCta" class="muted-text skills-equipped-empty-cta" style="display:none">Equip skills from the Library tab</div>
+                <div id="skillsEquippedInfoWrap" class="skills-equipped-info-wrap">${equippedInfo}</div>
+            </div>
+            <div id="skillsLibraryPane" class="skills-library-pane" style="display:none">
+                <div id="skillsLibraryTalentTotal" class="base-row skills-library-talent-total">Total Talent Level: <span id="skillsTotalTalentLevel">0</span></div>
+                ${createView._buildSkillSlotColumnsHtml("library", true)}
+                <div id="skillsLibraryListArea" class="skills-library-list-area">
+                    <div id="skillsListSearchRow" class="skills-list-search-row">
+                        <input type="search" id="skillsListSearch" class="skills-list-search" placeholder="Search skills…" autocomplete="off" spellcheck="false" oninput="events.setSkillListSearch(this.value)">
+                    </div>
+                    ${sortRadios}
+                    <div id="skillsLibraryTwoCol" class="skills-library-two-col">
+                        <div id="skillsLibraryColLeft" class="skills-library-col skills-list-column"></div>
+                        <div id="skillsLibraryColRight" class="skills-library-col skills-list-column"></div>
+                        ${libraryInfo}
+                    </div>
+                    <div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>
+                    <div id="skillsLibraryRowsHost" style="display:none">${libraryRows}</div>
+                </div>
+            </div>`;
+
+        const cacheIds = [
+            "skillsEquippedPane", "skillsLibraryPane", "skillsEquippedEmptyCta", "skillsEquippedInfoWrap",
+            "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryTalentTotal", "skillsTotalTalentLevel",
+            "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColLeft", "skillsLibraryColRight",
+            "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
+            "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards",
+            "skillInfoPanel", "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current",
+            "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
             "skillInfo_star_effect_row", "skillInfo_star_effect",
             "skillInfo_tips_row", "skillInfo_tips_text", "skillInfo_tips_mults",
-            "skillInfo_combined_mults", "skillInfo_integration_row", "skillInfo_integration_mult", "skillInfo_flavor"
-        );
+            "skillInfo_combined_mults", "skillInfo_integration_row", "skillInfo_integration_mult", "skillInfo_flavor",
+            "skillInfo_unequipBtn",
+            "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
+            "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
+            "libSkillInfo_equipError", "libSkillInfo_equipBtn",
+            "combatStarsInventory", "combatStarsCounts", "unequipChargesText",
+            "skillSubTab_equipped", "skillSubTab_library"
+        ];
+        createView.queueCache.apply(createView, cacheIds);
+
+        const views = ["equipped", "library"];
+        for (let vi = 0; vi < views.length; vi++) {
+            const viewName = views[vi];
+            const compact = viewName === "library";
+            for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+                const column = skills.SLOT_COLUMNS[c];
+                const count = (data.progress.skillEquip.slots[column] || [null]).length;
+                for (let i = 0; i < count; i++) {
+                    const idPrefix = `skillSlot_${viewName}_${column}_${i}`;
+                    if (compact) {
+                        createView.queueCache(idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_talent`);
+                    } else {
+                        createView.queueCache(
+                            idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_meta`,
+                            `${idPrefix}_stars`, `${idPrefix}_star_bronze`, `${idPrefix}_star_silver`, `${idPrefix}_star_gold`,
+                            `${idPrefix}_exp_fill`, `${idPrefix}_talent_fill`
+                        );
+                    }
+                }
+            }
+        }
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const key = skills.keysInOrder[i];
             createView.queueCache(
-                `skill_wrap_${key}`,
-                `skill_${key}_name`, `skill_${key}_lvl_talent`,
-                `skill_${key}_exp_fill`, `skill_${key}_talent_fill`,
-                `skill_${key}_stars_controls`, `skill_${key}_star_bronze`, `skill_${key}_star_silver`, `skill_${key}_star_gold`
+                `skill_wrap_${key}`, `skill_${key}_name`, `skill_${key}_talent_only`,
+                `skill_${key}_class_tag`, `skill_${key}_equipped_badge`
             );
         }
     },
@@ -1322,7 +1464,7 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_combat", "skillSubTab_foraging", "skillSubTab_class",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
         const maps = data.progress.mapDefinitions;

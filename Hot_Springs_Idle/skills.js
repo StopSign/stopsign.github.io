@@ -84,6 +84,7 @@ const SKILL_DEFINITION_ROWS = [
         key: "selfAffirmations",
         name: "Self-Affirmations",
         category: "combat",
+        slotCategory: "defense",
         initialExpToLevel: 10,
         flavorText: '"To love oneself is the beginning of a lifelong romance." — Oscar Wilde',
         shortDescription: "Restore Aud every second while the battle runs.",
@@ -1728,6 +1729,362 @@ let skills = {
         return skills.isSkillUnlocked(skillKey);
     },
 
+    SLOT_COLUMNS: ["offense", "defense", "utility", "any"],
+    UNEQUIP_CHARGE_MS: 30 * 60 * 1000,
+
+    getDefaultSkillEquip: function() {
+        return {
+            slots: {
+                offense: [null],
+                defense: [null],
+                utility: [null],
+                any: [null]
+            },
+            unequipCharges: 1,
+            unequipChargesMax: 1,
+            unequipChargeReadyAt: 0
+        };
+    },
+
+    ensureSkillEquip: function() {
+        if (!data.progress) {
+            return null;
+        }
+        if (!data.progress.skillEquip) {
+            data.progress.skillEquip = skills.getDefaultSkillEquip();
+        }
+        const eq = data.progress.skillEquip;
+        if (!eq.slots) {
+            eq.slots = { offense: [null], defense: [null], utility: [null], any: [null] };
+        }
+        for (let i = 0; i < skills.SLOT_COLUMNS.length; i++) {
+            const col = skills.SLOT_COLUMNS[i];
+            if (!Array.isArray(eq.slots[col]) || eq.slots[col].length < 1) {
+                eq.slots[col] = [null];
+            }
+        }
+        if (eq.unequipChargesMax === undefined || eq.unequipChargesMax === null || eq.unequipChargesMax < 1) {
+            eq.unequipChargesMax = 1;
+        }
+        if (eq.unequipCharges === undefined || eq.unequipCharges === null) {
+            eq.unequipCharges = eq.unequipChargesMax;
+        }
+        if (eq.unequipCharges > eq.unequipChargesMax) {
+            eq.unequipCharges = eq.unequipChargesMax;
+        }
+        if (eq.unequipChargeReadyAt === undefined || eq.unequipChargeReadyAt === null) {
+            eq.unequipChargeReadyAt = 0;
+        }
+        return eq;
+    },
+
+    getSlotCategory: function(skillKey) {
+        const def = skills._byKey[skillKey];
+        return (def && def.slotCategory) ? def.slotCategory : "";
+    },
+
+    findSkillEquipSlot: function(skillKey) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq || !skillKey) {
+            return null;
+        }
+        for (let i = 0; i < skills.SLOT_COLUMNS.length; i++) {
+            const col = skills.SLOT_COLUMNS[i];
+            const arr = eq.slots[col];
+            for (let j = 0; j < arr.length; j++) {
+                if (arr[j] === skillKey) {
+                    return { column: col, index: j };
+                }
+            }
+        }
+        return null;
+    },
+
+    isSkillEquipped: function(skillKey) {
+        return !!skills.findSkillEquipSlot(skillKey);
+    },
+
+    getEquippedSkillKeys: function() {
+        const eq = skills.ensureSkillEquip();
+        const out = [];
+        if (!eq) {
+            return out;
+        }
+        for (let i = 0; i < skills.SLOT_COLUMNS.length; i++) {
+            const arr = eq.slots[skills.SLOT_COLUMNS[i]];
+            for (let j = 0; j < arr.length; j++) {
+                if (arr[j]) {
+                    out.push(arr[j]);
+                }
+            }
+        }
+        return out;
+    },
+
+    /** Unlocked combat/class skills that have slotCategory (Library list). */
+    getLibrarySkillKeys: function() {
+        const out = [];
+        const sk = data.progress && data.progress.skills;
+        if (!sk) {
+            return out;
+        }
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const k = skills.keysInOrder[i];
+            if (!skills.isSkillUnlocked(k)) {
+                continue;
+            }
+            const def = skills._byKey[k];
+            if (!def || !def.slotCategory) {
+                continue;
+            }
+            const cat = def.category || "combat";
+            if (cat === "foraging") {
+                continue;
+            }
+            out.push(k);
+        }
+        return out;
+    },
+
+    canPlaceSkillInColumn: function(skillKey, column) {
+        const slotCat = skills.getSlotCategory(skillKey);
+        if (!slotCat) {
+            return false;
+        }
+        if (column === "any") {
+            return true;
+        }
+        return column === slotCat;
+    },
+
+    canPlaceSkillInSlot: function(skillKey, column, index) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq || !skills.canPlaceSkillInColumn(skillKey, column)) {
+            return false;
+        }
+        const arr = eq.slots[column];
+        if (!arr || index < 0 || index >= arr.length) {
+            return false;
+        }
+        return true;
+    },
+
+    returnSkillStarsToPool: function(skill) {
+        if (!skill || !skill.stars) {
+            return;
+        }
+        const pool = data.progress.stars;
+        if (!pool) {
+            return;
+        }
+        if (skill.stars.bronze) {
+            pool.bronze = (pool.bronze || 0) + 1;
+            skill.stars.bronze = false;
+        }
+        if (skill.stars.silver) {
+            pool.silver = (pool.silver || 0) + 1;
+            skill.stars.silver = false;
+        }
+        if (skill.stars.gold) {
+            pool.gold = (pool.gold || 0) + 1;
+            skill.stars.gold = false;
+        }
+    },
+
+    resetSkillLevelOnUnequip: function(skill) {
+        if (!skill) {
+            return;
+        }
+        const def = skills._byKey[skill.key];
+        skill.level = 0;
+        skill.exp = 0;
+        skill.expToLevel = def && def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
+        skill.triggerCount = 0;
+    },
+
+    /** Place skill into an empty slot. Fails if occupied, already equipped, or incompatible. */
+    equipSkillToSlot: function(skillKey, column, index) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq || !skillKey) {
+            return { ok: false, reason: "invalid" };
+        }
+        if (skills.isSkillEquipped(skillKey)) {
+            return { ok: false, reason: "already" };
+        }
+        if (!skills.canPlaceSkillInSlot(skillKey, column, index)) {
+            return { ok: false, reason: "incompatible" };
+        }
+        if (eq.slots[column][index]) {
+            return { ok: false, reason: "occupied" };
+        }
+        eq.slots[column][index] = skillKey;
+        return { ok: true };
+    },
+
+    /** Category column first, then Any. */
+    tryAutoEquip: function(skillKey) {
+        if (skills.isSkillEquipped(skillKey)) {
+            return { ok: false, reason: "already" };
+        }
+        const slotCat = skills.getSlotCategory(skillKey);
+        if (!slotCat) {
+            return { ok: false, reason: "unclassified" };
+        }
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return { ok: false, reason: "invalid" };
+        }
+        const tryCol = function(col) {
+            const arr = eq.slots[col];
+            for (let i = 0; i < arr.length; i++) {
+                if (!arr[i]) {
+                    eq.slots[col][i] = skillKey;
+                    return { ok: true, column: col, index: i };
+                }
+            }
+            return null;
+        };
+        const matched = tryCol(slotCat);
+        if (matched) {
+            return matched;
+        }
+        const any = tryCol("any");
+        if (any) {
+            return any;
+        }
+        return { ok: false, reason: "full", category: slotCat };
+    },
+
+    unequipSkillFromSlot: function(column, index, spendCharge) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return { ok: false, reason: "invalid" };
+        }
+        const arr = eq.slots[column];
+        if (!arr || index < 0 || index >= arr.length || !arr[index]) {
+            return { ok: false, reason: "empty" };
+        }
+        if (spendCharge) {
+            if ((eq.unequipCharges || 0) < 1) {
+                return { ok: false, reason: "nocharge" };
+            }
+        }
+        const skillKey = arr[index];
+        const skill = data.progress.skills[skillKey];
+        arr[index] = null;
+        if (skill) {
+            skills.returnSkillStarsToPool(skill);
+            skills.resetSkillLevelOnUnequip(skill);
+        }
+        if (spendCharge) {
+            eq.unequipCharges = Math.max(0, (eq.unequipCharges || 0) - 1);
+            if (eq.unequipCharges < eq.unequipChargesMax && !eq.unequipChargeReadyAt) {
+                eq.unequipChargeReadyAt = Date.now() + skills.UNEQUIP_CHARGE_MS;
+            }
+        }
+        return { ok: true, skillKey: skillKey };
+    },
+
+    unequipSkillByKey: function(skillKey, spendCharge) {
+        const loc = skills.findSkillEquipSlot(skillKey);
+        if (!loc) {
+            return { ok: false, reason: "notequipped" };
+        }
+        return skills.unequipSkillFromSlot(loc.column, loc.index, spendCharge);
+    },
+
+    canSwapSlots: function(colA, indexA, colB, indexB) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return false;
+        }
+        const arrA = eq.slots[colA];
+        const arrB = eq.slots[colB];
+        if (!arrA || !arrB || indexA < 0 || indexB < 0 || indexA >= arrA.length || indexB >= arrB.length) {
+            return false;
+        }
+        const keyA = arrA[indexA];
+        const keyB = arrB[indexB];
+        if (!keyA && !keyB) {
+            return false;
+        }
+        if (keyA && !skills.canPlaceSkillInColumn(keyA, colB)) {
+            return false;
+        }
+        if (keyB && !skills.canPlaceSkillInColumn(keyB, colA)) {
+            return false;
+        }
+        return true;
+    },
+
+    swapSkillSlots: function(colA, indexA, colB, indexB) {
+        if (!skills.canSwapSlots(colA, indexA, colB, indexB)) {
+            return { ok: false, reason: "invalid" };
+        }
+        const eq = skills.ensureSkillEquip();
+        const tmp = eq.slots[colA][indexA];
+        eq.slots[colA][indexA] = eq.slots[colB][indexB];
+        eq.slots[colB][indexB] = tmp;
+        return { ok: true };
+    },
+
+    /** Move equipped skill onto an empty target slot (same as swap with empty). */
+    moveSkillToEmptySlot: function(fromCol, fromIndex, toCol, toIndex) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return { ok: false, reason: "invalid" };
+        }
+        const key = eq.slots[fromCol] && eq.slots[fromCol][fromIndex];
+        if (!key) {
+            return { ok: false, reason: "empty" };
+        }
+        if (eq.slots[toCol][toIndex]) {
+            return { ok: false, reason: "occupied" };
+        }
+        if (!skills.canPlaceSkillInColumn(key, toCol)) {
+            return { ok: false, reason: "incompatible" };
+        }
+        eq.slots[toCol][toIndex] = key;
+        eq.slots[fromCol][fromIndex] = null;
+        return { ok: true };
+    },
+
+    tickUnequipCharges: function(now) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return;
+        }
+        now = now || Date.now();
+        if (eq.unequipCharges >= eq.unequipChargesMax) {
+            eq.unequipCharges = eq.unequipChargesMax;
+            eq.unequipChargeReadyAt = 0;
+            return;
+        }
+        if (!eq.unequipChargeReadyAt) {
+            eq.unequipChargeReadyAt = now + skills.UNEQUIP_CHARGE_MS;
+            return;
+        }
+        while (eq.unequipCharges < eq.unequipChargesMax && now >= eq.unequipChargeReadyAt) {
+            eq.unequipCharges++;
+            if (eq.unequipCharges >= eq.unequipChargesMax) {
+                eq.unequipChargeReadyAt = 0;
+                break;
+            }
+            eq.unequipChargeReadyAt += skills.UNEQUIP_CHARGE_MS;
+        }
+    },
+
+    getTotalTalentLevel: function() {
+        return skills.unlockedTalentLevelTotal();
+    },
+
+    categoryArticle: function(slotCategory) {
+        if (slotCategory === "offense" || slotCategory === "utility") {
+            return "an";
+        }
+        return "a";
+    },
+
     getSkillRewardText: function(skillKey, skill) {
         return skills._byKey[skillKey].rewardText(skill);
     },
@@ -1737,14 +2094,17 @@ let skills = {
         if (!def || !def.getEffect || !sk || !skills.isSkillUnlocked(skillKey)) {
             return {};
         }
+        if (!skills.isSkillEquipped(skillKey)) {
+            return {};
+        }
         try {
             return def.getEffect(sk) || {};
         } catch (e) {
             return {};
         }
     },
-    /** One-line current effect for Skills tab (uses getSkillEffect). */
-    skillEffectUiSummary: function(skillKey, skill) {
+    /** One-line current effect for Skills tab. Uses definition effect even if unequipped (for display). */
+    skillEffectUiSummary: function(skillKey, skill, opts) {
         const sk = skill || (data.progress && data.progress.skills && data.progress.skills[skillKey]);
         if (!sk || !skills.isSkillUnlocked(skillKey)) {
             return "";
@@ -1753,7 +2113,16 @@ let skills = {
         if (!def || typeof def.effectUiSummary !== "function") {
             return "";
         }
-        const e = skills.getSkillEffect(skillKey, sk);
+        let e = {};
+        if (opts && opts.ignoreEquip) {
+            try {
+                e = def.getEffect(sk) || {};
+            } catch (err) {
+                e = {};
+            }
+        } else {
+            e = skills.getSkillEffect(skillKey, sk);
+        }
         const cd = gameData.battle.cooldowns;
         return def.effectUiSummary(sk, e, cd);
     },

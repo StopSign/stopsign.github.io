@@ -298,12 +298,12 @@
             <div id="tabPane_skills" class="tab-pane">
                 <div class="pane-title">Skills</div>
                 <div class="row-buttons">
-                    <button id="skillSubTab_combat" class="tab-button" onclick="events.switchSkillsTab('combat')">Combat</button>
-                    <button id="skillSubTab_foraging" class="tab-button" onclick="events.switchSkillsTab('foraging')">Foraging</button>
-                    <button id="skillSubTab_class" class="tab-button" onclick="events.switchSkillsTab('class')">Class</button>
+                    <button id="skillSubTab_equipped" class="tab-button" onclick="events.switchSkillsTab('equipped')">Equipped</button>
+                    <button id="skillSubTab_library" class="tab-button" onclick="events.switchSkillsTab('library')">Library</button>
                 </div>
-                <div id="combatStarsInventory" class="base-row" style="display:none">
+                <div id="combatStarsInventory" class="base-row skills-stars-charges-row" style="display:none">
                     <div id="combatStarsCounts"></div>
+                    <div id="unequipChargesText" class="skills-unequip-charges"></div>
                 </div>
                 <div id="skillsList"></div>
             </div>

@@ -220,6 +220,20 @@ let onLoad = {
                 }
             }
         }
+        onLoad.ensureSkillEquipState();
+    },
+
+    ensureSkillEquipState: function() {
+        if (!data.progress) {
+            return;
+        }
+        const tab = data.progress.selectedSkillsTab;
+        if (tab === "combat" || tab === "foraging" || tab === "class" || tab === "resort" || !tab) {
+            data.progress.selectedSkillsTab = "equipped";
+        }
+        skills.ensureSkillEquip();
+        // Existing saves start with empty slots (do not auto-equip).
+        skills.tickUnequipCharges(Date.now());
     },
 
     applySaveVersionMigrations: function(loadedSaveVersion) {

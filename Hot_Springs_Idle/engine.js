@@ -3382,6 +3382,9 @@ let engine = {
         if (!skills.isSkillUnlocked(skillKey)) {
             return;
         }
+        if (!skills.isSkillEquipped(skillKey)) {
+            return;
+        }
         const d = skills._byKey[skillKey];
         const mode = data.battle.mode || "combat";
         const cat = d && d.category ? d.category : "combat";
