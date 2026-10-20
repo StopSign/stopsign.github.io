@@ -541,6 +541,10 @@ let events = {
         data.progress.compactViewPane = valid.indexOf(paneKey) >= 0 ? paneKey : "menus";
         view.updateCompactLayout();
         createView.updateLayoutMeasurements();
+        // Leaving Battle pauses CSS anims on #attackLines; clear so they don't pile up.
+        if (data.progress.compactViewPane !== "battle" && typeof view.clearAttackLineFx === "function") {
+            view.clearAttackLineFx();
+        }
     },
     clickEventHitsElement: function(e, el) {
         if (!el) {

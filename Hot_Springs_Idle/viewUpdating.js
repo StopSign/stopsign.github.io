@@ -1,6 +1,9 @@
 let viewData = {
     cached: {}, //contains the elements that are being iterated over and updated regularly,
     prevValues: {},
+    typeKeyCache: Object.create(null),
+    gpuPosCache: Object.create(null),
+    displayCache: Object.create(null),
     scheduled: [],
     skillListSearch: "",
     layout: {
@@ -55,8 +58,6 @@ let view = {
         if (data.progress && data.progress.showBattle) {
             view.renderBattlefield();
         }
-        // Global progress bars (okami/mana/divinity) — always on
-        view.updateOkamiPanel();
         // Map-only DOM (baseResortMap carriers / okami sprites / weaving) — skip when base map not visible
         if (view.isResortMapVisible()) {
             view.updateActiveWeavingButtons();
@@ -82,6 +83,8 @@ let view = {
         createView.showCurrentTab();
         view.updateMenuNumbers();
         view.updateGlobals();
+        // Progress bars (okami/mana/divinity) — 10 Hz is enough
+        view.updateOkamiPanel();
     },
     updateViewOnSecond: function() { //Updates once a second
         if (!events._buyableTooltipOpen) {
@@ -1648,7 +1651,7 @@ let view = {
             const pos = engine.getFoxDenMapSlotPosition(uk)
             view.updateVal(`foxDenSlot_${uk}`, building ? "" : "none", "style.display");
             if (building) {
-                view.updateVal(`foxDenSlot_${uk}`, view.gpuTranslate(pos.x, pos.y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(`foxDenSlot_${uk}`, pos.x, pos.y, false);
                 view.updateVal(`foxDenSlotPct_${uk}`, `${resortData.getConstructionPercent(site)}%`);
                 view.bindConstructionSlotTip(uk);
             }
@@ -1691,13 +1694,13 @@ let view = {
                     break;
                 }
             }
-            view.updateVal(elId, carrier ? "" : "none", "style.display");
+            view.setDisplayById(elId, !!carrier);
             if (carrier) {
                 const route = engine.getCarrierRoutePoints(carrier);
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".fox-den-carrier-img");
@@ -1726,13 +1729,13 @@ let view = {
                     break;
                 }
             }
-            view.updateVal(elId, carrier ? "" : "none", "style.display");
+            view.setDisplayById(elId, !!carrier);
             if (carrier) {
                 const route = engine.getCarrierRoutePoints(carrier);
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".bonfire-carrier-img");
@@ -1761,13 +1764,13 @@ let view = {
                     break;
                 }
             }
-            view.updateVal(elId, carrier ? "" : "none", "style.display");
+            view.setDisplayById(elId, !!carrier);
             if (carrier) {
                 const route = engine.getCarrierRoutePoints(carrier);
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".market-carrier-img");
@@ -1783,7 +1786,7 @@ let view = {
         const cistern = data.progress.base.cistern;
         if (!engine.cisternWorkersRevealed()) {
             for (let ci = 0; ci < 8; ci++) {
-                view.updateVal(`cisternCarrier_${ci}`, "none", "style.display");
+                view.setDisplayById(`cisternCarrier_${ci}`, false);
             }
             return;
         }
@@ -1802,13 +1805,13 @@ let view = {
                     break;
                 }
             }
-            view.updateVal(elId, carrier ? "" : "none", "style.display");
+            view.setDisplayById(elId, !!carrier);
             if (carrier) {
                 const route = engine.getCarrierRoutePoints(carrier);
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".cistern-carrier-img");
@@ -1824,7 +1827,7 @@ let view = {
         const inn = data.progress.base.inn;
         if (!engine.isInnOnsenConverted()) {
             for (let ci = 0; ci < 8; ci++) {
-                view.updateVal(`innCarrier_${ci}`, "none", "style.display");
+                view.setDisplayById(`innCarrier_${ci}`, false);
             }
             return;
         }
@@ -1843,13 +1846,13 @@ let view = {
                     break;
                 }
             }
-            view.updateVal(elId, carrier ? "" : "none", "style.display");
+            view.setDisplayById(elId, !!carrier);
             if (carrier) {
                 const route = engine.getCarrierRoutePoints(carrier);
                 const p = carrier.progress || 0;
                 const x = route.fromX + (route.toX - route.fromX) * p;
                 const y = route.fromY + (route.toY - route.fromY) * p;
-                view.updateVal(elId, view.gpuTranslate(x, y, "translate(-50%, -50%)"), "style.transform");
+                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
                 if (el) {
                     const img = el.querySelector(".inn-carrier-img");
@@ -2951,7 +2954,7 @@ let view = {
             }
             const diam = Math.round(pulse.rangePx || 0) * 2;
             const pulseCenter = engine.getFireLauncherSlotCenter(pulse.platformKey);
-            view.updateVal(aid, view.gpuTranslate(pulseCenter.x, pulseCenter.y, "translate(-50%, -50%)"), "style.transform");
+            view.setGpuPosById(aid, pulseCenter.x, pulseCenter.y, false);
             view.updateVal(aid, `${diam}px`, "style.width");
             view.updateVal(aid, `${diam}px`, "style.height");
             const el = viewData.cached[aid];
@@ -4014,7 +4017,7 @@ let view = {
             if (visual.mode === "travel") {
                 const pos = engine.getResortPathPosition(visual.pathProgress || 0);
                 travelEl.style.display = "";
-                travelEl.style.transform = view.gpuTranslate(pos.x - 8, pos.y - 8);
+                view.setGpuPos(travelEl, pos.x - 8, pos.y - 8, viewData.gpuPosCache.okamiTravelToken || (viewData.gpuPosCache.okamiTravelToken = {}), false);
                 const img = travelEl.querySelector(".okami-travel-tail");
                 if (img) {
                     img.classList.toggle("fox-travel-mirror", !!visual.east);
@@ -4032,7 +4035,7 @@ let view = {
                 const pos = spec ? engine.getResortPathPosition(spec.midDist) : null;
                 if (pos) {
                     weaveTokenEl.style.display = "";
-                    weaveTokenEl.style.transform = view.gpuTranslate(pos.x, pos.y, "translate(-100%, -50%)");
+                    view.setGpuPos(weaveTokenEl, pos.x, pos.y, viewData.gpuPosCache.okamiPathWeaveToken || (viewData.gpuPosCache.okamiPathWeaveToken = {}), false);
                 } else {
                     weaveTokenEl.style.display = "none";
                 }
@@ -5174,16 +5177,12 @@ let view = {
                 renderCache = viewData.intruderRenderCache[intruderId] = {};
             }
             const sizeKey = `${intruder.sizePx}`;
-            const posKey = `${leftPx}|${Math.round(renderY)}`;
             if (renderCache.sizeKey !== sizeKey) {
                 intruderEl.style.width = `${intruder.sizePx}px`;
                 intruderEl.style.height = `${intruder.sizePx}px`;
                 renderCache.sizeKey = sizeKey;
             }
-            if (renderCache.posKey !== posKey) {
-                intruderEl.style.transform = view.gpuTranslate(leftPx, renderY);
-                renderCache.posKey = posKey;
-            }
+            view.setGpuPos(intruderEl, leftPx, Math.round(renderY), renderCache, false);
             const shapeLayer = intruderEl.querySelector(".intruder-shape-layer");
             if (shapeLayer) {
                 const isForageUnit = intruder.intruderType === "tree" || intruder.intruderType === "bush" || intruder.intruderType === "ore_vein";
@@ -5337,9 +5336,25 @@ let view = {
             }
         }
     },
+    clearAttackLineFx: function() {
+        const linesRoot = viewData.cached.attackLines;
+        if (linesRoot) {
+            while (linesRoot.firstChild) {
+                linesRoot.removeChild(linesRoot.firstChild);
+            }
+        }
+        if (data.battle && data.battle.lineFxQueue) {
+            data.battle.lineFxQueue.length = 0;
+        }
+    },
     consumeLineFxQueue: function() {
         const q = data.battle.lineFxQueue;
         const linesRoot = viewData.cached.attackLines;
+        if (!view.isBattleVisible()) {
+            // Drain queue + drop any paused animation nodes so they don't burst when Battle is shown.
+            view.clearAttackLineFx();
+            return;
+        }
         if (!q || !q.length || !linesRoot) {
             return;
         }
@@ -5366,9 +5381,15 @@ let view = {
         if (!visible) {
             return;
         }
-        const transform = view.gpuTranslate(x, y, flip ? "scaleX(-1)" : "scaleX(1)");
-        if (el.style.transform !== transform) {
-            el.style.transform = transform;
+        let cache = el.__gpuPos;
+        if (!cache) {
+            cache = el.__gpuPos = {};
+        }
+        view.setGpuPos(el, x, y, cache, false);
+        const sx = flip ? -1 : 1;
+        if (cache._sx !== sx) {
+            cache._sx = sx;
+            el.style.setProperty("--sx", sx);
         }
     },
     renderIntruderAttackFx: function() {
@@ -5387,7 +5408,7 @@ let view = {
             const el = els[i];
             let render = viewData.intruderAttackGfxRender[i];
             if (!render) {
-                render = viewData.intruderAttackGfxRender[i] = { active: false, kind: "", transform: "", opacity: "" };
+                render = viewData.intruderAttackGfxRender[i] = { active: false, kind: "", opacity: "" };
             }
             const slot = slots[i];
             if (raisingDifficulty || !slot || !slot.active) {
@@ -5410,7 +5431,6 @@ let view = {
                 opacity = po + ((slot.opacity - po) * alpha);
             }
             const kind = slot.kind === "leer" ? "leer" : "wink";
-            const transform = view.gpuTranslate(x - half, y - half);
             const opacityText = String(Math.round(Math.max(0, opacity) * 1000) / 1000);
             if (!render.active) {
                 el.style.display = "block";
@@ -5420,10 +5440,7 @@ let view = {
                 el.src = kind === "leer" ? "img/leer.svg" : "img/wink.svg";
                 render.kind = kind;
             }
-            if (render.transform !== transform) {
-                el.style.transform = transform;
-                render.transform = transform;
-            }
+            view.setGpuPos(el, x - half, y - half, render, false);
             if (render.opacity !== opacityText) {
                 el.style.opacity = opacityText;
                 render.opacity = opacityText;
@@ -5484,7 +5501,7 @@ let view = {
             const slot = fx.dmgSlots[i];
             let render = viewData.slapDmgRender[i];
             if (!render) {
-                render = viewData.slapDmgRender[i] = { active: false, text: "", opacity: "", transform: "" };
+                render = viewData.slapDmgRender[i] = { active: false, text: "", opacity: "" };
             }
             if (!slot || !slot.active) {
                 if (render.active) {
@@ -5493,10 +5510,7 @@ let view = {
                 }
                 continue;
             }
-            const motion = view.floatHoldThenRise(slot.elapsedMs, slot.x, slot.y);
             const text = view.formatSlapDamageText(slot.damage);
-            const opacity = motion.opacity;
-            const transform = motion.transform;
             if (!render.active) {
                 el.style.display = "block";
                 render.active = true;
@@ -5505,28 +5519,29 @@ let view = {
                 el.textContent = text;
                 render.text = text;
             }
-            if (render.opacity !== opacity) {
-                el.style.opacity = opacity;
-                render.opacity = opacity;
-            }
-            if (render.transform !== transform) {
-                el.style.transform = transform;
-                render.transform = transform;
-            }
+            view.applyFloatMotion(el, render, slot.elapsedMs, slot.x, slot.y);
         }
     },
-    floatHoldThenRise: function(elapsedMs, x, y) {
+    applyFloatMotion: function(el, render, elapsedMs, x, y) {
         const holdMs = engine.FLOAT_HOLD_MS || 500;
         const riseMs = engine.FLOAT_RISE_MS || 1500;
         const risePx = engine.FLOAT_RISE_PX || 28;
-        if (elapsedMs <= holdMs) {
-            return { opacity: "1", transform: view.gpuTranslate(x, y, "translate(-50%, 0px)") };
+        let rise = 0;
+        let opacity = 1;
+        if (elapsedMs > holdMs) {
+            const t = Math.max(0, Math.min(1, (elapsedMs - holdMs) / riseMs));
+            rise = Math.round(-risePx * t);
+            opacity = 1 - t;
         }
-        const t = Math.max(0, Math.min(1, (elapsedMs - holdMs) / riseMs));
-        return {
-            opacity: String(1 - t),
-            transform: view.gpuTranslate(x, y, `translate(-50%, ${Math.round(-risePx * t)}px)`)
-        };
+        view.setGpuPos(el, x, y, render, false);
+        if (render._rise !== rise) {
+            render._rise = rise;
+            el.style.setProperty("--rise", rise);
+        }
+        if (render.opacity !== opacity) {
+            el.style.opacity = opacity;
+            render.opacity = opacity;
+        }
     },
     renderPlayerFloats: function() {
         const els = viewData.playerFloatElements;
@@ -5542,7 +5557,7 @@ let view = {
             const slot = fx.slots[i];
             let render = viewData.playerFloatRender[i];
             if (!render) {
-                render = viewData.playerFloatRender[i] = { active: false, text: "", opacity: "", transform: "", cls: "" };
+                render = viewData.playerFloatRender[i] = { active: false, text: "", opacity: "", cls: "" };
             }
             if (!slot || !slot.active) {
                 if (render.active) {
@@ -5551,10 +5566,7 @@ let view = {
                 }
                 continue;
             }
-            const motion = view.floatHoldThenRise(slot.elapsedMs, slot.x, slot.y);
             const text = slot.text || "";
-            const opacity = motion.opacity;
-            const transform = motion.transform;
             const cls = slot.kind === "hurt"
                 ? "slap-dmg-num hypervisible float-aud-hurt"
                 : "slap-dmg-num hypervisible float-aud-gain";
@@ -5570,14 +5582,7 @@ let view = {
                 el.textContent = text;
                 render.text = text;
             }
-            if (render.opacity !== opacity) {
-                el.style.opacity = opacity;
-                render.opacity = opacity;
-            }
-            if (render.transform !== transform) {
-                el.style.transform = transform;
-                render.transform = transform;
-            }
+            view.applyFloatMotion(el, render, slot.elapsedMs, slot.x, slot.y);
         }
     },
     spawnAttackLineFx: function(seg, parent) {
@@ -5940,6 +5945,66 @@ let view = {
         const t = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
         return extra ? `${t} ${extra}` : t;
     },
+    setGpuPos: function(el, x, y, cache, subpixel) {
+        if (!el) {
+            return;
+        }
+        const rx = subpixel ? (Math.round(x * 10) / 10) : Math.round(x);
+        const ry = subpixel ? (Math.round(y * 10) / 10) : Math.round(y);
+        if (cache && cache._tx === rx && cache._ty === ry) {
+            return;
+        }
+        if (cache) {
+            cache._tx = rx;
+            cache._ty = ry;
+        }
+        el.style.setProperty("--tx", rx);
+        el.style.setProperty("--ty", ry);
+    },
+    setGpuPosById: function(id, x, y, subpixel) {
+        const el = viewData.cached[id];
+        if (!el) {
+            return;
+        }
+        let cache = viewData.gpuPosCache[id];
+        if (!cache) {
+            cache = viewData.gpuPosCache[id] = {};
+        }
+        view.setGpuPos(el, x, y, cache, !!subpixel);
+    },
+    setDisplayById: function(id, show) {
+        const el = viewData.cached[id];
+        if (!el) {
+            return;
+        }
+        let cache = viewData.displayCache[id];
+        if (!cache) {
+            cache = viewData.displayCache[id] = {};
+        }
+        const display = show ? "" : "none";
+        if (cache.display === display) {
+            return;
+        }
+        cache.display = display;
+        el.style.display = display;
+    },
+    setSizeById: function(id, sizePx) {
+        const el = viewData.cached[id];
+        if (!el) {
+            return;
+        }
+        let cache = viewData.displayCache[id];
+        if (!cache) {
+            cache = viewData.displayCache[id] = {};
+        }
+        if (cache.sizePx === sizePx) {
+            return;
+        }
+        cache.sizePx = sizePx;
+        const sizeStr = sizePx + "px";
+        el.style.width = sizeStr;
+        el.style.height = sizeStr;
+    },
     renderLerpAlpha: function() {
         if (data.gameSettings && data.gameSettings.stop) {
             return 1;
@@ -5979,7 +6044,7 @@ let view = {
         for (let pi = 0; pi < 8; pi++) {
             const pid = `fireLauncherProjectile_${pi}`;
             const p = pi < projectiles.length ? projectiles[pi] : null;
-            view.updateVal(pid, p ? "" : "none", "style.display");
+            view.setDisplayById(pid, !!p);
             if (!p) {
                 continue;
             }
@@ -5991,9 +6056,8 @@ let view = {
             const y = (p.fromY || 0) + ((p.toY || 0) - (p.fromY || 0)) * t;
             const size = p.sizePx || 28;
             const half = size / 2;
-            view.updateVal(pid, `${size}px`, "style.width");
-            view.updateVal(pid, `${size}px`, "style.height");
-            view.updateVal(pid, view.gpuTranslateSubpixel(x - half, y - half), "style.transform");
+            view.setSizeById(pid, size);
+            view.setGpuPosById(pid, x - half, y - half, true);
         }
     },
     updatePathTokenPositions: function() {
@@ -6007,8 +6071,9 @@ let view = {
             const pebble = pebbles[pi];
             const pid = `pebbleToken_${pi}`;
             const pAmtId = `pebbleTokenAmt_${pi}`;
-            view.updateVal(pid, pebble ? "" : "none", "style.display");
-            view.updateVal(pAmtId, pebble ? "" : "none", "style.display");
+            const show = !!pebble;
+            view.setDisplayById(pid, show);
+            view.setDisplayById(pAmtId, show);
             if (!pebble) {
                 continue;
             }
@@ -6016,8 +6081,8 @@ let view = {
                 pebble.prevPathProgress = pebble.pathProgress || 0;
             }
             const pos = engine.getResortPathPosition(view.pathTokenVisualProgress(pebble));
-            view.updateVal(pid, view.gpuTranslateSubpixel(pos.x - 4, pos.y - 4), "style.transform");
-            view.updateVal(pAmtId, view.gpuTranslateSubpixel(pos.x, pos.y + 8, "translateX(-50%)"), "style.transform");
+            view.setGpuPosById(pid, pos.x - 4, pos.y - 4, true);
+            view.setGpuPosById(pAmtId, pos.x, pos.y + 8, true);
         }
         const droplets = base.droplets || [];
         for (let di = 0; di < 12; di++) {
@@ -6025,9 +6090,10 @@ let view = {
             const did = `dropletToken_${di}`;
             const dAmtBelow = `dropletTokenAmtBelow_${di}`;
             const dAmtTop = `dropletTokenAmtTop_${di}`;
-            view.updateVal(did, droplet ? "" : "none", "style.display");
-            view.updateVal(dAmtBelow, droplet ? "" : "none", "style.display");
-            view.updateVal(dAmtTop, droplet ? "" : "none", "style.display");
+            const show = !!droplet;
+            view.setDisplayById(did, show);
+            view.setDisplayById(dAmtBelow, show);
+            view.setDisplayById(dAmtTop, show);
             if (!droplet) {
                 continue;
             }
@@ -6035,9 +6101,9 @@ let view = {
                 droplet.prevPathProgress = droplet.pathProgress || 0;
             }
             const dpos = engine.getResortPathPosition(view.pathTokenVisualProgress(droplet));
-            view.updateVal(did, view.gpuTranslateSubpixel(dpos.x - 5, dpos.y - 5), "style.transform");
-            view.updateVal(dAmtBelow, view.gpuTranslateSubpixel(dpos.x, dpos.y + 10, "translateX(-50%)"), "style.transform");
-            view.updateVal(dAmtTop, view.gpuTranslateSubpixel(dpos.x, dpos.y - 18, "translateX(-50%)"), "style.transform");
+            view.setGpuPosById(did, dpos.x - 5, dpos.y - 5, true);
+            view.setGpuPosById(dAmtBelow, dpos.x, dpos.y + 10, true);
+            view.setGpuPosById(dAmtTop, dpos.x, dpos.y - 18, true);
         }
     },
     updateVal: function(id, newVal, type="textContent", sigFigs) {
@@ -6051,12 +6117,15 @@ let view = {
         }
         let prevValue = viewData.prevValues[id];
 
-        let typeKey = `lastValue_${type}`;
+        const tkCache = viewData.typeKeyCache;
+        let typeKey;
         if (type === "classList.toggle" && sigFigs) {
-            typeKey = `lastValue_${type}.${sigFigs}`;
+            const ck = type + "." + sigFigs;
+            typeKey = tkCache[ck] || (tkCache[ck] = "lastValue_" + ck);
+        } else {
+            typeKey = tkCache[type] || (tkCache[type] = "lastValue_" + type);
         }
         let lastVal = prevValue[typeKey] ?? null;
-        // let lastVal = null;
 
         if (lastVal !== newVal) {
             if (type.includes(".")) {

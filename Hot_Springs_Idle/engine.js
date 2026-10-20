@@ -2365,6 +2365,10 @@ let engine = {
         if (document.hidden) {
             return;
         }
+        // Hidden battle column pauses CSS animations → lines never remove; skip FX off-screen.
+        if (typeof view !== "undefined" && view.isBattleVisible && !view.isBattleVisible()) {
+            return;
+        }
         if (!data.battle.lineFxQueue) {
             data.battle.lineFxQueue = [];
         }
@@ -2386,6 +2390,9 @@ let engine = {
     },
     pushIntruderSandalLineFx: function(attacker) {
         if (document.hidden || !attacker) {
+            return;
+        }
+        if (typeof view !== "undefined" && view.isBattleVisible && !view.isBattleVisible()) {
             return;
         }
         if (!data.battle.lineFxQueue) {

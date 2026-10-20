@@ -607,6 +607,7 @@ button {
     transform-origin: center center;
     object-fit: contain;
     will-change: transform;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) scaleX(var(--sx, 1));
 }
 
 .intruder-attack-gfx {
@@ -620,6 +621,7 @@ button {
     user-select: none;
     object-fit: contain;
     will-change: transform, opacity;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .slap-dmg-num {
@@ -633,6 +635,7 @@ button {
     white-space: nowrap;
     z-index: 2;
     will-change: transform, opacity;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translate(-50%, calc(var(--rise, 0) * 1px));
 }
 
 .slap-dmg-num.float-aud-gain {
@@ -785,6 +788,7 @@ button {
     overflow: visible;
     z-index: 20;
     will-change: transform;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .intruder-shape-layer {
@@ -2793,6 +2797,7 @@ button {
     pointer-events: auto;
     cursor: default;
     overflow: visible;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translate(-50%, -50%);
 }
 
 .fox-den-build-art {
@@ -2811,6 +2816,7 @@ button {
     height: 46px;
     z-index: 5;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translate(-50%, -50%);
 }
 
 .fox-den-carrier-img {
@@ -2958,6 +2964,7 @@ button {
     height: 28px;
     z-index: 16;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .fire-launcher-projectile img {
@@ -2976,6 +2983,7 @@ button {
     pointer-events: none;
     z-index: 13;
     animation: fireLauncherAoeFade 0.5s ease-out forwards;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translate(-50%, -50%);
 }
 
 @keyframes fireLauncherAoeFade {
@@ -3191,6 +3199,7 @@ button {
     z-index: 13;
     box-sizing: border-box;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .droplet-token {
@@ -3205,6 +3214,7 @@ button {
     z-index: 13;
     box-sizing: border-box;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .droplet-token-inner {
@@ -3233,6 +3243,7 @@ button {
     line-height: 1;
     white-space: nowrap;
     text-align: center;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translateX(-50%);
 }
 
 .path-seg-hit {
@@ -3289,6 +3300,7 @@ button {
     height: 16px;
     z-index: 14;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0);
 }
 
 .okami-path-weave-token {
@@ -3299,6 +3311,7 @@ button {
     height: 20px;
     z-index: 14;
     pointer-events: none;
+    transform: translate3d(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px), 0) translate(-100%, -50%);
 }
 
 .okami-path-weave-tail {
