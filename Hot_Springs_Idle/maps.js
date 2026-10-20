@@ -40,16 +40,11 @@ let mapData = {
     },
     createMap: function(config) {
         const zones = config.zones || [];
-        const forageZones = config.forageZones || [];
         let totalDurationMs = 0;
         for (let i = 0; i < zones.length; i++) {
             const z = zones[i];
             z.name = `Wave ${i + 1}`;
             totalDurationMs = Math.max(totalDurationMs, z.startTimeMs);
-        }
-        for (let i = 0; i < forageZones.length; i++) {
-            const fz = forageZones[i];
-            fz.name = fz.name || `Forage ${i + 1}`;
         }
         const zoneShards = [];
         const rawZoneShards = config.zoneShards || [];
@@ -68,23 +63,9 @@ let mapData = {
             requiredClassKey: config.requiredClassKey || "",
             unlocksAfterMapKey: config.unlocksAfterMapKey || "",
             zones: zones,
-            forageZones: forageZones,
             zoneShards: zoneShards,
             totalDurationMs: totalDurationMs,
             version: config.version
-        };
-    },
-    createForageZone: function(totalEnemies, unitType, distanceBetweenUnits, index, baseAud, rewardAmount, rewardResource, expBasePerIntruder) {
-        return {
-            name: "",
-            totalEnemies: Math.max(1, totalEnemies || 1),
-            unitType: unitType || "tree",
-            distanceBetweenUnits: Math.max(0, distanceBetweenUnits || 0),
-            index: Math.max(0, index || 0),
-            baseAud: Math.max(1, baseAud || 10),
-            rewardAmount: Math.max(0, rewardAmount || 1),
-            rewardResource: rewardResource || "logs",
-            expBasePerIntruder: Math.max(0, expBasePerIntruder || 1)
         };
     },
     getMapTotalEnemies: function(mapDefinition) {

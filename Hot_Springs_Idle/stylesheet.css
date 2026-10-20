@@ -1388,6 +1388,11 @@ button {
     outline-offset: 1px;
 }
 
+.skill-equip-slot--dragover-invalid {
+    outline: 2px solid #ff4d4d;
+    outline-offset: 1px;
+}
+
 .skill-equip-slot--selected {
     background: rgba(79, 158, 255, 0.12);
 }
@@ -1497,17 +1502,30 @@ button {
 
 .skills-library-two-col {
     position: relative;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.skills-library-cols-scroll {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
     flex: 1 1 auto;
     min-height: 0;
+    overflow-y: auto;
+    align-content: start;
 }
 
 .skills-library-col {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
     min-height: 0;
-    overflow-y: auto;
-    max-height: 100%;
+    overflow: visible;
 }
 
 .skills-library-info-overlay {
@@ -1528,6 +1546,19 @@ button {
 .skills-library-info-overlay--left {
     left: 0;
     right: auto;
+}
+
+.skill-library-talent-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    margin-top: 1px;
+}
+
+.skill-library-talent-row .scroll-archives-choice-slot-cat {
+    margin-bottom: 0;
+    flex-shrink: 0;
 }
 
 .skill-library-row-tags {
@@ -3965,6 +3996,47 @@ button {
     background: rgba(0, 0, 0, 0.15);
     position: relative;
     overflow: visible;
+}
+
+.scroll-archives-choice-col--offense {
+    border-color: #ff4d4d;
+}
+
+.scroll-archives-choice-col--defense {
+    border-color: #7CFF9A;
+}
+
+.scroll-archives-choice-col--utility {
+    border-color: #7EB6FF;
+}
+
+.scroll-archives-choice-slot-cat {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    margin-bottom: 4px;
+    line-height: 1.2;
+}
+
+.scroll-archives-choice-slot-cat--offense {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.15);
+    border: 1px solid rgba(255, 77, 77, 0.55);
+}
+
+.scroll-archives-choice-slot-cat--defense {
+    color: #7CFF9A;
+    background: rgba(124, 255, 154, 0.12);
+    border: 1px solid rgba(124, 255, 154, 0.55);
+}
+
+.scroll-archives-choice-slot-cat--utility {
+    color: #7EB6FF;
+    background: rgba(126, 182, 255, 0.12);
+    border: 1px solid rgba(126, 182, 255, 0.55);
 }
 
 .scroll-archives-choice-shard {

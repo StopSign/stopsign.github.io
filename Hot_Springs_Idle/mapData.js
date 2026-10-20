@@ -17,10 +17,6 @@ mapData.getDefaultMaps = function() {
                 { key: "force", gain: 1, chance: 0.04, cap: 10 },
                 { key: "nickelAndDime", gain: 1, chance: 0.04, cap: 10 },
                 { key: "selfAffirmations", gain: 1, chance: 0.04, cap: 10 }
-            ],
-            forageZones: [
-                mapData.createForageZone(1, "tree", 200, 0, 10, 1, "logs", 1),
-                mapData.createForageZone(2, "tree", 300, 1, 20, 1, "logs", 1.2)
             ]
         }),
         mapData.createMap({
@@ -42,10 +38,6 @@ mapData.getDefaultMaps = function() {
                 { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 },
                 { key: "insultFatigue", gain: 1, chance: 0.02, cap: 10 },
                 { key: "mainCharacter", gain: 1, chance: 0.02, cap: 10 }
-            ],
-            forageZones: [
-                mapData.createForageZone(10, "bush", 165, 0, 5, 1, "lumber", 1),
-                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3)
             ]
         }),
         mapData.createMap({
@@ -67,9 +59,6 @@ mapData.getDefaultMaps = function() {
                 { key: "aboveItAll", gain: 1, chance: 0.01, cap: 10 },
                 { key: "hindsight", gain: 1, chance: 0.01, cap: 10 },
                 { key: "shameless", gain: 1, chance: 0.01, cap: 10 }
-            ],
-            forageZones: [
-                mapData.createForageZone(6, "ore_vein", 185, 0, 9, 1, "ironOre", 1.3)
             ]
         }),
         mapData.createMap({

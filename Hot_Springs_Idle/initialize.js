@@ -534,7 +534,6 @@ let initials = {
             mapDefinitions: mapData.getDefaultMaps(),
             mapStars: {},
             mapWorkersFound: {},
-            mapClearProgress: {},
             currentClassKey: "none",
             pendingClassKey: "",
             classSwitchCooldownMs: 0,
@@ -612,10 +611,6 @@ let initials = {
             scoldFlurryMs: 0,
             lastPlayerHitIntruderId: 0,
             lastPlayerHitStreak: 0,
-            forageIndexSpawned: {},
-            forageKindSpawnCounts: {},
-            forageActiveDrainMapKey: "",
-            forageMoveAccumPx: 0,
             intruderPool: initials.intruderPool(),
             buffs: battleBuffs.initState()
         };
@@ -1686,10 +1681,6 @@ let initialize = {
         data.battle.endRunAfterCountdown = false;
         data.battle.mode = "combat";
         data.battle.state = data.progress && data.progress.battleUnlocked ? "running" : "idle";
-        data.battle.forageIndexSpawned = {};
-        data.battle.forageKindSpawnCounts = {};
-        data.battle.forageActiveDrainMapKey = "";
-        data.battle.forageMoveAccumPx = 0;
         engine.initZoneShardRunCounts();
         engine.applySkillShardExpOnBattleStart();
         data.battle.cloneAttributePlan = engine.copyAttributePlan(data.progress.attributePlan);
@@ -1780,28 +1771,6 @@ let initialize = {
         data.battle.levelState.unassignedPoints = Math.max(0, maxLevelAssignable - assignedCount);
     },
     calcPlayerStats: function(fullHeal, opts) {
-        if (data.battle && data.battle.mode === "foraging") {
-            const gc = gameData.battle.combat;
-            const div = gc.conStrStatDivisor;
-            const ls = data.battle.levelState || {};
-            const totalCon = (ls.levelCon || 0);
-            const totalStr = (ls.levelStr || 0);
-            const brEff = skills.getSkillEffect("breathing");
-            const breathingBonus = brEff.staminaCapacityBonus || 0;
-            const maxStamina = Math.max(1, Math.ceil((gc.foragingBaseStaminaInner + breathingBonus) * (1 + (totalCon / div))));
-            data.battle.player.maxAud = maxStamina;
-            if (fullHeal) {
-                data.battle.player.aud = maxStamina;
-            } else {
-                data.battle.player.aud = Math.min(maxStamina, data.battle.player.aud);
-            }
-            data.battle.player.attackDamage = Math.max(1, roundNearestDecimals(gc.foragingHarvestDamageBase * (1 + (totalStr / div)), 1));
-            data.battle.player.sandalAttackDamage = 0;
-            data.progress.sandalAttackEnabled = false;
-            data.battle.player.regenPerSecond = 0;
-            engine.syncPlayerCooldownFields();
-            return;
-        }
         const gc = gameData.battle.combat;
         const div = gc.conStrStatDivisor;
         const oldMax = data.battle.player.maxAud;

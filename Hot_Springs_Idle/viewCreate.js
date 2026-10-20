@@ -127,7 +127,6 @@ let createView = {
                         <div class="travel-map-name"><span class="travel-map-stars-inline"><span id="mapStar_${m.key}_bronze" class="skill-star-btn skill-star-bronze">☆</span><span id="mapStar_${m.key}_silver" class="skill-star-btn skill-star-silver">☆</span><span id="mapStar_${m.key}_gold" class="skill-star-btn skill-star-gold">☆</span></span> [${i + 1}] ${m.name}<span class="muted-text">${classReq}</span></div>
                         <div class="row-buttons travel-map-actions">
                             <label class="travel-map-radio"><input type="radio" name="travelMapSelect" id="travelRadio_${m.key}" onclick="events.selectTravelMap('${m.key}')"> Travel here</label>
-                            ${m.requiredClassKey ? "" : `<button id="mapSmartHarvestStart_${m.key}" class="tab-button" onclick="events.startHarvestCountdownAndForage('${m.key}')" style="display:none">Start harvest</button><button id="mapHarvestButton_${m.key}" class="tab-button" onclick="events.startHarvest('${m.key}')" style="display:none">Harvest Resources</button>`}
                             <span id="mapActionCurrent_${m.key}" class="travel-map-current-label muted-text" style="display:none">Current</span>
                         </div>
                     </div>
@@ -139,10 +138,6 @@ let createView = {
                         <div>Kitsune Rescued: <span id="mapWorkers_${m.key}"></span></div>
                     </div>
                     <div class="muted-text">${resortData.insertResourceIcons(m.description || "")}</div>
-                    <div id="mapClearWrap_${m.key}" class="base-row">
-                        <div class="base-row">Intruders Cleared: <span id="mapClearStatus_${m.key}">0%</span></div>
-                        <div class="prog-track skill-prog-mini travel-map-clear-fill"><div id="mapClearFill_${m.key}" class="prog-fill prog-fill-skill"></div></div>
-                    </div>
                 </div>
             `;
             if (m.requiredClassKey) {
@@ -393,7 +388,7 @@ let createView = {
             let choiceCols = "";
             const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards, and only start to drop when this research is woven. Each shard increases the base exp of the skill when creating a new clone.";
             for (let ci = 0; ci < 3; ci++) {
-                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><div id="scrollArchivesChoiceTips_${ci}" class="muted-text scroll-archives-choice-tips" style="display:none"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
+                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceSlotCat_${ci}" class="scroll-archives-choice-slot-cat" style="display:none"></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><div id="scrollArchivesChoiceTips_${ci}" class="muted-text scroll-archives-choice-tips" style="display:none"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
             }
             return choiceCols;
         };
@@ -1089,6 +1084,8 @@ let createView = {
             const slotCat = def && def.slotCategory ? def.slotCategory : "";
             const isClass = (def && def.category === "class") || (skill && skill.category === "class");
             const borderClass = slotCat ? `skill-row--slot-${slotCat}` : "";
+            const catLabel = slotCat ? (slotCat.charAt(0).toUpperCase() + slotCat.slice(1)) : "";
+            const catStampClass = slotCat ? `scroll-archives-choice-slot-cat scroll-archives-choice-slot-cat--${slotCat}` : "scroll-archives-choice-slot-cat";
             libraryRows += `
                 <div class="skill-row skill-block skill-library-row ${borderClass}" id="skill_wrap_${key}" data-skill-key="${key}" draggable="true"
                     ondragstart="events.librarySkillDragStart(event, '${key}')"
@@ -1096,7 +1093,10 @@ let createView = {
                     <div class="skill-row-head">
                         <div class="skill-row-head-left">
                             <div class="skill-row-name" id="skill_${key}_name">${skill.name}</div>
-                            <div class="skill-row-lvl-talent" id="skill_${key}_talent_only">Talent ${skill.talentLevel}</div>
+                            <div class="skill-library-talent-row">
+                                <span id="skill_${key}_slot_cat" class="${catStampClass}" style="${slotCat ? "" : "display:none"}">${catLabel}</span>
+                                <div class="skill-row-lvl-talent" id="skill_${key}_talent_only">Talent ${skill.talentLevel}</div>
+                            </div>
                         </div>
                         <div class="skill-library-row-tags">
                             <span id="skill_${key}_class_tag" class="skill-class-tag" style="${isClass ? "" : "display:none"}">Class</span>
@@ -1137,8 +1137,10 @@ let createView = {
                     </div>
                     ${sortRadios}
                     <div id="skillsLibraryTwoCol" class="skills-library-two-col">
-                        <div id="skillsLibraryColLeft" class="skills-library-col skills-list-column"></div>
-                        <div id="skillsLibraryColRight" class="skills-library-col skills-list-column"></div>
+                        <div id="skillsLibraryColsScroll" class="skills-library-cols-scroll">
+                            <div id="skillsLibraryColLeft" class="skills-library-col"></div>
+                            <div id="skillsLibraryColRight" class="skills-library-col"></div>
+                        </div>
                         ${libraryInfo}
                     </div>
                     <div id="skillsListEmpty" class="muted-text skills-list-empty" style="display:none"></div>
@@ -1149,7 +1151,7 @@ let createView = {
         const cacheIds = [
             "skillsEquippedPane", "skillsLibraryPane", "skillsEquippedEmptyCta", "skillsEquippedInfoWrap",
             "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryResearchedTitle",
-            "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColLeft", "skillsLibraryColRight",
+            "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColsScroll", "skillsLibraryColLeft", "skillsLibraryColRight",
             "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
             "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards",
             "skillInfoPanel", "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current",
@@ -1192,7 +1194,7 @@ let createView = {
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const key = skills.keysInOrder[i];
             createView.queueCache(
-                `skill_wrap_${key}`, `skill_${key}_name`, `skill_${key}_talent_only`,
+                `skill_wrap_${key}`, `skill_${key}_name`, `skill_${key}_talent_only`, `skill_${key}_slot_cat`,
                 `skill_${key}_class_tag`, `skill_${key}_equipped_badge`
             );
         }
@@ -1456,7 +1458,7 @@ let createView = {
             "scrollArchivesResearchProgressText", "scrollArchivesResearchRequiredText", "scrollArchivesResearchEtaText", "scrollArchivesResearchPaused_row",
             "scrollArchivesResearchesToChoose", "scrollArchivesChoicesWrap",
             "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
-            "base_garden_smartHarvest_row", "base_garden_smartHarvest_btn", "base_garden_smartHarvest_extra", "base_garden_empty",
+            "base_garden_empty",
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
@@ -1468,11 +1470,7 @@ let createView = {
         for (let mi = 0; mi < maps.length; mi++) {
             const m = maps[mi];
             const mk = m.key;
-            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapShardSummary_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`, `mapClearWrap_${mk}`, `mapClearStatus_${mk}`, `mapClearFill_${mk}`);
-            /* Class-only maps omit harvest / smart-harvest controls in HTML - do not queue those ids. */
-            if (!m.requiredClassKey) {
-                createView.queueCache(`mapSmartHarvestStart_${mk}`, `mapHarvestButton_${mk}`);
-            }
+            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapShardSummary_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
         }
         for (let gi = 0; gi < 10; gi++) {
             createView.queueCache(`base_inn_guest_wrap_${gi}`, `base_inn_guest_name_${gi}`, `base_inn_guest_chat_${gi}`, `base_inn_guest_fill_${gi}`);
@@ -1616,7 +1614,7 @@ let createView = {
             createView.queueCache(`waveInfoZoneShard_${wsi}`);
         }
         for (let ci = 0; ci < 3; ci++) {
-            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceTips_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
+            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceSlotCat_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceTips_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
         }
         createView.queueCache("base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn");
         for (let tui = 0; tui < resortData.getFoxDenUnlockOrder().length; tui++) {

@@ -2954,8 +2954,7 @@ var resortData = {
                 arrangementOfLanternPlacingUnlocked: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
-                autoWeaveIncludePausedWeaves: false,
-                smartHarvestUnlocked: false
+                autoWeaveIncludePausedWeaves: false
             },
             introMuted: "Automation for an easy life, so you can go outside.",
             upgradesOrder: ["arrangementOfRotation", "arrangementOfRemembrance", "arrangementOfPathMaking", "arrangementOfAppraisal", "arrangementOfReview",
@@ -2964,7 +2963,7 @@ var resortData = {
                 "arrangementOfTargetPriority", "arrangementOfManaOrders", "arrangementOfDoubledStone", "arrangementOfRailingSafety",
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
-                "arrangementOfPaperMoney", "arrangementOfHeatTargeting", "smartHarvest"],
+                "arrangementOfPaperMoney", "arrangementOfHeatTargeting"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3639,32 +3638,6 @@ var resortData = {
                         return !!(g && g.arrangementOfLanternPlacingUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
-                },
-                smartHarvest: {
-                    key: "smartHarvest",
-                    name: "Smart Harvest",
-                    description: "Intruders Cleared stays at 100% until you choose Start harvest on the map; that begins the respawn timer and a foraging run.",
-                    cost: { coins: 50, stone: 20 },
-                    weavingTime: 240,
-                    canBuy: function() {
-                        if (typeof events !== "undefined" && events.harvestForageUnlocked && !events.harvestForageUnlocked()) {
-                            return false;
-                        }
-                        const g = data.progress.base.garden;
-                        return !(g && g.smartHarvestUnlocked);
-                    },
-                    onBuy: function() {
-                        data.progress.base.garden.smartHarvestUnlocked = true;
-                    },
-                    extraInfo: function() {
-                        return "";
-                    },
-                    rowVisible: function() {
-                        if (typeof events !== "undefined" && events.harvestForageUnlocked && !events.harvestForageUnlocked()) {
-                            return false;
-                        }
-                        return !data.progress.base.garden.smartHarvestUnlocked;
-                    }
                 }
             },
             emptyPlaceholderId: "base_garden_empty",

@@ -39,14 +39,6 @@ let events = {
         const rh = data.progress.base && data.progress.base.foxDen;
         return !!(rh && rh.unlocks && rh.unlocks.inn);
     },
-    /** Foraging skills / Scroll Archives foraging tab unlock with Scroll Archives */
-    foragingSkillsUnlocked: function() {
-        return events.skillsTabUnlocked();
-    },
-    /** Map harvest / intruder-clear forage - unlock condition TBD */
-    harvestForageUnlocked: function() {
-        return false;
-    },
     markTabNotify: function(tabKey) {
         data.progress.baseContentNotify.tab[tabKey] = true;
     },
@@ -431,24 +423,52 @@ let events = {
         ev.dataTransfer.effectAllowed = "copyMove";
         viewData.skillDragPayload = payload;
     },
+    _clearSkillSlotDragOver: function(slot) {
+        if (!slot || !slot.classList) {
+            return;
+        }
+        slot.classList.remove("skill-equip-slot--dragover");
+        slot.classList.remove("skill-equip-slot--dragover-invalid");
+    },
+    _skillKeyFromDragPayload: function() {
+        let raw = viewData.skillDragPayload || "";
+        let payload = null;
+        try {
+            payload = JSON.parse(raw);
+        } catch (e) {
+            payload = null;
+        }
+        if (!payload) {
+            return "";
+        }
+        if (payload.type === "library") {
+            return payload.skillKey || "";
+        }
+        if (payload.type === "slot") {
+            return payload.skillKey || "";
+        }
+        return "";
+    },
     skillSlotDragOver: function(ev) {
         if (!ev) {
             return;
         }
         ev.preventDefault();
-        if (ev.dataTransfer) {
-            ev.dataTransfer.dropEffect = "move";
-        }
         const slot = ev.currentTarget;
-        if (slot && slot.classList) {
-            slot.classList.add("skill-equip-slot--dragover");
+        if (!slot || !slot.classList) {
+            return;
         }
+        const toCol = slot.getAttribute("data-column");
+        const skillKey = events._skillKeyFromDragPayload();
+        const compatible = !!(skillKey && toCol && skills.canPlaceSkillInColumn(skillKey, toCol));
+        if (ev.dataTransfer) {
+            ev.dataTransfer.dropEffect = compatible ? "move" : "none";
+        }
+        events._clearSkillSlotDragOver(slot);
+        slot.classList.add(compatible ? "skill-equip-slot--dragover" : "skill-equip-slot--dragover-invalid");
     },
     skillSlotDragLeave: function(ev) {
-        const slot = ev && ev.currentTarget;
-        if (slot && slot.classList) {
-            slot.classList.remove("skill-equip-slot--dragover");
-        }
+        events._clearSkillSlotDragOver(ev && ev.currentTarget);
     },
     skillSlotDrop: function(ev) {
         if (!ev) {
@@ -456,9 +476,7 @@ let events = {
         }
         ev.preventDefault();
         const slot = ev.currentTarget;
-        if (slot && slot.classList) {
-            slot.classList.remove("skill-equip-slot--dragover");
-        }
+        events._clearSkillSlotDragOver(slot);
         const toCol = slot && slot.getAttribute("data-column");
         const toIndex = slot ? parseInt(slot.getAttribute("data-index"), 10) : -1;
         let raw = (ev.dataTransfer && ev.dataTransfer.getData("text/plain")) || viewData.skillDragPayload || "";
@@ -2327,62 +2345,6 @@ let events = {
         if (typeof view !== "undefined" && view.updateMenuNumbers) {
             view.updateMenuNumbers();
         }
-    },
-    startHarvest: function(mapKey) {
-        if (!events.harvestForageUnlocked()) {
-            return;
-        }
-        const defs = data.progress.mapDefinitions || [];
-        let target = null;
-        for (let i = 0; i < defs.length; i++) {
-            if (defs[i].key === mapKey) {
-                target = defs[i];
-                break;
-            }
-        }
-        if (!target || target.requiredClassKey) {
-            return;
-        }
-        if (!mapData.isMapUnlocked(target, data.progress)) {
-            return;
-        }
-        if (!engine.isMapHarvestReady(mapKey)) {
-            return;
-        }
-        data.progress.currentMapKey = mapKey;
-        initialize.startFreshBattle(Math.floor(Math.random() * 0x7fffffff) + 1, mapKey);
-        data.battle.mode = "foraging";
-        initialize.calcPlayerStats(true);
-    },
-    /** Smart Forage: from 100% cleared (no countdown yet), start the 120s window and begin foraging. */
-    startHarvestCountdownAndForage: function(mapKey) {
-        if (!events.harvestForageUnlocked()) {
-            return;
-        }
-        const g = data.progress.base && data.progress.base.garden;
-        if (!g || !g.smartHarvestUnlocked) {
-            return;
-        }
-        const defs = data.progress.mapDefinitions || [];
-        let target = null;
-        for (let i = 0; i < defs.length; i++) {
-            if (defs[i].key === mapKey) {
-                target = defs[i];
-                break;
-            }
-        }
-        if (!target || target.requiredClassKey) {
-            return;
-        }
-        if (!mapData.isMapUnlocked(target, data.progress)) {
-            return;
-        }
-        const st = engine.getMapClearState(mapKey);
-        if ((st.pct || 0) < 100 || (st.activeMs || 0) > 0) {
-            return;
-        }
-        st.activeMs = gameData.battle.mapHarvestRespawnDurationMs;
-        events.startHarvest(mapKey);
     },
     setSandalAttackEnabled: function(enabled) {
         const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);

@@ -89,9 +89,6 @@ let onLoad = {
         if (data.progress.mapWorkersFound) {
             delete data.progress.mapWorkersFound[mapKey];
         }
-        if (data.progress.mapClearProgress) {
-            delete data.progress.mapClearProgress[mapKey];
-        }
 
         if (!data.progress.kitsune) {
             data.progress.kitsune = { total: 2 };

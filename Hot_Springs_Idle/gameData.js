@@ -28,18 +28,12 @@ let gameData = {
         /** Starting value for both `levelState.expToLevelBase` and rounded `levelState.expToLevel`. */
         levelStartingExpToLevel: 2,
 
-        /** Harvest / clear-map respawn window after 100% clear (ms). */
-        mapHarvestRespawnDurationMs: 120000,
-
         /** Combat formulas - tuning only; saved stats live on `data.battle`. */
         combat: {
             baseSlapDamage: 5,
             sandalDamageSlapMultiplier: 1.5,
             baseAudInner: 20,
-            conStrStatDivisor: 10,
-            foragingBaseStaminaInner: 20,
-            foragingBreathingStaminaPerLevel: 2,
-            foragingHarvestDamageBase: 5
+            conStrStatDivisor: 10
         },
 
         /** Slap/sandal cooldown before Alacrity; floors after reduction. */

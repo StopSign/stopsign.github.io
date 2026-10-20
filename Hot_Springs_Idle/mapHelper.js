@@ -192,7 +192,6 @@ let mapHelper = {
             seed: 1,
             baseDifficulty: 1,
             zones: [zone],
-            forageZones: [],
             zoneShards: []
         });
         document.getElementById("mhMapSelect").value = "";
@@ -835,15 +834,7 @@ let mapHelper = {
             }
             lines.push("    ],");
         }
-        const forage = m.forageZones || [];
-        if (forage.length) {
-            lines.push("    forageZones: [");
-            for (let i = 0; i < forage.length; i++) {
-                const comma = i < forage.length - 1 ? "," : "";
-                lines.push("        " + mapHelper.formatCreateForageZone(forage[i]) + comma);
-            }
-            lines.push("    ]");
-        } else if (lines[lines.length - 1].endsWith(",")) {
+        if (lines[lines.length - 1].endsWith(",")) {
             lines[lines.length - 1] = lines[lines.length - 1].replace(/,$/, "");
         }
         lines.push("})");
@@ -872,10 +863,6 @@ let mapHelper = {
             return "";
         }
         return `{ key: ${JSON.stringify(sh.key)}, gain: ${mapHelper.fmtExportNum(sh.gain)}, chance: ${mapHelper.fmtExportNum(sh.chance)}, cap: ${mapHelper.fmtExportNum(sh.cap)} }`;
-    },
-
-    formatCreateForageZone: function(fz) {
-        return `mapData.createForageZone(${mapHelper.fmtExportNum(fz.totalEnemies)}, ${JSON.stringify(fz.unitType || "tree")}, ${mapHelper.fmtExportNum(fz.distanceBetweenUnits || 0)}, ${mapHelper.fmtExportNum(fz.index || 0)}, ${mapHelper.fmtExportNum(fz.baseAud || 10)}, ${mapHelper.fmtExportNum(fz.rewardAmount || 1)}, ${JSON.stringify(fz.rewardResource || "logs")}, ${mapHelper.fmtExportNum(fz.expBasePerIntruder !== undefined ? fz.expBasePerIntruder : 1)})`;
     },
 
     copyExport: function() {

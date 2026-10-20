@@ -17,7 +17,6 @@ let engine = {
             return;
         }
         engine.updateResortTimers(elapsedMs);
-        engine.updateMapClearProgressTimers(elapsedMs);
         engine.updateBaseProduction(elapsedMs);
         engine.updateZenkoResort(elapsedMs);
         engine.updateScrollArchivesResearch(elapsedMs);
@@ -55,92 +54,30 @@ let engine = {
         }
         data.battle.elapsedMs += dt;
 
-        if (data.battle.mode === "foraging") {
-            engine.spawnForageZonesForTime();
-        } else {
-            engine.spawnZonesForTime();
-        }
+        engine.spawnZonesForTime();
         engine.updateIntruderMovement(tickMs);
         engine.updateCurrentZoneInfo();
-        if (data.battle.mode !== "foraging") {
-            engine.updateShamelessSkillExp(tickMs);
-            engine.updateSelfAffirmationsEachSecond(tickMs);
-            engine.updateMainCharacterSkillExp(tickMs);
-            engine.updateSeetheEachSecond(tickMs);
-            engine.updateApplyTearDropsEachSecond(tickMs);
-            engine.updateBitterRivalryInRange(tickMs);
-            engine.updateNumbingCrowdsEachSecond(tickMs);
-            engine.updateCombatSkillPeriodics(tickMs);
-            engine.updatePassiveSkillExp(tickMs);
-            engine.updateClassEffects(tickMs);
-        } else {
-            engine.updateForagingPassiveSkillExp(tickMs);
-        }
+        engine.updateShamelessSkillExp(tickMs);
+        engine.updateSelfAffirmationsEachSecond(tickMs);
+        engine.updateMainCharacterSkillExp(tickMs);
+        engine.updateSeetheEachSecond(tickMs);
+        engine.updateApplyTearDropsEachSecond(tickMs);
+        engine.updateBitterRivalryInRange(tickMs);
+        engine.updateNumbingCrowdsEachSecond(tickMs);
+        engine.updateCombatSkillPeriodics(tickMs);
+        engine.updatePassiveSkillExp(tickMs);
+        engine.updateClassEffects(tickMs);
         engine.updateTargeting();
         engine.updatePlayerAttack(tickMs);
         engine.updateSlapFx(tickMs);
         engine.updatePlayerFloats(tickMs);
-        if (data.battle.mode !== "foraging") {
-            engine.updateBattleBuffs(tickMs);
-            engine.updateSandalAttack(tickMs);
-            engine.updateIntruderAttacks(tickMs);
-            engine.updateIntruderAttackFx(tickMs);
-        }
+        engine.updateBattleBuffs(tickMs);
+        engine.updateSandalAttack(tickMs);
+        engine.updateIntruderAttacks(tickMs);
+        engine.updateIntruderAttackFx(tickMs);
         engine.cleanupDeadEnemies();
         engine.checkMapCompletion();
         engine.checkLossCondition();
-    },
-    getMapClearState: function(mapKey) {
-        if (!data.progress.mapClearProgress) {
-            data.progress.mapClearProgress = {};
-        }
-        if (!data.progress.mapClearProgress[mapKey]) {
-            data.progress.mapClearProgress[mapKey] = { pct: 0, activeMs: 0 };
-        }
-        return data.progress.mapClearProgress[mapKey];
-    },
-    gardenSmartHarvestBlocksAutoCountdown: function() {
-        const g = data.progress.base && data.progress.base.garden;
-        return !!(g && g.smartHarvestUnlocked);
-    },
-    maybeStartHarvestRespawnCountdown: function(mapKey) {
-        const state = engine.getMapClearState(mapKey);
-        if (state.pct < 100 || (state.activeMs || 0) > 0) {
-            return;
-        }
-        if (engine.gardenSmartHarvestBlocksAutoCountdown()) {
-            return;
-        }
-        state.activeMs = gameData.battle.mapHarvestRespawnDurationMs;
-    },
-    addMapClearProgressForKill: function(mapKey) {
-        if (typeof events !== "undefined" && events.harvestForageUnlocked && !events.harvestForageUnlocked()) {
-            return;
-        }
-        const state = engine.getMapClearState(mapKey);
-        state.pct = Math.min(100, state.pct + 0.5);
-        engine.maybeStartHarvestRespawnCountdown(mapKey);
-    },
-    updateMapClearProgressTimers: function(tickMs) {
-        if (typeof events !== "undefined" && events.harvestForageUnlocked && !events.harvestForageUnlocked()) {
-            return;
-        }
-        const states = data.progress.mapClearProgress || {};
-        const keys = Object.keys(states);
-        for (let i = 0; i < keys.length; i++) {
-            const st = states[keys[i]];
-            if (!st || st.activeMs <= 0) continue;
-            st.activeMs = Math.max(0, st.activeMs - tickMs);
-            if (st.activeMs <= 0) {
-                st.pct = 0;
-            } else {
-                st.pct = Math.max(0, Math.min(100, (st.activeMs / gameData.battle.mapHarvestRespawnDurationMs) * 100));
-            }
-        }
-    },
-    isMapHarvestReady: function(mapKey) {
-        const st = engine.getMapClearState(mapKey);
-        return (st.pct >= 100 || st.activeMs > 0) && st.activeMs > 0;
     },
     getSandalIntruderStopY: function(playerTopY, battleHeight) {
         return playerTopY - 250;
@@ -249,89 +186,6 @@ let engine = {
             }
         }
     },
-    spawnForageZonesForTime: function() {
-        const map = initialize.getCurrentMapDefinition();
-        const zones = map && map.forageZones ? map.forageZones : [];
-        if (!zones.length) {
-            return;
-        }
-        const gd = gameData.battle;
-        const lm = engine.getBattleLaneMetrics();
-        const grouped = {};
-        for (let i = 0; i < zones.length; i++) {
-            const idx = Math.max(0, zones[i].index || 0);
-            if (!grouped[idx]) grouped[idx] = [];
-            grouped[idx].push(zones[i]);
-        }
-        const indexes = Object.keys(grouped).map(function(v) { return parseInt(v, 10); }).sort(function(a, b) { return a - b; });
-        let nextIndex = -1;
-        for (let i = 0; i < indexes.length; i++) {
-            const idx = indexes[i];
-            if (data.battle.forageIndexSpawned[idx]) continue;
-            nextIndex = idx;
-            break;
-        }
-        if (nextIndex < 0) return;
-        let hasEarlierAlive = false;
-        for (let i = 0; i < indexes.length; i++) {
-            const idx = indexes[i];
-            if (idx >= nextIndex) break;
-            for (let j = 0; j < data.battle.enemies.length; j++) {
-                const e = data.battle.enemies[j];
-                if (e.alive && e.forageIndex === idx) {
-                    hasEarlierAlive = true;
-                    break;
-                }
-            }
-            if (hasEarlierAlive) break;
-        }
-        if (hasEarlierAlive) return;
-        const spawnGroup = grouped[nextIndex] || [];
-        for (let gi = 0; gi < spawnGroup.length; gi++) {
-            const z = spawnGroup[gi];
-            const spacingPx = Math.max(0, z.distanceBetweenUnits || 0);
-            for (let ri = 0; ri < Math.max(1, z.totalEnemies || 1); ri++) {
-                const kind = z.unitType || "tree";
-                const prevCount = data.battle.forageKindSpawnCounts[kind] || 0;
-                data.battle.forageKindSpawnCounts[kind] = prevCount + 1;
-                const audScale = Math.pow(1.05, prevCount);
-                const maxAud = Math.max(1, Math.ceil((z.baseAud || 10) * audScale));
-                const intruderId = data.battle.intruderIdCounter++;
-                const lane = (gi + ri) % gd.laneCount;
-                const intruderSize = kind === "tree" ? Math.floor(lm.laneWidth * 0.35) : Math.floor(lm.laneWidth * 0.28);
-                const yPx = -intruderSize - (ri * spacingPx);
-                const staminaCost = kind === "tree" ? 2 : (kind === "ore_vein" ? 3 : 1);
-                data.battle.enemies.push({
-                    id: intruderId,
-                    lane: lane,
-                    spawnTimeMs: 0,
-                    zoneIndex: nextIndex,
-                    forageIndex: nextIndex,
-                    intruderType: kind,
-                    yPx: yPx,
-                    prevYPx: yPx,
-                    sizePx: intruderSize,
-                    aud: maxAud,
-                    maxAud: maxAud,
-                    speedPxPerSecond: 0,
-                    attackDamage: 0,
-                    attackCooldownMs: 0,
-                    attackTimerMs: 0,
-                    gain: z.rewardAmount || 1,
-                    rewardResource: z.rewardResource || "logs",
-                    expBase: z.expBasePerIntruder !== undefined ? z.expBasePerIntruder : 1,
-                    inRange: false,
-                    lecherReady: false,
-                    alive: true,
-                    hasEnteredSlapQueue: false,
-                    blockedByLecherMs: 0,
-                    staminaCost: staminaCost,
-                    firstHitTaken: false
-                });
-            }
-        }
-        data.battle.forageIndexSpawned[nextIndex] = true;
-    },
     grantWorkersForMapStar: function(mapKey, amount) {
         if (!mapKey || !amount || amount <= 0) return;
         if (!data.progress.mapWorkersFound) data.progress.mapWorkersFound = {};
@@ -355,9 +209,6 @@ let engine = {
         const deltaSeconds = tickMs / 1000;
         const pushBonus = engine.getIntruderPushBonusPxPerSecond();
         const stackGap = gameData.battle.intruderStackGapPx || 0;
-        if ((data.battle.mode || "combat") === "foraging" && pushBonus > 0) {
-            data.battle.forageMoveAccumPx = (data.battle.forageMoveAccumPx || 0) + (pushBonus * deltaSeconds);
-        }
         const laneBuckets = [];
         for (let l = 0; l < gameData.battle.laneCount; l++) {
             laneBuckets[l] = [];
@@ -863,17 +714,6 @@ let engine = {
             engine.addClassBarProgress("B", 50 * inSlap * sec);
         }
     },
-    updateForagingPassiveSkillExp: function(tickMs) {
-        const sec = tickMs / 1000;
-        engine.addSkillExp("breathing", sec);
-        const planningStepPx = 50;
-        const moved = data.battle.forageMoveAccumPx || 0;
-        if (moved >= planningStepPx) {
-            const triggers = Math.floor(moved / planningStepPx);
-            data.battle.forageMoveAccumPx = moved - (triggers * planningStepPx);
-            engine.addSkillExp("planning", triggers);
-        }
-    },
     addClassBarProgress: function(which, amount) {
         const key = which === "A" ? "classPowerA" : "classPowerB";
         const cur = data.battle[key] || 0;
@@ -924,37 +764,6 @@ let engine = {
         if (!target || !target.alive || !target.inRange) {
             p.attackTimerMs = 0;
             engine.cancelSlapWindupIfNeeded();
-            return;
-        }
-        if ((data.battle.mode || "combat") === "foraging") {
-            const staminaCost = target.staminaCost || 1;
-            if (data.battle.player.aud <= 0 || data.battle.player.aud < staminaCost) {
-                data.battle.player.aud = 0;
-                engine.idleSlapHand();
-                return;
-            }
-            data.battle.player.aud = Math.max(0, data.battle.player.aud - staminaCost);
-            let harvestDamage = data.battle.player.attackDamage;
-            const tch = skills.getSkillEffect("technique");
-            harvestDamage += tch.harvestDamageFlat || 0;
-            if (!target.firstHitTaken) {
-                const pln = skills.getSkillEffect("planning");
-                const planFrac = pln.firstHitDamageBonusFraction || 0;
-                harvestDamage *= (1 + planFrac);
-                target.firstHitTaken = true;
-            }
-            harvestDamage = Math.max(1, roundNearestDecimals(harvestDamage, 1));
-            target.aud -= harvestDamage;
-            engine.onSlapImpact(target, harvestDamage);
-            p.attackTimerMs = engine.getEffectiveSlapCooldownMs() + Math.min(0, p.attackTimerMs);
-            engine.addSkillExp("technique", 1);
-            if (target.aud <= 0) {
-                target.aud = 0;
-                target.alive = false;
-                data.battle.activeTargetId = null;
-                engine.removeIntruderFromSlapQueue(target.id);
-                engine.onIntruderKilled(target);
-            }
             return;
         }
         let slapDamage = data.battle.player.attackDamage;
@@ -1035,24 +844,6 @@ let engine = {
         }
     },
     updateCurrentZoneInfo: function() {
-        if ((data.battle.mode || "combat") === "foraging") {
-            const zones = [];
-            let alive = 0;
-            for (let i = 0; i < data.battle.enemies.length; i++) {
-                if (data.battle.enemies[i].alive) alive++;
-            }
-            zones.push({
-                index: 0,
-                name: "Foraging",
-                remainingSpawnMs: 0,
-                difficulty: initialize.getCurrentMapDefinition().baseDifficulty || 1,
-                remainingEnemies: alive,
-                coins: 0,
-                exp: 0
-            });
-            data.battle.activeZones = zones;
-            return;
-        }
         const map = initialize.getCurrentMapDefinition();
         const zones = [];
         if (!map || !map.zones) {
@@ -1234,9 +1025,6 @@ let engine = {
         if (data.battle.state !== "running") {
             return;
         }
-        if ((data.battle.mode || "combat") === "foraging") {
-            return;
-        }
         const map = initialize.getCurrentMapDefinition();
         const allSpawned = data.battle.zoneSpawnedInCycle && data.battle.zoneSpawnedInCycle.length
             ? data.battle.zoneSpawnedInCycle.every(function(v) { return !!v; })
@@ -1377,33 +1165,6 @@ let engine = {
     },
     onIntruderKilled: function(intruder, opts) {
         const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
-        if ((data.battle.mode || "combat") === "foraging") {
-            const res = data.progress.base && data.progress.base.resources;
-            if (res) {
-                const key = intruder.rewardResource || "logs";
-                const amount = Math.ceil((intruder.gain || 1) * (initialize.getCurrentMapDefinition().baseDifficulty || 1));
-                if (res[key] === undefined) {
-                    res[key] = 0;
-                }
-                res[key] += amount;
-            }
-            const forageExp = intruder.expBase !== undefined ? intruder.expBase : 1;
-            engine.addPendingOkamiExpFromClone(forageExp);
-            if (growthUnlocked) {
-                engine.addCloneLevelExp(forageExp);
-            }
-            data.battle.enemiesKilled++;
-            engine.addSkillExp("quick_rest", 1);
-            const qrEff = skills.getSkillEffect("quick_rest");
-            const qr = qrEff.staminaPerGather || 0;
-            if (qr > 0) {
-                engine.grantPlayerCurrentAudGain(qr);
-            }
-            if (growthUnlocked) {
-                engine.resolveLevelUps();
-            }
-            return;
-        }
         const gain = intruder.gain || 1;
         const expBase = intruder.expBase !== undefined ? intruder.expBase : 1;
         const expGain = engine.expAwardFromIntruderExpBase(expBase);
@@ -1416,7 +1177,6 @@ let engine = {
         }
         data.battle.enemiesKilled++;
         const shardDrop = engine.trySkillShardDropOnKill(intruder);
-        engine.addMapClearProgressForKill(data.progress.currentMapKey);
         engine.addSkillExp("experienceHog", 1);
         engine.addSkillExp("extortion", 1);
         engine.addSkillExp("nickelAndDime", engine.positiveLog(coinsGain, 10));
@@ -1538,14 +1298,6 @@ let engine = {
             return;
         }
         const d = skills._byKey[skillKey];
-        const mode = data.battle.mode || "combat";
-        const cat = d && d.category ? d.category : "combat";
-        if (mode === "foraging" && cat !== "foraging") {
-            return;
-        }
-        if (mode !== "foraging" && cat === "foraging") {
-            return;
-        }
         if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
             return;
         }
@@ -2202,9 +1954,6 @@ let engine = {
         return out;
     },
     getBattleTimeRateMultiplier: function() {
-        if ((data.battle.mode || "combat") === "foraging") {
-            return 1;
-        }
         if (!engine.areActiveZonesCleared()) {
             return 1;
         }
@@ -2250,11 +1999,6 @@ let engine = {
     beginTierTransition: function() {
         const map = initialize.getCurrentMapDefinition();
         const mapKey = map ? map.key : data.progress.currentMapKey;
-        const clearState = engine.getMapClearState(mapKey);
-        const addStarClearProgress = function(pct) {
-            clearState.pct = Math.min(100, (clearState.pct || 0) + pct);
-            engine.maybeStartHarvestRespawnCountdown(mapKey);
-        };
         if (!data.progress.mapStars[mapKey]) {
             data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
         }
@@ -2266,7 +2010,6 @@ let engine = {
                 stars.bronze = true;
                 data.progress.stars.bronze++;
                 engine.grantWorkersForMapStar(mapKey, 1);
-                addStarClearProgress(10);
                 engine.syncScrollArchivesResearchCost();
             }
             data.battle.transitionMessage = "Bronze star received! Raising difficulty...";
@@ -2282,7 +2025,6 @@ let engine = {
                 stars.silver = true;
                 data.progress.stars.silver++;
                 engine.grantWorkersForMapStar(mapKey, 2);
-                addStarClearProgress(15);
                 engine.syncScrollArchivesResearchCost();
             }
             data.battle.transitionMessage = "Silver star received! Raising difficulty...";
@@ -2297,7 +2039,6 @@ let engine = {
             stars.gold = true;
             data.progress.stars.gold++;
             engine.grantWorkersForMapStar(mapKey, 3);
-            addStarClearProgress(25);
             engine.syncScrollArchivesResearchCost();
         }
         data.battle.transitionMessage = "Gold star received! Map complete.";
@@ -3393,14 +3134,6 @@ let engine = {
             return;
         }
         const d = skills._byKey[skillKey];
-        const mode = data.battle.mode || "combat";
-        const cat = d && d.category ? d.category : "combat";
-        if (mode === "foraging" && cat !== "foraging") {
-            return;
-        }
-        if (mode !== "foraging" && cat === "foraging") {
-            return;
-        }
         if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
             return;
         }
@@ -3473,8 +3206,6 @@ let engine = {
         } else if (skill.key === "force" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "windfallSwagger" || skill.key === "shockValue" || skill.key === "validation" || skill.key === "paddingResume") {
-            initialize.calcPlayerStats(false);
-        } else if (skill.key === "technique" || skill.key === "breathing") {
             initialize.calcPlayerStats(false);
         }
     },
@@ -13359,11 +13090,6 @@ let engine = {
             if (!hasActiveClass || dSk.classKey !== currentCls) {
                 return false;
             }
-        }
-        const cat = sk.category || "combat";
-        if (cat === "foraging" && typeof events !== "undefined" && events.harvestForageUnlocked
-            && !events.harvestForageUnlocked()) {
-            return false;
         }
         return true;
     },

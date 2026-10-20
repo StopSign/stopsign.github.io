@@ -215,15 +215,10 @@ let view = {
         }
     },
     updatePlayerStatDmgLine: function() {
-        const isForaging = (data.battle.mode || "combat") === "foraging";
         const p = data.battle.player;
         const fmtDmg1 = function(x) {
             return roundNearestDecimals(x, 1).toFixed(1);
         };
-        if (isForaging) {
-            view.updateVal("playerStatDmgLine", `Harvest ${fmtDmg1(p.attackDamage)}`);
-            return;
-        }
         const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
         const slapDmg = typeof engine.getDisplayedSlapDamage === "function"
             ? engine.getDisplayedSlapDamage()
@@ -393,7 +388,6 @@ let view = {
         view.updateTabButtons(activeTab);
 
         // Battle HUD chrome (outside tab panes)
-        const isForaging = (data.battle.mode || "combat") === "foraging";
         const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
         const classSandalLocked = (data.progress.currentClassKey || "none") === "scold";
         const sandalToggle = viewData.cached.sandalAttackToggle;
@@ -405,7 +399,7 @@ let view = {
             sandalToggle.disabled = classSandalLocked;
         }
         view.updateVal("sandalAttackLockText", classSandalLocked ? "Scold cannot use sandal attacks." : "");
-        view.updateVal("sandalAttackWrap", (hasSandal && !isForaging) ? "" : "none", "style.display");
+        view.updateVal("sandalAttackWrap", hasSandal ? "" : "none", "style.display");
 
         if (activeTab === "base") {
             view.updateBaseTab();
@@ -730,8 +724,6 @@ let view = {
         view.updateVal("statsSandalCard", hasSandal ? "" : "none", "style.display");
     },
     updateTravelTab: function() {
-        const harvestForageOn = events.harvestForageUnlocked();
-        const smartHarvestOn = !!(data.progress.base && data.progress.base.garden && data.progress.base.garden.smartHarvestUnlocked);
         const clsMenu = data.progress.currentClassKey || "none";
         const hasClassForTravel = ["condescend", "scold", "mock", "shun"].indexOf(clsMenu) >= 0;
         const selectedTravel = data.progress.selectedTravelMapKey || data.progress.currentMapKey;
@@ -774,31 +766,6 @@ let view = {
                 radioEl.disabled = !classAllowed || !unlocked;
             }
             view.updateVal(`mapActionCurrent_${map.key}`, onThisMap ? "" : "none", "style.display");
-            view.updateVal(`mapClearWrap_${map.key}`, harvestForageOn && !reqClass ? "" : "none", "style.display");
-            const clearState = engine.getMapClearState(map.key);
-            const isCountingDown = (clearState.activeMs || 0) > 0;
-            const statusText = isCountingDown
-                ? `Cleared for Harvest. Intruders respawn in ${Math.ceil(clearState.activeMs / 1000)}s`
-                : `${round1(clearState.pct || 0)}%`;
-            view.updateVal(`mapClearStatus_${map.key}`, statusText);
-            view.updateVal(`mapClearFill_${map.key}`, `${Math.max(0, Math.min(100, clearState.pct || 0))}%`, "style.width");
-            const harvestId = `mapHarvestButton_${map.key}`;
-            const smartStartId = `mapSmartHarvestStart_${map.key}`;
-            if (!reqClass) {
-                if (!harvestForageOn) {
-                    view.updateVal(harvestId, "none", "style.display");
-                    view.updateVal(smartStartId, "none", "style.display");
-                } else {
-                    view.updateVal(harvestId, isCountingDown ? "" : "none", "style.display");
-                    view.updateVal(harvestId, "Harvest Resources", "textContent");
-                    const harvestReady = engine.isMapHarvestReady(map.key);
-                    view.updateVal(harvestId, !harvestReady, "disabled");
-                }
-                const showStart = !onThisMap && smartHarvestOn && !isCountingDown && (clearState.pct || 0) >= 100;
-                view.updateVal(smartStartId, showStart ? "" : "none", "style.display");
-            } else {
-                /* No harvest/smart-harvest elements for class-restricted maps - not cached. */
-            }
             const shardLootMult = engine.getShardLootChanceMultiplier();
             const shardSummary = shardLootMult > 0 ? mapData.getMapShardSummaryText(map, data.progress.skills, shardLootMult) : "";
             if (shardSummary) {
@@ -1341,10 +1308,33 @@ let view = {
                 view.updateVal(colId, "none", "style.display");
                 view.updateVal(`scrollArchivesChoiceShard_${ci}`, "none", "style.display");
                 view.updateVal(`scrollArchivesChoiceTips_${ci}`, "none", "style.display");
+                view.updateVal(`scrollArchivesChoiceSlotCat_${ci}`, "none", "style.display");
+                const emptyCol = viewData.cached[colId];
+                if (emptyCol) {
+                    emptyCol.classList.remove("scroll-archives-choice-col--offense", "scroll-archives-choice-col--defense", "scroll-archives-choice-col--utility");
+                }
                 continue;
             }
             const sk = data.progress.skills[skillKey];
+            const slotCat = skills.getSlotCategory(skillKey);
+            const colEl = viewData.cached[colId];
+            if (colEl) {
+                colEl.classList.toggle("scroll-archives-choice-col--offense", slotCat === "offense");
+                colEl.classList.toggle("scroll-archives-choice-col--defense", slotCat === "defense");
+                colEl.classList.toggle("scroll-archives-choice-col--utility", slotCat === "utility");
+            }
             view.updateVal(colId, "", "style.display");
+            if (slotCat) {
+                const catLabel = slotCat.charAt(0).toUpperCase() + slotCat.slice(1);
+                view.updateVal(`scrollArchivesChoiceSlotCat_${ci}`, "", "style.display");
+                view.updateVal(`scrollArchivesChoiceSlotCat_${ci}`, catLabel);
+                const catLabelEl = viewData.cached[`scrollArchivesChoiceSlotCat_${ci}`];
+                if (catLabelEl) {
+                    catLabelEl.className = `scroll-archives-choice-slot-cat scroll-archives-choice-slot-cat--${slotCat}`;
+                }
+            } else {
+                view.updateVal(`scrollArchivesChoiceSlotCat_${ci}`, "none", "style.display");
+            }
             view.updateVal(`scrollArchivesChoiceType_${ci}`, sk ? sk.name : skillKey);
             view.updateVal(`scrollArchivesChoiceDesc_${ci}`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(skillKey)), "innerHTML");
             view.updateVal(`scrollArchivesChoiceShard_${ci}`, engine.skillHasShardOnTravelableMap(skillKey) ? "" : "none", "style.display");
@@ -4807,7 +4797,6 @@ let view = {
     },
     updatePlayerBattleBars: function() {
         const p = data.battle.player;
-        const isForaging = (data.battle.mode || "combat") === "foraging";
         const ls = data.battle.levelState;
         const atkFill = viewData.cached.playerAttackBarFill;
         const atkLabel = viewData.cached.playerAttackBarLabel;
@@ -4833,54 +4822,46 @@ let view = {
             view.updateVal("playerAttackBarLabel", `${atkName} ${Math.round(atkElapsed)} / ${Math.round(cd)} ms`);
         }
         if (rngFill && rngLabel) {
-            if (isForaging) {
-                if (rngTrack) {
-                    rngTrack.style.display = "none";
-                }
-                rngFill.style.width = "0%";
-                view.updateVal("playerSandalBarLabel", "Foraging");
-            } else {
             if (data.battle.state !== "running") {
                 rngFill.style.width = "0%";
                 rngLabel.textContent = "\u2014";
             } else {
-            const pushPx = typeof engine.getIntruderPushBonusPxPerSecond === "function"
-                ? engine.getIntruderPushBonusPxPerSecond()
-                : gameData.battle.idlePushBonusPxPerSecond;
-            const timeRate = typeof engine.getBattleTimeRateMultiplier === "function"
-                ? engine.getBattleTimeRateMultiplier()
-                : 1;
-            const sandalOn = !!(data.progress.sandalAttackEnabled && data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt && (data.progress.currentClassKey || "none") !== "scold");
-            const idlePush = pushPx > 0;
-            if (sandalOn) {
-                if (rngTrack) {
-                    rngTrack.style.display = "";
-                }
-                if (timeRate > 1) {
-                    rngFill.style.width = "100%";
-                    view.updateVal("playerSandalBarLabel", `Battle time x${round2(timeRate)} (no visible enemies)`);
+                const pushPx = typeof engine.getIntruderPushBonusPxPerSecond === "function"
+                    ? engine.getIntruderPushBonusPxPerSecond()
+                    : gameData.battle.idlePushBonusPxPerSecond;
+                const timeRate = typeof engine.getBattleTimeRateMultiplier === "function"
+                    ? engine.getBattleTimeRateMultiplier()
+                    : 1;
+                const sandalOn = !!(data.progress.sandalAttackEnabled && data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt && (data.progress.currentClassKey || "none") !== "scold");
+                const idlePush = pushPx > 0;
+                if (sandalOn) {
+                    if (rngTrack) {
+                        rngTrack.style.display = "";
+                    }
+                    if (timeRate > 1) {
+                        rngFill.style.width = "100%";
+                        view.updateVal("playerSandalBarLabel", `Battle time x${round2(timeRate)} (no visible enemies)`);
+                    } else {
+                        const rcd = typeof engine.getEffectiveSandalCooldownMs === "function" ? engine.getEffectiveSandalCooldownMs() : (p.sandalAttackCooldownMs || 4000);
+                        const rRemain = Math.max(0, p.sandalAttackTimerMs || 0);
+                        const rPct = 100 - Math.max(0, Math.min(100, (rRemain / rcd) * 100));
+                        rngFill.style.width = `${rPct}%`;
+                        const rElapsed = rcd - rRemain;
+                        view.updateVal("playerSandalBarLabel", `Sandal attack ${intToString(rElapsed, 3)} / ${intToString(rcd, 3)} ms`);
+                    }
+                } else if (idlePush) {
+                    if (rngTrack) {
+                        rngTrack.style.display = "none";
+                    }
+                    rngFill.style.width = "0%";
+                    view.updateVal("playerSandalBarLabel", `Move speed +${intToString(pushPx, 3)} ft/s`);
                 } else {
-                    const rcd = typeof engine.getEffectiveSandalCooldownMs === "function" ? engine.getEffectiveSandalCooldownMs() : (p.sandalAttackCooldownMs || 4000);
-                    const rRemain = Math.max(0, p.sandalAttackTimerMs || 0);
-                    const rPct = 100 - Math.max(0, Math.min(100, (rRemain / rcd) * 100));
-                    rngFill.style.width = `${rPct}%`;
-                    const rElapsed = rcd - rRemain;
-                    view.updateVal("playerSandalBarLabel", `Sandal attack ${intToString(rElapsed, 3)} / ${intToString(rcd, 3)} ms`);
+                    if (rngTrack) {
+                        rngTrack.style.display = "none";
+                    }
+                    rngFill.style.width = "0%";
+                    view.updateVal("playerSandalBarLabel", "Intruder in range");
                 }
-            } else if (idlePush) {
-                if (rngTrack) {
-                    rngTrack.style.display = "none";
-                }
-                rngFill.style.width = "0%";
-                view.updateVal("playerSandalBarLabel", `Move speed +${intToString(pushPx, 3)} ft/s`);
-            } else {
-                if (rngTrack) {
-                    rngTrack.style.display = "none";
-                }
-                rngFill.style.width = "0%";
-                view.updateVal("playerSandalBarLabel", "Intruder in range");
-            }
-            }
             }
         }
         const movePulse = viewData.cached.playerMovePulse;
@@ -5223,40 +5204,19 @@ let view = {
             view.setGpuPos(intruderEl, leftPx, Math.round(renderY), renderCache, false);
             const shapeLayer = intruderEl.querySelector(".intruder-shape-layer");
             if (shapeLayer) {
-                const isForageUnit = intruder.intruderType === "tree" || intruder.intruderType === "bush" || intruder.intruderType === "ore_vein";
                 const lecherOn = intruder.intruderType === "lecher";
                 const spriteImg = shapeLayer.querySelector(".intruder-sprite-img");
                 if (spriteImg) {
-                    if (isForageUnit) {
-                        if (renderCache.spriteSrc) {
-                            spriteImg.style.display = "none";
-                            renderCache.spriteSrc = null;
-                        }
-                    } else {
-                        const spriteSrc = lecherOn ? "img/lecher.svg" : "img/scoundrel.svg";
-                        if (renderCache.spriteSrc !== spriteSrc) {
-                            spriteImg.src = spriteSrc;
-                            spriteImg.style.display = "";
-                            renderCache.spriteSrc = spriteSrc;
-                        }
+                    const spriteSrc = lecherOn ? "img/lecher.svg" : "img/scoundrel.svg";
+                    if (renderCache.spriteSrc !== spriteSrc) {
+                        spriteImg.src = spriteSrc;
+                        spriteImg.style.display = "";
+                        renderCache.spriteSrc = spriteSrc;
                     }
                 }
                 if (renderCache.lecherOn !== lecherOn) {
                     shapeLayer.classList.toggle("intruder-token-lecher", lecherOn);
                     renderCache.lecherOn = lecherOn;
-                }
-                if (isForageUnit) {
-                    const fill = intruder.intruderType === "tree" ? "#6f4e37" : (intruder.intruderType === "bush" ? "#3f7d3f" : "#737373");
-                    const forageKey = `${intruder.intruderType}|${fill}`;
-                    if (renderCache.forageKey !== forageKey) {
-                        shapeLayer.style.clipPath = "none";
-                        shapeLayer.style.border = "1px solid #2d2d2d";
-                        shapeLayer.style.background = fill;
-                        renderCache.forageKey = forageKey;
-                    }
-                } else if (renderCache.forageKey) {
-                    shapeLayer.style.background = "";
-                    renderCache.forageKey = null;
                 }
             }
             const audLayer = view.ensureIntruderAudFill(intruderEl);
@@ -5299,36 +5259,23 @@ let view = {
                 }
             }
             if (atkFill) {
-                const foraging = (data.battle.mode || "combat") === "foraging";
-                if (foraging) {
-                    if (renderCache.atkMode !== "foraging") {
-                        atkFill.style.width = "0%";
-                        const atkWrap = intruderEl.querySelector(".intruder-stat-atk-wrap");
-                        if (atkWrap) {
-                            atkWrap.style.display = "none";
-                        }
-                        renderCache.atkMode = "foraging";
-                        renderCache.atkWidth = "0%";
+                const atkWrap = intruderEl.querySelector(".intruder-stat-atk-wrap");
+                if (renderCache.atkMode !== "combat") {
+                    if (atkWrap) {
+                        atkWrap.style.display = "";
                     }
-                } else {
-                    const atkWrap = intruderEl.querySelector(".intruder-stat-atk-wrap");
-                    if (renderCache.atkMode !== "combat") {
-                        if (atkWrap) {
-                            atkWrap.style.display = "";
-                        }
-                        renderCache.atkMode = "combat";
-                    }
-                    const cd = intruder.intruderType === "lecher" ? (intruder.attackCooldownMs * 2) : intruder.attackCooldownMs;
-                    const canCharge = intruder.intruderType === "lecher" ? (!!intruder.lecherReady || !!intruder.inRange) : !!intruder.inRange;
-                    const remain = Math.max(0, Math.min(cd, intruder.attackTimerMs || 0));
-                    const atkBarPct = canCharge
-                        ? (100 - Math.max(0, Math.min(100, (remain / cd) * 100)))
-                        : 0;
-                    const atkWidth = `${atkBarPct}%`;
-                    if (renderCache.atkWidth !== atkWidth) {
-                        atkFill.style.width = atkWidth;
-                        renderCache.atkWidth = atkWidth;
-                    }
+                    renderCache.atkMode = "combat";
+                }
+                const cd = intruder.intruderType === "lecher" ? (intruder.attackCooldownMs * 2) : intruder.attackCooldownMs;
+                const canCharge = intruder.intruderType === "lecher" ? (!!intruder.lecherReady || !!intruder.inRange) : !!intruder.inRange;
+                const remain = Math.max(0, Math.min(cd, intruder.attackTimerMs || 0));
+                const atkBarPct = canCharge
+                    ? (100 - Math.max(0, Math.min(100, (remain / cd) * 100)))
+                    : 0;
+                const atkWidth = `${atkBarPct}%`;
+                if (renderCache.atkWidth !== atkWidth) {
+                    atkFill.style.width = atkWidth;
+                    renderCache.atkWidth = atkWidth;
                 }
             }
         }
