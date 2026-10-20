@@ -5610,6 +5610,7 @@ let engine = {
             toX: to.x,
             toY: to.y,
             progress: 0,
+            prevProgress: 0,
             durationMs: flightMs,
             sizePx: (def && def.projectileSizePx) ? def.projectileSizePx : 28
         });
@@ -5633,7 +5634,8 @@ let engine = {
         const next = [];
         for (let i = 0; i < fl.projectiles.length; i++) {
             const p = fl.projectiles[i];
-            p.progress = (p.progress || 0) + tickMs;
+            p.prevProgress = p.progress || 0;
+            p.progress = p.prevProgress + tickMs;
             if (p.progress >= (p.durationMs || 1050)) {
                 const droplets = (data.progress.base && data.progress.base.droplets) || [];
                 for (let di = 0; di < droplets.length; di++) {

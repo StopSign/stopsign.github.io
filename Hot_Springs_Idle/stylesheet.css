@@ -1117,6 +1117,51 @@ button {
     margin-bottom: 8px;
 }
 
+.info-button-wrap {
+    position: absolute;
+    top: 4px;
+    z-index: 20;
+}
+
+.info-button {
+    background: #1f2b3e;
+    border: 1px solid var(--border-color);
+    color: #89b4fa;
+    padding: 3px 7px;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.info-button:hover {
+    background: #2d4e7a;
+    color: #cdd6f4;
+}
+
+.info-button-panel {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    min-width: 200px;
+    max-width: 320px;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    border-radius: 4px;
+    text-align: left;
+    color: var(--text-primary);
+    font-size: 12px;
+    font-weight: normal;
+    white-space: normal;
+    z-index: 1000;
+}
+
+.info-button-wrap.info-button-open .info-button-panel {
+    display: block;
+}
+
 .leveling-header-row {
     display: flex;
     justify-content: space-between;

@@ -21,8 +21,69 @@ let createView = {
         createView.createWaveInfoStructure();
         createView.createBaseInfoElements();
         createView.createTravelElements();
+        createView.createInfoButtons();
         createView.showCurrentTab();
         createView.setAllCaches(); //happens after generation
+    },
+    /**
+     * Adds a ? info button to the top-right of the element with the given id.
+     * Click opens a panel with htmlText; the next click anywhere closes it.
+     * Optional x sets the CSS right offset in px (default 4).
+     */
+    createInfoButton: function(id, htmlText, x) {
+        const el = document.getElementById(id);
+        if (!el) {
+            return;
+        }
+        const existing = el.querySelector(".info-button-wrap");
+        if (existing && existing.parentNode === el) {
+            existing.remove();
+        }
+        const computedPos = window.getComputedStyle(el).position;
+        if (computedPos === "static") {
+            el.style.position = "relative";
+        }
+        const rightPx = x == null ? 4 : x;
+        const wrap = document.createElement("div");
+        wrap.className = "info-button-wrap";
+        wrap.style.right = rightPx + "px";
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "info-button";
+        btn.textContent = "?";
+        btn.setAttribute("aria-label", "Info");
+        const panel = document.createElement("div");
+        panel.className = "info-button-panel";
+        panel.innerHTML = htmlText;
+        const closePanel = function() {
+            wrap.classList.remove("info-button-open");
+            document.removeEventListener("click", onDocClick);
+        };
+        const onDocClick = function() {
+            closePanel();
+        };
+        btn.addEventListener("click", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (wrap.classList.contains("info-button-open")) {
+                closePanel();
+                return;
+            }
+            wrap.classList.add("info-button-open");
+            // Next click anywhere closes; defer so this click does not.
+            setTimeout(function() {
+                document.addEventListener("click", onDocClick);
+            }, 0);
+        });
+        wrap.appendChild(btn);
+        wrap.appendChild(panel);
+        el.appendChild(wrap);
+    },
+    createInfoButtons: function() {
+        createView.createInfoButton(
+            "tabPane_skills",
+            "Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively)."
+        );
     },
     waveInfoZoneSlotCount: 12,
     waveInfoZoneShardSlotCount: 8,

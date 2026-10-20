@@ -67,6 +67,7 @@ let view = {
             view.updateInnCarriers();
             view.updateMarketCarriers();
             view.updatePathTokenPositions();
+            view.updateFireLauncherProjectilePositions();
         }
         view.updateBuyableUpgradesOverlay(false);
 
@@ -2935,23 +2936,6 @@ let view = {
             if (wrapEl) {
                 wrapEl.classList.toggle("fire-launcher-range-visible", selectedLauncherKey === lk);
             }
-        }
-        const projectiles = (fl && fl.projectiles) || [];
-        for (let pi = 0; pi < 8; pi++) {
-            const pid = `fireLauncherProjectile_${pi}`;
-            const p = pi < projectiles.length ? projectiles[pi] : null;
-            view.updateVal(pid, p ? "" : "none", "style.display");
-            if (!p) {
-                continue;
-            }
-            const t = Math.min(1, (p.progress || 0) / (p.durationMs || 1050));
-            const x = (p.fromX || 0) + ((p.toX || 0) - (p.fromX || 0)) * t;
-            const y = (p.fromY || 0) + ((p.toY || 0) - (p.fromY || 0)) * t;
-            const size = p.sizePx || 28;
-            const half = size / 2;
-            view.updateVal(pid, `${size}px`, "style.width");
-            view.updateVal(pid, `${size}px`, "style.height");
-            view.updateVal(pid, view.gpuTranslate(x - half, y - half), "style.transform");
         }
         const pulses = (fl && fl.aoePulses) || [];
         for (let ai = 0; ai < 8; ai++) {
@@ -5873,14 +5857,9 @@ let view = {
         const t = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
         return extra ? `${t} ${extra}` : t;
     },
-    pathTokenVisualProgress: function(token) {
-        const current = token.pathProgress || 0;
+    renderLerpAlpha: function() {
         if (data.gameSettings && data.gameSettings.stop) {
-            return current;
-        }
-        const prev = token.prevPathProgress;
-        if (prev === undefined || prev === null) {
-            return current;
+            return 1;
         }
         let a = 1;
         const tps = data.gameSettings && data.gameSettings.ticksPerSecond;
@@ -5890,7 +5869,49 @@ let view = {
         } else if (data.gameSettings && data.gameSettings.renderAlpha !== undefined && data.gameSettings.renderAlpha !== null) {
             a = data.gameSettings.renderAlpha;
         }
+        return a;
+    },
+    pathTokenVisualProgress: function(token) {
+        const current = token.pathProgress || 0;
+        const prev = token.prevPathProgress;
+        if (prev === undefined || prev === null) {
+            return current;
+        }
+        const a = view.renderLerpAlpha();
         return prev + ((current - prev) * a);
+    },
+    projectileVisualProgress: function(projectile) {
+        const current = projectile.progress || 0;
+        const prev = projectile.prevProgress;
+        if (prev === undefined || prev === null) {
+            return current;
+        }
+        const a = view.renderLerpAlpha();
+        return prev + ((current - prev) * a);
+    },
+    updateFireLauncherProjectilePositions: function() {
+        const fl = data.progress && data.progress.base && data.progress.base.fireLaunchers;
+        const projectiles = (fl && fl.projectiles) || [];
+        const paused = !!(data.gameSettings && data.gameSettings.stop);
+        for (let pi = 0; pi < 8; pi++) {
+            const pid = `fireLauncherProjectile_${pi}`;
+            const p = pi < projectiles.length ? projectiles[pi] : null;
+            view.updateVal(pid, p ? "" : "none", "style.display");
+            if (!p) {
+                continue;
+            }
+            if (paused) {
+                p.prevProgress = p.progress || 0;
+            }
+            const t = Math.min(1, view.projectileVisualProgress(p) / (p.durationMs || 1050));
+            const x = (p.fromX || 0) + ((p.toX || 0) - (p.fromX || 0)) * t;
+            const y = (p.fromY || 0) + ((p.toY || 0) - (p.fromY || 0)) * t;
+            const size = p.sizePx || 28;
+            const half = size / 2;
+            view.updateVal(pid, `${size}px`, "style.width");
+            view.updateVal(pid, `${size}px`, "style.height");
+            view.updateVal(pid, view.gpuTranslateSubpixel(x - half, y - half), "style.transform");
+        }
     },
     updatePathTokenPositions: function() {
         const base = data.progress && data.progress.base;
