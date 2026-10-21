@@ -266,7 +266,10 @@ let events = {
         view.updateSkillsListVisibility("library");
     },
     setSkillGrouping: function(inputEl, commit) {
-        const key = data.progress.selectedSkillDetailKey;
+        const tab = data.progress.selectedSkillsTab || "equipped";
+        const key = tab === "library"
+            ? data.progress.selectedLibrarySkillKey
+            : data.progress.selectedEquippedSkillKey;
         const sk = key && data.progress.skills && data.progress.skills[key];
         if (!sk || !inputEl) {
             return;
@@ -298,8 +301,6 @@ let events = {
     switchSkillsTab: function(tabKey) {
         const t = tabKey === "library" ? "library" : "equipped";
         data.progress.selectedSkillsTab = t;
-        data.progress.selectedSkillDetailKey = "";
-        viewData.libraryInfoOverlaySide = "right";
         viewData.libraryListOrderSig = null;
         view.updateSkillsTab();
         createView.updateLayoutMeasurements();
@@ -313,15 +314,13 @@ let events = {
         if (!key) {
             return;
         }
-        if (data.progress.selectedSkillDetailKey === key) {
-            data.progress.selectedSkillDetailKey = "";
+        if (data.progress.selectedEquippedSkillKey === key) {
+            data.progress.selectedEquippedSkillKey = "";
         } else {
-            data.progress.selectedSkillDetailKey = key;
+            data.progress.selectedEquippedSkillKey = key;
         }
         view.applySkillDetailSelectionHighlight();
-        if ((data.progress.selectedSkillsTab || "equipped") === "library") {
-            view.updateLibrarySkillInfoPanel();
-        } else {
+        if ((data.progress.selectedSkillsTab || "equipped") === "equipped") {
             view.updateSkillInfoPanel();
         }
     },
@@ -336,10 +335,10 @@ let events = {
         } else {
             viewData.libraryInfoOverlaySide = "left";
         }
-        if (data.progress.selectedSkillDetailKey === skillKey) {
-            data.progress.selectedSkillDetailKey = "";
+        if (data.progress.selectedLibrarySkillKey === skillKey) {
+            data.progress.selectedLibrarySkillKey = "";
         } else {
-            data.progress.selectedSkillDetailKey = skillKey;
+            data.progress.selectedLibrarySkillKey = skillKey;
         }
         view.applySkillDetailSelectionHighlight();
         view.updateLibrarySkillInfoPanel();
@@ -347,7 +346,7 @@ let events = {
         view.updateVal("libSkillInfo_equipError", "");
     },
     equipSelectedLibrarySkill: function() {
-        const key = data.progress.selectedSkillDetailKey;
+        const key = data.progress.selectedLibrarySkillKey;
         const errEl = viewData.cached.libSkillInfo_equipError;
         const btn = viewData.cached.libSkillInfo_equipBtn;
         const showErr = function(msg) {
@@ -375,7 +374,7 @@ let events = {
         showErr(`Unequip ${article} ${label} skill first`);
     },
     unequipSelectedSkill: function() {
-        const key = data.progress.selectedSkillDetailKey;
+        const key = data.progress.selectedEquippedSkillKey;
         if (!key) {
             return;
         }
@@ -384,7 +383,7 @@ let events = {
             view.flashSkillEquipFail(viewData.cached.skillInfo_unequipBtn);
             return;
         }
-        data.progress.selectedSkillDetailKey = "";
+        data.progress.selectedEquippedSkillKey = "";
         view.updateSkillsTab();
     },
     toggleEquippedSlotStar: function(column, index, starType) {
@@ -2387,12 +2386,9 @@ let events = {
             const starPool = data.progress.stars;
             const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
             view.updateVal("combatStarsCounts", starLine, "innerHTML");
-            if (data.progress.selectedSkillDetailKey === skillKey) {
-                if ((data.progress.selectedSkillsTab || "equipped") === "library") {
-                    view.updateLibrarySkillInfoPanel();
-                } else {
-                    view.updateSkillInfoPanel();
-                }
+            if (data.progress.selectedEquippedSkillKey === skillKey
+                && (data.progress.selectedSkillsTab || "equipped") === "equipped") {
+                view.updateSkillInfoPanel();
             }
         }
     }

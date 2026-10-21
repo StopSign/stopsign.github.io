@@ -436,8 +436,11 @@ let view = {
             skillsTabNow = "equipped";
         }
         data.progress.selectedSkillsTab = skillsTabNow;
-        if (typeof data.progress.selectedSkillDetailKey !== "string") {
-            data.progress.selectedSkillDetailKey = "";
+        if (typeof data.progress.selectedEquippedSkillKey !== "string") {
+            data.progress.selectedEquippedSkillKey = "";
+        }
+        if (typeof data.progress.selectedLibrarySkillKey !== "string") {
+            data.progress.selectedLibrarySkillKey = "";
         }
         view.updateSkillSubTabs();
         view.updateSkillEquipSlots();
@@ -1437,30 +1440,29 @@ let view = {
         } else if (siteKey === "mage_tower") {
             required = 0;
         }
+        const wpt = `base_${siteKey}_wpt`;
         if (siteKey === "mage_tower") {
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "none", "style.display");
             const units = engine.getOrbWorkerUnits();
-            const expRate = engine.getOrbExpGainPerSecond();
-            const manaRate = engine.getEffectiveManaRatePerSecond();
-            let orbProdText = `Workers for Orb exp: ${units} (+${units * 20}% exp) | Exp: ${round2(expRate)}/s | Mana: ${round2(manaRate)}/s`;
+            view.updateVal(`${wpt}_units`, units);
+            view.updateVal(`${wpt}_units_pct`, units * 20);
+            view.updateVal(`${wpt}_exp`, round2(engine.getOrbExpGainPerSecond()));
+            view.updateVal(`${wpt}_mana`, round2(engine.getEffectiveManaRatePerSecond()));
+            view.updateVal(`${wpt}_okami_wrap`, okamiHere ? "" : "none", "style.display");
             if (okamiHere) {
-                orbProdText += ` | Inspiration x${round2(engine.getOkamiInspirationBonus())} on mana`;
+                view.updateVal(`${wpt}_okami`, round2(engine.getOkamiInspirationBonus()));
             }
-            view.updateVal(`base_${siteKey}_worker_prod_text`, orbProdText);
             return;
         }
         if (siteKey === "foxDen") {
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "none", "style.display");
-            const okamiFox = engine.getOkami();
-            const okamiHereFox = okamiFox.assignedBuildingKey === "foxDen";
-            const carrierCount = assigned + (okamiHereFox ? 1 : 0);
-            const workerSpeedFox = engine.getFoxDenCarrierSpeed({ isOkami: false });
-            const okamiSpeedFox = engine.getFoxDenCarrierSpeed({ isOkami: true });
-            let foxProdText = `Carriers assigned: ${carrierCount} | Carrier speed: ${round1(workerSpeedFox)}`;
+            const okamiHereFox = engine.getOkami().assignedBuildingKey === "foxDen";
+            view.updateVal(`${wpt}_carriers`, assigned + (okamiHereFox ? 1 : 0));
+            view.updateVal(`${wpt}_speed`, round1(engine.getFoxDenCarrierSpeed({ isOkami: false })));
+            view.updateVal(`${wpt}_okami_wrap`, okamiHereFox ? "" : "none", "style.display");
             if (okamiHereFox) {
-                foxProdText += ` | Okami speed: ${round1(okamiSpeedFox)}`;
+                view.updateVal(`${wpt}_okami_speed`, round1(engine.getFoxDenCarrierSpeed({ isOkami: true })));
             }
-            view.updateVal(`base_${siteKey}_worker_prod_text`, foxProdText);
             return;
         }
         if (siteKey === "scrollArchives") {
@@ -1470,137 +1472,131 @@ let view = {
             const literacyBought = engine.getLiteracyLessonsBought();
             const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
             const progress = lib.researchTaskProgress || 0;
-            const required = lib.researchTaskRequired || 10;
-            const remain = Math.max(0, required - progress);
-            const pct = required > 0 ? Math.max(0, Math.min(100, (progress / required) * 100)) : 0;
-            let prodText = `Researchers: ${researcherCount} | Research speed: ${round1(gainedRate)}/s`;
+            const taskRequired = lib.researchTaskRequired || 10;
+            const remain = Math.max(0, taskRequired - progress);
+            const pct = taskRequired > 0 ? Math.max(0, Math.min(100, (progress / taskRequired) * 100)) : 0;
+            const toChoose = lib.researchesToChoose || 0;
+            view.updateVal(`${wpt}_researchers`, researcherCount);
+            view.updateVal(`${wpt}_speed`, round1(gainedRate));
+            view.updateVal(`${wpt}_okami_wrap`, okamiHere ? "" : "none", "style.display");
             if (okamiHere) {
-                prodText += ` (${round1(engine.getOkamiInspirationBonus())}× from inspiration)`;
+                view.updateVal(`${wpt}_okami`, round1(engine.getOkamiInspirationBonus()));
             }
-            const etaText = (!lib.researchPaused && gainedRate > 0 && remain > 0)
-                ? secondsToTime(remain / gainedRate)
-                : "—";
-            prodText += `<br>Research: ${round1Fixed(progress)} / ${round1(required)} · ETA: ${etaText} (${round1(researchRate)} coins/s, ${round1(researchRate * 3)} star beads/s, ${round1(researchRate * 10)} mana/s)`;
-            if (lib.researchPaused) {
-                prodText += "<br>Paused - need more coins, star beads, or mana";
+            view.updateVal(`${wpt}_progress`, round1Fixed(progress));
+            view.updateVal(`${wpt}_required`, round1(taskRequired));
+            if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
+                view.updateEtaText(`${wpt}_eta`, remain, gainedRate);
+            } else {
+                view.updateVal(`${wpt}_eta`, "—");
             }
-            if ((lib.researchesToChoose || 0) > 0) {
-                prodText += `<br>Researches to choose: ${lib.researchesToChoose}`;
+            view.updateVal(`${wpt}_cost_coins`, round1(researchRate));
+            view.updateVal(`${wpt}_cost_beads`, round1(researchRate * 3));
+            view.updateVal(`${wpt}_cost_mana`, round1(researchRate * 10));
+            view.updateVal(`${wpt}_paused`, lib.researchPaused ? "" : "none", "style.display");
+            view.updateVal(`${wpt}_choose_wrap`, toChoose > 0 ? "" : "none", "style.display");
+            if (toChoose > 0) {
+                view.updateVal(`${wpt}_choose`, toChoose);
             }
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
             view.updateVal(`base_${siteKey}_worker_prog_fill`, `${pct}%`, "style.width");
             return;
         }
         if (siteKey === "bonfire") {
-            const okamiBonfire = engine.getOkami();
-            const okamiHereBonfire = okamiBonfire.assignedBuildingKey === "bonfire";
-            const carrierCount = assigned + (okamiHereBonfire ? 1 : 0);
-            const workerSpeedBonfire = engine.getBonfireCarrierSpeed({ isOkami: false });
-            const okamiSpeedBonfire = engine.getBonfireCarrierSpeed({ isOkami: true });
+            const okamiHereBonfire = engine.getOkami().assignedBuildingKey === "bonfire";
             const heatDisp = bonfire.getHeatDisplay();
             const heatPct = bonfire.getHeatBarFillPercent(heatDisp.heat);
-            const prodText = `Carriers assigned: ${carrierCount} | Carrier speed: ${round1(workerSpeedBonfire)} | Okami speed: ${round1(okamiSpeedBonfire)}<br>Heat: ${round1(heatDisp.heat)} / ${round1(heatDisp.nextThreshold)} | Mana Gain Bonus: ${heatDisp.bonusLabel}`;
+            view.updateVal(`${wpt}_carriers`, assigned + (okamiHereBonfire ? 1 : 0));
+            view.updateVal(`${wpt}_speed`, round1(engine.getBonfireCarrierSpeed({ isOkami: false })));
+            view.updateVal(`${wpt}_okami_speed`, round1(engine.getBonfireCarrierSpeed({ isOkami: true })));
+            view.updateVal(`${wpt}_heat`, round1(heatDisp.heat));
+            view.updateVal(`${wpt}_heat_next`, round1(heatDisp.nextThreshold));
+            view.updateVal(`${wpt}_heat_bonus`, heatDisp.bonusLabel);
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
             view.updateVal(`base_${siteKey}_worker_prog_fill`, `${heatPct}%`, "style.width");
             return;
         }
         if (siteKey === "market") {
-            const carrierCount = engine.getMarketCarrierCapacity();
-            const workerSpeedMarket = engine.getMarketCarrierSpeed({ isOkami: false });
             const allowed = engine.getMarketAllowedHaulResources();
-            let prodText = `Haulers assigned: ${carrierCount} | Carrier speed: ${round1(workerSpeedMarket)}`;
+            const hasHaul = allowed.length > 0;
+            view.updateVal(`${wpt}_carriers`, engine.getMarketCarrierCapacity());
+            view.updateVal(`${wpt}_speed`, round1(engine.getMarketCarrierSpeed({ isOkami: false })));
+            view.updateVal(`${wpt}_okami_wrap`, okamiHere ? "" : "none", "style.display");
             if (okamiHere) {
-                prodText += ` | Okami speed: ${round1(engine.getMarketCarrierSpeed({ isOkami: true }))}`;
+                view.updateVal(`${wpt}_okami_speed`, round1(engine.getMarketCarrierSpeed({ isOkami: true })));
             }
-            prodText += `<br>${allowed.length ? `Hauling: ${allowed.join(", ")}` : "No resources allowed - check a box to start hauling"}`;
-            prodText += ` | Credit rate: ${round1(engine.getMarketCreditPerSecond())}/s`;
+            view.updateVal(`${wpt}_haul_list_wrap`, hasHaul ? "" : "none", "style.display");
+            view.updateVal(`${wpt}_haul_empty`, hasHaul ? "none" : "", "style.display");
+            if (hasHaul) {
+                view.updateVal(`${wpt}_haul_list`, allowed.join(", "));
+            }
+            view.updateVal(`${wpt}_credit`, round1(engine.getMarketCreditPerSecond()));
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "none", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
-            return;
-        }
-        if (siteKey === "inn") {
-            const okamiInn = engine.getOkami();
-            const okamiHereInn = okamiInn.assignedBuildingKey === "inn";
-            const carrierCount = assigned + (okamiHereInn ? 1 : 0);
-            const workerSpeed = engine.getInnCarrierSpeed({ isOkami: false });
-            const okamiSpeed = engine.getInnCarrierSpeed({ isOkami: true });
-            const inn = base.inn;
-            const hot = inn.hotWater || 0;
-            const hotCap = engine.getInnHotWaterCapacity();
-            let prodText = `Carriers assigned: ${carrierCount} | Carrier speed: ${round1(workerSpeed)}`;
-            if (okamiHereInn) {
-                prodText += ` | Okami speed: ${round1(okamiSpeed)}`;
-            }
-            prodText += `<br>Hot Water: ${round1(hot)} / ${hotCap}`;
-            if (!engine.isCisternWaterHotEnoughForOnsen()) {
-                prodText += " (Cistern water must be above 40C)";
-            }
-            view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
-            view.updateVal(`base_${siteKey}_worker_prog_fill`, hotCap > 0 ? `${Math.round((hot / hotCap) * 100)}%` : "0%", "style.width");
             return;
         }
         if (siteKey === "cistern") {
-            const okamiCistern = engine.getOkami();
-            const okamiHereCistern = okamiCistern.assignedBuildingKey === "cistern";
-            const carrierCount = assigned + (okamiHereCistern ? 1 : 0);
-            const workerSpeed = engine.getCisternCarrierSpeed({ isOkami: false });
-            const okamiSpeed = engine.getCisternCarrierSpeed({ isOkami: true });
+            const okamiHereCistern = engine.getOkami().assignedBuildingKey === "cistern";
             const inn = base.inn;
             const hot = inn.hotWater || 0;
             const hotCap = engine.getInnHotWaterCapacity();
-            let prodText = `Carriers assigned: ${carrierCount} | Carrier speed: ${round1(workerSpeed)}`;
+            const onsen = engine.isInnOnsenConverted();
+            view.updateVal(`${wpt}_carriers`, assigned + (okamiHereCistern ? 1 : 0));
+            view.updateVal(`${wpt}_speed`, round1(engine.getCisternCarrierSpeed({ isOkami: false })));
+            view.updateVal(`${wpt}_okami_wrap`, okamiHereCistern ? "" : "none", "style.display");
             if (okamiHereCistern) {
-                prodText += ` | Okami speed: ${round1(okamiSpeed)}`;
+                view.updateVal(`${wpt}_okami_speed`, round1(engine.getCisternCarrierSpeed({ isOkami: true })));
             }
-            if (engine.isInnOnsenConverted()) {
-                prodText += `<br>Onsen Hot Water: ${round1(hot)} / ${hotCap}`;
-                if (!engine.isCisternWaterHotEnoughForOnsen()) {
-                    prodText += " (Cistern water must be above 40C)";
-                }
+            view.updateVal(`${wpt}_hot_wrap`, onsen ? "" : "none", "style.display");
+            if (onsen) {
+                view.updateVal(`${wpt}_hot`, round1(hot));
+                view.updateVal(`${wpt}_hot_cap`, hotCap);
+                view.updateVal(`${wpt}_hot_note`, engine.isCisternWaterHotEnoughForOnsen() ? "none" : "", "style.display");
             }
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
             view.updateVal(`base_${siteKey}_worker_prog_fill`, hotCap > 0 ? `${Math.round((hot / hotCap) * 100)}%` : "0%", "style.width");
             return;
         }
         let pct = required > 0 ? Math.max(0, Math.min(100, ((slot.workerPower || 0) / required) * 100)) : 0;
         view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
         const power = round1(slot.workerPower || 0);
-        const rateStr = round1(workRate);
-        let prodText;
         if (siteKey === "torii") {
             const canReduce = workRate > 0;
             const reduceSec = engine.getToriiWorkerTimerReduceSeconds();
             const reducingPerSec = required > 0 && canReduce ? (reduceSec * workRate) / required : 0;
             const reduceSecStr = (Math.abs(reduceSec - Math.round(reduceSec)) < 1e-9) ? String(Math.round(reduceSec)) : round1(reduceSec);
-            prodText = required > 0
-                ? `Worker Power: ${rateStr} |  On complete, reduce next visitor by ${reduceSecStr}s<br>${power}/${required} to complete | Reducing ${round2(reducingPerSec)}/s`
-                : `Worker Power: ${rateStr}`;
+            view.updateVal(`${wpt}_rate`, round1(workRate));
+            view.updateVal(`${wpt}_reduce_wrap`, required > 0 ? "" : "none", "style.display");
+            view.updateVal(`${wpt}_progress_wrap`, required > 0 ? "" : "none", "style.display");
+            if (required > 0) {
+                view.updateVal(`${wpt}_reduce_sec`, reduceSecStr);
+                view.updateVal(`${wpt}_power`, power);
+                view.updateVal(`${wpt}_required`, required);
+                view.updateVal(`${wpt}_reducing`, round2(reducingPerSec));
+            }
         } else if (siteKey === "bambooForest") {
             const bambooRate = engine.getBambooCutWorkerRate();
             const chopPower = engine.getBambooChopPower();
-            const bambooRateStr = round1(bambooRate);
             const canComplete = bambooRate > 0;
             const woodPerSec = required > 0 && canComplete ? (bambooRate / required) * chopPower : 0;
-            const woodPerSecStr = round2(woodPerSec);
-            prodText = required > 0
-                ? `Worker Power: ${bambooRateStr} | ${power}/${required} to complete | ~${woodPerSecStr}/s`
-                : `Worker Power: ${bambooRateStr} | ~${woodPerSecStr}/s`;
-            workRate = bambooRate;
+            view.updateVal(`${wpt}_rate`, round1(bambooRate));
+            view.updateVal(`${wpt}_complete_wrap`, required > 0 ? "" : "none", "style.display");
+            if (required > 0) {
+                view.updateVal(`${wpt}_power`, power);
+                view.updateVal(`${wpt}_required`, required);
+            }
+            view.updateVal(`${wpt}_per_sec`, round2(woodPerSec));
             pct = required > 0 && canComplete ? Math.max(0, Math.min(100, ((slot.workerPower || 0) / required) * 100)) : 0;
         } else {
             const canComplete = workRate > 0 && (siteKey !== "laundry" || productive);
             const completionsPerSec = required > 0 && canComplete ? workRate / required : 0;
-            const completionsStr = round2(completionsPerSec);
-            prodText = required > 0
-                ? `Worker Power: ${rateStr} | ${power}/${required} to complete | ${completionsStr}/s`
-                : `Worker Power: ${rateStr} | ${completionsStr}/s`;
+            view.updateVal(`${wpt}_rate`, round1(workRate));
+            view.updateVal(`${wpt}_complete_wrap`, required > 0 ? "" : "none", "style.display");
+            if (required > 0) {
+                view.updateVal(`${wpt}_power`, power);
+                view.updateVal(`${wpt}_required`, required);
+            }
+            view.updateVal(`${wpt}_per_sec`, round2(completionsPerSec));
         }
         view.updateVal(`base_${siteKey}_worker_prog_fill`, `${pct}%`, "style.width");
-        view.updateVal(`base_${siteKey}_worker_prod_text`, prodText, "innerHTML");
     },
     updateMapRevealVisibility: function() {
         const hsRevealed = engine.isMapElementRevealed("hiddenSpring");
@@ -4484,7 +4480,7 @@ let view = {
                             }
                         }
                         if (slotEl) {
-                            slotEl.classList.toggle("skill-equip-slot--selected", data.progress.selectedSkillDetailKey === key);
+                            slotEl.classList.toggle("skill-equip-slot--selected", data.progress.selectedEquippedSkillKey === key);
                         }
                         view.updateVal(`${idPrefix}_name`, skill ? skill.name : key);
                         if (compact) {
@@ -4639,31 +4635,32 @@ let view = {
             view.updateSkillsListVisibility("library");
         }
     },
-    syncSelectedSkillDetailKey: function(tab) {
-        const t = tab !== undefined && tab !== null ? tab : (data.progress.selectedSkillsTab || "equipped");
-        const sel = data.progress.selectedSkillDetailKey;
-        if (sel === "" || sel === undefined || sel === null) {
-            data.progress.selectedSkillDetailKey = "";
-            return;
+    syncSelectedSkillDetailKey: function() {
+        if (typeof data.progress.selectedEquippedSkillKey !== "string") {
+            data.progress.selectedEquippedSkillKey = "";
         }
-        if (t === "equipped") {
-            if (!skills.isSkillEquipped(sel)) {
-                data.progress.selectedSkillDetailKey = "";
+        if (typeof data.progress.selectedLibrarySkillKey !== "string") {
+            data.progress.selectedLibrarySkillKey = "";
+        }
+        if (data.progress.selectedEquippedSkillKey
+            && !skills.isSkillEquipped(data.progress.selectedEquippedSkillKey)) {
+            data.progress.selectedEquippedSkillKey = "";
+        }
+        if (data.progress.selectedLibrarySkillKey) {
+            const list = skills.getLibrarySkillKeys();
+            if (list.indexOf(data.progress.selectedLibrarySkillKey) < 0) {
+                data.progress.selectedLibrarySkillKey = "";
             }
-            return;
-        }
-        const list = skills.getLibrarySkillKeys();
-        if (list.indexOf(sel) < 0) {
-            data.progress.selectedSkillDetailKey = "";
         }
     },
     applySkillDetailSelectionHighlight: function() {
-        const sel = data.progress.selectedSkillDetailKey;
+        const libSel = data.progress.selectedLibrarySkillKey || "";
+        const eqSel = data.progress.selectedEquippedSkillKey || "";
         for (let i = 0; i < skills.keysInOrder.length; i++) {
             const k = skills.keysInOrder[i];
             const wrap = viewData.cached[`skill_wrap_${k}`];
             if (wrap) {
-                wrap.classList.toggle("skill-row--selected", k === sel);
+                wrap.classList.toggle("skill-row--selected", k === libSel);
             }
         }
         const eq = skills.ensureSkillEquip();
@@ -4676,7 +4673,7 @@ let view = {
                     for (let i = 0; i < arr.length; i++) {
                         const slotEl = viewData.cached[`skillSlot_${views[vi]}_${column}_${i}`];
                         if (slotEl) {
-                            slotEl.classList.toggle("skill-equip-slot--selected", !!arr[i] && arr[i] === sel);
+                            slotEl.classList.toggle("skill-equip-slot--selected", !!arr[i] && arr[i] === eqSel);
                         }
                     }
                 }
@@ -4694,10 +4691,10 @@ let view = {
     },
     /** Equipped tab: full detail for selected equipped skill. */
     updateSkillInfoPanel: function() {
-        if (data.progress.selectedSkillDetailKey === undefined || data.progress.selectedSkillDetailKey === null) {
-            data.progress.selectedSkillDetailKey = "";
+        if (typeof data.progress.selectedEquippedSkillKey !== "string") {
+            data.progress.selectedEquippedSkillKey = "";
         }
-        const skillKey = data.progress.selectedSkillDetailKey;
+        const skillKey = data.progress.selectedEquippedSkillKey;
         if (!skillKey || !skills.isSkillEquipped(skillKey)) {
             view.updateVal("skillInfoPanel", "none", "style.display");
             return;
@@ -4735,6 +4732,10 @@ let view = {
         }
         view.updateVal("skillInfo_reward", skills.getSkillRewardText(skillKey, skill), "innerHTML");
         view.updateVal("skillInfo_trigger", skills.getSkillTriggerDescription(skillKey), "innerHTML");
+        const def = skills._byKey[skillKey];
+        const baseSkillExp = def && def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
+        const baseTalentExp = def && def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
+        view.updateVal("skillInfo_base_exp", `Base Skill Exp: ${baseSkillExp}, Base Talent Exp: ${baseTalentExp}`);
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
         view.updateVal("skillInfo_initial_exp_shards", `Initial exp from shards: ${intToStringRound(skill.shards || 0)}`);
         view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}`);
@@ -4760,7 +4761,10 @@ let view = {
         view.updateVal("skillInfo_flavor", skills.getSkillFlavorText(skillKey), "innerHTML");
     },
     updateLibrarySkillInfoPanel: function() {
-        const skillKey = data.progress.selectedSkillDetailKey;
+        if (typeof data.progress.selectedLibrarySkillKey !== "string") {
+            data.progress.selectedLibrarySkillKey = "";
+        }
+        const skillKey = data.progress.selectedLibrarySkillKey;
         if (!skillKey || skills.getLibrarySkillKeys().indexOf(skillKey) < 0) {
             view.updateVal("skillInfoPanelLibrary", "none", "style.display");
             return;
@@ -4785,6 +4789,10 @@ let view = {
         }
         view.updateVal("libSkillInfo_reward", skills.getSkillRewardText(skillKey, skill), "innerHTML");
         view.updateVal("libSkillInfo_trigger", skills.getSkillTriggerDescription(skillKey), "innerHTML");
+        const def = skills._byKey[skillKey];
+        const baseSkillExp = def && def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
+        const baseTalentExp = def && def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
+        view.updateVal("libSkillInfo_base_exp", `Base Skill Exp: ${baseSkillExp}, Base Talent Exp: ${baseTalentExp}`);
         view.updateVal("libSkillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
         view.updateVal("libSkillInfo_talent_fill", `${talPct}%`, "style.width");
         view.updateVal("libSkillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");

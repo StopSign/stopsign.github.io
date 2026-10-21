@@ -174,6 +174,38 @@ let createView = {
             }
             return h;
         };
+        const workerProdTextHtml = function(siteKey) {
+            const id = `base_${siteKey}`;
+            const coinIcon = resortData.resourceIconHtml("coins");
+            const beadIcon = resortData.resourceIconHtml("starBeads");
+            const manaIcon = resortData.resourceIconHtml("mana");
+            const creditIcon = resortData.resourceIconHtml("credit");
+            if (siteKey === "mage_tower") {
+                return `<span id="${id}_worker_prod_text">Workers for Orb exp: <span id="${id}_wpt_units"></span> (+<span id="${id}_wpt_units_pct"></span>% exp) | Exp: <span id="${id}_wpt_exp"></span>/s | ${manaIcon} Mana: <span id="${id}_wpt_mana"></span>/s<span id="${id}_wpt_okami_wrap" style="display:none"> | Inspiration x<span id="${id}_wpt_okami"></span> on mana</span></span>`;
+            }
+            if (siteKey === "foxDen") {
+                return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span></span>`;
+            }
+            if (siteKey === "scrollArchives") {
+                return `<span id="${id}_worker_prod_text">Researchers: <span id="${id}_wpt_researchers"></span> | Research speed: <span id="${id}_wpt_speed"></span>/s<span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>× from inspiration)</span><br>Research: <span id="${id}_wpt_progress"></span> / <span id="${id}_wpt_required"></span> · ETA: <span id="${id}_wpt_eta"></span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span><span id="${id}_wpt_choose_wrap" style="display:none"><br>Researches to choose: <span id="${id}_wpt_choose"></span></span></span>`;
+            }
+            if (siteKey === "bonfire") {
+                return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span> | Okami speed: <span id="${id}_wpt_okami_speed"></span><br>Heat: <span id="${id}_wpt_heat"></span> / <span id="${id}_wpt_heat_next"></span> | Mana Gain Bonus: <span id="${id}_wpt_heat_bonus"></span></span>`;
+            }
+            if (siteKey === "market") {
+                return `<span id="${id}_worker_prod_text">Haulers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span><br><span id="${id}_wpt_haul_list_wrap">Hauling: <span id="${id}_wpt_haul_list"></span></span><span id="${id}_wpt_haul_empty" class="muted-text" style="display:none">No resources allowed - check a box to start hauling</span> | ${creditIcon} Credit rate: <span id="${id}_wpt_credit"></span>/s</span>`;
+            }
+            if (siteKey === "cistern") {
+                return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span><span id="${id}_wpt_hot_wrap" style="display:none"><br>Onsen Hot Water: <span id="${id}_wpt_hot"></span> / <span id="${id}_wpt_hot_cap"></span><span id="${id}_wpt_hot_note" class="muted-text" style="display:none"> (Cistern water must be above 40C)</span></span></span>`;
+            }
+            if (siteKey === "torii") {
+                return `<span id="${id}_worker_prod_text">Worker Power: <span id="${id}_wpt_rate"></span><span id="${id}_wpt_reduce_wrap" class="muted-text" style="display:none"> | On complete, reduce next visitor by <span id="${id}_wpt_reduce_sec"></span>s</span><span id="${id}_wpt_progress_wrap" style="display:none"><br><span id="${id}_wpt_power"></span>/<span id="${id}_wpt_required"></span> <span class="muted-text">to complete</span> | Reducing <span id="${id}_wpt_reducing"></span>/s</span></span>`;
+            }
+            if (siteKey === "bambooForest") {
+                return `<span id="${id}_worker_prod_text">Worker Power: <span id="${id}_wpt_rate"></span><span id="${id}_wpt_complete_wrap" style="display:none"> | <span id="${id}_wpt_power"></span>/<span id="${id}_wpt_required"></span> <span class="muted-text">to complete</span></span> | ~<span id="${id}_wpt_per_sec"></span>/s</span>`;
+            }
+            return `<span id="${id}_worker_prod_text">Worker Power: <span id="${id}_wpt_rate"></span><span id="${id}_wpt_complete_wrap" style="display:none"> | <span id="${id}_wpt_power"></span>/<span id="${id}_wpt_required"></span> <span class="muted-text">to complete</span></span> | <span id="${id}_wpt_per_sec"></span>/s</span>`;
+        };
         const workerControls = function(siteKey) {
             const p = `'${siteKey}'`;
             const bonfireProg = siteKey === "bonfire";
@@ -195,7 +227,7 @@ let createView = {
                     <span id="base_${siteKey}_workers_label" class="base-worker-cap-label muted-text"></span>
                 </div>
                 <div class="base-row base-worker-power-row">
-                    <span id="base_${siteKey}_worker_prod_text" class="muted-text"></span>
+                    ${workerProdTextHtml(siteKey)}
                     <div id="base_${siteKey}_worker_prod_wrap" class="${progWrapClass}">
                         <div id="base_${siteKey}_worker_prog_fill" class="${progFillClass}"></div>
                     </div>
@@ -1046,6 +1078,7 @@ let createView = {
                 <div class="skill-current-wrap" id="skillInfo_current_wrap"><div id="skillInfo_current" class="skill-current"></div></div>
                 <div class="skill-reward" id="skillInfo_reward"></div>
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
+                <div class="skill-base-exp" id="skillInfo_base_exp"></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_exp_on_trigger"></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_initial_exp_shards"></div>
                 <div class="prog-label-row skill-exp-row">Skill exp: <span id="skillInfo_exp_text"></span> <span class="skill-exp-mults" id="skillInfo_exp_mults"></span></div>
@@ -1067,6 +1100,7 @@ let createView = {
                 </div>
                 <div class="skill-reward" id="libSkillInfo_reward"></div>
                 <div class="skill-trigger" id="libSkillInfo_trigger"></div>
+                <div class="skill-base-exp" id="libSkillInfo_base_exp"></div>
                 <div class="prog-label-row">Talent: <span id="libSkillInfo_talent_text"></span></div>
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="libSkillInfo_talent_fill" class="prog-fill prog-fill-talent"></div></div>
                 <div id="libSkillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsHiddenStyle}>Tips: <span id="libSkillInfo_tips_text"></span></div>
@@ -1155,7 +1189,7 @@ let createView = {
             "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
             "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards",
             "skillInfoPanel", "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current",
-            "skillInfo_reward", "skillInfo_trigger", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
+            "skillInfo_reward", "skillInfo_trigger", "skillInfo_base_exp", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
             "skillInfo_star_effect_row", "skillInfo_star_effect",
@@ -1163,7 +1197,7 @@ let createView = {
             "skillInfo_combined_mults", "skillInfo_integration_row", "skillInfo_integration_mult", "skillInfo_flavor",
             "skillInfo_unequipBtn",
             "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
-            "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
+            "libSkillInfo_base_exp", "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
             "libSkillInfo_equipError", "libSkillInfo_equipBtn",
             "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel", "unequipChargesText",
             "skillSubTab_equipped", "skillSubTab_library"
@@ -1580,6 +1614,13 @@ let createView = {
                 `base_${wsk}_workers_label`, `base_${wsk}_assign_okami_btn`
             );
             createView.queueCache(`base_${wsk}_worker_prod_text`, `base_${wsk}_worker_prod_wrap`, `base_${wsk}_worker_prog_fill`);
+            const prodEl = document.getElementById(`base_${wsk}_worker_prod_text`);
+            if (prodEl) {
+                const nested = prodEl.querySelectorAll("[id]");
+                for (let ni = 0; ni < nested.length; ni++) {
+                    createView.queueCache(nested[ni].id);
+                }
+            }
         }
         const resortBuildingKeys = Object.keys(resortData.buildings || {});
         for (let rbi = 0; rbi < resortBuildingKeys.length; rbi++) {

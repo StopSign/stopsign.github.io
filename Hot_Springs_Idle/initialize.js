@@ -12,7 +12,6 @@ let lastTickTime = 0;
 
 let timerId = null;
 let saveName = "battleLoops1"; //Blank if you don't want to save, change name to force user reset
-const CODE_SAVE_VERSION = 0;
 
 let data = {};
 let language = "english";
@@ -509,7 +508,8 @@ let initials = {
             },
             selectedSkillsTab: "equipped",
             skillListSort: "oldest",
-            selectedSkillDetailKey: "",
+            selectedEquippedSkillKey: "",
+            selectedLibrarySkillKey: "",
             skillEquip: {
                 slots: {
                     offense: [null],
@@ -517,8 +517,8 @@ let initials = {
                     utility: [null],
                     any: [null]
                 },
-                unequipCharges: 1,
-                unequipChargesMax: 1,
+                unequipCharges: 5,
+                unequipChargesMax: 5,
                 unequipChargeReadyAt: 0
             },
             selectedStatsTab: "combat",
@@ -732,53 +732,11 @@ let initialize = {
         if (!inn.waterCarriers) {
             inn.waterCarriers = [];
         }
-        if ((inn.hotWaterCapacity || 0) === 200) {
-            inn.hotWaterCapacity = 500;
-        }
-        for (let gi = 0; gi < inn.guests.length; gi++) {
-            initialize.migrateGuestItineraryStep(inn.guests[gi]);
-        }
-    },
-    migrateGuestItineraryStep: function(guest) {
-        if (!guest) {
-            return;
-        }
-        if (guest.itineraryStep) {
-            if (guest.state !== undefined) {
-                delete guest.state;
-            }
-            return;
-        }
-        if (guest.state) {
-            const legacy = guest.state;
-            if (legacy === "settling in") {
-                guest.itineraryStep = "settleIn";
-            } else if (legacy === "watch water spirits play") {
-                guest.itineraryStep = "watchWaterSpirits";
-            } else if (legacy === "resting") {
-                guest.itineraryStep = "rest";
-            } else {
-                guest.itineraryStep = "settleIn";
-            }
-            delete guest.state;
-            return;
-        }
-        if (guest.room !== undefined && guest.room !== null) {
-            guest.itineraryStep = "settleIn";
-        }
     },
     initializeManaBuildings: function() {
         const base = data.progress.base;
         if (!base) {
             return;
-        }
-        const inn = base.inn;
-        if (inn) {
-            const bought = (base.mage_tower && base.mage_tower.increaseInnManaCapacityBought) || 0;
-            const oldFormula = 100 + bought * 50;
-            if ((inn.manaCapacity || 0) === oldFormula) {
-                inn.manaCapacity = 1000 + bought * 500;
-            }
         }
         const torii = base.torii;
         if (torii) {
@@ -797,28 +755,16 @@ let initialize = {
             if (torii.water === undefined) {
                 torii.water = 0;
             }
-            if (torii.karmaCheckPowerRequired !== undefined) {
-                if (torii.visitorDrawPowerRequired === undefined || torii.visitorDrawPowerRequired === null) {
-                    torii.visitorDrawPowerRequired = torii.karmaCheckPowerRequired;
-                }
-                delete torii.karmaCheckPowerRequired;
-            }
             if (torii.visitorDrawPowerRequired === undefined || torii.visitorDrawPowerRequired === null) {
                 torii.visitorDrawPowerRequired = 30;
             }
         }
         const pile = base.stonePile;
         if (pile) {
-            const legacyUsed = pile.usedStone || 0;
             if (pile.dupedStone === undefined) {
                 pile.dupedStone = 0;
             }
-            if (legacyUsed !== 0 || pile.usedStone !== undefined) {
-                pile.dupedStone = Math.floor((pile.dupedStone || 0) + legacyUsed);
-                delete pile.usedStone;
-            } else {
-                pile.dupedStone = Math.floor(pile.dupedStone || 0);
-            }
+            pile.dupedStone = Math.floor(pile.dupedStone || 0);
             pile.stone = Math.floor(pile.stone || 0);
             if (pile.mana === undefined) {
                 pile.mana = 0;
@@ -835,25 +781,6 @@ let initialize = {
             if (pile.stoneDuplicatorUnlocked === undefined) {
                 pile.stoneDuplicatorUnlocked = false;
             }
-        }
-        const migrateStoneTaken = function(carriers) {
-            if (!carriers) {
-                return;
-            }
-            for (let i = 0; i < carriers.length; i++) {
-                const st = carriers[i].stoneTaken;
-                if (!st || st.used === undefined) {
-                    continue;
-                }
-                st.duped = (st.duped || 0) + (st.used || 0);
-                delete st.used;
-            }
-        };
-        if (base.foxDen) {
-            migrateStoneTaken(base.foxDen.constructionCarriers);
-        }
-        if (base.market) {
-            migrateStoneTaken(base.market.creditCarriers);
         }
         const garden = base.garden;
         const manaOrderOn = !!(garden && garden.arrangementOfManaOrdersUnlocked);
@@ -1137,58 +1064,6 @@ let initialize = {
                 site.paused = false;
             }
         }
-        initialize.roundUpgradeGatherStoneOnce();
-    },
-    /** One-time: round fractional stone already on upgrade gather jobs / inbound carriers. */
-    roundUpgradeGatherStoneOnce: function() {
-        if (data.progress.roundedUpgradeStoneOnce) {
-            return;
-        }
-        data.progress.roundedUpgradeStoneOnce = true;
-        const rh = data.progress.base && data.progress.base.foxDen;
-        if (!rh) {
-            return;
-        }
-        const jobs = rh.upgradeGatherJobs || {};
-        const jobKeys = Object.keys(jobs);
-        for (let i = 0; i < jobKeys.length; i++) {
-            const jobKey = jobKeys[i];
-            const job = jobs[jobKey];
-            if (!job) {
-                continue;
-            }
-            if (job.required && job.required.stone) {
-                job.required.stone = Math.round(job.required.stone);
-            }
-            if (job.delivered && job.delivered.stone) {
-                job.delivered.stone = Math.round(job.delivered.stone);
-            }
-            if (typeof engine !== "undefined" && engine.checkUpgradeGatherJobComplete) {
-                engine.checkUpgradeGatherJobComplete(jobKey);
-            }
-        }
-        const carriers = rh.constructionCarriers || [];
-        for (let ci = 0; ci < carriers.length; ci++) {
-            const c = carriers[ci];
-            if (!c || c.resourceType !== "stone") {
-                continue;
-            }
-            const jobKey = c.jobKey || "";
-            if (jobKey.indexOf("upgrade:") !== 0) {
-                continue;
-            }
-            if (c.stoneTaken) {
-                const d = Math.round(c.stoneTaken.duped || 0);
-                const u = Math.round(c.stoneTaken.used || 0);
-                const r = Math.round(c.stoneTaken.raw || 0);
-                c.stoneTaken.duped = d + u;
-                c.stoneTaken.raw = r;
-                delete c.stoneTaken.used;
-                c.amount = d + u + r;
-            } else {
-                c.amount = Math.round(c.amount || 0);
-            }
-        }
     },
     initializeMapRevealed: function() {
         const base = data.progress.base;
@@ -1285,20 +1160,12 @@ let initialize = {
             base.shrine = JSON.parse(JSON.stringify(def));
         }
         const shrine = base.shrine;
-        const needsKarmaMigrate = !shrine.karmaMechanicMigrated;
         const keys = Object.keys(def);
         for (let i = 0; i < keys.length; i++) {
             const k = keys[i];
             if (shrine[k] === undefined || shrine[k] === null) {
                 shrine[k] = def[k];
             }
-        }
-        if (needsKarmaMigrate) {
-            shrine.level = 0;
-            shrine.exp = 0;
-            shrine.expToLevel = 10000;
-            shrine.selectedClassKey = "none";
-            shrine.karmaMechanicMigrated = true;
         }
         if (shrine.selectedClassKey === undefined || shrine.selectedClassKey === null) {
             shrine.selectedClassKey = "none";

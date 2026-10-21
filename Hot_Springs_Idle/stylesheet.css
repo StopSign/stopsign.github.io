@@ -1532,20 +1532,24 @@ button {
     position: absolute;
     top: 0;
     bottom: 0;
-    width: calc(50% - 4px);
     z-index: 3;
+    overflow-x: hidden;
     overflow-y: auto;
+    box-sizing: border-box;
+    max-width: 100%;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.45);
 }
 
 .skills-library-info-overlay--right {
+    left: calc(50% + 4px);
     right: 0;
-    left: auto;
+    width: auto;
 }
 
 .skills-library-info-overlay--left {
     left: 0;
-    right: auto;
+    right: calc(50% + 4px);
+    width: auto;
 }
 
 .skill-library-talent-row {

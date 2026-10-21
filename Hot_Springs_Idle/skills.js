@@ -1716,7 +1716,10 @@ let skills = {
         return skills.UNEQUIP_CHARGE_MS;
     },
 
+    DEFAULT_UNEQUIP_CHARGES_MAX: 5,
+
     getDefaultSkillEquip: function() {
+        const max = skills.DEFAULT_UNEQUIP_CHARGES_MAX;
         return {
             slots: {
                 offense: [null],
@@ -1724,8 +1727,8 @@ let skills = {
                 utility: [null],
                 any: [null]
             },
-            unequipCharges: 1,
-            unequipChargesMax: 1,
+            unequipCharges: max,
+            unequipChargesMax: max,
             unequipChargeReadyAt: 0
         };
     },
@@ -1747,8 +1750,15 @@ let skills = {
                 eq.slots[col] = [null];
             }
         }
-        if (eq.unequipChargesMax === undefined || eq.unequipChargesMax === null || eq.unequipChargesMax < 1) {
-            eq.unequipChargesMax = 1;
+        const defaultMax = skills.DEFAULT_UNEQUIP_CHARGES_MAX;
+        if (eq.unequipChargesMax === undefined || eq.unequipChargesMax === null || eq.unequipChargesMax < defaultMax) {
+            const prevMax = eq.unequipChargesMax || 0;
+            const wasFull = eq.unequipCharges !== undefined && eq.unequipCharges !== null && eq.unequipCharges >= prevMax;
+            eq.unequipChargesMax = defaultMax;
+            if (wasFull || eq.unequipCharges === undefined || eq.unequipCharges === null) {
+                eq.unequipCharges = defaultMax;
+                eq.unequipChargeReadyAt = 0;
+            }
         }
         if (eq.unequipCharges === undefined || eq.unequipCharges === null) {
             eq.unequipCharges = eq.unequipChargesMax;

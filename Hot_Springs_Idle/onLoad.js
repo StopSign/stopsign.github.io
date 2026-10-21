@@ -1,8 +1,6 @@
-// Applies a save blob to `data`, then runs saveVersion migrations for maps/skills.
+// Applies a save blob to `data`, then runs saveFix migrations after initialize.
 
 let onLoad = {
-    STAR_TYPES: ["bronze", "silver", "gold"],
-
     countUnlockedSkills: function(unlockedSkills) {
         let n = 0;
         const keys = Object.keys(unlockedSkills || {});
@@ -12,155 +10,6 @@ let onLoad = {
             }
         }
         return n;
-    },
-
-    applyResearchTaskRequired: function(lib) {
-        if (!lib) {
-            return;
-        }
-        const curveLen = Array.isArray(lib.researchCoinCosts) ? lib.researchCoinCosts.length : 0;
-        const prev = lib.researchTaskRequired || 0;
-        const progress = lib.researchTaskProgress || 0;
-        engine.syncScrollArchivesResearchCost(lib);
-        const next = lib.researchTaskRequired || 0;
-        if (curveLen <= 1 && prev > 0 && next > 0 && progress > 0 && prev !== next) {
-            lib.researchTaskProgress = progress * (next / prev);
-        }
-    },
-
-    returnSkillStarsToPool: function(skill) {
-        if (!skill || !skill.stars) {
-            return;
-        }
-        const pool = data.progress.stars;
-        for (let i = 0; i < onLoad.STAR_TYPES.length; i++) {
-            const t = onLoad.STAR_TYPES[i];
-            if (skill.stars[t]) {
-                skill.stars[t] = false;
-                pool[t] = (pool[t] || 0) + 1;
-            }
-        }
-    },
-
-    removeOneStarFromEconomy: function(starType) {
-        const pool = data.progress.stars;
-        if ((pool[starType] || 0) > 0) {
-            pool[starType]--;
-            return;
-        }
-        const sks = data.progress.skills || {};
-        const keys = Object.keys(sks);
-        for (let i = 0; i < keys.length; i++) {
-            const sk = sks[keys[i]];
-            if (sk && sk.stars && sk.stars[starType]) {
-                sk.stars[starType] = false;
-                return;
-            }
-        }
-    },
-
-    collectMapShardSkillKeys: function(mapDef) {
-        const out = {};
-        const zoneShards = mapDef.zoneShards || [];
-        for (let i = 0; i < zoneShards.length; i++) {
-            const sh = zoneShards[i];
-            if (sh && sh.key) {
-                out[sh.key] = true;
-            }
-        }
-        const zones = mapDef.zones || [];
-        for (let zi = 0; zi < zones.length; zi++) {
-            const sh = zones[zi].skillShard;
-            if (sh && sh.key) {
-                out[sh.key] = true;
-            }
-        }
-        return out;
-    },
-
-    wipeMapProgressForVersion: function(mapDef) {
-        const mapKey = mapDef.key;
-        const workers = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[mapKey]) || 0;
-        const stars = (data.progress.mapStars && data.progress.mapStars[mapKey]) || {};
-
-        if (data.progress.mapStars) {
-            delete data.progress.mapStars[mapKey];
-        }
-        if (data.progress.mapWorkersFound) {
-            delete data.progress.mapWorkersFound[mapKey];
-        }
-
-        if (!data.progress.kitsune) {
-            data.progress.kitsune = { total: 2 };
-        }
-        data.progress.kitsune.total = Math.max(0, (data.progress.kitsune.total || 0) - workers);
-
-        for (let i = 0; i < onLoad.STAR_TYPES.length; i++) {
-            const t = onLoad.STAR_TYPES[i];
-            if (stars[t]) {
-                onLoad.removeOneStarFromEconomy(t);
-            }
-        }
-
-        const shardKeys = onLoad.collectMapShardSkillKeys(mapDef);
-        const sks = data.progress.skills || {};
-        const keys = Object.keys(shardKeys);
-        for (let si = 0; si < keys.length; si++) {
-            const sk = sks[keys[si]];
-            if (sk) {
-                sk.shards = 0;
-            }
-        }
-    },
-
-    wipeSkillProgressForVersion: function(skillKey) {
-        const sk = data.progress.skills[skillKey];
-        onLoad.returnSkillStarsToPool(sk);
-        data.progress.skills[skillKey] = skills.createFreshSkillState(skillKey);
-    },
-
-    renameSkillKey: function(oldKey, newKey) {
-        if (!oldKey || !newKey || oldKey === newKey) {
-            return;
-        }
-        const sks = data.progress.skills || {};
-        if (sks[oldKey]) {
-            if (!sks[newKey]) {
-                sks[newKey] = sks[oldKey];
-                sks[newKey].key = newKey;
-                const def = skills._byKey[newKey];
-                if (def && def.name) {
-                    sks[newKey].name = def.name;
-                }
-            }
-            delete sks[oldKey];
-        }
-        const lib = data.progress.base && data.progress.base.scrollArchives;
-        if (lib && lib.unlockedSkills) {
-            if (lib.unlockedSkills[oldKey]) {
-                lib.unlockedSkills[newKey] = true;
-            }
-            delete lib.unlockedSkills[oldKey];
-        }
-        if (lib && lib.researchChoices) {
-            for (let i = 0; i < lib.researchChoices.length; i++) {
-                if (lib.researchChoices[i] === oldKey) {
-                    lib.researchChoices[i] = newKey;
-                }
-            }
-        }
-        if (lib && lib.selectedResearchChoice === oldKey) {
-            lib.selectedResearchChoice = newKey;
-        }
-        if (data.progress.selectedSkillDetailKey === oldKey) {
-            data.progress.selectedSkillDetailKey = newKey;
-        }
-        if (data.battle && data.battle.runSkillTalentStart && data.battle.runSkillTalentStart[oldKey] !== undefined) {
-            if (data.battle.runSkillTalentStart[newKey] === undefined) {
-                data.battle.runSkillTalentStart[newKey] = data.battle.runSkillTalentStart[oldKey];
-            }
-            delete data.battle.runSkillTalentStart[oldKey];
-        }
     },
 
     removeUnknownSkillStates: function() {
@@ -175,7 +24,7 @@ let onLoad = {
             if (skills._byKey[k]) {
                 continue;
             }
-            onLoad.returnSkillStarsToPool(sks[k]);
+            skills.returnSkillStarsToPool(sks[k]);
             delete sks[k];
             if (lib && lib.unlockedSkills) {
                 delete lib.unlockedSkills[k];
@@ -188,8 +37,14 @@ let onLoad = {
             if (lib && lib.selectedResearchChoice === k) {
                 lib.selectedResearchChoice = null;
             }
+            if (data.progress.selectedEquippedSkillKey === k) {
+                data.progress.selectedEquippedSkillKey = "";
+            }
+            if (data.progress.selectedLibrarySkillKey === k) {
+                data.progress.selectedLibrarySkillKey = "";
+            }
             if (data.progress.selectedSkillDetailKey === k) {
-                data.progress.selectedSkillDetailKey = null;
+                data.progress.selectedSkillDetailKey = "";
             }
             if (data.battle && data.battle.runSkillTalentStart) {
                 delete data.battle.runSkillTalentStart[k];
@@ -228,97 +83,27 @@ let onLoad = {
         if (tab === "combat" || tab === "foraging" || tab === "class" || tab === "resort" || !tab) {
             data.progress.selectedSkillsTab = "equipped";
         }
+        if (typeof data.progress.selectedEquippedSkillKey !== "string") {
+            data.progress.selectedEquippedSkillKey = "";
+        }
+        if (typeof data.progress.selectedLibrarySkillKey !== "string") {
+            data.progress.selectedLibrarySkillKey = "";
+        }
+        // Migrate legacy shared selection into the two independent keys once.
+        if (typeof data.progress.selectedSkillDetailKey === "string" && data.progress.selectedSkillDetailKey) {
+            const legacy = data.progress.selectedSkillDetailKey;
+            if (!data.progress.selectedEquippedSkillKey && skills.isSkillEquipped(legacy)) {
+                data.progress.selectedEquippedSkillKey = legacy;
+            }
+            if (!data.progress.selectedLibrarySkillKey && skills.getLibrarySkillKeys().indexOf(legacy) >= 0) {
+                data.progress.selectedLibrarySkillKey = legacy;
+            }
+            data.progress.selectedSkillDetailKey = "";
+        }
+        delete data.progress.selectedSkillDetailKey;
         skills.ensureSkillEquip();
         // Existing saves start with empty slots (do not auto-equip).
         skills.tickUnequipCharges(Date.now());
-    },
-
-    applySaveVersionMigrations: function(loadedSaveVersion) {
-        onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
-        onLoad.ensureAllSkillStates();
-        if (data.battle) {
-            if (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null) {
-                data.battle.applyTearDropsAccMs = data.battle.fakeTearDropsSecondAccMs || 0;
-            }
-            delete data.battle.fakeTearDropsSecondAccMs;
-        }
-        data.progress.mapDefinitions = mapData.getDefaultMaps();
-        const maps = data.progress.mapDefinitions;
-        for (let mi = 0; mi < maps.length; mi++) {
-            const map = maps[mi];
-            const mapVer = map.version !== undefined ? map.version : 0;
-            if (loadedSaveVersion < mapVer) {
-                onLoad.wipeMapProgressForVersion(map);
-            }
-        }
-
-        const lib = data.progress.base.scrollArchives;
-        let wipedUnlockedCount = 0;
-        for (let si = 0; si < skills.keysInOrder.length; si++) {
-            const skillKey = skills.keysInOrder[si];
-            const def = skills._byKey[skillKey];
-            const skillVer = def && def.version !== undefined ? def.version : 0;
-            if (loadedSaveVersion >= skillVer) {
-                continue;
-            }
-            const wasUnlocked = !!(lib.unlockedSkills && lib.unlockedSkills[skillKey]);
-            onLoad.wipeSkillProgressForVersion(skillKey);
-            if (wasUnlocked) {
-                delete lib.unlockedSkills[skillKey];
-                wipedUnlockedCount++;
-            }
-        }
-
-        if (wipedUnlockedCount > 0) {
-            lib.researchesToChoose = (lib.researchesToChoose || 0) + wipedUnlockedCount;
-            lib.researchChoices = [];
-            lib.selectedResearchChoice = "";
-        }
-        onLoad.applyResearchTaskRequired(lib);
-
-        if ((lib.researchesToChoose || 0) > 0 && (!lib.researchChoices || !lib.researchChoices.length)) {
-            engine.rollScrollArchivesResearchChoices();
-        }
-        onLoad.syncKitsuneTotalFromRescues();
-        onLoad.migrateMissingWaterSpirits();
-    },
-
-    /** Restore water spirits when purchase/wishing-well counters are ahead of the spirits array. */
-    migrateMissingWaterSpirits: function() {
-        const hs = data.progress.base.hiddenSpring;
-        const cistern = data.progress.base.cistern;
-        const expected = (hs.waterSpiritsBought || 0) + (cistern.wishingWellBought || 0);
-        let actual = 0;
-        for (let i = 0; i < hs.spirits.length; i++) {
-            if (hs.spirits[i].kind === "water") {
-                actual++;
-            }
-        }
-        while (actual < expected) {
-            if (!engine.assembleWaterSpiritFromWishingWell()) {
-                break;
-            }
-            actual++;
-        }
-    },
-
-    /** Rescues used to update the map counter without adding workers. Raise the pool to match. */
-    syncKitsuneTotalFromRescues: function() {
-        if (!data.progress.kitsune) {
-            data.progress.kitsune = { total: 2 };
-        }
-        const found = data.progress.mapWorkersFound || {};
-        const foundKeys = Object.keys(found);
-        let rescued = 0;
-        for (let i = 0; i < foundKeys.length; i++) {
-            rescued += found[foundKeys[i]] || 0;
-        }
-        const torii = data.progress.base && data.progress.base.torii;
-        const calls = (torii && torii.callForAllyBought) || 0;
-        const expected = 2 + calls + rescued;
-        if ((data.progress.kitsune.total || 0) < expected) {
-            data.progress.kitsune.total = expected;
-        }
     },
 
     handleLoad: function(data, toLoad) {
@@ -368,12 +153,6 @@ let onLoad = {
         if (typeof toasts !== "undefined" && toasts.ensureStates) {
             toasts.ensureStates();
         }
-        onLoad.renameSkillKey("fakeTearDrops", "applyTearDrops");
-        onLoad.ensureAllSkillStates();
-        if (data.battle && (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null)) {
-            data.battle.applyTearDropsAccMs = data.battle.fakeTearDropsSecondAccMs || 0;
-            delete data.battle.fakeTearDropsSecondAccMs;
-        }
 
         initialize.useStableSeeds = true;
         initialize.initializeBaseContentNotify();
@@ -397,7 +176,7 @@ let onLoad = {
         initialize.initializeMine();
         initialize.initializePathSegments();
 
-        onLoad.applySaveVersionMigrations(loadedSaveVersion);
+        saveFix.runAfterInitialize(loadedSaveVersion);
         initialize.useStableSeeds = false;
         data.saveVersion = CODE_SAVE_VERSION;
 
