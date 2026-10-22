@@ -659,17 +659,6 @@ function statistics() {
     return list;
 }
 
-function benchmark(code, iterations) {
-    // supposed to kinda account for the cost of just running the eval
-    const baseCost = iterations / 20;
-    const before = Date.now();
-    for (let i = 0; i < iterations; i++) {
-        // eslint-disable-next-line no-eval
-        eval(code);
-    }
-    const after = Date.now();
-    return `Total cost: ${after - before - baseCost}ms\n Cost per iteration: ~${(after - before - baseCost) / iterations}ms`;
-}
 
 // make a lazy getter for an object (most useful for prototypes), which executes the
 // provided function once upon first attempting to get the property, and in the future has

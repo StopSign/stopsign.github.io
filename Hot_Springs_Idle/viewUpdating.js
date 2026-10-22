@@ -129,22 +129,12 @@ let view = {
         view.updateGlobals();
         view.updateCompactLayout();
     },
-    formatWaveShardInfoLine: function(sh) {
-        if (!sh || !sh.key) {
-            return "";
-        }
-        const tierMult = mapData.getShardLootTierMultiplier(data.battle.mapTier || 0);
-        return mapData.formatShardInfoLine(sh, tierMult, engine.getShardLootChanceMultiplier());
-    },
     updateWaveInfoPanel: function(runClock, growthUnlocked) {
         if (!viewData.cached.waveInfo || viewData.cached.waveInfo.dataset.waveInfoBuilt !== "1") {
             createView.createWaveInfoStructure();
             createView.queueCache("waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones");
             for (let wzi = 0; wzi < createView.waveInfoZoneSlotCount; wzi++) {
                 createView.queueCache(`waveInfoZone_${wzi}`);
-            }
-            for (let wsi = 0; wsi < createView.waveInfoZoneShardSlotCount; wsi++) {
-                createView.queueCache(`waveInfoZoneShard_${wsi}`);
             }
             createView.clearCacheQueue();
         }
@@ -180,23 +170,14 @@ let view = {
             view.updateVal("waveInfoTransition", "none", "style.display");
         }
         const mapDef = (data.battle.mode || "combat") === "combat" ? initialize.getCurrentMapDefinition() : null;
-        const zoneShards = (mapDef && mapDef.zoneShards) || [];
-        const shardSlotCount = createView.waveInfoZoneShardSlotCount;
-        let anyZoneShard = false;
-        const collectShardsLevel = (data.progress.base && data.progress.base.scrollArchives
-            && data.progress.base.scrollArchives.collectShardsLevel) || 0;
-        const showZoneShards = collectShardsLevel >= 1;
-        for (let si = 0; si < shardSlotCount; si++) {
-            const sh = zoneShards[si];
-            if (!showZoneShards || !sh) {
-                view.updateVal(`waveInfoZoneShard_${si}`, "none", "style.display");
-                continue;
-            }
-            anyZoneShard = true;
-            view.updateVal(`waveInfoZoneShard_${si}`, "", "style.display");
-            view.updateVal(`waveInfoZoneShard_${si}`, view.formatWaveShardInfoLine(sh));
+        const showZoneShards = engine.isShardLootUnlocked() && !!mapDef;
+        if (showZoneShards) {
+            const amt = mapData.getMapShardDropAmount(mapDef);
+            view.updateVal("waveInfoZoneShards", `Shard Drop Amount: ${round1(amt)}`);
+            view.updateVal("waveInfoZoneShards", "", "style.display");
+        } else {
+            view.updateVal("waveInfoZoneShards", "none", "style.display");
         }
-        view.updateVal("waveInfoZoneShards", anyZoneShard ? "" : "none", "style.display");
         const zones = data.battle.activeZones || [];
         const zoneSlotCount = createView.waveInfoZoneSlotCount;
         for (let i = 0; i < zoneSlotCount; i++) {
@@ -205,11 +186,11 @@ let view = {
                 view.updateVal(`waveInfoZone_${i}`, "none", "style.display");
                 continue;
             }
-            const rm = z.remainingSpawnMs !== undefined ? z.remainingSpawnMs : 0;
-            const spawnTail = rm > 25 ? ` | ${round1(rm / 1000)}s to spawn last` : "";
             const expInfo = growthUnlocked ? ` | exp ${round2(z.exp)}` : "";
-            const shardPart = z.shardInfo ? ` | ${z.shardInfo}` : "";
-            const line = `${z.name} | Difficulty x${round2(z.difficulty)} | coins ${round2(z.coins)}${expInfo} | ${intToStringRound(z.remainingEnemies)} left${spawnTail}${shardPart}`;
+            const shardPct = showZoneShards
+                ? ` | ${round1((z.shardDropChance || 0) * 100)}% shards`
+                : "";
+            const line = `${z.name} | Difficulty x${round2(z.difficulty)} | coins ${round2(z.coins)}${expInfo} | ${intToStringRound(z.remainingEnemies)} left${shardPct}`;
             view.updateVal(`waveInfoZone_${i}`, "", "style.display");
             view.updateVal(`waveInfoZone_${i}`, line, "innerHTML");
         }
@@ -445,6 +426,7 @@ let view = {
         view.updateSkillSubTabs();
         view.updateSkillEquipSlots();
         view.updateUnequipChargesText();
+        view.updateSkillsShardSlotProgress();
         const starPool = data.progress.stars;
         const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
         view.updateVal("combatStarsInventory", "", "style.display");
@@ -555,56 +537,64 @@ let view = {
         const statDiv = gc.conStrStatDivisor;
         const conMult = 1 + (conTotal / statDiv);
         const strMult = 1 + (strTotal / statDiv);
+        // Tip mirrors ((base + cards) × density + skill Aud) × Confidence
         const audBaseLines = [];
-        let audBaseSum = 0;
+        let densBaseSum = gc.baseAudInner + cardAud;
         audBaseLines.push(`Base Aud: +${gc.baseAudInner}`);
-        audBaseSum += gc.baseAudInner;
         if (cardAud) {
             audBaseLines.push(`Base Audacity: +${cardAud}`);
-            audBaseSum += cardAud;
         }
+        const denseAudUi = densBaseSum * densMult;
+        if (runDensity > 0) {
+            audBaseLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base Aud) → ${roundNearestDecimals(denseAudUi, 2)}`);
+        }
+        const skillAudLines = [];
+        let skillAudSum = 0;
         if (shamelessResearched) {
-            audBaseLines.push(`Shameless: +${fortInner}`);
-            audBaseSum += fortInner;
+            skillAudLines.push(`Shameless: +${fortInner}`);
+            skillAudSum += fortInner;
         }
         const corneredAmt = corneredResearched ? tenB : 0;
         if (corneredResearched) {
             const corneredCurrent = corneredAmt * 2;
-            audBaseLines.push(`Cornered Ego: +${corneredAmt} base, +${corneredCurrent} current`);
-            audBaseSum += corneredAmt + corneredCurrent;
+            skillAudLines.push(`Cornered Ego: +${corneredAmt} base, +${corneredCurrent} current`);
+            skillAudSum += corneredAmt + corneredCurrent;
         }
         let valAud = 0;
         if (skills.isSkillUnlocked("validation")) {
             valAud = engine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
             const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
-            audBaseLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`);
-            audBaseSum += valAud;
+            skillAudLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`);
+            skillAudSum += valAud;
         }
         let padAud = 0;
         if (skills.isSkillUnlocked("paddingResume")) {
             const padEffUi = skills.getSkillEffect("paddingResume");
             padAud = padEffUi.audBonus || 0;
-            audBaseLines.push(`Padding the Resume: +${padAud} (${padEffUi.audPerCharLevel || 0} per character level)`);
-            audBaseSum += padAud;
+            skillAudLines.push(`Padding the Resume: +${padAud} (${padEffUi.audPerCharLevel || 0} per character level)`);
+            skillAudSum += padAud;
         }
-        audBaseLines.push(`Total base: ${audBaseSum}`);
-        const shamelessAmt = shamelessResearched ? fortInner : 0;
-        const baseInner = (gc.baseAudInner + cardAud) * densMult + shamelessAmt + corneredAmt;
-        const multipliedAud = Math.ceil(baseInner * conMult) + Math.ceil((corneredAmt * 2) * conMult) + valAud + padAud;
-        const finalAud = Math.max(1, multipliedAud);
-        const audMultExtra = finalAud - audBaseSum;
-        const audEffective = audBaseSum > 0 ? finalAud / audBaseSum : 1;
+        const preConSum = denseAudUi + skillAudSum;
+        if (skillAudLines.length) {
+            skillAudLines.push(`Total from skills: ${skillAudSum}`);
+        }
+        audBaseLines.push(`After density + skills: ${roundNearestDecimals(preConSum, 2)}`);
+        const finalAud = Math.max(1, Math.ceil(preConSum * conMult));
+        const audMultExtra = finalAud - preConSum;
+        const audEffective = preConSum > 0 ? finalAud / preConSum : 1;
         const audMultLines = [];
-        if (runDensity > 0) {
-            audMultLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base Aud)`);
-        }
         if (growthUnlocked || conTotal > 0) {
             audMultLines.push(`Confidence: ×${roundNearestDecimals(conMult, 2)} (+${Math.round(conTotal * (100 / statDiv))}%)`);
         }
         const audExtraText = audMultExtra > 0 ? ` (+${audMultExtra} Aud)` : "";
         audMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(audEffective, 2)}${audExtraText}`);
-        const audTip = audBaseLines.join("<br>") + "<br><br>" + audMultLines.join("<br>");
+        const audTipParts = [audBaseLines.join("<br>")];
+        if (skillAudLines.length) {
+            audTipParts.push(skillAudLines.join("<br>"));
+        }
+        audTipParts.push(audMultLines.join("<br>"));
+        const audTip = audTipParts.join("<br><br>");
         view.updateVal("statsAudText", `${intToStringRound(p.maxAud)} Aud`);
         view.updateVal("statsAudTip", audTip, "innerHTML");
         const regenVal = p.regenPerSecond || 0;
@@ -769,14 +759,6 @@ let view = {
                 radioEl.disabled = !classAllowed || !unlocked;
             }
             view.updateVal(`mapActionCurrent_${map.key}`, onThisMap ? "" : "none", "style.display");
-            const shardLootMult = engine.getShardLootChanceMultiplier();
-            const shardSummary = shardLootMult > 0 ? mapData.getMapShardSummaryText(map, data.progress.skills, shardLootMult) : "";
-            if (shardSummary) {
-                view.updateVal(`mapShardSummary_${map.key}`, shardSummary, "textContent");
-                view.updateVal(`mapShardSummary_${map.key}`, "", "style.display");
-            } else {
-                view.updateVal(`mapShardSummary_${map.key}`, "none", "style.display");
-            }
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
             view.updateVal(`mapTime_${map.key}`, `${round1Fixed((map.totalDurationMs || 0) / 1000)}s`);
@@ -1286,13 +1268,21 @@ let view = {
         const lib = base.scrollArchives;
         this.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
         const researchRate = engine.getScrollArchivesResearchRate();
-        const literacyBought = engine.getLiteracyLessonsBought();
-        const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
+        const gainedRate = researchRate * engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
         const progress = lib.researchTaskProgress || 0;
         const required = lib.researchTaskRequired || 10;
         const remain = Math.max(0, required - progress);
         view.updateVal("scrollArchivesResearchProgressText", round1Fixed(progress));
         view.updateVal("scrollArchivesResearchRequiredText", round1Fixed(required));
+        const mapStars = engine.countAchievedMapStarsByType();
+        const costPct = round1Fixed(engine.getScrollArchivesBronzeResearchCostMult() * 100);
+        const speedPct = round1Fixed(engine.getScrollArchivesSilverResearchSpeedMult() * 100);
+        const gainPct = round1Fixed(engine.getScrollArchivesGoldResearchGainMult() * 100);
+        view.updateVal("scrollArchivesStarEffects_row",
+            `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>×${mapStars.bronze} cost ${costPct}% · `
+            + `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>×${mapStars.silver} speed ${speedPct}% · `
+            + `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>×${mapStars.gold} gain ${gainPct}%`,
+            "innerHTML");
         view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
         if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
             view.updateEtaText("scrollArchivesResearchEtaText", remain, gainedRate);
@@ -1309,7 +1299,6 @@ let view = {
             const colId = `scrollArchivesChoice_${ci}`;
             if (!skillKey) {
                 view.updateVal(colId, "none", "style.display");
-                view.updateVal(`scrollArchivesChoiceShard_${ci}`, "none", "style.display");
                 view.updateVal(`scrollArchivesChoiceTips_${ci}`, "none", "style.display");
                 view.updateVal(`scrollArchivesChoiceSlotCat_${ci}`, "none", "style.display");
                 const emptyCol = viewData.cached[colId];
@@ -1340,7 +1329,6 @@ let view = {
             }
             view.updateVal(`scrollArchivesChoiceType_${ci}`, sk ? sk.name : skillKey);
             view.updateVal(`scrollArchivesChoiceDesc_${ci}`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(skillKey)), "innerHTML");
-            view.updateVal(`scrollArchivesChoiceShard_${ci}`, engine.skillHasShardOnTravelableMap(skillKey) ? "" : "none", "style.display");
             const choiceTips = sk ? (sk.tips || 0) : 0;
             view.updateVal(`scrollArchivesChoiceTips_${ci}`, choiceTips > 0 ? "" : "none", "style.display");
             view.updateVal(`scrollArchivesChoiceTips_${ci}`, choiceTips > 0 ? `${choiceTips} tips` : "");
@@ -1369,6 +1357,9 @@ let view = {
             }
         }
         t.refreshOrderedPurchasables("scrollArchives", ["collectShards"], { hideMaxed: t.hideMaxed });
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("baseBuildingInfoScroll");
+        }
     },
 
     updateBasePanelAtelier: function(t) {
@@ -1469,8 +1460,7 @@ let view = {
             const lib = base.scrollArchives;
             const researcherCount = assigned + (okamiHere ? 1 : 0);
             const researchRate = engine.getScrollArchivesResearchRate();
-            const literacyBought = engine.getLiteracyLessonsBought();
-            const gainedRate = literacyBought > 0 ? researchRate * engine.getLiteracyResearchMultiplier() : researchRate;
+            const gainedRate = researchRate * engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
             const progress = lib.researchTaskProgress || 0;
             const taskRequired = lib.researchTaskRequired || 10;
             const remain = Math.max(0, taskRequired - progress);
@@ -2068,7 +2058,8 @@ let view = {
             const dens = typeof bonfire !== "undefined" && bonfire.getCloneDensity
                 ? bonfire.getCloneDensity() : (bfOrb.cloneDensity || 0);
             const totalBonus = bonusBase + dens;
-            view.updateVal("orbBaseManaCloneBonusText", `(+${bonusBase} + ${dens} = ${totalBonus} base mana per clone dispersal)`);
+            const bondTxt = bfOrb.bondGrowthUnlocked ? ", +10% per 10s alive" : "";
+            view.updateVal("orbBaseManaCloneBonusText", `(+${bonusBase} + ${dens} = ${totalBonus} base mana per clone dispersal${bondTxt})`);
         } else {
             view.updateVal("orbBaseManaCloneBonusText", `(+${engine.getManaCapacityBonusPerCloneDispersal()} base mana per clone dispersal)`);
         }
@@ -2706,11 +2697,9 @@ let view = {
                 const key = offered[i];
                 view.updateVal(`noodleTipSkill_${i}`, key ? "" : "none", "style.display");
                 if (!key) {
-                    view.updateVal(`noodleTipSkill_${i}_shard`, "none", "style.display");
                     continue;
                 }
                 const skill = data.progress.skills && data.progress.skills[key];
-                view.updateVal(`noodleTipSkill_${i}_shard`, engine.skillHasShardOnTravelableMap(key) ? "" : "none", "style.display");
                 view.updateVal(`noodleTipSkill_${i}_name`, engine.getNoodleSkillDisplayName(key));
                 view.updateVal(`noodleTipSkill_${i}_desc`, skills.wrapBuffNamesInHtml(skills.getSkillShortDescription(key)), "innerHTML");
                 view.updateVal(`noodleTipSkill_${i}_tips`, `Talent: ${(skill && skill.talentLevel) || 0} | Tips: ${(skill && skill.tips) || 0}`);
@@ -4307,11 +4296,8 @@ let view = {
                 }).join(" | ");
                 html += `<div class="history-talent muted-text">Talent Levels: ${talentText}</div>`;
             }
-            const shardRows = run.shardRows || [];
-            if (shardRows.length > 0) {
-                html += `<div class="history-shards muted-text">Shards Gained: ${shardRows.join(" | ")}</div>`;
-            } else if ((run.shardsGained || 0) > 0) {
-                html += `<div class="history-shards muted-text">Shards Gained: ${intToStringRound(run.shardsGained)}</div>`;
+            if ((run.shardsGained || 0) > 0) {
+                html += `<div class="history-shards muted-text">Shards Gained: ${round1(run.shardsGained)}</div>`;
             }
             html += `</div>`;
         }
@@ -4352,7 +4338,7 @@ let view = {
     },
     getSortedLibrarySkillKeys: function() {
         const sortMode = data.progress.skillListSort;
-        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "shards"
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping"
             ? sortMode
             : "oldest";
         const unlocked = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.unlockedSkills) || {};
@@ -4395,12 +4381,6 @@ let view = {
                 if (ga !== gb) {
                     return ga - gb;
                 }
-            } else if (sort === "shards") {
-                const ha = (sa && sa.shards) || 0;
-                const hb = (sb && sb.shards) || 0;
-                if (hb !== ha) {
-                    return hb - ha;
-                }
             } else {
                 const ia = unlockIndex[a];
                 const ib = unlockIndex[b];
@@ -4429,6 +4409,21 @@ let view = {
         setTimeout(function() {
             el.classList.remove("skill-equip-fail-flash");
         }, 450);
+    },
+    updateSkillsShardSlotProgress: function() {
+        engine.ensureShardProgress();
+        const unlocked = engine.isShardLootUnlocked();
+        const cost = data.progress.nextSkillSlotShardCost || 50;
+        const have = data.progress.shards || 0;
+        if (!unlocked) {
+            view.updateVal("skillsShardSlotProgressLabel", "Research Collect Shards to unlock");
+            view.updateVal("skillsShardSlotProgressFill", "0%", "style.width");
+            return;
+        }
+        const shown = Math.floor(have);
+        const pct = cost > 0 ? Math.max(0, Math.min(100, (have / cost) * 100)) : 0;
+        view.updateVal("skillsShardSlotProgressLabel", `${shown}/${Math.floor(cost)} Shards until next Skill Slot`);
+        view.updateVal("skillsShardSlotProgressFill", `${pct}%`, "style.width");
     },
     updateUnequipChargesText: function() {
         const eq = skills.ensureSkillEquip();
@@ -4610,7 +4605,7 @@ let view = {
 // Temporary patch fragment — applied by script then deleted.
     applySkillListSortRadiosOnly: function() {
         const sortMode = data.progress.skillListSort;
-        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "shards"
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping"
             ? sortMode
             : "oldest";
         const map = {
@@ -4618,8 +4613,7 @@ let view = {
             talent: viewData.cached.skillSortTalent,
             alpha: viewData.cached.skillSortAlpha,
             tips: viewData.cached.skillSortTips,
-            grouping: viewData.cached.skillSortGrouping,
-            shards: viewData.cached.skillSortShards
+            grouping: viewData.cached.skillSortGrouping
         };
         const keys = Object.keys(map);
         for (let i = 0; i < keys.length; i++) {
@@ -4737,7 +4731,6 @@ let view = {
         const baseTalentExp = def && def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
         view.updateVal("skillInfo_base_exp", `Base Skill Exp: ${baseSkillExp}, Base Talent Exp: ${baseTalentExp}`);
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
-        view.updateVal("skillInfo_initial_exp_shards", `Initial exp from shards: ${intToStringRound(skill.shards || 0)}`);
         view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}`);
         view.updateVal("skillInfo_exp_text", `${round1Fixed(skill.exp)} / ${round1Fixed(skill.expToLevel)}`);
         view.updateVal("skillInfo_exp_fill", `${expPct}%`, "style.width");

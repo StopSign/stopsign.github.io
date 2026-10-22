@@ -253,7 +253,7 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     setSkillListSort: function(mode) {
-        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha" && mode !== "tips" && mode !== "grouping" && mode !== "shards") {
+        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha" && mode !== "tips" && mode !== "grouping") {
             return;
         }
         data.progress.skillListSort = mode;

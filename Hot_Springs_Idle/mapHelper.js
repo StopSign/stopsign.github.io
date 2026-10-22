@@ -192,7 +192,7 @@ let mapHelper = {
             seed: 1,
             baseDifficulty: 1,
             zones: [zone],
-            zoneShards: []
+            shardDropAmount: 1
         });
         document.getElementById("mhMapSelect").value = "";
         mapHelper.scrubMs = 0;
@@ -368,7 +368,6 @@ let mapHelper = {
                 coinsPer: cr.perIntruderGain,
                 waveCoins: waveCoins,
                 distancePx: spacingPx,
-                skillShard: z.skillShard || null,
                 totalEnemies: z.totalEnemies,
                 difficulty: z.difficulty,
                 trade: z.audDamageTradeRatio,
@@ -496,11 +495,8 @@ let mapHelper = {
             const z = mapHelper.workingMap.zones[i];
             const color = mapHelper.WAVE_COLORS[i % mapHelper.WAVE_COLORS.length];
             const active = t >= w.startMs && t <= w.lastMs;
-            const shard = z.skillShard && z.skillShard.key
-                ? `<span class="mh-shard-tag" title="${mapHelper.esc(z.skillShard.key)}">shard</span>`
-                : "";
             html += `<tr data-zone-index="${i}" class="${active ? "mh-row-active" : ""}">`;
-            html += `<td><span class="mh-wave-swatch" style="background:${color}"></span>${mapHelper.esc(w.name)}${shard}</td>`;
+            html += `<td><span class="mh-wave-swatch" style="background:${color}"></span>${mapHelper.esc(w.name)}</td>`;
             html += `<td><input type="number" min="1" step="1" data-field="totalEnemies" value="${mapHelper.esc(z.totalEnemies)}"></td>`;
             html += `<td><select data-field="intruderType">`;
             html += `<option value="scoundrel"${z.intruderType === "lecher" ? "" : " selected"}>scoundrel</option>`;
@@ -825,18 +821,8 @@ let mapHelper = {
             }
         }
         lines.push("    ],");
-        const shards = m.zoneShards || [];
-        if (shards.length) {
-            lines.push("    zoneShards: [");
-            for (let i = 0; i < shards.length; i++) {
-                const comma = i < shards.length - 1 ? "," : "";
-                lines.push("        " + mapHelper.formatSkillShard(shards[i]) + comma);
-            }
-            lines.push("    ],");
-        }
-        if (lines[lines.length - 1].endsWith(",")) {
-            lines[lines.length - 1] = lines[lines.length - 1].replace(/,$/, "");
-        }
+        const dropAmt = m.shardDropAmount !== undefined ? m.shardDropAmount : 1;
+        lines.push("    shardDropAmount: " + mapHelper.fmtExportNum(dropAmt));
         lines.push("})");
         return lines.join("\n");
     },
@@ -851,18 +837,7 @@ let mapHelper = {
             mapHelper.fmtExportNum(z.audDamageTradeRatio !== undefined ? z.audDamageTradeRatio : 1),
             mapHelper.fmtExportNum(z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1)
         ];
-        const shard = z.skillShard ? mapHelper.formatSkillShard(z.skillShard) : "";
-        if (shard) {
-            return `mapData.createZone(${args.join(", ")},\n    ${shard})`;
-        }
         return `mapData.createZone(${args.join(", ")})`;
-    },
-
-    formatSkillShard: function(sh) {
-        if (!sh || !sh.key) {
-            return "";
-        }
-        return `{ key: ${JSON.stringify(sh.key)}, gain: ${mapHelper.fmtExportNum(sh.gain)}, chance: ${mapHelper.fmtExportNum(sh.chance)}, cap: ${mapHelper.fmtExportNum(sh.cap)} }`;
     },
 
     copyExport: function() {

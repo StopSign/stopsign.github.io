@@ -510,12 +510,15 @@ let initials = {
             skillListSort: "oldest",
             selectedEquippedSkillKey: "",
             selectedLibrarySkillKey: "",
+            shards: 0,
+            nextSkillSlotShardCost: 50,
+            skillSlotUnlockIndex: 0,
             skillEquip: {
                 slots: {
                     offense: [null],
                     defense: [null],
                     utility: [null],
-                    any: [null]
+                    any: []
                 },
                 unequipCharges: 5,
                 unequipChargesMax: 5,
@@ -577,7 +580,6 @@ let initials = {
             completionBonusCoins: 0,
             pendingOkamiExp: 0,
             runShardsGained: 0,
-            runShardBySkill: {},
             runStarCleared: null,
             bonfireModifiers: {},
             cloneDensity: 0,
@@ -1548,8 +1550,6 @@ let initialize = {
         data.battle.endRunAfterCountdown = false;
         data.battle.mode = "combat";
         data.battle.state = data.progress && data.progress.battleUnlocked ? "running" : "idle";
-        engine.initZoneShardRunCounts();
-        engine.applySkillShardExpOnBattleStart();
         data.battle.cloneAttributePlan = engine.copyAttributePlan(data.progress.attributePlan);
         initialize.applyPlanForCurrentLevel();
         initialize.calcPlayerStats(true);
@@ -1670,13 +1670,13 @@ let initialize = {
             ? shrineCards.getAggregatedEffects() : {};
         const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0)) * densMult;
         const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0)) * densMult;
-        const baseInner = denseAud + fortLvl + tenInner;
         const conMult = 1 + totalCon / div;
-        const tenacityAudExtra = Math.ceil((2 * tenInner) * conMult);
-        let maxAud = Math.max(1, Math.ceil(baseInner * conMult) + tenacityAudExtra);
-        maxAud += engine.getValidationAudFromKills();
+        const validationAud = engine.getValidationAudFromKills();
         const padEff = skills.getSkillEffect("paddingResume");
-        maxAud += padEff.audBonus || 0;
+        const paddingAud = padEff.audBonus || 0;
+        // ((base + cards) × density + skill Aud) × Confidence
+        const skillAud = fortLvl + tenInner + (2 * tenInner) + validationAud + paddingAud;
+        const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult));
         data.battle.player.maxAud = maxAud;
         if (fullHeal) {
             data.battle.player.aud = data.battle.player.maxAud;

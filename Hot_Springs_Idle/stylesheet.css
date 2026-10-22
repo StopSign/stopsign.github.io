@@ -1369,6 +1369,28 @@ button {
 .skills-slot-column--utility .skills-slot-column-title { color: #7EB6FF; }
 .skills-slot-column--any .skills-slot-column-title { color: #A78BFA; }
 
+.skills-shard-slot-progress-wrap {
+    margin: 0 0 10px 0;
+}
+.skills-shard-slot-progress-track {
+    height: 10px;
+    border-radius: 4px;
+    background: rgba(167, 139, 250, 0.18);
+    overflow: hidden;
+    border: 1px solid rgba(167, 139, 250, 0.35);
+}
+.skills-shard-slot-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #A78BFA;
+    border-radius: 3px;
+    transition: width 0.15s ease-out;
+}
+.skills-shard-slot-progress-label {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
 .skill-equip-slot {
     border: 1px solid var(--border-color);
     border-radius: 4px;

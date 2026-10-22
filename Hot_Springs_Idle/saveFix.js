@@ -8,7 +8,7 @@
 // Then bump CODE_SAVE_VERSION to N+1 so the next save stamps past N.
 // Prefer saveVersion gates over permanent progress flags for new fixups.
 
-const CODE_SAVE_VERSION = 1;
+const CODE_SAVE_VERSION = 2;
 
 let saveFix = {
     STAR_TYPES: ["bronze", "silver", "gold"],
@@ -26,6 +26,85 @@ let saveFix = {
         saveFix.applySaveVersionMigrations(loadedSaveVersion);
         if (loadedSaveVersion === 0) {
             saveFix.applyVersion0Fixes();
+        }
+        if (loadedSaveVersion < 2) {
+            saveFix.migrateGlobalShardsRework();
+        }
+    },
+
+    /**
+     * Pool per-skill shards into global currency, fix default Any slot, apply slot unlocks,
+     * and recompute Scroll Archives research cost under the new formula.
+     */
+    migrateGlobalShardsRework: function() {
+        engine.ensureShardProgress();
+        skills.ensureSkillEquip();
+        const eq = data.progress.skillEquip;
+        if (eq && eq.slots) {
+            if (!Array.isArray(eq.slots.any)) {
+                eq.slots.any = [];
+            }
+            // Remove default empty Any slot(s) from the old 4-slot layout.
+            const keptAny = [];
+            for (let ai = 0; ai < eq.slots.any.length; ai++) {
+                if (eq.slots.any[ai]) {
+                    keptAny.push(eq.slots.any[ai]);
+                }
+            }
+            eq.slots.any = keptAny;
+            // Typed columns keep at least one slot.
+            const typed = ["offense", "defense", "utility"];
+            for (let ti = 0; ti < typed.length; ti++) {
+                const col = typed[ti];
+                if (!Array.isArray(eq.slots[col]) || eq.slots[col].length < 1) {
+                    eq.slots[col] = [null];
+                }
+            }
+            // Existing Any slots count as already unlocked (cycle starts at Any).
+            data.progress.skillSlotUnlockIndex = Math.max(
+                data.progress.skillSlotUnlockIndex || 0,
+                eq.slots.any.length
+            );
+        }
+
+        let pooled = data.progress.shards || 0;
+        const sks = data.progress.skills || {};
+        const skillKeys = Object.keys(sks);
+        for (let i = 0; i < skillKeys.length; i++) {
+            const sk = sks[skillKeys[i]];
+            if (!sk) {
+                continue;
+            }
+            pooled += sk.shards || 0;
+            delete sk.shards;
+        }
+
+        const bank = data.currentGameState && data.currentGameState.offlineShardBank;
+        if (bank && typeof bank === "object") {
+            const bankKeys = Object.keys(bank);
+            for (let bi = 0; bi < bankKeys.length; bi++) {
+                pooled += bank[bankKeys[bi]] || 0;
+            }
+            data.currentGameState.offlineShardBank = 0;
+        } else if (typeof bank === "number") {
+            pooled += bank;
+            data.currentGameState.offlineShardBank = 0;
+        }
+
+        data.progress.shards = pooled;
+        if (!data.progress.nextSkillSlotShardCost || data.progress.nextSkillSlotShardCost < 1) {
+            data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
+        }
+        engine.processShardSkillSlotUnlocks();
+
+        if (data.progress.skillListSort === "shards") {
+            data.progress.skillListSort = "oldest";
+        }
+
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (lib) {
+            delete lib.researchCoinCosts;
+            engine.syncScrollArchivesResearchCost(lib);
         }
     },
 
@@ -121,15 +200,6 @@ let saveFix = {
             }
         }
 
-        const shardKeys = saveFix.collectMapShardSkillKeys(mapDef);
-        const sks = data.progress.skills || {};
-        const keys = Object.keys(shardKeys);
-        for (let si = 0; si < keys.length; si++) {
-            const sk = sks[keys[si]];
-            if (sk) {
-                sk.shards = 0;
-            }
-        }
     },
 
     wipeSkillProgressForVersion: function(skillKey) {

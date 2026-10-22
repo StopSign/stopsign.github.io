@@ -1,27 +1,8 @@
 let mapData = {
-    /**
-     * Normalize a shard drop def: `{ key, gain, chance, cap }`.
-     * Soft cap: each time it is reached, drop chance ÷5 and the next segment size ×2.
-     */
-    normalizeSkillShardDef: function(skillShard) {
-        if (!skillShard || !skillShard.key) {
-            return null;
-        }
-        return {
-            key: skillShard.key,
-            gain: Math.max(1, Math.floor(skillShard.gain !== undefined ? skillShard.gain : 1)),
-            chance: Math.max(0, Math.min(1, skillShard.chance !== undefined ? skillShard.chance : 0)),
-            cap: Math.max(1, Math.floor(skillShard.cap !== undefined ? skillShard.cap : 1))
-        };
-    },
-    /**
-     * @param {object} [skillShard] Optional single-type shard drop for this zone: `{ key, gain, chance, cap }`
-     *   (skill key must match `skills` definition keys). At most one shard type per zone.
-     */
-    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder, skillShard) {
+    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
         const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
-        const z = {
+        return {
             name: "",
             totalEnemies: safeEnemies,
             difficulty: difficulty || 1,
@@ -32,11 +13,6 @@ let mapData = {
             coinsPerIntruder: coinsPerIntruder !== undefined ? Math.max(0, coinsPerIntruder) : 1,
             audDamageTradeRatio: audDamageTradeRatio !== undefined ? Math.max(0.01, audDamageTradeRatio) : 1
         };
-        const normalized = mapData.normalizeSkillShardDef(skillShard);
-        if (normalized) {
-            z.skillShard = normalized;
-        }
-        return z;
     },
     createMap: function(config) {
         const zones = config.zones || [];
@@ -46,14 +22,9 @@ let mapData = {
             z.name = `Wave ${i + 1}`;
             totalDurationMs = Math.max(totalDurationMs, z.startTimeMs);
         }
-        const zoneShards = [];
-        const rawZoneShards = config.zoneShards || [];
-        for (let si = 0; si < rawZoneShards.length; si++) {
-            const n = mapData.normalizeSkillShardDef(rawZoneShards[si]);
-            if (n) {
-                zoneShards.push(n);
-            }
-        }
+        const shardDropAmount = config.shardDropAmount !== undefined
+            ? Math.max(0, config.shardDropAmount)
+            : 1;
         return {
             key: config.key,
             name: config.name,
@@ -63,7 +34,7 @@ let mapData = {
             requiredClassKey: config.requiredClassKey || "",
             unlocksAfterMapKey: config.unlocksAfterMapKey || "",
             zones: zones,
-            zoneShards: zoneShards,
+            shardDropAmount: shardDropAmount,
             totalDurationMs: totalDurationMs,
             version: config.version
         };

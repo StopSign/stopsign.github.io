@@ -30,6 +30,12 @@ let createView = {
      * Click opens a panel with htmlText; the next click anywhere closes it.
      * Optional x sets the CSS right offset in px (default 4).
      */
+    /**
+     * Click opens a panel with htmlText; the next click anywhere closes it.
+     * Optional x sets the CSS right offset in px (default 4).
+     * If htmlText is a function, it is called whenever the panel opens and when
+     * createView.refreshInfoButtonPanel(id) runs while open.
+     */
     createInfoButton: function(id, htmlText, x) {
         const el = document.getElementById(id);
         if (!el) {
@@ -47,6 +53,7 @@ let createView = {
         const wrap = document.createElement("div");
         wrap.className = "info-button-wrap";
         wrap.style.right = rightPx + "px";
+        wrap.dataset.infoButtonFor = id;
         const btn = document.createElement("button");
         btn.type = "button";
         btn.className = "info-button";
@@ -54,7 +61,12 @@ let createView = {
         btn.setAttribute("aria-label", "Info");
         const panel = document.createElement("div");
         panel.className = "info-button-panel";
-        panel.innerHTML = htmlText;
+        const resolveHtml = function() {
+            return typeof htmlText === "function" ? htmlText() : htmlText;
+        };
+        panel.innerHTML = resolveHtml();
+        wrap._infoResolveHtml = resolveHtml;
+        wrap._infoPanel = panel;
         const closePanel = function() {
             wrap.classList.remove("info-button-open");
             document.removeEventListener("click", onDocClick);
@@ -69,6 +81,7 @@ let createView = {
                 closePanel();
                 return;
             }
+            panel.innerHTML = resolveHtml();
             wrap.classList.add("info-button-open");
             // Next click anywhere closes; defer so this click does not.
             setTimeout(function() {
@@ -79,18 +92,58 @@ let createView = {
         wrap.appendChild(panel);
         el.appendChild(wrap);
     },
+    refreshInfoButtonPanel: function(id) {
+        const el = document.getElementById(id);
+        if (!el) {
+            return;
+        }
+        const wrap = el.querySelector(".info-button-wrap");
+        if (!wrap || !wrap.classList.contains("info-button-open") || !wrap._infoResolveHtml || !wrap._infoPanel) {
+            return;
+        }
+        wrap._infoPanel.innerHTML = wrap._infoResolveHtml();
+    },
+    getScrollArchivesInfoHtml: function() {
+        const stars = (typeof engine !== "undefined" && engine.countAchievedMapStarsByType)
+            ? engine.countAchievedMapStarsByType()
+            : { bronze: 0, silver: 0, gold: 0 };
+        const bronzeMult = (typeof engine !== "undefined" && engine.getScrollArchivesBronzeResearchCostMult)
+            ? engine.getScrollArchivesBronzeResearchCostMult() : 1;
+        const silverMult = (typeof engine !== "undefined" && engine.getScrollArchivesSilverResearchSpeedMult)
+            ? engine.getScrollArchivesSilverResearchSpeedMult() : 1;
+        const goldMult = (typeof engine !== "undefined" && engine.getScrollArchivesGoldResearchGainMult)
+            ? engine.getScrollArchivesGoldResearchGainMult() : 1;
+        const bronzeStar = `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>`;
+        const silverStar = `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>`;
+        const goldStar = `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>`;
+        return "<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices — select one and weave it with Finish Research to unlock that skill.</p>"
+            + `<p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>`
+            + `<p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>`
+            + `<p>Each ${goldStar} increases research gain by 10% (does not raise cost). Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>`;
+    },
     createInfoButtons: function() {
+        createView.createInfoButton(
+            "baseBuildingInfoScroll",
+            function() {
+                return createView.getScrollArchivesInfoHtml();
+            },
+            56
+        );
         createView.createInfoButton(
             "tabPane_skills",
             "<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</p>"
             + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot. The Equipped and Library slot columns stay in sync.</p>"
             + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a specific slot equips into that slot only if it is empty and compatible. Invalid drops do nothing.</p>"
             + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
-            + "<p><strong>Unequip:</strong> Costs one Unequip Skill Charge. Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept. Charges refill one every 30 minutes (including while offline).</p>"
+            + "<p><strong>Unequip:</strong> Costs one Unequip Skill Charge. Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept. Charges refill one every 60 minutes (including while offline).</p>"
+        );
+        createView.createInfoButton(
+            "tabPane_stats",
+            "<p><strong>Audacity order:</strong> (Base Aud + card Base Audacity) × Dense Clones, then + Aud from skills, then × Confidence.</p>"
+            + "<p><strong>Damage reduction order:</strong> (1) Clout absorbs raw incoming damage, (2) flat reduction (Armor, Insult Fatigue), (3) multiplier reductions from skills, buffs, and class.</p>"
         );
     },
     waveInfoZoneSlotCount: 12,
-    waveInfoZoneShardSlotCount: 8,
     createWaveInfoStructure: function() {
         const root = document.getElementById("waveInfo");
         if (!root || root.dataset.waveInfoBuilt === "1") {
@@ -100,11 +153,7 @@ let createView = {
         let h = "";
         h += `<div id="waveInfoTimeRow" class="wave-info-time-row"><span id="waveInfoStar" class="wave-info-star-inline skill-star-btn skill-star-bronze" title="Bronze cycle">☆</span><span id="waveInfoTimeLabel" class="wave-info-time-label">Time 0s</span></div>`;
         h += `<div id="waveInfoTransition" style="display:none"></div>`;
-        h += `<div id="waveInfoZoneShards">`;
-        for (let si = 0; si < createView.waveInfoZoneShardSlotCount; si++) {
-            h += `<div id="waveInfoZoneShard_${si}" class="wave-info-zone-shard" style="display:none"></div>`;
-        }
-        h += `</div>`;
+        h += `<div id="waveInfoZoneShards" class="wave-info-zone-shard" style="display:none">Shard Drop Amount: 0</div>`;
         h += `<div id="waveInfoZones">`;
         for (let zi = 0; zi < createView.waveInfoZoneSlotCount; zi++) {
             h += `<div id="waveInfoZone_${zi}" class="wave-info-zone-row" style="display:none"></div>`;
@@ -130,7 +179,6 @@ let createView = {
                             <span id="mapActionCurrent_${m.key}" class="travel-map-current-label muted-text" style="display:none">Current</span>
                         </div>
                     </div>
-                    <div id="mapShardSummary_${m.key}" class="travel-map-shards muted-text" style="display:none"></div>
                     <div class="travel-map-meta">
                         <div>Difficulty: <span id="mapDifficulty_${m.key}"></span></div>
                         <div># Waves: <span id="mapWaves_${m.key}"></span></div>
@@ -418,15 +466,15 @@ let createView = {
         };
         const scrollArchivesChoicesHtml = function() {
             let choiceCols = "";
-            const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards, and only start to drop when this research is woven. Each shard increases the base exp of the skill when creating a new clone.";
             for (let ci = 0; ci < 3; ci++) {
-                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceShard_${ci}" class="scroll-archives-choice-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="scroll-archives-choice-shard-img" draggable="false"><div class="showthis">${shardTip}</div></div><div id="scrollArchivesChoiceSlotCat_${ci}" class="scroll-archives-choice-slot-cat" style="display:none"></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><div id="scrollArchivesChoiceTips_${ci}" class="muted-text scroll-archives-choice-tips" style="display:none"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
+                choiceCols += `<div id="scrollArchivesChoice_${ci}" class="scroll-archives-choice-col" style="display:none"><div id="scrollArchivesChoiceSlotCat_${ci}" class="scroll-archives-choice-slot-cat" style="display:none"></div><div id="scrollArchivesChoiceType_${ci}" class="muted-text scroll-archives-choice-type"></div><div id="scrollArchivesChoiceDesc_${ci}" class="base-skill-short scroll-archives-choice-desc"></div><div id="scrollArchivesChoiceTips_${ci}" class="muted-text scroll-archives-choice-tips" style="display:none"></div><label class="scroll-archives-choice-select"><input type="radio" name="scrollArchivesResearchPick" id="scrollArchivesChoiceRadio_${ci}" onchange="events.selectScrollResearchChoice(${ci})"> Select</label></div>`;
             }
             return choiceCols;
         };
         const htmlScrollArchivesPanel = function() {
             return `
                 <div class="base-row">Research: <span id="scrollArchivesResearchProgressText">0</span> / <span id="scrollArchivesResearchRequiredText">10</span><span class="game-progress-sep">|</span>ETA: <span id="scrollArchivesResearchEtaText">—</span></div>
+                <div id="scrollArchivesStarEffects_row" class="base-row muted-text"></div>
                 <div id="scrollArchivesResearchPaused_row" class="base-row muted-text" style="display:none">Paused - need more coins, star beads, or mana</div>
                 <div class="base-row">Choose Research: <span id="scrollArchivesResearchesToChoose">0</span></div>
                 <div id="scrollArchivesChoicesWrap" style="display:none">
@@ -518,12 +566,11 @@ let createView = {
         };
         const htmlNoodleTipRows = function() {
             let h = "";
-            const shardTip = "This skill has a matching shard drop available within the unlocked maps. Shard drops require Collect Shards. Each shard increases the base exp of the skill when creating a new clone.";
             for (let ni = 0; ni < 5; ni++) {
                 h += `
                     <div id="noodleTipSkill_${ni}" class="noodle-tip-skill" style="display:none">
                         <div class="noodle-tip-skill-header">
-                            <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_shard" class="noodle-tip-skill-shard showthat" style="display:none"><img src="img/shard.svg" alt="" class="noodle-tip-skill-shard-img" draggable="false"><div class="showthis">${shardTip}</div></span><span id="noodleTipSkill_${ni}_name"></span></label>
+                            <label class="noodle-tip-skill-label"><input type="radio" name="noodleTipSkill" id="noodleTipSkill_${ni}_radio" onchange="events.selectNoodleTipSkill(this.value)"> <span id="noodleTipSkill_${ni}_name"></span></label>
                             <span id="noodleTipSkill_${ni}_tips" class="muted-text noodle-tip-skill-meta"></span>
                         </div>
                         <div id="noodleTipSkill_${ni}_desc" class="muted-text base-skill-short"></div>
@@ -1047,7 +1094,10 @@ let createView = {
         let html = `<div id="skillsSlots_${viewName}" class="skills-slot-columns${compact ? " skills-slot-columns--compact" : ""}">`;
         for (let c = 0; c < cols.length; c++) {
             const col = cols[c];
-            const count = ((data.progress.skillEquip && data.progress.skillEquip.slots && data.progress.skillEquip.slots[col]) || [null]).length;
+            const arr = data.progress.skillEquip && data.progress.skillEquip.slots
+                ? data.progress.skillEquip.slots[col]
+                : null;
+            const count = Array.isArray(arr) ? arr.length : (col === "any" ? 0 : 1);
             html += `<div class="skills-slot-column skills-slot-column--${col}" data-column="${col}">`;
             html += `<div class="skills-slot-column-title">${createView._skillSlotColumnLabel(col)}</div>`;
             for (let i = 0; i < count; i++) {
@@ -1057,6 +1107,33 @@ let createView = {
         }
         html += `</div>`;
         return html;
+    },
+    /** Append one new equip slot DOM for both Equipped and Library views after a shard unlock. */
+    appendSkillEquipSlot: function(column, index) {
+        const views = ["equipped", "library"];
+        for (let vi = 0; vi < views.length; vi++) {
+            const viewName = views[vi];
+            const compact = viewName === "library";
+            const host = document.querySelector(`#skillsSlots_${viewName} .skills-slot-column--${column}`);
+            if (!host) {
+                continue;
+            }
+            const tmp = document.createElement("div");
+            tmp.innerHTML = createView._buildSkillEquipSlotHtml(viewName, column, index, compact);
+            const slotEl = tmp.firstElementChild;
+            if (slotEl) {
+                host.appendChild(slotEl);
+                const idPrefix = `skillSlot_${viewName}_${column}_${index}`;
+                createView.queueCache(
+                    idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`,
+                    `${idPrefix}_stars`, `${idPrefix}_star_bronze`, `${idPrefix}_star_silver`, `${idPrefix}_star_gold`,
+                    `${idPrefix}_meta`, `${idPrefix}_exp_fill`, `${idPrefix}_talent_fill`, `${idPrefix}_talent`
+                );
+            }
+        }
+        if (typeof createView.clearCacheQueue === "function") {
+            createView.clearCacheQueue();
+        }
     },
     /** One-time on load: Equipped + Library skill panes. */
     createSkillElements: function() {
@@ -1080,7 +1157,6 @@ let createView = {
                 <div class="skill-trigger" id="skillInfo_trigger"></div>
                 <div class="skill-base-exp" id="skillInfo_base_exp"></div>
                 <div class="skill-exp-on-trigger" id="skillInfo_exp_on_trigger"></div>
-                <div class="skill-exp-on-trigger" id="skillInfo_initial_exp_shards"></div>
                 <div class="prog-label-row skill-exp-row">Skill exp: <span id="skillInfo_exp_text"></span> <span class="skill-exp-mults" id="skillInfo_exp_mults"></span></div>
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="skillInfo_exp_fill" class="prog-fill prog-fill-skill"></div></div>
                 <div class="prog-label-row">Talent: <span id="skillInfo_talent_text"></span></div>
@@ -1150,7 +1226,6 @@ let createView = {
                 <div class="skill-sort-row">
                     <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Sort by Tips</label>
                     <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Sort by Grouping</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortShards" value="shards" onchange="events.setSkillListSort('shards')"> Sort by Shards</label>
                 </div>
             </div>`;
 
@@ -1187,9 +1262,9 @@ let createView = {
             "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryResearchedTitle",
             "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColsScroll", "skillsLibraryColLeft", "skillsLibraryColRight",
             "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
-            "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortShards",
+            "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping",
             "skillInfoPanel", "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current",
-            "skillInfo_reward", "skillInfo_trigger", "skillInfo_base_exp", "skillInfo_exp_on_trigger", "skillInfo_initial_exp_shards",
+            "skillInfo_reward", "skillInfo_trigger", "skillInfo_base_exp", "skillInfo_exp_on_trigger",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
             "skillInfo_talent_text", "skillInfo_talent_fill",
             "skillInfo_star_effect_row", "skillInfo_star_effect",
@@ -1497,14 +1572,15 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats", "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
+            "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
         const maps = data.progress.mapDefinitions;
         for (let mi = 0; mi < maps.length; mi++) {
             const m = maps[mi];
             const mk = m.key;
-            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapShardSummary_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
+            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
         }
         for (let gi = 0; gi < 10; gi++) {
             createView.queueCache(`base_inn_guest_wrap_${gi}`, `base_inn_guest_name_${gi}`, `base_inn_guest_chat_${gi}`, `base_inn_guest_fill_${gi}`);
@@ -1530,7 +1606,7 @@ let createView = {
         );
         for (let nti = 0; nti < 5; nti++) {
             createView.queueCache(
-                `noodleTipSkill_${nti}`, `noodleTipSkill_${nti}_radio`, `noodleTipSkill_${nti}_shard`, `noodleTipSkill_${nti}_name`,
+                `noodleTipSkill_${nti}`, `noodleTipSkill_${nti}_radio`, `noodleTipSkill_${nti}_name`,
                 `noodleTipSkill_${nti}_desc`, `noodleTipSkill_${nti}_tips`
             );
         }
@@ -1651,11 +1727,8 @@ let createView = {
         for (let wzi = 0; wzi < createView.waveInfoZoneSlotCount; wzi++) {
             createView.queueCache(`waveInfoZone_${wzi}`);
         }
-        for (let wsi = 0; wsi < createView.waveInfoZoneShardSlotCount; wsi++) {
-            createView.queueCache(`waveInfoZoneShard_${wsi}`);
-        }
         for (let ci = 0; ci < 3; ci++) {
-            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceSlotCat_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceTips_${ci}`, `scrollArchivesChoiceRadio_${ci}`, `scrollArchivesChoiceShard_${ci}`);
+            createView.queueCache(`scrollArchivesChoice_${ci}`, `scrollArchivesChoiceSlotCat_${ci}`, `scrollArchivesChoiceType_${ci}`, `scrollArchivesChoiceDesc_${ci}`, `scrollArchivesChoiceTips_${ci}`, `scrollArchivesChoiceRadio_${ci}`);
         }
         createView.queueCache("base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn");
         for (let tui = 0; tui < resortData.getFoxDenUnlockOrder().length; tui++) {

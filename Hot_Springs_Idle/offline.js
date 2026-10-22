@@ -23,8 +23,12 @@ let offline = {
         if (data.currentGameState.pendingOfflineMs === undefined || data.currentGameState.pendingOfflineMs === null) {
             data.currentGameState.pendingOfflineMs = 0;
         }
-        if (!data.currentGameState.offlineShardBank || typeof data.currentGameState.offlineShardBank !== "object") {
-            data.currentGameState.offlineShardBank = {};
+        if (data.currentGameState.offlineShardBank === undefined || data.currentGameState.offlineShardBank === null
+            || typeof data.currentGameState.offlineShardBank === "object") {
+            // Migrate legacy per-skill bank object → numeric global bank (summed in saveFix).
+            data.currentGameState.offlineShardBank = typeof data.currentGameState.offlineShardBank === "number"
+                ? data.currentGameState.offlineShardBank
+                : 0;
         }
         if (data.currentGameState.bonusTime === undefined || data.currentGameState.bonusTime === null) {
             data.currentGameState.bonusTime = 0;
@@ -333,8 +337,7 @@ let offline = {
             skillsSnap[k] = {
                 expTotal: offline.skillExpLifetime(k, s),
                 talentTotal: offline.skillTalentLifetime(k, s),
-                talentLevel: s.talentLevel || 0,
-                shards: s.shards || 0
+                talentLevel: s.talentLevel || 0
             };
         }
         const base = data.progress.base || {};
@@ -344,6 +347,7 @@ let offline = {
             coins: data.progress.coins || 0,
             characterExp: offline.characterExpLifetime(data.battle && data.battle.levelState),
             skills: skillsSnap,
+            shards: data.progress.shards || 0,
             talentLevels: offline.totalTalentLevels(),
             okamiExp: (data.progress.okami && data.progress.okami.exp) || 0,
             kills: (data.battle && data.battle.enemiesKilled) || 0,
@@ -370,6 +374,7 @@ let offline = {
         g.starBeads += Math.max(0, (after.starBeads || 0) - (before.starBeads || 0));
         g.credit += Math.max(0, (after.credit || 0) - (before.credit || 0));
         g.spiritLevels += Math.max(0, (after.spiritLevels || 0) - (before.spiritLevels || 0));
+        // Shard gains are tracked via engine.grantShards while offline (slot unlocks consume progress.shards).
         const keys = Object.keys(after.skills || {});
         for (let i = 0; i < keys.length; i++) {
             const k = keys[i];
@@ -377,7 +382,6 @@ let offline = {
             const b = (before.skills && before.skills[k]) || {};
             g.skillExp += Math.max(0, (a.expTotal || 0) - (b.expTotal || 0));
             g.talentExp += Math.max(0, (a.talentTotal || 0) - (b.talentTotal || 0));
-            g.shards += Math.max(0, (a.shards || 0) - (b.shards || 0));
         }
     },
 
@@ -575,7 +579,7 @@ let offline = {
             data.progress.mana.amount = Math.max(0, (data.progress.mana.amount || 0) - manaSpend);
         }
         if (launches > 0 && data.progress.mana && typeof engine.getManaCapacityBonusPerCloneDispersal === "function") {
-            const per = engine.getManaCapacityBonusPerCloneDispersal();
+            const per = engine.getManaCapacityBonusPerCloneDispersal((rates.durationSec || 0) * 1000);
             const capGain = launches * per;
             data.progress.mana.capacityBonus = (data.progress.mana.capacityBonus || 0) + capGain;
             offline.gains.manaCapacity += capGain;
@@ -599,102 +603,61 @@ let offline = {
         g.coins = Math.max(0, (after.coins || 0) - (before.coins || 0));
         g.talentLevels = Math.max(0, (after.talentLevels || 0) - (before.talentLevels || 0));
         g.manaCapacity = Math.max(0, (after.manaCapacity || 0) - (before.manaCapacity || 0));
-        let shardGain = 0;
-        const keys = Object.keys(after.skills || {});
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            const a = after.skills[k] || {};
-            const b = (before.skills && before.skills[k]) || {};
-            shardGain += Math.max(0, (a.shards || 0) - (b.shards || 0));
-        }
-        g.shards = shardGain;
         // characterExp stays from tracked combat gains (levelState resets between runs).
+        // g.shards already accumulated via engine.grantShards during offline.
     },
 
-    /** Expected shard chance for one def at current found count. */
-    shardHitChance: function(sh) {
-        if (!sh || !sh.key || !skills._byKey[sh.key]) {
+    /** Average per-kill hit chance across all map enemies (for EV). */
+    averageKillShardChance: function(map) {
+        if (!map || !engine.isShardLootUnlocked()) {
             return 0;
         }
-        if (!skills.isSkillResearchComplete(sh.key)) {
-            return 0;
-        }
-        if (!engine.isShardLootUnlocked()) {
-            return 0;
-        }
-        const target = data.progress.skills[sh.key];
-        const found = target && target.shards !== undefined ? target.shards : 0;
-        const bank = offline.shardBank[sh.key] || 0;
-        const virtualFound = found + bank;
-        const baseCap = mapData.getSkillShardCap(sh);
-        const softChance = mapData.getShardSoftCapChance(sh.chance || 0, virtualFound, baseCap);
-        const tier = data.battle.mapTier || 0;
-        const chanceMult = tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
-        const lootMult = engine.getShardLootChanceMultiplier();
-        return Math.min(0.999, softChance * chanceMult * lootMult);
-    },
-
-    grantBankedShards: function(skillKey, amount) {
-        if (!amount || amount < 1) {
-            return;
-        }
-        const whole = Math.floor(amount);
-        if (whole < 1) {
-            return;
-        }
-        const target = data.progress.skills[skillKey];
-        if (!target) {
-            return;
-        }
-        target.shards = (target.shards || 0) + whole;
-        offline.gains.shards += whole;
-        offline.shardBank[skillKey] = (offline.shardBank[skillKey] || 0) - whole;
-        if (offline.shardBank[skillKey] < 0) {
-            offline.shardBank[skillKey] = 0;
-        }
-    },
-
-    addShardExpectation: function(skillKey, expected) {
-        if (!skillKey || expected <= 0) {
-            return;
-        }
-        offline.shardBank[skillKey] = (offline.shardBank[skillKey] || 0) + expected;
-        const banked = offline.shardBank[skillKey];
-        if (banked >= 1) {
-            offline.grantBankedShards(skillKey, banked);
-        }
-    },
-
-    /** Sequential first-hit EV matching trySkillShardDropOnKill order for map-wide shards. */
-    /** Sequential first-hit EV for one kill; `scale` multiplies added expectation (for fractional kills). */
-    applyExpectedShardsForOneKill: function(map, zoneShards, scale) {
-        const mult = scale === undefined ? 1 : scale;
-        if (mult <= 0) {
-            return;
-        }
-        let missP = 1;
         const zones = map.zones || [];
-        if (zones[0] && zones[0].skillShard) {
-            const sh = zones[0].skillShard;
-            const p = offline.shardHitChance(sh);
-            const hit = missP * p;
-            if (hit > 0 && sh.key) {
-                offline.addShardExpectation(sh.key, hit * Math.max(1, sh.gain || 1) * mult);
+        let totalEnemies = 0;
+        let weighted = 0;
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
+        const tier = data.battle.mapTier || 0;
+        for (let i = 0; i < zones.length; i++) {
+            const n = Math.max(0, zones[i].totalEnemies || 0);
+            if (n <= 0) {
+                continue;
             }
-            missP *= (1 - p);
+            const p = Math.min(1, mapData.getZoneShardDropChance(map, i, tier) + cardAdd);
+            weighted += p * n;
+            totalEnemies += n;
         }
-        for (let si = 0; si < zoneShards.length; si++) {
-            const sh = zoneShards[si];
-            const p = offline.shardHitChance(sh);
-            const hit = missP * p;
-            if (hit > 0 && sh.key) {
-                offline.addShardExpectation(sh.key, hit * Math.max(1, sh.gain || 1) * mult);
-            }
-            missP *= (1 - p);
-            if (missP < 1e-12) {
-                break;
-            }
+        if (totalEnemies <= 0) {
+            return 0;
         }
+        return weighted / totalEnemies;
+    },
+
+    addShardExpectation: function(expected) {
+        if (!(expected > 0)) {
+            return;
+        }
+        if (typeof offline.shardBank !== "number") {
+            offline.shardBank = 0;
+        }
+        offline.shardBank += expected;
+    },
+
+    /** EV shards for one kill × scale (fractional kills supported). */
+    applyExpectedShardsForOneKill: function(map, scale) {
+        const mult = scale === undefined ? 1 : scale;
+        if (mult <= 0 || !map) {
+            return;
+        }
+        const p = offline.averageKillShardChance(map);
+        if (p <= 0) {
+            return;
+        }
+        const amount = mapData.getMapShardDropAmount(map);
+        if (!(amount > 0)) {
+            return;
+        }
+        offline.addShardExpectation(p * amount * mult);
     },
 
     applyShardEvForKills: function(killCount) {
@@ -705,14 +668,13 @@ let offline = {
         if (!map) {
             return;
         }
-        const zoneShards = map.zoneShards || [];
         const whole = Math.floor(killCount);
         const frac = killCount - whole;
         for (let i = 0; i < whole; i++) {
-            offline.applyExpectedShardsForOneKill(map, zoneShards, 1);
+            offline.applyExpectedShardsForOneKill(map, 1);
         }
         if (frac > 0.001) {
-            offline.applyExpectedShardsForOneKill(map, zoneShards, frac);
+            offline.applyExpectedShardsForOneKill(map, frac);
         }
     },
 
@@ -824,7 +786,9 @@ let offline = {
 
         offline.gains = offline.emptyGains();
         offline.startSnap = offline.snapshotProgress();
-        offline.shardBank = Object.assign({}, data.currentGameState.offlineShardBank || {});
+        offline.shardBank = typeof data.currentGameState.offlineShardBank === "number"
+            ? data.currentGameState.offlineShardBank
+            : 0;
         offline.totalToProcessMs = Math.min(OFFLINE_CAP_MS, pending);
         offline.processedMs = 0;
         offline.wallStartMs = performance.now();
@@ -865,8 +829,13 @@ let offline = {
                 await offline.yieldToBrowser();
             }
 
-            // Persist fractional shard bank
-            data.currentGameState.offlineShardBank = offline.shardBank || {};
+            // Grant accumulated expected shards
+            const banked = typeof offline.shardBank === "number" ? offline.shardBank : 0;
+            if (banked > 0) {
+                engine.grantShards(banked);
+                offline.shardBank = 0;
+            }
+            data.currentGameState.offlineShardBank = 0;
             data.currentGameState.pendingOfflineMs = 0;
 
             offline.finalizeGainsFromStartSnap();

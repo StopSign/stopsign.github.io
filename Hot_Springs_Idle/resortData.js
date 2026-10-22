@@ -1160,12 +1160,13 @@ var resortData = {
                 denseClonesUnlocked: false,
                 cloneDensity: 0,
                 lingeringDensityUnlocked: false,
+                bondGrowthUnlocked: false,
                 tendTheFlameUnlocked: false,
                 applyLiveSettingsToNextClone: false,
                 startWithFullManaUnlocked: false,
                 startWithFullManaEnabled: false
             },
-            upgradesOrder: ["tendTheFlame", "autoRetry", "denseClones", "lingeringDensity", "growthBlessing", "plannedGrowthBlessing", "stokeFireSpirit", "startWithFullMana"],
+            upgradesOrder: ["tendTheFlame", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "plannedGrowthBlessing", "stokeFireSpirit", "startWithFullMana"],
             upgrades: {
                 tendTheFlame: {
                     key: "tend_the_flame",
@@ -1268,6 +1269,32 @@ var resortData = {
                         return !!data.progress.base.bonfire.lingeringDensityUnlocked;
                     },
                     soldOutButtonLabel: "Lingering"
+                },
+                bondGrowth: {
+                    key: "bond_growth",
+                    name: "Bond Growth",
+                    description: "When a clone disperses, base mana capacity gained gets +10% per 10 seconds the clone was alive. Applies to (10 + density).",
+                    cost: { mana: 40000, coins: 5000 },
+                    weavingTime: 360,
+                    canBuy: function() {
+                        const b = data.progress.base.bonfire;
+                        return !!(b && b.lingeringDensityUnlocked && !b.bondGrowthUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.bonfire.bondGrowthUnlocked = true;
+                    },
+                    extraInfo: function() {
+                        return "";
+                    },
+                    rowVisible: function() {
+                        const b = data.progress.base.bonfire;
+                        return !!(b && b.lingeringDensityUnlocked && !b.bondGrowthUnlocked)
+                            && engine.hasManaCapacityForCost(this.cost);
+                    },
+                    upgradeSoldOut: function() {
+                        return !!data.progress.base.bonfire.bondGrowthUnlocked;
+                    },
+                    soldOutButtonLabel: "Bonded"
                 },
                 growthBlessing: {
                     key: "growth",
@@ -2366,7 +2393,6 @@ var resortData = {
                 assignedWorkers: 0,
                 researchPerWorkerPerSecond: 1,
                 researchTaskRequired: 20,
-                researchCoinCosts: [20],
                 researchTaskProgress: 0,
                 researchPaused: false,
                 researchesToChoose: 0,
@@ -2397,7 +2423,7 @@ var resortData = {
                 collectShards: {
                     key: "collect_shards",
                     name: "Collect Shards",
-                    description: "Reveal shard loot info on travel maps. Each level doubles shard drop chance. Shards give default exp to created clones for their skill.",
+                    description: "Unlock shard drops from intruders. Each level multiplies shard drop amount by x1.5. Shards unlock extra skill slots.",
                     getCost: function() {
                         const n = data.progress.base.scrollArchives.collectShardsLevel || 0;
                         const mult = Math.pow(2, n);
@@ -2417,9 +2443,9 @@ var resortData = {
                     extraInfo: function() {
                         const lv = data.progress.base.scrollArchives.collectShardsLevel || 0;
                         if (lv <= 0) {
-                            return "Unlocks shard summary on maps";
+                            return "Unlocks shard drops and skill-slot progress";
                         }
-                        return `Shard loot chance: x${Math.pow(2, lv - 1)}`;
+                        return `Shard drop amount: x${round1(Math.pow(1.5, lv - 1))}`;
                     },
                     rowVisible: function() {
                         return !!(data.progress && data.progress.showBattle);

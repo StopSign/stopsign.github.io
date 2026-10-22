@@ -860,10 +860,12 @@ let engine = {
             const z = map.zones[i];
             const cr = mapData.computeZoneCombatAndRewards(map, i, tierMult);
             const lastSpawnT = mapData.getZoneLastSpawnTimeMs(z);
-            let shardInfo = "";
-            if (z.skillShard && skills._byKey[z.skillShard.key]) {
-                const shardTierMult = mapData.getShardLootTierMultiplier(data.battle.mapTier || 0);
-                shardInfo = mapData.formatShardInfoLine(z.skillShard, shardTierMult, engine.getShardLootChanceMultiplier());
+            let shardDropChance = 0;
+            if (engine.isShardLootUnlocked()) {
+                const baseChance = mapData.getZoneShardDropChance(map, i, data.battle.mapTier || 0);
+                const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+                    ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
+                shardDropChance = Math.min(1, baseChance + cardAdd);
             }
             zones.push({
                 index: i,
@@ -873,7 +875,7 @@ let engine = {
                 remainingEnemies: rem,
                 coins: engine.coinsAwardFromIntruderGain(cr.perIntruderGain),
                 exp: engine.expDisplayFromIntruderExpBase(cr.expBasePerIntruder),
-                shardInfo: shardInfo
+                shardDropChance: shardDropChance
             });
         }
         data.battle.activeZones = zones;
@@ -906,10 +908,19 @@ let engine = {
                 } else if ((intruder.intruderType || "scoundrel") === "scoundrel") {
                     engine.spawnWinkGfx(intruder);
                 }
+                // Order: (1) Clout on raw, (2) flat (Insult Fatigue + Armor), (3) multipliers
+                const rawIncoming = Math.max(0, intruder.attackDamage || 0);
+                const atOrBelowHalfBeforeHit = engine.isPlayerAtOrBelowAudFraction(0.5);
+                let incoming = engine.applyCloutToIncomingDamage(rawIncoming);
+                const cloutEntry = battleBuffs.getState().byKey.clout;
+                const cloutConsumed = cloutEntry ? (cloutEntry.lastNegation || 0) : 0;
+                incoming = engine.applyInsultFatigueFlat(intruder, incoming);
+                const armorEff = skills.getSkillEffect("toughness_condescend");
+                const armorFlat = (armorEff.armorFlat || 0) + (skills.getSkillEffect("thickSkin").armorFlat || 0);
+                incoming = Math.max(0, incoming - armorFlat);
                 const endEff = skills.getSkillEffect("aboveItAll");
                 const dmgMultiplier = endEff.incomingDamageMultiplier !== undefined ? endEff.incomingDamageMultiplier : 1;
-                let incoming = intruder.attackDamage * dmgMultiplier;
-                const atOrBelowHalfBeforeHit = engine.isPlayerAtOrBelowAudFraction(0.5);
+                incoming *= dmgMultiplier;
                 if (atOrBelowHalfBeforeHit) {
                     const sulEff = skills.getSkillEffect("stiffUpperLip");
                     const sulMult = sulEff.incomingDamageMultiplier;
@@ -917,10 +928,6 @@ let engine = {
                         incoming *= sulMult;
                     }
                 }
-                incoming = engine.applyInsultFatigueFlat(intruder, incoming);
-                const tEff = skills.getSkillEffect("toughness_condescend");
-                const armorFlat = (tEff.armorFlat || 0) + (skills.getSkillEffect("thickSkin").armorFlat || 0);
-                incoming = Math.max(0, incoming - armorFlat);
                 incoming *= bonfire.getCombatDamageMultiplier();
                 if ((data.progress.currentClassKey || "none") === "condescend" && (data.battle.classPowerB || 0) >= 1000) {
                     data.battle.classPowerB -= 1000;
@@ -932,7 +939,11 @@ let engine = {
                         engine.grantPlayerCurrentAudGain(secondWindHeal);
                     }
                 }
-                if (incoming > 0 && (data.progress.currentClassKey || "none") === "condescend" && intruder.intruderType !== "lecher") {
+                incoming = engine.applyIncomingDamageBeforeClout(incoming);
+                const audLost = Math.max(0, incoming);
+                const shownIncoming = cloutConsumed + audLost;
+                const damageApplied = shownIncoming > 0;
+                if (damageApplied && (data.progress.currentClassKey || "none") === "condescend" && intruder.intruderType !== "lecher") {
                     engine.addClassBarProgress("B", 200);
                     const thEff = skills.getSkillEffect("thorns");
                     const thorns = thEff.retaliationDamage || 0;
@@ -940,12 +951,9 @@ let engine = {
                         intruder.aud -= thorns;
                     }
                 }
-                const shownIncoming = engine.applyIncomingDamageBeforeClout(incoming);
-                incoming = engine.applyCloutToIncomingDamage(shownIncoming);
-                const damageApplied = incoming > 0;
                 const aboveHalfAudBeforeHit = engine.isPlayerAboveHalfAud();
                 engine.spawnPlayerHurtFloat(intruder, shownIncoming);
-                data.battle.player.aud -= incoming;
+                data.battle.player.aud -= audLost;
                 intruder.hasAttackedPlayer = true;
                 if (damageApplied) {
                     intruder.insultFatigueStacks = (intruder.insultFatigueStacks || 0) + 1;
@@ -1237,7 +1245,7 @@ let engine = {
                 `+${round1(expDisplay)} exp`
             ];
             if (shardDrop) {
-                parts.push(`+${shardDrop.gain} ${shardDrop.name}`);
+                parts.push(`+${round1(shardDrop.gain)} Shards`);
             }
             view.spawnKillRewardFloater(pos.x, pos.y, parts);
         }
@@ -1279,109 +1287,83 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
         return baseCoinsPart * greedMult * (1 + cardAdd);
     },
-    initZoneShardRunCounts: function() {
-        const map = initialize.getCurrentMapDefinition();
-        data.battle.zoneShardRunCounts = [];
-        if (!map || !map.zones) {
+    SKILL_SLOT_UNLOCK_CYCLE: ["any", "offense", "defense", "utility"],
+    DEFAULT_NEXT_SKILL_SLOT_SHARD_COST: 50,
+
+    ensureShardProgress: function() {
+        if (!data.progress) {
             return;
         }
-        for (let i = 0; i < map.zones.length; i++) {
-            data.battle.zoneShardRunCounts.push(0);
+        if (data.progress.shards === undefined || data.progress.shards === null) {
+            data.progress.shards = 0;
+        }
+        if (data.progress.nextSkillSlotShardCost === undefined || data.progress.nextSkillSlotShardCost === null
+            || data.progress.nextSkillSlotShardCost < 1) {
+            data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
+        }
+        if (data.progress.skillSlotUnlockIndex === undefined || data.progress.skillSlotUnlockIndex === null) {
+            data.progress.skillSlotUnlockIndex = 0;
         }
     },
-    /** Skill exp only (no talent); shard amount is a flat add, not multiplied. */
-    addSkillExpFromShardsOnly: function(skillKey, amount) {
-        if (!amount || amount <= 0) {
-            return;
-        }
-        if (!skills.isSkillUnlocked(skillKey)) {
-            return;
-        }
-        const d = skills._byKey[skillKey];
-        if (d && d.classKey && d.classKey !== (data.progress.currentClassKey || "none")) {
-            return;
-        }
-        const skill = data.progress.skills[skillKey];
-        if (!skill) {
-            return;
-        }
-        if (skill.maxLevel !== undefined && skill.level >= skill.maxLevel) {
-            return;
-        }
-        skill.exp += amount;
-        const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
-        while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
-            skill.exp -= skill.expToLevel;
-            skill.level++;
-            skill.expToLevel = initExp * Math.pow(1.3, skill.level);
-            engine.onSkillLevelUp(skill);
-        }
-    },
-    applySkillShardExpOnBattleStart: function() {
-        const sks = data.progress.skills;
-        if (!sks) {
-            return;
-        }
-        const keys = Object.keys(sks);
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            const sk = sks[k];
-            const n = sk && sk.shards !== undefined ? sk.shards : 0;
-            if (n <= 0) {
-                continue;
-            }
-            engine.addSkillExpFromShardsOnly(k, n);
-        }
-    },
-    getShardLootChanceMultiplier: function() {
+
+    /** Collect Shards level → amount multiplier (0 if locked). L1 = ×1, L2 = ×1.5, … */
+    getShardLootAmountMultiplier: function() {
         const lv = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.collectShardsLevel) || 0;
         if (lv <= 0) {
             return 0;
         }
-        return Math.pow(2, lv - 1);
+        return Math.pow(1.5, lv - 1);
+    },
+    /** @deprecated Use getShardLootAmountMultiplier; kept for call-site migration. */
+    getShardLootChanceMultiplier: function() {
+        return engine.getShardLootAmountMultiplier();
     },
     isShardLootUnlocked: function() {
-        return engine.getShardLootChanceMultiplier() > 0;
+        return engine.getShardLootAmountMultiplier() > 0;
     },
-    /** Soft-capped roll for one shard def; grants on hit. Returns floater payload or null. */
-    tryGrantSkillShardDrop: function(sh, zoneIndex) {
-        if (!sh || !sh.key || !skills._byKey[sh.key]) {
-            return null;
+
+    /** Grant global shards and process skill-slot unlocks. Returns gain applied. */
+    grantShards: function(amount) {
+        if (!amount || amount <= 0) {
+            return 0;
         }
-        if (!skills.isSkillResearchComplete(sh.key)) {
-            return null;
+        engine.ensureShardProgress();
+        data.progress.shards = (data.progress.shards || 0) + amount;
+        if (data.battle) {
+            data.battle.runShardsGained = (data.battle.runShardsGained || 0) + amount;
         }
-        const target = data.progress.skills[sh.key];
-        const found = target && target.shards !== undefined ? target.shards : 0;
-        const baseCap = mapData.getSkillShardCap(sh);
-        const softChance = mapData.getShardSoftCapChance(sh.chance || 0, found, baseCap);
-        const tier = data.battle.mapTier || 0;
-        const chanceMult = tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
-        const lootMult = engine.getShardLootChanceMultiplier();
-        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
-            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
-        const p = Math.min(1, softChance * chanceMult * lootMult * (1 + cardAdd));
-        if (Math.random() >= p) {
-            return null;
+        if (typeof isProcessingOffline !== "undefined" && isProcessingOffline
+            && typeof offline !== "undefined" && offline.gains) {
+            offline.gains.shards = (offline.gains.shards || 0) + amount;
         }
-        const gain = Math.max(1, sh.gain || 1);
-        if (zoneIndex !== undefined && zoneIndex !== null) {
-            const counts = data.battle.zoneShardRunCounts;
-            if (counts && zoneIndex >= 0 && zoneIndex < counts.length) {
-                counts[zoneIndex] += gain;
+        engine.processShardSkillSlotUnlocks();
+        return amount;
+    },
+
+    processShardSkillSlotUnlocks: function() {
+        engine.ensureShardProgress();
+        skills.ensureSkillEquip();
+        const cycle = engine.SKILL_SLOT_UNLOCK_CYCLE;
+        let unlockedAny = false;
+        while ((data.progress.shards || 0) >= data.progress.nextSkillSlotShardCost) {
+            data.progress.shards -= data.progress.nextSkillSlotShardCost;
+            data.progress.nextSkillSlotShardCost *= 2;
+            const col = cycle[data.progress.skillSlotUnlockIndex % cycle.length];
+            data.progress.skillSlotUnlockIndex++;
+            const eq = data.progress.skillEquip;
+            if (!eq.slots[col]) {
+                eq.slots[col] = [];
+            }
+            eq.slots[col].push(null);
+            unlockedAny = true;
+            if (typeof createView !== "undefined" && createView.appendSkillEquipSlot) {
+                createView.appendSkillEquipSlot(col, eq.slots[col].length - 1);
             }
         }
-        if (target) {
-            target.shards = (target.shards || 0) + gain;
-        }
-        data.battle.runShardsGained = (data.battle.runShardsGained || 0) + gain;
-        const skillName = skills._byKey[sh.key].name;
-        if (!data.battle.runShardBySkill) {
-            data.battle.runShardBySkill = {};
-        }
-        data.battle.runShardBySkill[skillName] = (data.battle.runShardBySkill[skillName] || 0) + gain;
-        return { gain: gain, name: skillName, key: sh.key };
+        return unlockedAny;
     },
+
+    /** Roll shard drop for one kill. Returns { gain } or null. */
     trySkillShardDropOnKill: function(intruder) {
         if ((data.battle.mode || "combat") !== "combat" || !intruder) {
             return null;
@@ -1394,24 +1376,22 @@ let engine = {
             return null;
         }
         const zi = intruder.zoneIndex;
-        const z = map.zones[zi];
-        if (!z) {
+        if (!map.zones[zi]) {
             return null;
         }
-        if (z.skillShard) {
-            const personal = engine.tryGrantSkillShardDrop(z.skillShard, zi);
-            if (personal) {
-                return personal;
-            }
+        const baseChance = mapData.getZoneShardDropChance(map, zi, data.battle.mapTier || 0);
+        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
+        const p = Math.min(1, baseChance + cardAdd);
+        if (Math.random() >= p) {
+            return null;
         }
-        const zoneShards = map.zoneShards || [];
-        for (let si = 0; si < zoneShards.length; si++) {
-            const mapWide = engine.tryGrantSkillShardDrop(zoneShards[si], null);
-            if (mapWide) {
-                return mapWide;
-            }
+        const gain = mapData.getMapShardDropAmount(map);
+        if (!(gain > 0)) {
+            return null;
         }
-        return null;
+        engine.grantShards(gain);
+        return { gain: gain };
     },
     getKillFloaterScreenPosition: function(intruder) {
         const lm = engine.getBattleLaneMetrics();
@@ -2069,7 +2049,6 @@ let engine = {
         data.battle.player.attackTimerMs = 0;
         data.battle.player.sandalAttackTimerMs = 0;
         data.battle.shamelessExpAccMs = 0;
-        engine.initZoneShardRunCounts();
     },
     /** True if the intruder token overlaps the battlefield clip rect (may be partially outside); used for draw and range checks while simulating all enemies. */
     intruderIntersectsBattlefield: function(intruder) {
@@ -3235,16 +3214,6 @@ let engine = {
         const cloneDensity = data.battle.cloneDensity !== undefined && data.battle.cloneDensity !== null
             ? data.battle.cloneDensity
             : ((data.battle.cloneRunSettings && data.battle.cloneRunSettings.cloneDensity) || 0);
-        const shardMap = data.battle.runShardBySkill || {};
-        const shardNames = Object.keys(shardMap);
-        const shardRows = [];
-        for (let si = 0; si < shardNames.length; si++) {
-            const shardName = shardNames[si];
-            const shardGain = shardMap[shardName] || 0;
-            if (shardGain > 0) {
-                shardRows.push(`${shardName} +${shardGain}`);
-            }
-        }
         data.progress.runHistory.unshift({
             mapKey: mapKey,
             survivedSeconds: runSeconds,
@@ -3254,7 +3223,6 @@ let engine = {
             kills: runKills,
             talentRows: talentRows,
             shardsGained: data.battle.runShardsGained || 0,
-            shardRows: shardRows,
             okamiExpGained: engine.getPendingOkamiExpWithSoul(),
             cloneDensity: cloneDensity,
             starCleared: data.battle.runStarCleared || null
@@ -11654,7 +11622,7 @@ let engine = {
     getOrbFloorBonusMultiplier: function() {
         return 1 + 0.1 * engine.getOrbBuildFloorBought();
     },
-    getManaCapacityBonusPerCloneDispersal: function() {
+    getManaCapacityBonusPerCloneDispersal: function(aliveMsOpt) {
         const base = (resortData.manaCapacityBonusPerCloneDispersal !== undefined)
             ? resortData.manaCapacityBonusPerCloneDispersal : 10;
         const bf = data.progress.base && data.progress.base.bonfire;
@@ -11669,6 +11637,20 @@ let engine = {
                 dens = bf.cloneDensity || 0;
             }
             amount = base + dens;
+        }
+        if (bf && bf.bondGrowthUnlocked) {
+            let aliveMs = aliveMsOpt;
+            if (aliveMs === undefined || aliveMs === null) {
+                if (data.battle && (data.battle.state === "running" || data.battle.state === "dead" || data.battle.state === "completed")) {
+                    aliveMs = data.battle.cloneAliveMs !== undefined ? data.battle.cloneAliveMs : (data.battle.elapsedMs || 0);
+                } else {
+                    aliveMs = 0;
+                }
+            }
+            const tens = Math.floor(Math.max(0, aliveMs) / 10000);
+            if (tens > 0) {
+                amount = amount * (1 + 0.1 * tens);
+            }
         }
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().manaPerDeadCloneAdd || 0) : 0;
@@ -13013,31 +12995,48 @@ let engine = {
         }
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().researchSpeedAdd || 0) : 0;
-        return rate * (1 + cardAdd);
+        rate *= (1 + cardAdd);
+        rate *= engine.getScrollArchivesSilverResearchSpeedMult();
+        return rate;
     },
     getNextSkillResearchTargetKey: function() {
         return "";
     },
     countAchievedStars: function() {
+        const byType = engine.countAchievedMapStarsByType();
+        return byType.bronze + byType.silver + byType.gold;
+    },
+    countAchievedMapStarsByType: function() {
         const mapStars = data.progress.mapStars || {};
         const keys = Object.keys(mapStars);
-        let n = 0;
+        let bronze = 0;
+        let silver = 0;
+        let gold = 0;
         for (let i = 0; i < keys.length; i++) {
             const stars = mapStars[keys[i]];
             if (!stars) {
                 continue;
             }
             if (stars.bronze) {
-                n++;
+                bronze++;
             }
             if (stars.silver) {
-                n++;
+                silver++;
             }
             if (stars.gold) {
-                n++;
+                gold++;
             }
         }
-        return n;
+        return { bronze: bronze, silver: silver, gold: gold };
+    },
+    getScrollArchivesBronzeResearchCostMult: function() {
+        return Math.pow(0.9, engine.countAchievedMapStarsByType().bronze);
+    },
+    getScrollArchivesSilverResearchSpeedMult: function() {
+        return Math.pow(1.1, engine.countAchievedMapStarsByType().silver);
+    },
+    getScrollArchivesGoldResearchGainMult: function() {
+        return Math.pow(1.1, engine.countAchievedMapStarsByType().gold);
     },
     getScrollArchivesCompletedResearchCount: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
@@ -13045,21 +13044,11 @@ let engine = {
         const raw = onLoad.countUnlockedSkills(archives.unlockedSkills) + (archives.researchesToChoose || 0) - credit;
         return Math.max(0, raw - engine.getLostScrollsBought());
     },
-    ensureResearchCoinCosts: function(lib) {
-        const completed = engine.getScrollArchivesCompletedResearchCount(lib);
-        const costs = [20];
-        while (costs.length <= completed) {
-            const prev = costs[costs.length - 1];
-            costs.push(Math.floor(prev * 1.5 + 5));
-        }
-        lib.researchCoinCosts = costs;
-    },
     getScrollArchivesResearchCoinCost: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
-        engine.ensureResearchCoinCosts(archives);
-        const completed = engine.getScrollArchivesCompletedResearchCount(archives);
-        const index = Math.max(0, completed - engine.countAchievedStars());
-        return archives.researchCoinCosts[index];
+        const n = engine.getScrollArchivesCompletedResearchCount(archives);
+        const base = 49 + Math.pow(1 + n / 10, 11);
+        return Math.floor(base * engine.getScrollArchivesBronzeResearchCostMult());
     },
     syncScrollArchivesResearchCost: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
@@ -13067,12 +13056,14 @@ let engine = {
             return;
         }
         archives.researchTaskRequired = engine.getScrollArchivesResearchCoinCost(archives);
+        if (archives.researchCoinCosts !== undefined) {
+            delete archives.researchCoinCosts;
+        }
     },
     getScrollArchivesFinishWeaveSeconds: function() {
         const lib = data.progress.base.scrollArchives;
         const unlocked = onLoad.countUnlockedSkills(lib.unlockedSkills);
-        const n = Math.max(0, unlocked - engine.countAchievedStars());
-        return 20 + 10 * n;
+        return 20 + 10 * Math.max(0, unlocked);
     },
     isScrollArchivesSkillViable: function(skillKey) {
         const lib = data.progress.base.scrollArchives;
@@ -13115,50 +13106,17 @@ let engine = {
         }
         return out;
     },
-    getSkillKeysWithShardsOnTravelableMaps: function() {
-        const maps = engine.getTravelableMapDefinitions();
-        const seen = {};
-        const out = [];
-        const addKey = function(key) {
-            if (!key || seen[key]) {
-                return;
-            }
-            seen[key] = true;
-            out.push(key);
-        };
-        for (let mi = 0; mi < maps.length; mi++) {
-            const map = maps[mi];
-            const zoneShards = map.zoneShards || [];
-            for (let si = 0; si < zoneShards.length; si++) {
-                addKey(zoneShards[si] && zoneShards[si].key);
-            }
-            const zones = map.zones || [];
-            for (let zi = 0; zi < zones.length; zi++) {
-                const sh = zones[zi].skillShard;
-                addKey(sh && sh.key);
-            }
-        }
-        return out;
-    },
-    skillHasShardOnTravelableMap: function(skillKey) {
-        if (!skillKey) {
+    /** True if player has at least one unlocked skill in the given slotCategory. */
+    hasUnlockedSkillInSlotCategory: function(slotCategory) {
+        const unlocked = data.progress.base && data.progress.base.scrollArchives
+            && data.progress.base.scrollArchives.unlockedSkills;
+        if (!unlocked || !slotCategory) {
             return false;
         }
-        const maps = engine.getTravelableMapDefinitions();
-        for (let mi = 0; mi < maps.length; mi++) {
-            const map = maps[mi];
-            const zoneShards = map.zoneShards || [];
-            for (let si = 0; si < zoneShards.length; si++) {
-                if (zoneShards[si] && zoneShards[si].key === skillKey) {
-                    return true;
-                }
-            }
-            const zones = map.zones || [];
-            for (let zi = 0; zi < zones.length; zi++) {
-                const sh = zones[zi].skillShard;
-                if (sh && sh.key === skillKey) {
-                    return true;
-                }
+        const keys = Object.keys(unlocked);
+        for (let i = 0; i < keys.length; i++) {
+            if (unlocked[keys[i]] && skills.getSlotCategory(keys[i]) === slotCategory) {
+                return true;
             }
         }
         return false;
@@ -13239,34 +13197,30 @@ let engine = {
             return engine.nextSeededFloat(lib, "researchSeed");
         };
         const viable = engine.getScrollArchivesViableSkillPool();
-        const shardSet = {};
-        const shardKeys = engine.getSkillKeysWithShardsOnTravelableMaps();
-        for (let si = 0; si < shardKeys.length; si++) {
-            shardSet[shardKeys[si]] = true;
-        }
-        const shardViable = [];
-        for (let vi = 0; vi < viable.length; vi++) {
-            if (shardSet[viable[vi]]) {
-                shardViable.push(viable[vi]);
+        let pool = viable;
+        const forceCats = ["offense", "defense", "utility"];
+        for (let fi = 0; fi < forceCats.length; fi++) {
+            const cat = forceCats[fi];
+            if (engine.hasUnlockedSkillInSlotCategory(cat)) {
+                continue;
             }
+            const catPool = [];
+            for (let vi = 0; vi < viable.length; vi++) {
+                if (skills.getSlotCategory(viable[vi]) === cat) {
+                    catPool.push(viable[vi]);
+                }
+            }
+            if (catPool.length > 0) {
+                pool = catPool;
+                break;
+            }
+            // No remaining skills in this category to research — treat as satisfied and continue.
         }
+        engine.shuffleArrayInPlace(pool, rand);
+        const need = Math.min(3, pool.length);
         const choices = [];
-        const chosen = {};
-        if (shardViable.length > 0) {
-            const pick = shardViable[Math.floor(rand() * shardViable.length)];
-            choices.push(pick);
-            chosen[pick] = true;
-        }
-        const fillPool = [];
-        for (let fi = 0; fi < viable.length; fi++) {
-            if (!chosen[viable[fi]]) {
-                fillPool.push(viable[fi]);
-            }
-        }
-        engine.shuffleArrayInPlace(fillPool, rand);
-        const need = Math.min(3, viable.length) - choices.length;
         for (let ni = 0; ni < need; ni++) {
-            choices.push(fillPool[ni]);
+            choices.push(pool[ni]);
         }
         lib.researchChoices = choices;
         lib.selectedResearchChoice = "";
@@ -13328,7 +13282,8 @@ let engine = {
         data.progress.coins -= cost;
         data.progress.starBeads -= beadCost;
         data.progress.mana.amount = manaAmt - manaCost;
-        lib.researchTaskProgress = (lib.researchTaskProgress) + (rate * sec * engine.getLiteracyResearchMultiplier());
+        const gainMult = engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
+        lib.researchTaskProgress = (lib.researchTaskProgress) + (rate * sec * gainMult);
         while (true) {
             const required = lib.researchTaskRequired;
             if ((lib.researchTaskProgress) < required) {

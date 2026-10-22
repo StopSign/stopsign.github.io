@@ -13,11 +13,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 9),
                 mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12),
             ],
-            zoneShards: [
-                { key: "force", gain: 1, chance: 0.04, cap: 10 },
-                { key: "nickelAndDime", gain: 1, chance: 0.04, cap: 10 },
-                { key: "selfAffirmations", gain: 1, chance: 0.04, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -34,11 +30,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 13),
                 mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 15),
             ],
-            zoneShards: [
-                { key: "corneredEgo", gain: 1, chance: 0.02, cap: 10 },
-                { key: "insultFatigue", gain: 1, chance: 0.02, cap: 10 },
-                { key: "mainCharacter", gain: 1, chance: 0.02, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -55,11 +47,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "lecher", 38000, 400, 1.6, 0.75, 24),
                 mapData.createZone(7, "scoundrel", 40000, 270, 2, 1, 22),
             ],
-            zoneShards: [
-                { key: "aboveItAll", gain: 1, chance: 0.01, cap: 10 },
-                { key: "hindsight", gain: 1, chance: 0.01, cap: 10 },
-                { key: "shameless", gain: 1, chance: 0.01, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -77,11 +65,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(6, "lecher", 52000, 200, 1.8, 1.25, 40),
                 mapData.createZone(2, "scoundrel", 56000, 400, 2, 1, 40),
             ],
-            zoneShards: [
-                { key: "grudge", gain: 1, chance: 0.005, cap: 10 },
-                { key: "seethe", gain: 1, chance: 0.005, cap: 10 },
-                { key: "brokenRecord", gain: 1, chance: 0.005, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -101,11 +85,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(2, "scoundrel", 48000, 300, 2.6, 2, 110),
                 mapData.createZone(1, "lecher", 49000, 200, 2.6, 1, 110),
             ],
-            zoneShards: [
-                { key: "extortion", gain: 1, chance: 0.005, cap: 10 },
-                { key: "bitterRivalry", gain: 1, chance: 0.005, cap: 10 },
-                { key: "shockValue", gain: 1, chance: 0.005, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -122,11 +102,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 46),
                 mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 54),
             ],
-            zoneShards: [
-                { key: "adaptation", gain: 1, chance: 0.00125, cap: 10 },
-                { key: "savageLessons", gain: 1, chance: 0.00125, cap: 10 },
-                { key: "validation", gain: 1, chance: 0.00125, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -146,11 +122,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 60000, 150, 2, 1, 85),
                 mapData.createZone(2, "lecher", 62000, 300, 2, 1, 85),
             ],
-            zoneShards: [
-                { key: "echoChamber", gain: 1, chance: 0.000625, cap: 10 },
-                { key: "narcissism", gain: 1, chance: 0.000625, cap: 10 },
-                { key: "temper", gain: 1, chance: 0.000625, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -167,11 +139,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "lecher", 34000, 200, 1.9, 1, 90),
                 mapData.createZone(6, "lecher", 48000, 200, 2.2, 1, 105),
             ],
-            zoneShards: [
-                { key: "applyTearDrops", gain: 1, chance: 0.0005, cap: 10 },
-                { key: "crowdWork", gain: 1, chance: 0.0005, cap: 10 },
-                { key: "walkingItOff", gain: 1, chance: 0.0005, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -190,11 +158,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "scoundrel", 60000, 150, 2, 1, 135),
                 mapData.createZone(1, "lecher", 62000, 200, 2, 0.75, 150),
             ],
-            zoneShards: [
-                { key: "publicApology", gain: 1, chance: 0.0004, cap: 10 },
-                { key: "secondWind", gain: 1, chance: 0.0004, cap: 10 },
-                { key: "slowBurn", gain: 1, chance: 0.0004, cap: 10 }
-            ]
+            shardDropAmount: 1
         }),
         mapData.createMap({
             version: 0,
@@ -211,11 +175,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(3, "lecher", 36000, 100, 1.8, 1.25, 200),
                 mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5, 220),
             ],
-            zoneShards: [
-                { key: "experienceHog", gain: 1, chance: 0.0003, cap: 10 },
-                { key: "socialArmor", gain: 1, chance: 0.0003, cap: 10 },
-                { key: "closingArgument", gain: 1, chance: 0.0003, cap: 10 }
-            ]
+            shardDropAmount: 1
         })
 
         //gropers - 1 scoundrel lots of lechers 
@@ -291,91 +251,58 @@ mapData.isMapUnlocked = function(mapDef, progress) {
     return !!prevStars.bronze;
 };
 
-/** Base soft-cap value for a zone skillShard. */
-mapData.getSkillShardCap = function(sh) {
-    if (!sh) {
-        return 1;
+/** Bronze/silver/gold cycle chance pool: 100% / 200% / 300%. */
+mapData.getMapShardChancePool = function(mapTier) {
+    const tier = mapTier || 0;
+    if (tier >= 2) {
+        return 3;
     }
-    return Math.max(1, Math.floor(sh.cap !== undefined ? sh.cap : 1));
+    if (tier >= 1) {
+        return 2;
+    }
+    return 1;
+};
+
+/** Sum of zone.difficulty across the map (for splitting the chance pool). */
+mapData.getMapZoneDifficultySum = function(mapDef) {
+    const zones = (mapDef && mapDef.zones) || [];
+    let sum = 0;
+    for (let i = 0; i < zones.length; i++) {
+        sum += Math.max(0, zones[i].difficulty || 0);
+    }
+    return Math.max(0, sum);
 };
 
 /**
- * Soft-cap tier for `found` shards with base cap C.
- * Thresholds at C, 3C, 7C, ... = C*(2^(k+1)-1); chance is base/5^k in tier k.
+ * Base per-kill shard chance for a zone (before shrine additive bonus / 100% cap).
+ * pool × (zoneDifficulty / sumDifficulties) / enemyCount
  */
-mapData.getShardSoftCapTier = function(found, baseCap) {
-    const C = Math.max(1, baseCap || 1);
-    const f = Math.max(0, found || 0);
-    let k = 0;
-    while (C * (Math.pow(2, k + 1) - 1) <= f) {
-        k++;
+mapData.getZoneShardDropChance = function(mapDef, zoneIndex, mapTier) {
+    if (!mapDef || !mapDef.zones || zoneIndex < 0 || zoneIndex >= mapDef.zones.length) {
+        return 0;
     }
-    return k;
+    const z = mapDef.zones[zoneIndex];
+    const sumDiff = mapData.getMapZoneDifficultySum(mapDef);
+    if (sumDiff <= 0) {
+        return 0;
+    }
+    const enemies = Math.max(1, z.totalEnemies || 1);
+    const pool = mapData.getMapShardChancePool(mapTier);
+    const waveShare = (Math.max(0, z.difficulty || 0) / sumDiff);
+    return pool * waveShare / enemies;
 };
 
-mapData.getShardSoftCapNextThreshold = function(found, baseCap) {
-    const C = Math.max(1, baseCap || 1);
-    const k = mapData.getShardSoftCapTier(found, C);
-    return C * (Math.pow(2, k + 1) - 1);
-};
-
-mapData.getShardSoftCapChance = function(baseChance, found, baseCap) {
-    const k = mapData.getShardSoftCapTier(found, baseCap);
-    return (baseChance || 0) / Math.pow(5, k);
-};
-
-/** Shard loot tier multiplier from map star cycle (bronze/silver/gold). */
-mapData.getShardLootTierMultiplier = function(mapTier) {
-    const tier = mapTier || 0;
-    return tier >= 2 ? 10 : (tier >= 1 ? 3 : 1);
-};
-
-/** Display line for wave info / travel map shard rows. */
-mapData.formatShardInfoLine = function(sh, tierMult, lootMult) {
-    if (!sh || !sh.key) {
-        return "";
-    }
-    if (!skills.isSkillResearchComplete(sh.key)) {
-        return "??? Shards";
-    }
-    const def = skills._byKey[sh.key];
-    const nm = def && def.name ? def.name : sh.key;
-    const sk = data.progress.skills[sh.key];
-    const found = sk && sk.shards !== undefined ? sk.shards : 0;
-    const baseCap = mapData.getSkillShardCap(sh);
-    const next = mapData.getShardSoftCapNextThreshold(found, baseCap);
-    const softChance = mapData.getShardSoftCapChance(sh.chance || 0, found, baseCap);
-    const p = Math.min(0.999, softChance * (tierMult || 1) * (lootMult || 1));
-    const chancePct = round1(p * 100);
-    return `${nm} Shards ${found}/${next}, ${chancePct}%`;
-};
-
-/** Per-zone shard summary for travel cards; includes soft-cap progress and effective loot chance. */
-mapData.getMapShardSummaryText = function(mapDef, progressSkills, lootChanceMult) {
-    if (!mapDef || !lootChanceMult) {
-        return "";
-    }
-    const parts = [];
-    const tierMult = 1;
-    const zoneShards = mapDef.zoneShards || [];
-    for (let si = 0; si < zoneShards.length; si++) {
-        const sh = zoneShards[si];
-        if (!sh || !sh.key) {
-            continue;
-        }
-        parts.push(mapData.formatShardInfoLine(sh, tierMult, lootChanceMult));
-    }
-    if (mapDef.zones) {
-        for (let i = 0; i < mapDef.zones.length; i++) {
-            const sh = mapDef.zones[i].skillShard;
-            if (!sh || !sh.key) {
-                continue;
-            }
-            const line = mapData.formatShardInfoLine(sh, tierMult, lootChanceMult);
-            if (line) {
-                parts.push(line + " wave " + (i + 1));
-            }
-        }
-    }
-    return parts.join(" · ");
+/**
+ * Shard drop amount for a map, including Collect Shards and map-star multipliers.
+ * Callers should gate visibility/drops on Collect Shards unlock separately.
+ */
+mapData.getMapShardDropAmount = function(mapDef) {
+    const base = mapDef && mapDef.shardDropAmount !== undefined ? mapDef.shardDropAmount : 1;
+    const amountMult = (typeof engine !== "undefined" && engine.getShardLootAmountMultiplier)
+        ? engine.getShardLootAmountMultiplier()
+        : 0;
+    const starCount = (typeof engine !== "undefined" && engine.countAchievedStars)
+        ? engine.countAchievedStars()
+        : 0;
+    return base * amountMult * Math.pow(1.3, starCount);
 };

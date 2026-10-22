@@ -1608,7 +1608,6 @@ let skills = {
             talent: 0,
             talentLevel:0,
             talentToLevel: d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10,
-            shards: 0,
             triggerCount: 0,
             tips: 0,
             grouping: 0,
@@ -1706,7 +1705,7 @@ let skills = {
     },
 
     SLOT_COLUMNS: ["offense", "defense", "utility", "any"],
-    UNEQUIP_CHARGE_MS: 30 * 60 * 1000,
+    UNEQUIP_CHARGE_MS: 60 * 60 * 1000,
     UNEQUIP_CHARGE_MS_DEBUG: 5 * 1000,
 
     getUnequipChargeMs: function() {
@@ -1725,7 +1724,7 @@ let skills = {
                 offense: [null],
                 defense: [null],
                 utility: [null],
-                any: [null]
+                any: []
             },
             unequipCharges: max,
             unequipChargesMax: max,
@@ -1742,13 +1741,18 @@ let skills = {
         }
         const eq = data.progress.skillEquip;
         if (!eq.slots) {
-            eq.slots = { offense: [null], defense: [null], utility: [null], any: [null] };
+            eq.slots = { offense: [null], defense: [null], utility: [null], any: [] };
         }
-        for (let i = 0; i < skills.SLOT_COLUMNS.length; i++) {
-            const col = skills.SLOT_COLUMNS[i];
+        // Typed columns always have at least one slot; Any starts empty until shard unlocks.
+        const typed = ["offense", "defense", "utility"];
+        for (let i = 0; i < typed.length; i++) {
+            const col = typed[i];
             if (!Array.isArray(eq.slots[col]) || eq.slots[col].length < 1) {
                 eq.slots[col] = [null];
             }
+        }
+        if (!Array.isArray(eq.slots.any)) {
+            eq.slots.any = [];
         }
         const defaultMax = skills.DEFAULT_UNEQUIP_CHARGES_MAX;
         if (eq.unequipChargesMax === undefined || eq.unequipChargesMax === null || eq.unequipChargesMax < defaultMax) {
@@ -2123,7 +2127,7 @@ let skills = {
         "Outrage": "Your attack timer recharges 50% faster while active. Its timer counts down only while your slap cooldown is not full. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5.",
         "Malice": "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level × 5.",
         "Fake Tears": "You take 20% less damage while active. Additional time extends the buff. Duration is capped at 10 seconds + Okami's level.",
-        "Clout": "Each stack blocks 1 incoming damage. Stacks consumed equal damage prevented. Clout cannot exceed your max Audacity."
+        "Clout": "Each stack blocks 1 raw incoming damage before flat and multiplier reductions. Stacks consumed equal damage prevented. Clout cannot exceed your max Audacity."
     },
     wrapBuffNamesInHtml: function(text) {
         const raw = text || "";

@@ -119,8 +119,8 @@ let onLoad = {
         if (data.currentGameState.pendingOfflineMs === undefined || data.currentGameState.pendingOfflineMs === null) {
             data.currentGameState.pendingOfflineMs = 0;
         }
-        if (!data.currentGameState.offlineShardBank || typeof data.currentGameState.offlineShardBank !== "object") {
-            data.currentGameState.offlineShardBank = {};
+        if (data.currentGameState.offlineShardBank === undefined || data.currentGameState.offlineShardBank === null) {
+            data.currentGameState.offlineShardBank = 0;
         }
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
         if (data.gameSettings.prestigePackOpen === undefined || data.gameSettings.prestigePackOpen === null) {
