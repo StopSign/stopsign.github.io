@@ -60,8 +60,11 @@ let viewData = {
 
 let view = {
     updateViewAtFrame: function() { //This is the main view update function that is run once per frame
-        if (data.progress && data.progress.showBattle) {
+        // Only paint the battlefield when it is on-screen; still drain FX queues while unlocked but hidden.
+        if (view.isBattleVisible()) {
             view.renderBattlefield();
+        } else if (data.progress && data.progress.showBattle) {
+            view.consumeLineFxQueue();
         }
         // Map-only DOM (baseResortMap carriers / okami sprites / weaving) — skip when base map not visible
         if (view.isResortMapVisible()) {
@@ -5960,8 +5963,9 @@ let view = {
             cache._tx = rx;
             cache._ty = ry;
         }
-        el.style.setProperty("--tx", rx);
-        el.style.setProperty("--ty", ry);
+        // Use the individual `translate` property (compositor-friendly) instead of
+        // custom --tx/--ty inside `transform`, which forces main-thread style work each move.
+        el.style.translate = `${rx}px ${ry}px`;
     },
     setGpuPosById: function(id, x, y, subpixel) {
         const el = viewData.cached[id];
