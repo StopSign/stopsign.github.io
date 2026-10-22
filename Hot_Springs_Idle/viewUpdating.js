@@ -743,9 +743,18 @@ let view = {
         view.updateVal("travelPane_challenges", travelSub === "challenges" && hasClassForTravel ? "" : "none", "style.display");
 
         const mapDefs = data.progress.mapDefinitions || [];
+        const authoredMaps = mapData.getDefaultMaps();
+        const authoredByKey = Object.create(null);
+        for (let ai = 0; ai < authoredMaps.length; ai++) {
+            authoredByKey[authoredMaps[ai].key] = authoredMaps[ai];
+        }
         const current = data.progress.currentMapKey;
         for (let i = 0; i < mapDefs.length; i++) {
             const map = mapDefs[i];
+            const authored = authoredByKey[map.key] || map;
+            if (authored.shardDropAmount !== undefined) {
+                map.shardDropAmount = authored.shardDropAmount;
+            }
             const reqClass = map.requiredClassKey || "";
             const classAllowed = !reqClass;
             const unlocked = mapData.isMapUnlocked(map, data.progress);
@@ -761,7 +770,7 @@ let view = {
             view.updateVal(`mapActionCurrent_${map.key}`, onThisMap ? "" : "none", "style.display");
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
-            view.updateVal(`mapTime_${map.key}`, `${round1Fixed((map.totalDurationMs || 0) / 1000)}s`);
+            view.updateVal(`mapShardDrop_${map.key}`, round1(mapData.getMapShardDropAmount(map)));
             const workersFound = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[map.key]) || 0;
             const workersMax = 6;
             view.updateVal(`mapWorkers_${map.key}`, `${workersFound}/${workersMax}`);
@@ -4475,7 +4484,10 @@ let view = {
                             }
                         }
                         if (slotEl) {
-                            slotEl.classList.toggle("skill-equip-slot--selected", data.progress.selectedEquippedSkillKey === key);
+                            const selKey = viewName === "library"
+                                ? data.progress.selectedLibrarySkillKey
+                                : data.progress.selectedEquippedSkillKey;
+                            slotEl.classList.toggle("skill-equip-slot--selected", !!key && key === selKey);
                         }
                         view.updateVal(`${idPrefix}_name`, skill ? skill.name : key);
                         if (compact) {
@@ -4661,13 +4673,15 @@ let view = {
         if (eq) {
             const views = ["equipped", "library"];
             for (let vi = 0; vi < views.length; vi++) {
+                const viewName = views[vi];
+                const selKey = viewName === "library" ? libSel : eqSel;
                 for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
                     const column = skills.SLOT_COLUMNS[c];
                     const arr = eq.slots[column] || [];
                     for (let i = 0; i < arr.length; i++) {
-                        const slotEl = viewData.cached[`skillSlot_${views[vi]}_${column}_${i}`];
+                        const slotEl = viewData.cached[`skillSlot_${viewName}_${column}_${i}`];
                         if (slotEl) {
-                            slotEl.classList.toggle("skill-equip-slot--selected", !!arr[i] && arr[i] === eqSel);
+                            slotEl.classList.toggle("skill-equip-slot--selected", !!arr[i] && arr[i] === selKey);
                         }
                     }
                 }

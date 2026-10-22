@@ -21,7 +21,7 @@ mapData.getDefaultMaps = function() {
             name: "Protecting Modesty",
             description: "Word has spread that there is a beautiful woman protecting an unknown village, and the Okami must slap some sense into the groups of curious scoundrels.",
             seed: 424242,
-            baseDifficulty: 1.3,
+            baseDifficulty: 1.4,
             unlocksAfterMapKey: "map_1",
             zones: [
                 mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1, 8),
@@ -30,7 +30,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 13),
                 mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 15),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 2
         }),
         mapData.createMap({
             version: 0,
@@ -38,7 +38,7 @@ mapData.getDefaultMaps = function() {
             name: "Leering Intruders",
             description: "Rumors of a hotspring have brought both scoundrels and lechers, looking to peep in and ruin the peace. The Okami will have them run away in embarrasment.",
             seed: 6001,
-            baseDifficulty: 1.6,
+            baseDifficulty: 1.8,
             unlocksAfterMapKey: "map_2",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 14),
@@ -47,7 +47,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "lecher", 38000, 400, 1.6, 0.75, 24),
                 mapData.createZone(7, "scoundrel", 40000, 270, 2, 1, 22),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 3
         }),
         mapData.createMap({
             version: 0,
@@ -55,7 +55,7 @@ mapData.getDefaultMaps = function() {
             name: "Muse-Seekers",
             description: "Artists seeking muses have heard rumors of beauties in the mist. They will have shame after the Okami has finished with them.",
             seed: 7777,
-            baseDifficulty: 2.2,
+            baseDifficulty: 2.5,
             unlocksAfterMapKey: "map_3",
             zones: [
                 mapData.createZone(6, "lecher", 0, 150, 1, 1, 20),
@@ -65,7 +65,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(6, "lecher", 52000, 200, 1.8, 1.25, 40),
                 mapData.createZone(2, "scoundrel", 56000, 400, 2, 1, 40),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 5
         }),
         mapData.createMap({
             version: 0,
@@ -73,7 +73,7 @@ mapData.getDefaultMaps = function() {
             name: "Courtesan Chasers",
             description: "A few big shot adventurers have heard of the hotspring. They want to see if any beauties are for hire. Slap them away.",
             seed: 9371,
-            baseDifficulty: 3,
+            baseDifficulty: 4,
             unlocksAfterMapKey: "map_4",
             zones: [
                 mapData.createZone(3, "scoundrel", 0, 400, 1.4, 2, 50),
@@ -85,7 +85,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(2, "scoundrel", 48000, 300, 2.6, 2, 110),
                 mapData.createZone(1, "lecher", 49000, 200, 2.6, 1, 110),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 8
         }),
         mapData.createMap({
             version: 0,
@@ -93,7 +93,7 @@ mapData.getDefaultMaps = function() {
             name: "Romance Novelists",
             description: "Masses of novelists are determined in their pursuit of finding inspiration from the truth of the rumor's surrounding the hotspring. The Okami must fill their hearts with shame for their vanity.",
             seed: 9944,
-            baseDifficulty: 3,
+            baseDifficulty: 4.5,
             unlocksAfterMapKey: "map_5",
             zones: [
                 mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 30),
@@ -102,7 +102,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 46),
                 mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 54),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 13
         }),
         mapData.createMap({
             version: 0,
@@ -110,7 +110,7 @@ mapData.getDefaultMaps = function() {
             name: "The Gawk Squad",
             description: "A gang known for forming small groups and catcalling everyone walking by has found a new target. The Okami will stand in their way.",
             seed: 15003,
-            baseDifficulty: 3.5,
+            baseDifficulty: 6,
             unlocksAfterMapKey: "map_6",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 150, 1, 1, 40),
@@ -122,7 +122,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(4, "scoundrel", 60000, 150, 2, 1, 85),
                 mapData.createZone(2, "lecher", 62000, 300, 2, 1, 85),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 20
         }),
         mapData.createMap({
             version: 0,
@@ -130,7 +130,7 @@ mapData.getDefaultMaps = function() {
             name: "Sketch Artists",
             description: "They don't want to touch, only look; their gazes still make the guests uncomfortable. The Okami will show them the error of their ways.",
             seed: 21888,
-            baseDifficulty: 4,
+            baseDifficulty: 7.5,
             unlocksAfterMapKey: "map_7",
             zones: [
                 mapData.createZone(4, "lecher", 0, 200, 1, 1, 45),
@@ -139,7 +139,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "lecher", 34000, 200, 1.9, 1, 90),
                 mapData.createZone(6, "lecher", 48000, 200, 2.2, 1, 105),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 30
         }),
         mapData.createMap({
             version: 0,
@@ -147,7 +147,7 @@ mapData.getDefaultMaps = function() {
             name: "Fedora Tippers",
             description: "They tip their hats when they wink and leer, but the illusion of chivalry does not fool the Okami.",
             seed: 21888,
-            baseDifficulty: 6,
+            baseDifficulty: 10,
             unlocksAfterMapKey: "map_8",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 175, 1, 1.25, 60),
@@ -158,7 +158,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(5, "scoundrel", 60000, 150, 2, 1, 135),
                 mapData.createZone(1, "lecher", 62000, 200, 2, 0.75, 150),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 50
         }),
         mapData.createMap({
             version: 0,
@@ -166,7 +166,7 @@ mapData.getDefaultMaps = function() {
             name: "Catcallers",
             description: "Seeking to whistle at the rumored beauties in the mist, they will take a good beating before giving up.",
             seed: 21888,
-            baseDifficulty: 10,
+            baseDifficulty: 15,
             unlocksAfterMapKey: "map_9",
             zones: [
                 mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5, 140),
@@ -175,7 +175,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(3, "lecher", 36000, 100, 1.8, 1.25, 200),
                 mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5, 220),
             ],
-            shardDropAmount: 1
+            shardDropAmount: 80
         })
 
         //gropers - 1 scoundrel lots of lechers 

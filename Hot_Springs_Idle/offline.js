@@ -289,12 +289,10 @@ let offline = {
     },
 
     skillExpLifetime: function(skillKey, skill) {
-        const d = skills._byKey[skillKey] || {};
-        const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
         let total = skill.exp || 0;
         const level = skill.level || 0;
         for (let lv = 0; lv < level; lv++) {
-            total += initExp * Math.pow(1.3, lv);
+            total += skills.getExpToLevel(skillKey, lv);
         }
         return total;
     },
@@ -521,18 +519,16 @@ let offline = {
         if (!skill) {
             return;
         }
-        const d = skills._byKey[skillKey] || {};
         if (skill.maxLevel !== undefined && skill.level >= skill.maxLevel && (!talentDelta || talentDelta <= 0)) {
             // still allow talent
         }
         if (expDelta > 0 && !(skill.maxLevel !== undefined && skill.level >= skill.maxLevel)) {
             skill.exp += expDelta;
             offline.gains.skillExp += expDelta;
-            const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
             while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
                 skill.exp -= skill.expToLevel;
                 skill.level++;
-                skill.expToLevel = initExp * Math.pow(1.3, skill.level);
+                skill.expToLevel = skills.getExpToLevel(skillKey, skill.level);
                 engine.onSkillLevelUp(skill);
             }
         }

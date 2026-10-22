@@ -85,11 +85,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"To love oneself is the beginning of a lifelong romance." — Oscar Wilde',
         shortDescription: "Restore Aud every second while the battle runs.",
         rewardText: function() {
-            return "Reward: +0.1 Aud per skill level per second.";
+            return "Reward: +0.5 Aud/s, plus +0.25 Aud/s per skill level.";
         },
         triggerText: "Trigger: 1 skill exp per second while Aud is below 100%.",
         getEffect: function(sk) {
-            return { audPerSec: (sk.level || 0) * 0.1 };
+            return { audPerSec: 0.5 + (sk.level || 0) * 0.25 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals(e.audPerSec || 0, 2).toFixed(2)} Aud/s`;
@@ -1596,6 +1596,20 @@ let skills = {
         return m;
     })(),
 
+    /** Multiplier applied per skill level for exp-to-next-level. */
+    expToLevelScale: 1.2,
+    defaultInitialExpToLevel: 5,
+
+    getInitialExpToLevel: function(skillKey) {
+        const d = skills._byKey[skillKey] || {};
+        return d.initialExpToLevel !== undefined ? d.initialExpToLevel : skills.defaultInitialExpToLevel;
+    },
+
+    /** Exp required to advance from `level` to the next level. */
+    getExpToLevel: function(skillKey, level) {
+        return skills.getInitialExpToLevel(skillKey) * Math.pow(skills.expToLevelScale, level || 0);
+    },
+
     createFreshSkillState: function(key) {
         const d = skills._byKey[key];
         const s = {
@@ -1604,7 +1618,7 @@ let skills = {
             affectedStat: d.affectedStat,
             level: 0,
             exp: 0,
-            expToLevel: d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5,
+            expToLevel: skills.getExpToLevel(key, 0),
             talent: 0,
             talentLevel:0,
             talentToLevel: d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10,
@@ -1637,7 +1651,7 @@ let skills = {
         const cat = skill.category || "combat";
         skill.level = 0;
         skill.exp = 0;
-        skill.expToLevel = skills._byKey[skill.key].initialExpToLevel;
+        skill.expToLevel = skills.getExpToLevel(skill.key, 0);
         skill.triggerCount = 0;
         if (cat === "class") {
             skill.talent = 0;

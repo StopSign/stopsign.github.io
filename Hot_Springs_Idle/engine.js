@@ -3133,12 +3133,11 @@ let engine = {
         skill.exp += gain * (1 + skillCardAdd);
         skill.talent += gain * 0.1 * (1 + talentCardAdd);
         skill.triggerCount += amount;
-        const initExp = d.initialExpToLevel !== undefined ? d.initialExpToLevel : 5;
         const initTal = d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10;
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
             skill.exp -= skill.expToLevel;
             skill.level++;
-            skill.expToLevel = initExp * Math.pow(1.3, skill.level);
+            skill.expToLevel = skills.getExpToLevel(skillKey, skill.level);
             engine.onSkillLevelUp(skill);
         }
         while (skill.talent >= skill.talentToLevel) {

@@ -305,13 +305,19 @@ let events = {
         view.updateSkillsTab();
         createView.updateLayoutMeasurements();
     },
-    selectEquippedSlotSkill: function(column, index, ev) {
-        if (ev && ev.target && ev.target.closest && ev.target.closest(".skill-stars-controls")) {
+    /** Slot click: Equipped pane uses equipped selection; Library pane uses library selection. */
+    selectSkillSlotSkill: function(viewName, column, index, ev) {
+        // Only ignore the star buttons themselves — not the whole stars row hitbox.
+        if (ev && ev.target && ev.target.closest && ev.target.closest(".skill-star-btn")) {
             return;
         }
         const eq = skills.ensureSkillEquip();
         const key = eq && eq.slots[column] && eq.slots[column][index];
         if (!key) {
+            return;
+        }
+        if (viewName === "library") {
+            events.selectLibrarySkillForDetail(key, ev);
             return;
         }
         if (data.progress.selectedEquippedSkillKey === key) {
@@ -320,9 +326,11 @@ let events = {
             data.progress.selectedEquippedSkillKey = key;
         }
         view.applySkillDetailSelectionHighlight();
-        if ((data.progress.selectedSkillsTab || "equipped") === "equipped") {
-            view.updateSkillInfoPanel();
-        }
+        view.updateSkillInfoPanel();
+    },
+    /** Legacy alias kept for any leftover callers. */
+    selectEquippedSlotSkill: function(column, index, ev) {
+        events.selectSkillSlotSkill("equipped", column, index, ev);
     },
     selectLibrarySkillForDetail: function(skillKey, ev) {
         if (!skills.isSkillUnlocked(skillKey) || !skills.getSlotCategory(skillKey)) {
@@ -330,10 +338,13 @@ let events = {
         }
         const wrap = viewData.cached[`skill_wrap_${skillKey}`];
         const leftCol = viewData.cached.skillsLibraryColLeft;
+        // Slot clicks (no list row parent) default overlay to the right column.
         if (wrap && leftCol && wrap.parentElement === leftCol) {
             viewData.libraryInfoOverlaySide = "right";
-        } else {
+        } else if (wrap && wrap.parentElement === viewData.cached.skillsLibraryColRight) {
             viewData.libraryInfoOverlaySide = "left";
+        } else {
+            viewData.libraryInfoOverlaySide = "right";
         }
         if (data.progress.selectedLibrarySkillKey === skillKey) {
             data.progress.selectedLibrarySkillKey = "";

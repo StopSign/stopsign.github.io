@@ -182,7 +182,7 @@ let createView = {
                     <div class="travel-map-meta">
                         <div>Difficulty: <span id="mapDifficulty_${m.key}"></span></div>
                         <div># Waves: <span id="mapWaves_${m.key}"></span></div>
-                        <div>Time for Last Spawn: <span id="mapTime_${m.key}"></span></div>
+                        <div>Shard Drop Amount: <span id="mapShardDrop_${m.key}"></span></div>
                         <div>Kitsune Rescued: <span id="mapWorkers_${m.key}"></span></div>
                     </div>
                     <div class="muted-text">${resortData.insertResourceIcons(m.description || "")}</div>
@@ -1060,7 +1060,7 @@ let createView = {
             filled = `
                 <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
                     ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
-                    onclick="events.selectEquippedSlotSkill('${column}', ${index}, event)">
+                    onclick="events.selectSkillSlotSkill('${viewName}', '${column}', ${index}, event)">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
                     <div class="skill-equip-slot-talent" id="${idPrefix}_talent"></div>
                 </div>`;
@@ -1068,12 +1068,12 @@ let createView = {
             filled = `
                 <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
                     ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
-                    onclick="events.selectEquippedSlotSkill('${column}', ${index}, event)">
+                    onclick="events.selectSkillSlotSkill('${viewName}', '${column}', ${index}, event)">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
-                    <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact skill-equip-slot-stars" onclick="event.stopPropagation()">
-                        <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
-                        <button id="${idPrefix}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'silver')">☆</button>
-                        <button id="${idPrefix}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="events.toggleEquippedSlotStar('${column}', ${index}, 'gold')">☆</button>
+                    <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact skill-equip-slot-stars">
+                        <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="event.stopPropagation(); events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
+                        <button id="${idPrefix}_star_silver" class="skill-star-btn skill-panel-star-btn skill-star-silver" onclick="event.stopPropagation(); events.toggleEquippedSlotStar('${column}', ${index}, 'silver')">☆</button>
+                        <button id="${idPrefix}_star_gold" class="skill-star-btn skill-panel-star-btn skill-star-gold" onclick="event.stopPropagation(); events.toggleEquippedSlotStar('${column}', ${index}, 'gold')">☆</button>
                     </div>
                     <div class="skill-equip-slot-meta" id="${idPrefix}_meta"></div>
                     <div class="skill-row-bars">
@@ -1580,7 +1580,7 @@ let createView = {
         for (let mi = 0; mi < maps.length; mi++) {
             const m = maps[mi];
             const mk = m.key;
-            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTime_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
+            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapShardDrop_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
         }
         for (let gi = 0; gi < 10; gi++) {
             createView.queueCache(`base_inn_guest_wrap_${gi}`, `base_inn_guest_name_${gi}`, `base_inn_guest_chat_${gi}`, `base_inn_guest_fill_${gi}`);
