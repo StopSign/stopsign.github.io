@@ -60,6 +60,7 @@ let engine = {
         engine.updateShamelessSkillExp(tickMs);
         engine.updateSelfAffirmationsEachSecond(tickMs);
         engine.updateMainCharacterSkillExp(tickMs);
+        engine.updateSecondhandEmbarrassmentSkillExp(tickMs);
         engine.updateSeetheEachSecond(tickMs);
         engine.updateApplyTearDropsEachSecond(tickMs);
         engine.updateBitterRivalryInRange(tickMs);
@@ -412,7 +413,7 @@ let engine = {
         p.attackCooldownMs = engine.getEffectiveSlapCooldownMs();
         p.sandalAttackCooldownMs = engine.getEffectiveSandalCooldownMs();
     },
-    /** Shameless skill exp: every 5s of combat time; exp = max(log10(current Aud), 1) per trigger. */
+    /** Shameless skill exp: 1 exp every 5s of combat time. */
     updateShamelessSkillExp: function(tickMs) {
         if (!skills.isSkillUnlocked("shameless")) {
             return;
@@ -424,25 +425,28 @@ let engine = {
         data.battle.shamelessExpAccMs += dt;
         while (data.battle.shamelessExpAccMs >= 5000) {
             data.battle.shamelessExpAccMs -= 5000;
-            const p = data.battle.player;
-            engine.addSkillExp("shameless", Math.max(1, engine.positiveLog(p.aud || 0, 10)));
+            engine.addSkillExp("shameless", 1);
         }
     },
     updateMainCharacterSkillExp: function(tickMs) {
         if (!skills.isSkillUnlocked("mainCharacter")) {
             return;
         }
-        if (engine.countVisibleIntruders() < 4) {
+        const visible = engine.countVisibleIntruders();
+        if (visible <= 0) {
             return;
         }
-        if (data.battle.mainCharacterSecondAccMs === undefined || data.battle.mainCharacterSecondAccMs === null) {
-            data.battle.mainCharacterSecondAccMs = 0;
+        engine.addSkillExp("mainCharacter", 0.25 * visible * (tickMs / 1000));
+    },
+    updateSecondhandEmbarrassmentSkillExp: function(tickMs) {
+        if (!skills.isSkillUnlocked("secondhandEmbarrassment")) {
+            return;
         }
-        data.battle.mainCharacterSecondAccMs += tickMs;
-        while (data.battle.mainCharacterSecondAccMs >= 1000) {
-            data.battle.mainCharacterSecondAccMs -= 1000;
-            engine.addSkillExp("mainCharacter", 1);
+        const visible = engine.countVisibleIntruders();
+        if (visible <= 0) {
+            return;
         }
+        engine.addSkillExp("secondhandEmbarrassment", 0.25 * visible * (tickMs / 1000));
     },
     updateSeetheEachSecond: function(tickMs) {
         if (!skills.isSkillUnlocked("seethe")) {
@@ -686,7 +690,7 @@ let engine = {
                 engine.addSkillExp("selfAffirmations", 1);
             }
             if (skills.isSkillUnlocked("corneredEgo")) {
-                if (p.aud < mx * 0.5) {
+                if (p.aud < mx) {
                     engine.addSkillExp("corneredEgo", 1);
                 }
             }
@@ -769,34 +773,42 @@ let engine = {
         let slapDamage = data.battle.player.attackDamage;
         const exEff = skills.getSkillEffect("execute");
         const executeFrac = exEff.lowAudBonusFraction || 0;
-        if (executeFrac > 0 && target.aud <= (target.maxAud * 0.5)) {
-            slapDamage *= 1 + executeFrac;
-            engine.addSkillExp("execute", 1);
-        }
+        const applyExecute = executeFrac > 0 && target.aud <= (target.maxAud * 0.5);
         const snEff = skills.getSkillEffect("sneak_attack");
         const sneakFrac = snEff.firstHitDamageBonusFraction || 0;
         const priorHits = target.timesHitByPlayer || 0;
-        if (sneakFrac > 0 && priorHits === 0) {
-            slapDamage *= 1 + sneakFrac;
-        }
         const xpEff = skills.getSkillEffect("exploit");
         const exploitStep = xpEff.flatDamagePerConsecutiveStep || 0;
         const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === target.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
+        let exploitFlat = 0;
         if (exploitStep > 0 && streak >= 2) {
-            slapDamage += (streak - 1) * exploitStep;
+            exploitFlat = (streak - 1) * exploitStep;
         }
         let isPowerStrike = false;
         if (cls === "condescend" && (data.battle.classPowerA || 0) >= 1000) {
             data.battle.classPowerA -= 1000;
-            slapDamage *= 2;
             isPowerStrike = true;
         }
         if (cls === "scold" && (data.battle.classPowerB || 0) >= 1000) {
             data.battle.classPowerB -= 1000;
             data.battle.scoldFlurryMs = 2000;
         }
-        slapDamage = engine.applyCombatOutgoingDamage(slapDamage, target, { consumeFury: true });
+        // ((base+cards)×density + Force + other flats) × Brutality × damage mults
+        slapDamage = engine.applyCombatOutgoingDamage(slapDamage, target, {
+            consumeFury: true,
+            flatBonus: exploitFlat
+        });
+        if (applyExecute) {
+            slapDamage *= 1 + executeFrac;
+            engine.addSkillExp("execute", 1);
+        }
+        if (sneakFrac > 0 && priorHits === 0) {
+            slapDamage *= 1 + sneakFrac;
+        }
+        if (isPowerStrike) {
+            slapDamage *= 2;
+        }
         slapDamage = Math.max(1, roundNearestDecimals(slapDamage, 1));
         slapDamage *= bonfire.getCombatDamageMultiplier();
         slapDamage = Math.max(1, roundNearestDecimals(slapDamage, 1));
@@ -1150,20 +1162,24 @@ let engine = {
         if (!skills.isSkillUnlocked("validation")) {
             return 0;
         }
-        const cap = (skills.getSkillEffect("validation").audCap || 0);
-        return Math.min(data.battle.enemiesKilled || 0, cap);
+        const eff = skills.getSkillEffect("validation");
+        const per = eff.audPerKill || 1;
+        const cap = eff.audCap || 0;
+        return Math.min((data.battle.enemiesKilled || 0) * per, cap);
     },
     /** True when the latest kill raised Validation's max-Aud contribution (still under the per-level cap). */
     didValidationMaxAudIncreaseOnLastKill: function() {
         if (!skills.isSkillUnlocked("validation")) {
             return false;
         }
-        const cap = (skills.getSkillEffect("validation").audCap || 0);
+        const eff = skills.getSkillEffect("validation");
+        const per = eff.audPerKill || 1;
+        const cap = eff.audCap || 0;
         const kills = data.battle.enemiesKilled || 0;
-        if (kills <= 0 || cap <= 0) {
+        if (kills <= 0 || cap <= 0 || per <= 0) {
             return false;
         }
-        return Math.min(kills, cap) > Math.min(kills - 1, cap);
+        return Math.min(kills * per, cap) > Math.min((kills - 1) * per, cap);
     },
     getValidationCurrentAudOnMaxIncrease: function() {
         if (!skills.isSkillUnlocked("validation")) {
@@ -1177,8 +1193,8 @@ let engine = {
         const expBase = intruder.expBase !== undefined ? intruder.expBase : 1;
         const expGain = engine.expAwardFromIntruderExpBase(expBase);
         const coinsGain = engine.coinsAwardFromIntruderGain(gain);
-        data.progress.coins += coinsGain;
-        data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + coinsGain;
+        engine.grantBattleCoins(coinsGain);
+        const splashCoins = engine.applySecondhandEmbarrassmentCoins(intruder);
         engine.addPendingOkamiExpFromClone(expGain);
         if (growthUnlocked) {
             engine.addCloneLevelExp(expGain);
@@ -1186,10 +1202,8 @@ let engine = {
         data.battle.enemiesKilled++;
         const shardDrop = engine.trySkillShardDropOnKill(intruder);
         engine.addSkillExp("experienceHog", 1);
-        engine.addSkillExp("extortion", 1);
-        engine.addSkillExp("nickelAndDime", engine.positiveLog(coinsGain, 10));
+        engine.addSkillExp("nickelAndDime", 1);
         engine.addSkillExp("validation", 1);
-        engine.addSkillExp("windfallSwagger", engine.positiveLog(coinsGain, 10));
         if (skills.isSkillUnlocked("publicApology")) {
             const paEff = skills.getSkillEffect("publicApology");
             const heal = paEff.audPerKill || 0;
@@ -1223,14 +1237,19 @@ let engine = {
             }
             engine.addSkillExp("sadism", engine.positiveLog(overkillDamage, 2));
         }
-        // Validation: +1 max Aud per kill (via calcPlayerStats). When that max rises, also gain
-        // +Validation level current Aud. missingAud already grants +1 current for the +1 max, so pass the rest
-        // as extraCurrentOnMaxRise (Narcissism + left float apply to the full heal).
+        // Validation: +audPerKill max Aud per kill (via calcPlayerStats). When that max rises, additionally
+        // heal equal to Validation level. Equal recover already grants that max-rise amount, so pass the
+        // rest as extraCurrentOnMaxRise (not boosted by Narcissism).
         let validationExtraCurrent = 0;
         if (engine.didValidationMaxAudIncreaseOnLastKill()) {
             const curGain = engine.getValidationCurrentAudOnMaxIncrease();
-            if (curGain > 1) {
-                validationExtraCurrent = curGain - 1;
+            const eff = skills.getSkillEffect("validation");
+            const per = eff.audPerKill || 1;
+            const cap = eff.audCap || 0;
+            const kills = data.battle.enemiesKilled || 0;
+            const valRise = Math.min(kills * per, cap) - Math.min((kills - 1) * per, cap);
+            if (curGain > valRise) {
+                validationExtraCurrent = curGain - valRise;
             }
         }
         initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: validationExtraCurrent });
@@ -1240,8 +1259,9 @@ let engine = {
         if (typeof view !== "undefined" && view.spawnKillRewardFloater) {
             const pos = engine.getKillFloaterScreenPosition(intruder);
             const expDisplay = expGain * engine.getLevelingExpCardMultiplier();
+            const totalCoins = coinsGain + (splashCoins || 0);
             const parts = [
-                `${intToStringRound(coinsGain)} coins`,
+                `${intToStringRound(totalCoins)} coins`,
                 `+${round1(expDisplay)} exp`
             ];
             if (shardDrop) {
@@ -1286,6 +1306,55 @@ let engine = {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
         return baseCoinsPart * greedMult * (1 + cardAdd);
+    },
+    /** Flat coin bonus from skills (e.g. Nickel and Dime), excluding %/mult and zone base. */
+    getKillCoinsFlatBonus: function() {
+        return skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
+    },
+    /**
+     * Award coins and grant Windfall Swagger 1 skill exp when amount > 0.
+     * opts.countRunKills (default true): add to battle runCoinsFromKills.
+     */
+    grantBattleCoins: function(amount, opts) {
+        const gain = amount || 0;
+        if (!(gain > 0)) {
+            return 0;
+        }
+        const o = opts || {};
+        data.progress.coins = (data.progress.coins || 0) + gain;
+        if (o.countRunKills !== false && data.battle) {
+            data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + gain;
+        }
+        engine.addSkillExp("windfallSwagger", 1);
+        engine.addSkillExp("extortion", 1);
+        return gain;
+    },
+    /**
+     * Secondhand Embarrassment: other slap-range intruders pay (10% base coins + flat coin bonuses).
+     * Returns total coins granted (0 if none).
+     */
+    applySecondhandEmbarrassmentCoins: function(killedIntruder) {
+        if (!skills.isSkillUnlocked("secondhandEmbarrassment")) {
+            return 0;
+        }
+        const frac = skills.getSkillEffect("secondhandEmbarrassment").splashCoinFraction || 0;
+        if (!(frac > 0)) {
+            return 0;
+        }
+        const flat = engine.getKillCoinsFlatBonus();
+        const killedId = killedIntruder && killedIntruder.id;
+        let total = 0;
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || !e.inRange || e.id === killedId) {
+                continue;
+            }
+            total += ((e.gain || 1) * frac) + flat;
+        }
+        if (total > 0) {
+            engine.grantBattleCoins(total);
+        }
+        return total;
     },
     SKILL_SLOT_UNLOCK_CYCLE: ["any", "offense", "defense", "utility"],
     DEFAULT_NEXT_SKILL_SLOT_SHARD_COST: 50,
@@ -1431,11 +1500,11 @@ let engine = {
                     ls.unassignedPoints++;
                 }
             }
-            engine.addSkillExp("adaptation", 1);
-            engine.addSkillExp("savageLessons", 1);
-            engine.addSkillExp("paddingResume", 1);
-            engine.addSkillExp("hindsight", 1);
-            engine.addSkillExp("studyGroup", 1);
+            engine.addSkillExp("adaptation", 2);
+            engine.addSkillExp("savageLessons", 2);
+            engine.addSkillExp("paddingResume", 2);
+            engine.addSkillExp("hindsight", 2);
+            engine.addSkillExp("studyGroup", 2);
             if (skills.isSkillUnlocked("levelHeaded")) {
                 const lhEff = skills.getSkillEffect("levelHeaded");
                 const desMs = lhEff.desensitizedMsPerLevel || 0;
@@ -1751,6 +1820,13 @@ let engine = {
         }
         return n;
     },
+    getBrutalityMultiplier: function() {
+        const ls = data.battle.levelState || {};
+        let totalStr = (ls.levelStr || 0) + (ls.skillStrBonus || 0);
+        totalStr += skills.getSkillEffect("shockValue").bonusStr || 0;
+        const div = gameData.battle.combat.conStrStatDivisor || 10;
+        return 1 + totalStr / div;
+    },
     getMainCharacterFlatDamage: function() {
         if (!skills.isSkillUnlocked("mainCharacter")) {
             return 0;
@@ -1777,6 +1853,17 @@ let engine = {
         }
         const eff = skills.getSkillEffect("repeatOffender");
         return priorHits * (eff.flatDamagePerPriorHit || 0);
+    },
+    /** Flat ego damage added after density and before Brutality (on top of Force already in attackDamage). */
+    getCombatOutgoingFlatBonus: function(target, opts) {
+        let flat = engine.getMainCharacterFlatDamage() + engine.getPeerPressureFlatDamage();
+        if (target) {
+            flat += engine.getRepeatOffenderFlatDamage(target);
+        }
+        if (opts && opts.flatBonus) {
+            flat += opts.flatBonus;
+        }
+        return flat;
     },
     applyPercentOutgoingBonus: function(damage, fraction) {
         if (!fraction) {
@@ -1905,11 +1992,16 @@ let engine = {
         return currentAud;
     },
     applyCombatOutgoingDamage: function(baseDamage, target, opts) {
+        // baseDamage is already ((base + cards) × density + Force) × Brutality.
+        // Extra flats (MC, Peer Pressure, Repeat Offender, Exploit, …) also get Brutality,
+        // then skill / buff / card damage multipliers apply.
+        const o = opts || {};
         let out = Math.max(0, baseDamage || 0);
-        out += engine.getMainCharacterFlatDamage();
-        out += engine.getPeerPressureFlatDamage();
+        const flatExtra = engine.getCombatOutgoingFlatBonus(target, o);
+        if (flatExtra) {
+            out += flatExtra * engine.getBrutalityMultiplier();
+        }
         if (target) {
-            out += engine.getRepeatOffenderFlatDamage(target);
             out = engine.applyGrudgeOutgoingMultiplier(out, target);
             out = engine.applyBitterRivalryOutgoingMultiplier(out, target);
             out = engine.applyClosingArgumentOutgoingMultiplier(out, target);
@@ -1918,7 +2010,7 @@ let engine = {
         out = engine.applyUnderdogOutgoingMultiplier(out);
         out = engine.applyCrowdWorkOutgoingMultiplier(out);
         out = engine.applyMarathonEgoOutgoingMultiplier(out);
-        out = engine.applyBattleBuffsToOutgoingDamage(out, opts || {});
+        out = engine.applyBattleBuffsToOutgoingDamage(out, o);
         return out;
     },
     getIntruderPushBonusPxPerSecond: function() {
@@ -2927,17 +3019,21 @@ let engine = {
         const snEffR = skills.getSkillEffect("sneak_attack");
         const sneakFracR = snEffR.firstHitDamageBonusFraction || 0;
         const priorHits = rt.timesHitByPlayer || 0;
-        if (sneakFracR > 0 && priorHits === 0) {
-            sandalDamage *= 1 + sneakFracR;
-        }
         const xpEffR = skills.getSkillEffect("exploit");
         const exploitStepR = xpEffR.flatDamagePerConsecutiveStep || 0;
         const prevTarget = data.battle.lastPlayerHitIntruderId || 0;
         const streak = (prevTarget === rt.id) ? ((data.battle.lastPlayerHitStreak || 0) + 1) : 1;
+        let exploitFlatR = 0;
         if (exploitStepR > 0 && streak >= 2) {
-            sandalDamage += (streak - 1) * exploitStepR;
+            exploitFlatR = (streak - 1) * exploitStepR;
         }
-        sandalDamage = engine.applyCombatOutgoingDamage(sandalDamage, rt, { consumeFury: true });
+        sandalDamage = engine.applyCombatOutgoingDamage(sandalDamage, rt, {
+            consumeFury: true,
+            flatBonus: exploitFlatR
+        });
+        if (sneakFracR > 0 && priorHits === 0) {
+            sandalDamage *= 1 + sneakFracR;
+        }
         sandalDamage = Math.max(1, roundNearestDecimals(sandalDamage, 1));
         sandalDamage *= bonfire.getCombatDamageMultiplier();
         sandalDamage = Math.max(1, roundNearestDecimals(sandalDamage, 1));
@@ -3178,9 +3274,11 @@ let engine = {
         } else if (skill.key === "alacrity") {
             engine.syncPlayerCooldownFields();
         } else if (skill.key === "shameless") {
-            initialize.calcPlayerStats(false);
+            // +10 max (equal recover) + additionally recover 10 × skill level (no Narcissism on the extra).
+            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: (skill.level || 0) * 10 });
         } else if (skill.key === "corneredEgo") {
-            initialize.calcPlayerStats(false);
+            // +4 max (equal recover) + additionally recover 8 current (no Narcissism on the extra).
+            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: 8 });
         } else if (skill.key === "force" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "windfallSwagger" || skill.key === "shockValue" || skill.key === "validation" || skill.key === "paddingResume") {

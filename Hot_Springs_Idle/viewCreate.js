@@ -139,7 +139,9 @@ let createView = {
         );
         createView.createInfoButton(
             "tabPane_stats",
-            "<p><strong>Audacity order:</strong> (Base Aud + card Base Audacity) × Dense Clones, then + Aud from skills, then × Confidence.</p>"
+            "<p><strong>Audacity order:</strong> ((Base Aud + card Base Audacity) × Dense Clones + Aud) × Confidence.</p>"
+            + "<p><strong>Max Aud recover:</strong> Whenever max Aud increases, recover an equal amount of current Audacity (+max and +current)."
+            + "<p><strong>Ego Damage order:</strong> (Base slap + card Base Ego Damage) × Dense Clones, then + flat ego damage from skills, then × Brutality, then × damage multipliers from skills, buffs, and cards.</p>"
             + "<p><strong>Damage reduction order:</strong> (1) Clout absorbs raw incoming damage, (2) flat reduction (Armor, Insult Fatigue), (3) multiplier reductions from skills, buffs, and class.</p>"
         );
     },

@@ -551,21 +551,21 @@ let view = {
         const skillAudLines = [];
         let skillAudSum = 0;
         if (shamelessResearched) {
-            skillAudLines.push(`Shameless: +${fortInner}`);
+            skillAudLines.push(`Shameless: +${fortInner} max; additionally recover ${fortInner} when leveling`);
             skillAudSum += fortInner;
         }
         const corneredAmt = corneredResearched ? tenB : 0;
         if (corneredResearched) {
-            const corneredCurrent = corneredAmt * 2;
-            skillAudLines.push(`Cornered Ego: +${corneredAmt} base, +${corneredCurrent} current`);
-            skillAudSum += corneredAmt + corneredCurrent;
+            const corneredRecover = skills.getSkillEffect("corneredEgo").audRecoverBonus || (corneredAmt * 2);
+            skillAudLines.push(`Cornered Ego: +${corneredAmt} max; additionally recover ${corneredRecover}`);
+            skillAudSum += corneredAmt;
         }
         let valAud = 0;
         if (skills.isSkillUnlocked("validation")) {
             valAud = engine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
             const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
-            skillAudLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); +${valCur} current Aud when max increases from a kill`);
+            skillAudLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); additionally recover +${valCur} Audacity when max increases from a kill`);
             skillAudSum += valAud;
         }
         let padAud = 0;
@@ -607,13 +607,18 @@ let view = {
         const ppRaw = (skills.isSkillUnlocked("peerPressure") && typeof engine.getPeerPressureFlatDamage === "function")
             ? engine.getPeerPressureFlatDamage() : 0;
         const attackBaseLines = [];
-        const attackBaseSum = gc.baseSlapDamage + cardSlap + forceRaw + mcRaw + ppRaw;
+        const denseSlapUi = (gc.baseSlapDamage + cardSlap) * densMult;
+        const skillFlatSum = forceRaw + mcRaw + ppRaw;
+        const attackPreBru = denseSlapUi + skillFlatSum;
         attackBaseLines.push(`Base slap: +${gc.baseSlapDamage}`);
         if (cardSlap) {
             attackBaseLines.push(`Base ego damage: +${roundNearestDecimals(cardSlap, 2)}`);
         }
+        if (runDensity > 0) {
+            attackBaseLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base) → ${roundNearestDecimals(denseSlapUi, 2)}`);
+        }
         if (forceResearched) {
-            attackBaseLines.push(`Force (base): +${roundNearestDecimals(forceRaw, 2)}`);
+            attackBaseLines.push(`Force (flat): +${roundNearestDecimals(forceRaw, 2)}`);
         }
         if (skills.isSkillUnlocked("mainCharacter")) {
             const vis = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
@@ -623,12 +628,9 @@ let view = {
             const inSlap = typeof engine.countIntrudersInSlapRange === "function" ? engine.countIntrudersInSlapRange() : 0;
             attackBaseLines.push(`Peer Pressure: +${roundNearestDecimals(ppRaw, 2)} from ${inSlap} in slap range`);
         }
-        attackBaseLines.push(`Total base: ${roundNearestDecimals(attackBaseSum, 2)}`);
-        let afterAttack = ((gc.baseSlapDamage + cardSlap) * densMult + forceRaw) * strMult + mcRaw + ppRaw;
+        attackBaseLines.push(`After density + flats: ${roundNearestDecimals(attackPreBru, 2)}`);
+        let afterAttack = attackPreBru * strMult;
         const attackMultLines = [];
-        if (runDensity > 0) {
-            attackMultLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% base ego damage)`);
-        }
         if (growthUnlocked || strTotal > 0) {
             attackMultLines.push(`Brutality: ×${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
         }
@@ -673,8 +675,8 @@ let view = {
             attackMultLines.push(`Marathon Ego: ×${roundNearestDecimals(meFactor, 2)} (+${round2(mePct * tens)}% from ${tens * 10}s)`);
             afterAttack *= meFactor;
         }
-        const atkExtra = afterAttack - attackBaseSum;
-        const atkEffective = attackBaseSum > 0 ? afterAttack / attackBaseSum : 1;
+        const atkExtra = afterAttack - attackPreBru;
+        const atkEffective = attackPreBru > 0 ? afterAttack / attackPreBru : 1;
         const atkExtraText = Math.abs(atkExtra) >= 0.05 ? ` (${atkExtra > 0 ? "+" : ""}${roundNearestDecimals(atkExtra, 2)} ego dmg)` : "";
         attackMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(atkEffective, 2)}${atkExtraText}`);
         const attackTip = attackBaseLines.join("<br>") + "<br><br>" + attackMultLines.join("<br>");

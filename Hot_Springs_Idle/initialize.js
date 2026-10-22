@@ -1675,37 +1675,39 @@ let initialize = {
         const padEff = skills.getSkillEffect("paddingResume");
         const paddingAud = padEff.audBonus || 0;
         // ((base + cards) × density + skill Aud) × Confidence
-        const skillAud = fortLvl + tenInner + (2 * tenInner) + validationAud + paddingAud;
+        // Skill Aud is max only; "additionally recover" heals are applied as current, not max.
+        const skillAud = fortLvl + tenInner + validationAud + paddingAud;
         const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult));
         data.battle.player.maxAud = maxAud;
         if (fullHeal) {
             data.battle.player.aud = data.battle.player.maxAud;
         } else {
+            // Equal recover: when max rises by X, current rises by X (missing Aud preserved).
             let newAud = Math.max(1, maxAud - missingAud);
             const maxRise = maxAud - oldMax;
-            // Extra current Aud tied to this max increase (e.g. Validation beyond the +1 from preserving missing).
+            // Narcissism only boosts the equal recover from the max increase — not extra recovers.
+            if (maxRise > 0) {
+                newAud = engine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
+                engine.addSkillExp("narcissism", 1);
+                if (skills.isSkillUnlocked("borrowedGlory")) {
+                    engine.addSkillExp("borrowedGlory", 1);
+                }
+            }
+            // Additional recovers (Validation, Cornered Ego, …) — not boosted by Narcissism.
             const extraOnMaxRise = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
                 ? opts.extraCurrentOnMaxRise : 0;
             if (extraOnMaxRise > 0) {
                 newAud = Math.min(maxAud, newAud + extraOnMaxRise);
             }
-            const currentRise = newAud - oldAud;
-            if (maxRise > 0 && currentRise > 0) {
-                newAud = engine.applyNarcissismToMaxAudCurrentIncrease(newAud, currentRise, maxAud);
-            }
-            if (maxRise > 0) {
-                engine.addSkillExp("narcissism", 1);
-            }
-            if (maxRise > 0 && skills.isSkillUnlocked("borrowedGlory")) {
-                engine.addSkillExp("borrowedGlory", 1);
-            }
             data.battle.player.aud = newAud;
             const healed = newAud - oldAud;
-            // Left float = current Aud healed from a max increase (incl. Narcissism); none if no heal.
+            // Left float = current Aud from max increase (equal recover + Narcissism + extras).
             if (maxRise > 0 && healed > 0) {
                 engine.spawnAudGainFloat(healed, "left");
             }
         }
+        // Ego damage: ((base + cards) × density + Force flat) × Brutality.
+        // Other skill flats and damage mults apply on hit in engine.applyCombatOutgoingDamage.
         let atk = (denseSlap + forceFlat) * (1 + (totalStr / div));
         atk = Math.max(1, roundNearestDecimals(atk, 1));
         data.battle.player.attackDamage = atk;
