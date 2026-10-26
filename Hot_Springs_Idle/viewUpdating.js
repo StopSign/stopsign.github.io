@@ -607,11 +607,13 @@ let view = {
         const forceRaw = forceResearched ? (skills.getSkillEffect("force").baseDamage || 0) : 0;
         const mcRaw = (skills.isSkillUnlocked("mainCharacter") && typeof engine.getMainCharacterFlatDamage === "function")
             ? engine.getMainCharacterFlatDamage() : 0;
-        const ppRaw = (skills.isSkillUnlocked("peerPressure") && typeof engine.getPeerPressureFlatDamage === "function")
-            ? engine.getPeerPressureFlatDamage() : 0;
+        const sadismRaw = (skills.isSkillUnlocked("sadism") && typeof engine.getSadismFlatDamage === "function")
+            ? engine.getSadismFlatDamage() : 0;
+        const slowBurnRaw = (skills.isSkillUnlocked("slowBurn") && typeof engine.getSlowBurnFlatDamage === "function")
+            ? engine.getSlowBurnFlatDamage() : 0;
         const attackBaseLines = [];
         const denseSlapUi = (gc.baseSlapDamage + cardSlap) * densMult;
-        const skillFlatSum = forceRaw + mcRaw + ppRaw;
+        const skillFlatSum = forceRaw + mcRaw + sadismRaw + slowBurnRaw;
         const attackPreBru = denseSlapUi + skillFlatSum;
         attackBaseLines.push(`Base slap: +${gc.baseSlapDamage}`);
         if (cardSlap) {
@@ -627,9 +629,12 @@ let view = {
             const vis = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             attackBaseLines.push(`Main Character: +${roundNearestDecimals(mcRaw, 2)} from ${vis} visible ${vis === 1 ? "enemy" : "enemies"}`);
         }
-        if (skills.isSkillUnlocked("peerPressure")) {
-            const inSlap = typeof engine.countIntrudersInSlapRange === "function" ? engine.countIntrudersInSlapRange() : 0;
-            attackBaseLines.push(`Peer Pressure: +${roundNearestDecimals(ppRaw, 2)} from ${inSlap} in slap range`);
+        if (skills.isSkillUnlocked("sadism")) {
+            attackBaseLines.push(`Sadism (flat): +${roundNearestDecimals(sadismRaw, 2)}`);
+        }
+        if (skills.isSkillUnlocked("slowBurn")) {
+            const sbSecs = (data.battle && data.battle.slowBurnSeconds) || 0;
+            attackBaseLines.push(`Slow Burn (flat): +${roundNearestDecimals(slowBurnRaw, 2)} after ${sbSecs}s in slap range`);
         }
         attackBaseLines.push(`After density + flats: ${roundNearestDecimals(attackPreBru, 2)}`);
         let afterAttack = attackPreBru * strMult;
@@ -653,21 +658,32 @@ let view = {
             }
             attackMultLines.push(brLine);
         }
-        if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAboveHalfAud === "function" && engine.isPlayerAboveHalfAud()) {
+        if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAtMaxAud === "function" && engine.isPlayerAtMaxAud()) {
             const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
-            attackMultLines.push(`High Horse: ×${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% while above half Aud)`);
+            attackMultLines.push(`High Horse: ×${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% at full Aud)`);
             afterAttack *= (1 + hhFrac);
         }
-        if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtOrBelowAudFraction === "function" && engine.isPlayerAtOrBelowAudFraction(0.5)) {
+        if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtMaxAud === "function" && !engine.isPlayerAtMaxAud()) {
             const udFrac = skills.getSkillEffect("underdog").damageBonusFraction || 0;
-            attackMultLines.push(`Underdog: ×${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% at or below half Aud)`);
+            attackMultLines.push(`Underdog: ×${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% while not at full Aud)`);
             afterAttack *= (1 + udFrac);
         }
+        if (skills.isSkillUnlocked("peerPressure")) {
+            const ppFrac = (typeof engine.getPeerPressureDamageBonusFraction === "function")
+                ? engine.getPeerPressureDamageBonusFraction() : 0;
+            const closeNow = (typeof engine.countVisibleIntrudersCloserThan === "function")
+                ? engine.countVisibleIntrudersCloserThan(200) : 0;
+            if (ppFrac > 0) {
+                attackMultLines.push(`Peer Pressure: ×${roundNearestDecimals(1 + ppFrac, 2)} (+${roundNearestDecimals(ppFrac * 100, 1)}% from ${closeNow} closer than 200 ft)`);
+                afterAttack *= (1 + ppFrac);
+            }
+        }
         if (skills.isSkillUnlocked("crowdWork")) {
+            const cwFrac = (typeof engine.getCrowdWorkDamageBonusFraction === "function")
+                ? engine.getCrowdWorkDamageBonusFraction() : 0;
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
-            if (visNow >= 4) {
-                const cwFrac = skills.getSkillEffect("crowdWork").damageBonusFraction || 0;
-                attackMultLines.push(`Crowd Work: ×${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% with ${visNow} visible)`);
+            if (cwFrac > 0) {
+                attackMultLines.push(`Crowd Work: ×${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% from ${visNow} visible)`);
                 afterAttack *= (1 + cwFrac);
             }
         }

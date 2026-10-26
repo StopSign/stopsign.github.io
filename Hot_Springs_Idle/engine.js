@@ -61,10 +61,14 @@ let engine = {
         engine.updateSelfAffirmationsEachSecond(tickMs);
         engine.updateMainCharacterSkillExp(tickMs);
         engine.updateSecondhandEmbarrassmentSkillExp(tickMs);
+        engine.updateStageSob(tickMs);
+        engine.updateCrowdWorkSkillExp(tickMs);
         engine.updateSeetheEachSecond(tickMs);
         engine.updateApplyTearDropsEachSecond(tickMs);
         engine.updateBitterRivalryInRange(tickMs);
         engine.updateNumbingCrowdsEachSecond(tickMs);
+        engine.updatePeerPressureSkillExp(tickMs);
+        engine.updateSlowBurn(tickMs);
         engine.updateCombatSkillPeriodics(tickMs);
         engine.updatePassiveSkillExp(tickMs);
         engine.updateClassEffects(tickMs);
@@ -448,25 +452,51 @@ let engine = {
         }
         engine.addSkillExp("secondhandEmbarrassment", 0.25 * visible * (tickMs / 1000));
     },
+    updateStageSob: function(tickMs) {
+        if (!skills.isSkillUnlocked("stageSob")) {
+            return;
+        }
+        const visible = engine.countVisibleIntruders();
+        if (visible <= 0) {
+            return;
+        }
+        const sec = tickMs / 1000;
+        engine.addSkillExp("stageSob", 0.25 * visible * sec);
+        const per = skills.getSkillEffect("stageSob").cloutPerVisible || 0;
+        if (per > 0) {
+            engine.addCloutStacks(per * visible * sec);
+        }
+    },
+    updateCrowdWorkSkillExp: function(tickMs) {
+        if (!skills.isSkillUnlocked("crowdWork")) {
+            return;
+        }
+        const visible = engine.countVisibleIntruders();
+        if (visible <= 0) {
+            return;
+        }
+        engine.addSkillExp("crowdWork", 0.25 * visible * (tickMs / 1000));
+    },
     updateSeetheEachSecond: function(tickMs) {
         if (!skills.isSkillUnlocked("seethe")) {
             return;
         }
-        if (engine.anyIntruderInSlapRange()) {
+        const farCount = engine.countVisibleIntrudersFurtherThan(200);
+        if (farCount <= 0) {
             return;
         }
+        engine.addSkillExp("seethe", 0.5 * farCount * (tickMs / 1000));
         if (data.battle.seetheSecondAccMs === undefined || data.battle.seetheSecondAccMs === null) {
             data.battle.seetheSecondAccMs = 0;
         }
         data.battle.seetheSecondAccMs += tickMs;
-        while (data.battle.seetheSecondAccMs >= 1000) {
-            data.battle.seetheSecondAccMs -= 1000;
+        while (data.battle.seetheSecondAccMs >= 500) {
+            data.battle.seetheSecondAccMs -= 500;
             const eff = skills.getSkillEffect("seethe");
-            const stacks = eff.furyPerLevel || 0;
+            const stacks = (eff.furyPerLevel || 0) * farCount;
             if (stacks > 0) {
                 engine.addFuryStacks(stacks);
             }
-            engine.addSkillExp("seethe", 1);
         }
     },
     updateApplyTearDropsEachSecond: function(tickMs) {
@@ -504,7 +534,7 @@ let engine = {
             while (e.bitterRivalryInRangeAccMs >= 1000) {
                 e.bitterRivalryInRangeAccMs -= 1000;
                 e.bitterRivalrySeconds = (e.bitterRivalrySeconds || 0) + 1;
-                engine.addSkillExp("bitterRivalry", 1);
+                engine.addSkillExp("bitterRivalry", 0.5);
             }
         }
     },
@@ -512,9 +542,11 @@ let engine = {
         if (!skills.isSkillUnlocked("numbingCrowds")) {
             return;
         }
-        if (engine.countIntrudersInSlapRange() < 3) {
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount <= 0) {
             return;
         }
+        engine.addSkillExp("numbingCrowds", 0.5 * closeCount * (tickMs / 1000));
         if (data.battle.numbingCrowdsSecondAccMs === undefined || data.battle.numbingCrowdsSecondAccMs === null) {
             data.battle.numbingCrowdsSecondAccMs = 0;
         }
@@ -522,11 +554,45 @@ let engine = {
         while (data.battle.numbingCrowdsSecondAccMs >= 1000) {
             data.battle.numbingCrowdsSecondAccMs -= 1000;
             const eff = skills.getSkillEffect("numbingCrowds");
-            const ms = eff.fakeTearsMsPerLevel || 0;
+            const ms = (eff.fakeTearsMsPerLevel || 0) * closeCount;
             if (ms > 0) {
                 engine.addFakeTearsMs(ms);
             }
-            engine.addSkillExp("numbingCrowds", 1);
+        }
+    },
+    updatePeerPressureSkillExp: function(tickMs) {
+        if (!skills.isSkillUnlocked("peerPressure")) {
+            return;
+        }
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount <= 0) {
+            return;
+        }
+        engine.addSkillExp("peerPressure", 0.5 * closeCount * (tickMs / 1000));
+    },
+    updateSlowBurn: function(tickMs) {
+        if (!skills.isSkillUnlocked("slowBurn")) {
+            return;
+        }
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount > 0) {
+            engine.addSkillExp("slowBurn", 0.5 * closeCount * (tickMs / 1000));
+        }
+        if (!engine.anyIntruderInSlapRange()) {
+            data.battle.slowBurnSeconds = 0;
+            data.battle.slowBurnAccMs = 0;
+            return;
+        }
+        if (data.battle.slowBurnAccMs === undefined || data.battle.slowBurnAccMs === null) {
+            data.battle.slowBurnAccMs = 0;
+        }
+        if (data.battle.slowBurnSeconds === undefined || data.battle.slowBurnSeconds === null) {
+            data.battle.slowBurnSeconds = 0;
+        }
+        data.battle.slowBurnAccMs += tickMs;
+        while (data.battle.slowBurnAccMs >= 1000) {
+            data.battle.slowBurnAccMs -= 1000;
+            data.battle.slowBurnSeconds += 1;
         }
     },
     advanceBattleAccMs: function(key, tickMs, intervalMs, onTick) {
@@ -542,9 +608,7 @@ let engine = {
     updateCombatSkillPeriodics: function(tickMs) {
         const moving = engine.isPlayerMovingForward();
         const atMax = engine.isPlayerAtMaxAud();
-        const inSlap = engine.anyIntruderInSlapRange();
-        const slapCount = inSlap ? engine.countIntrudersInSlapRange() : 0;
-        const visible = engine.countVisibleIntruders();
+        const slapCount = engine.countIntrudersInSlapRange();
 
         engine.advanceBattleAccMs("combatSkillSecondAccMs", tickMs, 1000, function() {
             if (moving && skills.isSkillUnlocked("righteousRant")) {
@@ -563,15 +627,25 @@ let engine = {
                 }
                 engine.addSkillExp("walkingItOff", 1);
             }
-            if (inSlap) {
-                engine.addSkillExp("peerPressure", 1);
-                if (skills.isSkillUnlocked("slowBurn")) {
-                    const burnEff = skills.getSkillEffect("slowBurn");
-                    const fury = (burnEff.furyPerLevel || 0) * slapCount;
-                    if (fury > 0) {
-                        engine.addFuryStacks(fury);
+            if (atMax) {
+                engine.addSkillExp("highHorse", 1);
+                engine.addSkillExp("simmer", 1);
+                if (skills.isSkillUnlocked("simmer")) {
+                    const simEff = skills.getSkillEffect("simmer");
+                    const maliceAmt = simEff.malicePerLevel || 0;
+                    if (maliceAmt > 0) {
+                        engine.addMalice(maliceAmt);
                     }
-                    engine.addSkillExp("slowBurn", 1);
+                }
+            } else {
+                engine.addSkillExp("underdog", 1);
+                engine.addSkillExp("imposterSyndrome", 1);
+                if (skills.isSkillUnlocked("imposterSyndrome")) {
+                    const isEff = skills.getSkillEffect("imposterSyndrome");
+                    const maliceAmt = isEff.malicePerLevel || 0;
+                    if (maliceAmt > 0) {
+                        engine.addMalice(maliceAmt);
+                    }
                 }
             }
             if (atMax && skills.isSkillUnlocked("stoic")) {
@@ -599,36 +673,6 @@ let engine = {
                     }
                     engine.addSkillExp("heckled", 1);
                 }
-                if (skills.isSkillUnlocked("socialArmor")) {
-                    const saEff = skills.getSkillEffect("socialArmor");
-                    const clout = saEff.cloutPerLevel || 0;
-                    if (clout > 0) {
-                        engine.addCloutStacks(clout);
-                    }
-                    engine.addSkillExp("socialArmor", 1);
-                }
-            }
-            if (visible >= 4) {
-                engine.addSkillExp("crowdWork", 1);
-                if (skills.isSkillUnlocked("stageSob")) {
-                    const sobEff = skills.getSkillEffect("stageSob");
-                    const ms = sobEff.fakeTearsMsPerLevel || 0;
-                    if (ms > 0) {
-                        engine.addFakeTearsMs(ms);
-                    }
-                    engine.addSkillExp("stageSob", 1);
-                }
-            }
-        });
-
-        engine.advanceBattleAccMs("combatSkillTwoSecondAccMs", tickMs, 2000, function() {
-            if (atMax && skills.isSkillUnlocked("simmer")) {
-                const simEff = skills.getSkillEffect("simmer");
-                const maliceAmt = simEff.malicePerLevel || 0;
-                if (maliceAmt > 0) {
-                    engine.addMalice(maliceAmt);
-                }
-                engine.addSkillExp("simmer", 1);
             }
         });
 
@@ -644,8 +688,9 @@ let engine = {
             return;
         }
         const swEff = skills.getSkillEffect("secondWind");
-        const heal = swEff.restoreAud || 0;
-        if (heal <= 0) {
+        const maxAud = (data.battle.player && data.battle.player.maxAud) || 0;
+        const heal = (swEff.restoreAudFlat || 0) + (swEff.restoreAudMaxFraction || 0) * maxAud;
+        if (!(heal > 0)) {
             return;
         }
         data.battle.secondWindRestoreUsed = true;
@@ -663,14 +708,6 @@ let engine = {
             engine.addSkillExp("thinIce", 1);
         }
         engine.addSkillExp("stiffUpperLip", 1);
-        if (skills.isSkillUnlocked("imposterSyndrome")) {
-            const isEff = skills.getSkillEffect("imposterSyndrome");
-            const furyStacks = isEff.furyPerLevel || 0;
-            if (furyStacks > 0) {
-                engine.addFuryStacks(furyStacks);
-            }
-            engine.addSkillExp("imposterSyndrome", 1);
-        }
     },
     updateSelfAffirmationsEachSecond: function(tickMs) {
         if (data.battle.selfAffirmationsSecondAccMs === undefined) {
@@ -926,7 +963,7 @@ let engine = {
                 let incoming = engine.applyCloutToIncomingDamage(rawIncoming);
                 const cloutEntry = battleBuffs.getState().byKey.clout;
                 const cloutConsumed = cloutEntry ? (cloutEntry.lastNegation || 0) : 0;
-                incoming = engine.applyInsultFatigueFlat(intruder, incoming);
+                incoming = engine.applyInsultFatigueFlat(intruder, incoming, rawIncoming);
                 const armorEff = skills.getSkillEffect("toughness_condescend");
                 const armorFlat = (armorEff.armorFlat || 0) + (skills.getSkillEffect("thickSkin").armorFlat || 0);
                 incoming = Math.max(0, incoming - armorFlat);
@@ -963,7 +1000,6 @@ let engine = {
                         intruder.aud -= thorns;
                     }
                 }
-                const aboveHalfAudBeforeHit = engine.isPlayerAboveHalfAud();
                 engine.spawnPlayerHurtFloat(intruder, shownIncoming);
                 data.battle.player.aud -= audLost;
                 intruder.hasAttackedPlayer = true;
@@ -981,13 +1017,15 @@ let engine = {
                 if ((intruder.playerAttackCount || 0) >= 2) {
                     engine.addSkillExp("insultFatigue", 1);
                 }
-                if (damageApplied && aboveHalfAudBeforeHit && skills.isSkillUnlocked("temper")) {
-                    const tEff = skills.getSkillEffect("temper");
-                    const maliceAmt = tEff.malicePerLevel || 0;
-                    if (maliceAmt > 0) {
-                        engine.addMalice(maliceAmt);
-                    }
+                if (damageApplied) {
                     engine.addSkillExp("temper", 1);
+                    if (skills.isSkillUnlocked("temper")) {
+                        const tEff = skills.getSkillEffect("temper");
+                        const maliceAmt = tEff.malicePerLevel || 0;
+                        if (maliceAmt > 0) {
+                            engine.addMalice(maliceAmt);
+                        }
+                    }
                 }
                 engine.addSkillExp("aboveItAll", 1);
                 if (damageApplied) {
@@ -1004,11 +1042,22 @@ let engine = {
                     }
                     if (skills.isSkillUnlocked("sobStory")) {
                         const ssEff = skills.getSkillEffect("sobStory");
-                        const tearsMs = ssEff.fakeTearsMsPerLevel || 0;
-                        if (tearsMs > 0) {
-                            engine.addFakeTearsMs(tearsMs);
+                        const clout = ssEff.cloutPerHit || 0;
+                        if (clout > 0) {
+                            engine.addCloutStacks(clout);
                         }
                         engine.addSkillExp("sobStory", 1);
+                    }
+                    if (skills.isSkillUnlocked("socialArmor")) {
+                        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+                        if (closeCount > 0) {
+                            const saEff = skills.getSkillEffect("socialArmor");
+                            const clout = (saEff.cloutPerCloseEnemy || 0) * closeCount;
+                            if (clout > 0) {
+                                engine.addCloutStacks(clout);
+                            }
+                            engine.addSkillExp("socialArmor", 0.5 * closeCount);
+                        }
                     }
                 }
                 if (data.battle.player.aud < 0) {
@@ -1155,8 +1204,9 @@ let engine = {
         const e = skills.getSkillEffect("hindsight");
         const hog = skills.getSkillEffect("experienceHog");
         const hindsight = e.characterExpMultiplier !== undefined ? e.characterExpMultiplier : 1;
-        const hogAdd = hog.characterExpAdd || 0;
-        return hindsight + hogAdd + 0.10 * engine.getCloneSoulLevel();
+        const hogMult = hog.characterExpMultiplier !== undefined ? hog.characterExpMultiplier : 1;
+        // Hindsight and Experience Hog multiply; Soul remains an additive bonus on the product.
+        return hindsight * hogMult + 0.10 * engine.getCloneSoulLevel();
     },
     getValidationAudFromKills: function() {
         if (!skills.isSkillUnlocked("validation")) {
@@ -1212,14 +1262,6 @@ let engine = {
             }
             engine.addSkillExp("publicApology", 1);
         }
-        if (skills.isSkillUnlocked("retailTherapy")) {
-            const rtEff = skills.getSkillEffect("retailTherapy");
-            const desMs = rtEff.desensitizedMsPerLevel || 0;
-            if (desMs > 0) {
-                engine.addDesensitizedStack(desMs);
-            }
-            engine.addSkillExp("retailTherapy", engine.positiveLog(coinsGain, 10));
-        }
         if (skills.isSkillUnlocked("bloodRush") && engine.isPlayerAboveHalfAud()) {
             const brEff = skills.getSkillEffect("bloodRush");
             const maliceAmt = brEff.malicePerLevel || 0;
@@ -1229,14 +1271,8 @@ let engine = {
             engine.addSkillExp("bloodRush", 1);
         }
         const overkillDamage = (opts && opts.overkillDamage) ? opts.overkillDamage : 0;
-        if (skills.isSkillUnlocked("sadism")) {
-            const sadEff = skills.getSkillEffect("sadism");
-            const maliceAmt = sadEff.malicePerLevel || 0;
-            if (maliceAmt > 0) {
-                engine.addMalice(maliceAmt);
-            }
-            engine.addSkillExp("sadism", engine.positiveLog(overkillDamage, 2));
-        }
+        const sadismExp = overkillDamage > 0 ? Math.log10(overkillDamage) : 0;
+        engine.addSkillExp("sadism", Math.max(sadismExp, 1));
         // Validation: +audPerKill max Aud per kill (via calcPlayerStats). When that max rises, additionally
         // heal equal to Validation level. Equal recover already grants that max-rise amount, so pass the
         // rest as extraCurrentOnMaxRise (not boosted by Narcissism).
@@ -1312,7 +1348,8 @@ let engine = {
         return skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
     },
     /**
-     * Award coins and grant Windfall Swagger 1 skill exp when amount > 0.
+     * Award coins and grant Windfall Swagger / Extortion / Retail Therapy 1 skill exp when amount > 0.
+     * Retail Therapy also adds its Desensitized stack on each grant.
      * opts.countRunKills (default true): add to battle runCoinsFromKills.
      */
     grantBattleCoins: function(amount, opts) {
@@ -1327,10 +1364,19 @@ let engine = {
         }
         engine.addSkillExp("windfallSwagger", 1);
         engine.addSkillExp("extortion", 1);
+        engine.addSkillExp("retailTherapy", 1);
+        if (skills.isSkillUnlocked("retailTherapy")) {
+            const rtEff = skills.getSkillEffect("retailTherapy");
+            const desMs = rtEff.desensitizedMsPerLevel || 0;
+            if (desMs > 0) {
+                engine.addDesensitizedStack(desMs);
+            }
+        }
         return gain;
     },
     /**
      * Secondhand Embarrassment: other slap-range intruders pay (10% base coins + flat coin bonuses).
+     * Each splash is its own grantBattleCoins call so coin-gain triggers fire per drop.
      * Returns total coins granted (0 if none).
      */
     applySecondhandEmbarrassmentCoins: function(killedIntruder) {
@@ -1349,10 +1395,11 @@ let engine = {
             if (!e.alive || !e.inRange || e.id === killedId) {
                 continue;
             }
-            total += ((e.gain || 1) * frac) + flat;
-        }
-        if (total > 0) {
-            engine.grantBattleCoins(total);
+            const drop = ((e.gain || 1) * frac) + flat;
+            if (drop > 0) {
+                engine.grantBattleCoins(drop);
+                total += drop;
+            }
         }
         return total;
     },
@@ -1481,7 +1528,6 @@ let engine = {
             ls.expToLevelBase = ls.expToLevel || gameData.battle.levelStartingExpToLevel;
         }
         while (ls.exp >= ls.expToLevel) {
-            const expForLevel = ls.expToLevel;
             ls.exp -= ls.expToLevel;
             ls.level++;
             engine.noteHighestLevelReached(ls.level);
@@ -1513,7 +1559,7 @@ let engine = {
                         engine.addDesensitizedStack(desMs);
                     }
                 }
-                engine.addSkillExp("levelHeaded", Math.sqrt(Math.max(0, expForLevel)));
+                engine.addSkillExp("levelHeaded", 2);
             }
             initialize.calcPlayerStats(false);
         }
@@ -1820,6 +1866,38 @@ let engine = {
         }
         return n;
     },
+    countVisibleIntrudersFurtherThan: function(rangePx) {
+        const battleHeight = viewData.layout.battlefieldHeightPx || gameData.battle.battlefieldHeightPx || 500;
+        const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
+        let n = 0;
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || !engine.intruderIntersectsBattlefield(e)) {
+                continue;
+            }
+            const dist = playerTopY - (e.yPx + (e.sizePx || 0));
+            if (dist > rangePx) {
+                n++;
+            }
+        }
+        return n;
+    },
+    countVisibleIntrudersCloserThan: function(rangePx) {
+        const battleHeight = viewData.layout.battlefieldHeightPx || gameData.battle.battlefieldHeightPx || 500;
+        const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
+        let n = 0;
+        for (let i = 0; i < data.battle.enemies.length; i++) {
+            const e = data.battle.enemies[i];
+            if (!e.alive || !engine.intruderIntersectsBattlefield(e)) {
+                continue;
+            }
+            const dist = playerTopY - (e.yPx + (e.sizePx || 0));
+            if (dist < rangePx) {
+                n++;
+            }
+        }
+        return n;
+    },
     getBrutalityMultiplier: function() {
         const ls = data.battle.levelState || {};
         let totalStr = (ls.levelStr || 0) + (ls.skillStrBonus || 0);
@@ -1835,13 +1913,15 @@ let engine = {
         const per = eff.flatDamagePerEnemy || 0;
         return per * engine.countVisibleIntruders();
     },
-    getPeerPressureFlatDamage: function() {
+    getPeerPressureDamageBonusFraction: function() {
         if (!skills.isSkillUnlocked("peerPressure")) {
             return 0;
         }
-        const eff = skills.getSkillEffect("peerPressure");
-        const per = eff.flatDamagePerInRange || 0;
-        return per * engine.countIntrudersInSlapRange();
+        const per = skills.getSkillEffect("peerPressure").damageBonusFractionPerEnemy || 0;
+        if (!(per > 0)) {
+            return 0;
+        }
+        return per * engine.countVisibleIntrudersCloserThan(200);
     },
     getRepeatOffenderFlatDamage: function(target) {
         if (!target || !skills.isSkillUnlocked("repeatOffender")) {
@@ -1854,9 +1934,27 @@ let engine = {
         const eff = skills.getSkillEffect("repeatOffender");
         return priorHits * (eff.flatDamagePerPriorHit || 0);
     },
+    getSadismFlatDamage: function() {
+        if (!skills.isSkillUnlocked("sadism")) {
+            return 0;
+        }
+        return skills.getSkillEffect("sadism").flatDamage || 0;
+    },
+    getSlowBurnFlatDamage: function() {
+        if (!skills.isSkillUnlocked("slowBurn")) {
+            return 0;
+        }
+        const secs = data.battle.slowBurnSeconds || 0;
+        if (secs <= 0) {
+            return 0;
+        }
+        const per = skills.getSkillEffect("slowBurn").flatDamagePerSecond || 0;
+        return per * secs;
+    },
     /** Flat ego damage added after density and before Brutality (on top of Force already in attackDamage). */
     getCombatOutgoingFlatBonus: function(target, opts) {
-        let flat = engine.getMainCharacterFlatDamage() + engine.getPeerPressureFlatDamage();
+        let flat = engine.getMainCharacterFlatDamage() + engine.getSadismFlatDamage()
+            + engine.getSlowBurnFlatDamage();
         if (target) {
             flat += engine.getRepeatOffenderFlatDamage(target);
         }
@@ -1872,25 +1970,34 @@ let engine = {
         return damage * (1 + fraction);
     },
     applyHighHorseOutgoingMultiplier: function(damage) {
-        if (!engine.isPlayerAboveHalfAud() || !skills.isSkillUnlocked("highHorse")) {
+        if (!engine.isPlayerAtMaxAud() || !skills.isSkillUnlocked("highHorse")) {
             return damage;
         }
         const eff = skills.getSkillEffect("highHorse");
         return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
     },
     applyUnderdogOutgoingMultiplier: function(damage) {
-        if (!engine.isPlayerAtOrBelowAudFraction(0.5) || !skills.isSkillUnlocked("underdog")) {
+        if (engine.isPlayerAtMaxAud() || !skills.isSkillUnlocked("underdog")) {
             return damage;
         }
         const eff = skills.getSkillEffect("underdog");
-        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction);
+        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
+    },
+    applyPeerPressureOutgoingMultiplier: function(damage) {
+        return engine.applyPercentOutgoingBonus(damage, engine.getPeerPressureDamageBonusFraction());
+    },
+    getCrowdWorkDamageBonusFraction: function() {
+        if (!skills.isSkillUnlocked("crowdWork")) {
+            return 0;
+        }
+        const per = skills.getSkillEffect("crowdWork").damageBonusFractionPerEnemy || 0;
+        if (!(per > 0)) {
+            return 0;
+        }
+        return per * engine.countVisibleIntruders();
     },
     applyCrowdWorkOutgoingMultiplier: function(damage) {
-        if (engine.countVisibleIntruders() < 4 || !skills.isSkillUnlocked("crowdWork")) {
-            return damage;
-        }
-        const eff = skills.getSkillEffect("crowdWork");
-        return engine.applyPercentOutgoingBonus(damage, eff.damageBonusFraction || 0);
+        return engine.applyPercentOutgoingBonus(damage, engine.getCrowdWorkDamageBonusFraction());
     },
     applyMarathonEgoOutgoingMultiplier: function(damage) {
         if (!skills.isSkillUnlocked("marathonEgo")) {
@@ -1920,14 +2027,6 @@ let engine = {
     addCombatOutgoingHitSkillExp: function(target, priorHits) {
         if (priorHits > 0) {
             engine.addSkillExp("repeatOffender", 1);
-        }
-        if (engine.isPlayerAboveHalfAud()) {
-            engine.addSkillExp("highHorse", 1);
-        }
-        if (engine.isPlayerAtOrBelowAudFraction(0.5)) {
-            engine.addSkillExp("underdog", 1);
-        }
-        if (priorHits > 0) {
             engine.addSkillExp("closingArgument", 1);
         }
     },
@@ -1954,7 +2053,8 @@ let engine = {
         }
         return damage * (1 + (pct / 100) * secs);
     },
-    applyInsultFatigueFlat: function(intruder, incoming) {
+    /** Insult Fatigue flat reduction only; capped at 50% of raw attack damage (not post-Clout remaining). */
+    applyInsultFatigueFlat: function(intruder, incoming, rawIncoming) {
         if (!skills.isSkillUnlocked("insultFatigue")) {
             return incoming;
         }
@@ -1964,7 +2064,8 @@ let engine = {
         }
         const eff = skills.getSkillEffect("insultFatigue");
         const flat = stacks * (eff.flatReductionPerStack || 0);
-        const reduction = Math.min(flat, Math.max(0, incoming) * 0.5);
+        const rawCap = Math.max(0, rawIncoming !== undefined ? rawIncoming : incoming) * 0.5;
+        const reduction = Math.min(flat, rawCap);
         return Math.max(0, incoming - reduction);
     },
     grantPlayerCurrentAudGain: function(amount) {
@@ -1993,7 +2094,7 @@ let engine = {
     },
     applyCombatOutgoingDamage: function(baseDamage, target, opts) {
         // baseDamage is already ((base + cards) × density + Force) × Brutality.
-        // Extra flats (MC, Peer Pressure, Repeat Offender, Exploit, …) also get Brutality,
+        // Extra flats (MC, Sadism, Repeat Offender, Exploit, …) also get Brutality,
         // then skill / buff / card damage multipliers apply.
         const o = opts || {};
         let out = Math.max(0, baseDamage || 0);
@@ -2008,6 +2109,7 @@ let engine = {
         }
         out = engine.applyHighHorseOutgoingMultiplier(out);
         out = engine.applyUnderdogOutgoingMultiplier(out);
+        out = engine.applyPeerPressureOutgoingMultiplier(out);
         out = engine.applyCrowdWorkOutgoingMultiplier(out);
         out = engine.applyMarathonEgoOutgoingMultiplier(out);
         out = engine.applyBattleBuffsToOutgoingDamage(out, o);
@@ -3245,18 +3347,19 @@ let engine = {
     onSkillLevelUp: function(skill) {
         const def = skills._byKey[skill.key];
         const cat = def && def.category ? def.category : "combat";
-        if (skill.key !== "echoChamber" && (cat === "combat" || cat === "class")) {
-            engine.addSkillExp("echoChamber", 1);
+        if (cat === "combat" || cat === "class") {
+            if (skill.key !== "echoChamber") {
+                engine.addSkillExp("echoChamber", 0.5);
+            }
+            if (skill.key !== "recognition") {
+                engine.addSkillExp("recognition", 0.5);
+            }
         }
-        if (skills.isSkillUnlocked("recognition")) {
-            if (skill.key === "recognition") {
-                const recEff = skills.getSkillEffect("recognition");
-                const cloutGain = recEff.cloutPerLevel || 0;
-                if (cloutGain > 0) {
-                    engine.addCloutStacks(cloutGain);
-                }
-            } else {
-                engine.addSkillExp("recognition", 1);
+        if (skill.key === "recognition" && skills.isSkillUnlocked("recognition")) {
+            const recEff = skills.getSkillEffect("recognition");
+            const cloutGain = recEff.cloutPerLevel || 0;
+            if (cloutGain > 0) {
+                engine.addCloutStacks(cloutGain);
             }
         }
         if (skill.key === "adaptation") {

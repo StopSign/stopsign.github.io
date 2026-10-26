@@ -601,6 +601,8 @@ let initials = {
             seetheSecondAccMs: 0,
             applyTearDropsAccMs: 0,
             numbingCrowdsSecondAccMs: 0,
+            slowBurnAccMs: 0,
+            slowBurnSeconds: 0,
             combatSkillHalfSecondAccMs: 0,
             combatSkillSecondAccMs: 0,
             combatSkillTwoSecondAccMs: 0,
