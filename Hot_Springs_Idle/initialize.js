@@ -1673,7 +1673,7 @@ let initialize = {
         const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0)) * densMult;
         const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0)) * densMult;
         const conMult = 1 + totalCon / div;
-        const validationAud = engine.getValidationAudFromKills();
+        const validationAud = skillEngine.getValidationAudFromKills();
         const padEff = skills.getSkillEffect("paddingResume");
         const paddingAud = padEff.audBonus || 0;
         // ((base + cards) × density + skill Aud) × Confidence
@@ -1689,7 +1689,7 @@ let initialize = {
             const maxRise = maxAud - oldMax;
             // Narcissism only boosts the equal recover from the max increase — not extra recovers.
             if (maxRise > 0) {
-                newAud = engine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
+                newAud = skillEngine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
                 engine.addSkillExp("narcissism", 1);
                 if (skills.isSkillUnlocked("borrowedGlory")) {
                     engine.addSkillExp("borrowedGlory", 1);

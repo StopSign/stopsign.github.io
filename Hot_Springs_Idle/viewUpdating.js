@@ -565,7 +565,7 @@ let view = {
         }
         let valAud = 0;
         if (skills.isSkillUnlocked("validation")) {
-            valAud = engine.getValidationAudFromKills();
+            valAud = skillEngine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
             const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
             skillAudLines.push(`Validation: +${valAud} max Aud from kills (cap ${valCap}); additionally recover +${valCur} Audacity when max increases from a kill`);
@@ -605,12 +605,12 @@ let view = {
         view.updateVal("statsRegenTip", "From Self-Affirmations skill level (Aud/s).", "innerHTML");
         view.updateVal("statsRegenCard", regenVal > 0 ? "" : "none", "style.display");
         const forceRaw = forceResearched ? (skills.getSkillEffect("force").baseDamage || 0) : 0;
-        const mcRaw = (skills.isSkillUnlocked("mainCharacter") && typeof engine.getMainCharacterFlatDamage === "function")
-            ? engine.getMainCharacterFlatDamage() : 0;
-        const sadismRaw = (skills.isSkillUnlocked("sadism") && typeof engine.getSadismFlatDamage === "function")
-            ? engine.getSadismFlatDamage() : 0;
-        const slowBurnRaw = (skills.isSkillUnlocked("slowBurn") && typeof engine.getSlowBurnFlatDamage === "function")
-            ? engine.getSlowBurnFlatDamage() : 0;
+        const mcRaw = (skills.isSkillUnlocked("mainCharacter") && typeof skillEngine.getMainCharacterFlatDamage === "function")
+            ? skillEngine.getMainCharacterFlatDamage() : 0;
+        const sadismRaw = (skills.isSkillUnlocked("sadism") && typeof skillEngine.getSadismFlatDamage === "function")
+            ? skillEngine.getSadismFlatDamage() : 0;
+        const slowBurnRaw = (skills.isSkillUnlocked("slowBurn") && typeof skillEngine.getSlowBurnFlatDamage === "function")
+            ? skillEngine.getSlowBurnFlatDamage() : 0;
         const attackBaseLines = [];
         const denseSlapUi = (gc.baseSlapDamage + cardSlap) * densMult;
         const skillFlatSum = forceRaw + mcRaw + sadismRaw + slowBurnRaw;
@@ -669,8 +669,8 @@ let view = {
             afterAttack *= (1 + udFrac);
         }
         if (skills.isSkillUnlocked("peerPressure")) {
-            const ppFrac = (typeof engine.getPeerPressureDamageBonusFraction === "function")
-                ? engine.getPeerPressureDamageBonusFraction() : 0;
+            const ppFrac = (typeof skillEngine.getPeerPressureDamageBonusFraction === "function")
+                ? skillEngine.getPeerPressureDamageBonusFraction() : 0;
             const closeNow = (typeof engine.countVisibleIntrudersCloserThan === "function")
                 ? engine.countVisibleIntrudersCloserThan(200) : 0;
             if (ppFrac > 0) {
@@ -679,8 +679,8 @@ let view = {
             }
         }
         if (skills.isSkillUnlocked("crowdWork")) {
-            const cwFrac = (typeof engine.getCrowdWorkDamageBonusFraction === "function")
-                ? engine.getCrowdWorkDamageBonusFraction() : 0;
+            const cwFrac = (typeof skillEngine.getCrowdWorkDamageBonusFraction === "function")
+                ? skillEngine.getCrowdWorkDamageBonusFraction() : 0;
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             if (cwFrac > 0) {
                 attackMultLines.push(`Crowd Work: ×${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% from ${visNow} visible)`);
