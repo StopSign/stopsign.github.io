@@ -1,8 +1,10 @@
 let skillHelper = {
     LEVELS: [0, 50, 100],
-    displayOrder: [],
-    defIndex: {},
-    copyStatusTimer: 0,
+    SLOT_ORDER: { offense: 0, defense: 1, utility: 2 },
+    combatKeys: [],
+    sortMode: "alpha",
+    slotFilter: "all",
+    query: "",
 
     init: function() {
         if (typeof data === "undefined") {
@@ -13,40 +15,52 @@ let skillHelper = {
             data.gameSettings = { numberType: "numberSuffix" };
         }
         const keys = skills.keysInOrder || [];
-        skillHelper.defIndex = {};
-        skillHelper.displayOrder = [];
+        skillHelper.combatKeys = [];
         for (let i = 0; i < keys.length; i++) {
-            skillHelper.defIndex[keys[i]] = i;
-            skillHelper.displayOrder.push(keys[i]);
-        }
-        document.getElementById("shSortBtn").addEventListener("click", function() {
-            skillHelper.sortByPriority();
-        });
-        document.getElementById("shCopyBtn").addEventListener("click", function() {
-            skillHelper.copyExport();
-        });
-        document.getElementById("shSkillList").addEventListener("input", function(ev) {
-            const el = ev.target;
-            if (el && el.dataset && el.dataset.priorityKey) {
-                skillHelper.renderExport();
+            const def = skills._byKey[keys[i]];
+            if (def && def.category === "combat") {
+                skillHelper.combatKeys.push(keys[i]);
             }
-        });
-        skillHelper.renderAll();
-    },
-
-    getPriorityValue: function(key) {
-        const input = document.querySelector(`[data-priority-key="${key}"]`);
-        if (input) {
-            const n = parseFloat(input.value);
-            return isFinite(n) ? n : 0;
         }
-        const p = typeof SKILL_PRIORITY !== "undefined" ? SKILL_PRIORITY[key] : 0;
-        return isFinite(p) ? p : 0;
-    },
-
-    defaultPriority: function(key) {
-        const p = typeof SKILL_PRIORITY !== "undefined" ? SKILL_PRIORITY[key] : 0;
-        return isFinite(p) ? p : 0;
+        document.getElementById("shTotal").textContent = "Total skills: " + skillHelper.combatKeys.length;
+        const search = document.getElementById("shSearch");
+        search.addEventListener("input", function() {
+            skillHelper.query = String(search.value || "").trim().toLowerCase();
+            skillHelper.renderAll();
+        });
+        search.addEventListener("keydown", function(ev) {
+            if (ev.key !== "Escape") {
+                return;
+            }
+            if (!search.value) {
+                return;
+            }
+            search.value = "";
+            skillHelper.query = "";
+            skillHelper.renderAll();
+        });
+        const slotRadios = document.querySelectorAll('input[name="shSlot"]');
+        for (let s = 0; s < slotRadios.length; s++) {
+            slotRadios[s].addEventListener("change", function() {
+                if (!slotRadios[s].checked) {
+                    return;
+                }
+                skillHelper.slotFilter = slotRadios[s].value;
+                skillHelper.renderAll();
+            });
+        }
+        const sortRadios = document.querySelectorAll('input[name="shSort"]');
+        for (let r = 0; r < sortRadios.length; r++) {
+            sortRadios[r].addEventListener("change", function() {
+                if (!sortRadios[r].checked) {
+                    return;
+                }
+                skillHelper.sortMode = sortRadios[r].value === "slot" ? "slot" : "alpha";
+                skillHelper.renderAll();
+            });
+        }
+        skillHelper.renderAll();
+        search.focus();
     },
 
     syntheticSkill: function(key, level) {
@@ -55,20 +69,13 @@ let skillHelper = {
         return sk;
     },
 
-    expToNext: function(initExp, level) {
-        if (level <= 0) {
-            return initExp;
-        }
-        return initExp * Math.pow(level, 1.2);
-    },
-
-    cumulativeToLevel: function(initExp, level) {
+    totalExpToReach: function(key, level) {
         if (level <= 0) {
             return 0;
         }
-        let total = initExp;
-        for (let L = 1; L < level; L++) {
-            total += initExp * Math.pow(L, 1.2);
+        let total = 0;
+        for (let i = 0; i < level; i++) {
+            total += skills.getExpToLevel(key, i);
         }
         return total;
     },
@@ -100,7 +107,7 @@ let skillHelper = {
         }
     },
 
-    rewardLine: function(def, sk) {
+    rewardText: function(def, sk) {
         try {
             if (typeof def.rewardText !== "function") {
                 return "";
@@ -109,6 +116,85 @@ let skillHelper = {
         } catch (err) {
             return "";
         }
+    },
+
+    stripHtml: function(html) {
+        return String(html == null ? "" : html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+    },
+
+    matchesSearch: function(key, queryLower) {
+        if (!queryLower) {
+            return true;
+        }
+        const def = skills._byKey[key];
+        if (!def) {
+            return false;
+        }
+        const name = String(def.name || "").toLowerCase();
+        if (name.indexOf(queryLower) >= 0) {
+            return true;
+        }
+        const slotCat = skills.getSlotCategory(key);
+        if (slotCat && (slotCat.indexOf(queryLower) >= 0 || queryLower === slotCat)) {
+            return true;
+        }
+        const reward = skillHelper.stripHtml(skillHelper.rewardText(def, skillHelper.syntheticSkill(key, 0))).toLowerCase();
+        if (reward.indexOf(queryLower) >= 0) {
+            return true;
+        }
+        const trigger = skillHelper.stripHtml(def.triggerText || "").toLowerCase();
+        return trigger.indexOf(queryLower) >= 0;
+    },
+
+    compareAlpha: function(a, b) {
+        const da = skills._byKey[a];
+        const db = skills._byKey[b];
+        const na = (da && da.name) || a;
+        const nb = (db && db.name) || b;
+        const cmp = na.localeCompare(nb);
+        if (cmp !== 0) {
+            return cmp;
+        }
+        return a.localeCompare(b);
+    },
+
+    compareSlot: function(a, b) {
+        const ca = skills.getSlotCategory(a) || "";
+        const cb = skills.getSlotCategory(b) || "";
+        const oa = skillHelper.SLOT_ORDER[ca] !== undefined ? skillHelper.SLOT_ORDER[ca] : 100;
+        const ob = skillHelper.SLOT_ORDER[cb] !== undefined ? skillHelper.SLOT_ORDER[cb] : 100;
+        if (oa !== ob) {
+            return oa - ob;
+        }
+        if (oa === 100 && ca !== cb) {
+            return ca.localeCompare(cb);
+        }
+        return skillHelper.compareAlpha(a, b);
+    },
+
+    visibleKeys: function() {
+        const out = [];
+        const slot = skillHelper.slotFilter;
+        const query = skillHelper.query;
+        for (let i = 0; i < skillHelper.combatKeys.length; i++) {
+            const key = skillHelper.combatKeys[i];
+            if (slot !== "all" && skills.getSlotCategory(key) !== slot) {
+                continue;
+            }
+            if (!skillHelper.matchesSearch(key, query)) {
+                continue;
+            }
+            out.push(key);
+        }
+        out.sort(skillHelper.sortMode === "slot" ? skillHelper.compareSlot : skillHelper.compareAlpha);
+        return out;
+    },
+
+    slotLabel: function(slotCat) {
+        if (slotCat === "offense" || slotCat === "defense" || slotCat === "utility") {
+            return slotCat.charAt(0).toUpperCase() + slotCat.slice(1);
+        }
+        return slotCat || "";
     },
 
     esc: function(s) {
@@ -120,13 +206,32 @@ let skillHelper = {
     },
 
     renderAll: function() {
+        const keys = skillHelper.visibleKeys();
+        const showing = document.getElementById("shShowing");
+        const narrowed = keys.length !== skillHelper.combatKeys.length;
+        showing.hidden = !narrowed;
+        if (narrowed) {
+            showing.textContent = "Showing " + keys.length;
+        }
+        const empty = document.getElementById("shEmpty");
+        empty.hidden = keys.length !== 0;
         const list = document.getElementById("shSkillList");
         let html = "";
-        for (let i = 0; i < skillHelper.displayOrder.length; i++) {
-            html += skillHelper.renderCard(skillHelper.displayOrder[i]);
+        let lastSlot = null;
+        const grouped = skillHelper.sortMode === "slot";
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (grouped) {
+                const slot = skills.getSlotCategory(key) || "";
+                if (slot !== lastSlot) {
+                    const label = skillHelper.slotLabel(slot) || slot || "Other";
+                    html += `<h2 class="sh-group-head">${skillHelper.esc(label)}</h2>`;
+                    lastSlot = slot;
+                }
+            }
+            html += skillHelper.renderCard(key);
         }
         list.innerHTML = html;
-        skillHelper.renderExport();
     },
 
     renderCard: function(key) {
@@ -134,17 +239,21 @@ let skillHelper = {
         if (!def) {
             return "";
         }
-        const prio = skillHelper.defaultPriority(key);
         const initExp = def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
+        const initTalent = def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
         const sk0 = skillHelper.syntheticSkill(key, 0);
-        const cat = def.category || "combat";
-        const classBit = def.classKey ? ` · ${def.classKey}` : "";
+        const slotCat = skills.getSlotCategory(key);
+        const slotClass = slotCat ? ` skill-row--slot-${slotCat}` : "";
         const maxBit = def.maxLevel !== undefined ? ` · max ${def.maxLevel}` : "";
-        let html = `<section class="sh-card" data-skill-key="${skillHelper.esc(key)}">`;
+        let html = `<section class="sh-card${slotClass}" data-skill-key="${skillHelper.esc(key)}">`;
         html += `<div class="sh-card-head">`;
-        html += `<div><div class="sh-card-title">${skillHelper.esc(def.name || key)}</div>`;
-        html += `<div class="sh-card-meta"><code>${skillHelper.esc(key)}</code> · ${skillHelper.esc(cat)}${skillHelper.esc(classBit)}${skillHelper.esc(maxBit)} · base exp ${skillHelper.fmtExp(initExp)}</div></div>`;
-        html += `<label class="sh-priority-field">Priority <input type="number" step="1" data-priority-key="${skillHelper.esc(key)}" value="${skillHelper.esc(prio)}"></label>`;
+        html += `<div class="sh-card-title-row"><div class="sh-card-title">${skillHelper.esc(def.name || key)}</div>`;
+        if (slotCat) {
+            const stampClass = `scroll-archives-choice-slot-cat scroll-archives-choice-slot-cat--${slotCat}`;
+            html += `<span class="${stampClass}">${skillHelper.esc(skillHelper.slotLabel(slotCat))}</span>`;
+        }
+        html += `</div>`;
+        html += `<div class="sh-card-meta"><code>${skillHelper.esc(key)}</code>${skillHelper.esc(maxBit)} · Base Skill Exp: ${skillHelper.esc(initExp)}, Base Talent Exp: ${skillHelper.esc(initTalent)}</div>`;
         html += `</div>`;
         if (def.shortDescription) {
             html += `<p class="sh-blurb">${skillHelper.esc(def.shortDescription)}</p>`;
@@ -152,7 +261,7 @@ let skillHelper = {
         if (def.triggerText) {
             html += `<p class="sh-blurb muted-text">${skillHelper.esc(def.triggerText)}</p>`;
         }
-        const reward = skillHelper.rewardLine(def, sk0);
+        const reward = skillHelper.rewardText(def, sk0);
         if (reward) {
             html += `<p class="sh-blurb muted-text">${skillHelper.esc(reward)}</p>`;
         }
@@ -163,109 +272,13 @@ let skillHelper = {
             const lv = skillHelper.LEVELS[i];
             const sk = skillHelper.syntheticSkill(key, lv);
             const effect = skillHelper.effectLine(def, sk);
-            const toNext = skillHelper.expToNext(initExp, lv);
-            const total = skillHelper.cumulativeToLevel(initExp, lv);
+            const toNext = skills.getExpToLevel(key, lv);
+            const total = skillHelper.totalExpToReach(key, lv);
             html += `<tr><td class="sh-num">${lv}</td><td>${skillHelper.esc(effect)}</td>`;
             html += `<td class="sh-num">${skillHelper.fmtExp(toNext)}</td>`;
             html += `<td class="sh-num">${skillHelper.fmtExp(total)}</td></tr>`;
         }
         html += `</tbody></table></div></section>`;
         return html;
-    },
-
-    sortByPriority: function() {
-        const prios = {};
-        for (let i = 0; i < skillHelper.displayOrder.length; i++) {
-            const k = skillHelper.displayOrder[i];
-            prios[k] = skillHelper.getPriorityValue(k);
-        }
-        skillHelper.displayOrder.sort(function(a, b) {
-            if (prios[a] !== prios[b]) {
-                return prios[a] - prios[b];
-            }
-            return (skillHelper.defIndex[a] || 0) - (skillHelper.defIndex[b] || 0);
-        });
-        const saved = {};
-        const inputs = document.querySelectorAll("[data-priority-key]");
-        for (let i = 0; i < inputs.length; i++) {
-            saved[inputs[i].dataset.priorityKey] = inputs[i].value;
-        }
-        skillHelper.renderAll();
-        const after = document.querySelectorAll("[data-priority-key]");
-        for (let i = 0; i < after.length; i++) {
-            const k = after[i].dataset.priorityKey;
-            if (saved[k] !== undefined) {
-                after[i].value = saved[k];
-            }
-        }
-        skillHelper.renderExport();
-    },
-
-    sortedPriorityKeys: function() {
-        const keys = (skills.keysInOrder || []).slice();
-        keys.sort(function(a, b) {
-            const pa = skillHelper.getPriorityValue(a);
-            const pb = skillHelper.getPriorityValue(b);
-            if (pa !== pb) {
-                return pa - pb;
-            }
-            return a.localeCompare(b);
-        });
-        return keys;
-    },
-
-    formatExport: function() {
-        const keys = skillHelper.sortedPriorityKeys();
-        const lines = ["const SKILL_PRIORITY = {"];
-        for (let i = 0; i < keys.length; i++) {
-            const k = keys[i];
-            const n = skillHelper.getPriorityValue(k);
-            const comma = i < keys.length - 1 ? "," : "";
-            lines.push(`    ${k}: ${n}${comma}`);
-        }
-        lines.push("};");
-        return lines.join("\n");
-    },
-
-    renderExport: function() {
-        document.getElementById("shExport").value = skillHelper.formatExport();
-    },
-
-    copyExport: function() {
-        const text = skillHelper.formatExport();
-        document.getElementById("shExport").value = text;
-        const status = document.getElementById("shCopyStatus");
-        const done = function(ok) {
-            status.textContent = ok ? "Copied." : "Copy failed - select the text manually.";
-            if (skillHelper.copyStatusTimer) {
-                clearTimeout(skillHelper.copyStatusTimer);
-            }
-            skillHelper.copyStatusTimer = setTimeout(function() {
-                status.textContent = "";
-            }, 2000);
-        };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(function() {
-                done(true);
-            }).catch(function() {
-                done(skillHelper.fallbackCopy());
-            });
-            return;
-        }
-        done(skillHelper.fallbackCopy());
-    },
-
-    fallbackCopy: function() {
-        const ta = document.getElementById("shExport");
-        ta.removeAttribute("readonly");
-        ta.select();
-        let ok = false;
-        try {
-            ok = document.execCommand("copy");
-        } catch (e) {
-            ok = false;
-        }
-        ta.setAttribute("readonly", "readonly");
-        return ok;
     }
 };

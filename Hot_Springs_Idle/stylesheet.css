@@ -1279,7 +1279,15 @@ button {
 
 #tabPane_leveling {
     max-height: 720px;
+    overflow-x: hidden;
     overflow-y: auto;
+}
+
+#tabPane_leveling .leveling-stat-card > .showthis {
+    position: fixed;
+    z-index: 1000;
+    margin-top: 0;
+    max-width: 280px;
 }
 
 #tabPane_skills {
@@ -1482,6 +1490,10 @@ button {
     flex: 1 1 0;
     min-height: 0;
     overflow-y: auto;
+}
+
+.skills-equipped-pane--no-selection > .skills-equipped-info-wrap {
+    display: none;
 }
 
 .skills-equipped-info-panel {

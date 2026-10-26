@@ -176,7 +176,7 @@ let view = {
         const showZoneShards = engine.isShardLootUnlocked() && !!mapDef;
         if (showZoneShards) {
             const amt = mapData.getMapShardDropAmount(mapDef);
-            view.updateVal("waveInfoZoneShards", `Shard Drop Amount: ${round1(amt)}`);
+            view.updateVal("waveInfoZoneShards", `Shard Drop Amount: ${intToString(amt, 2)}`);
             view.updateVal("waveInfoZoneShards", "", "style.display");
         } else {
             view.updateVal("waveInfoZoneShards", "none", "style.display");
@@ -197,6 +197,13 @@ let view = {
             view.updateVal(`waveInfoZone_${i}`, "", "style.display");
             view.updateVal(`waveInfoZone_${i}`, line, "innerHTML");
         }
+    },
+    formatAudLine: function(aud, maxAud) {
+        const maxAudText = intToString(maxAud || 0, 1);
+        const lowAud = maxAudText < 100;
+        return lowAud
+            ? `${round1Fixed(aud)}/${maxAudText} Aud`
+            : `${intToString(aud, 1)}/${maxAudText} Aud`;
     },
     updatePlayerStatDmgLine: function() {
         const p = data.battle.player;
@@ -223,14 +230,7 @@ let view = {
         const runClock = (data.battle.cloneAliveMs !== undefined ? data.battle.cloneAliveMs : (data.battle.elapsedMs || 0)) / 1000;
         if (showBattle) {
             const regenPerSec = data.battle.player.regenPerSecond || 0;
-            const maxAudInt = Math.round(data.battle.player.maxAud || 0);
-            const p = data.battle.player;
-            const audCur = p.aud;
-            const lowAud = maxAudInt < 100;
-            const audLineText = lowAud
-                ? `${Math.max(0, roundNearestDecimals(audCur, 1)).toFixed(1)}/${maxAudInt} Aud`
-                : `${Math.round(audCur)}/${maxAudInt} Aud`;
-            view.updateVal("playerStatAudLine", audLineText, "textContent", 1);
+            view.updateVal("playerStatAudLine", view.formatAudLine(data.battle.player.aud, data.battle.player.maxAud));
             view.updatePlayerStatDmgLine();
             const twEff = skills.getSkillEffect("toughness_condescend");
             const armorFlat = twEff.armorFlat !== undefined ? round2(twEff.armorFlat) : 0;
@@ -465,7 +465,7 @@ let view = {
         view.updateVal("levelingAssignButtons", plannedGrowthUnlocked ? "" : "none", "style.display");
         view.updateVal("attributePlanTitle", plannedGrowthUnlocked ? "" : "none", "style.display");
         view.updateVal("attributePlanList", plannedGrowthUnlocked ? "" : "none", "style.display");
-        view.updateVal("attributePlanHighest", `Highest: ${data.progress.highestLevelReached || 0}`);
+        view.updateVal("attributePlanHighest", `Highest Achieved: ${data.progress.highestLevelReached || 0}, Plan Until: ${engine.getPlanLevelCap()}`);
         view.updateVal("attributePlanPending", engine.hasPendingAttributePlanChanges() ? "" : "none", "style.display");
         const shockEffUi = skills.getSkillEffect("shockValue");
         const windfallEffUi = skills.getSkillEffect("windfallSwagger");
@@ -488,18 +488,18 @@ let view = {
         view.updateVal("strText", strDisplay, "textContent", 1);
         view.updateVal("conText", conDisplay, "textContent", 1);
         let strStatTip = "Brutality - +10% damage per point.<br>Damage is always rounded up.";
-        if (skills.isSkillUnlocked("savageLessons")) {
+        if (skills.isSkillEquipped("savageLessons")) {
             strStatTip += `<br>Savage Lessons: +${savageLessonsEffUi.bonusStr || 0} Bru from skill levels`;
         }
-        if (skills.isSkillUnlocked("shockValue")) {
+        if (skills.isSkillEquipped("shockValue")) {
             strStatTip += `<br>Shock Value: +${shockEffUi.bonusStr || 0} Bru from skill level`;
         }
         view.updateVal("strStatTip", strStatTip, "innerHTML");
-        let conStatTip = "Confidence - +10% current and max Aud per point";
-        if (skills.isSkillUnlocked("adaptation")) {
+        let conStatTip = "Confidence - +10% max Audacity per point. +10% healing per point";
+        if (skills.isSkillEquipped("adaptation")) {
             conStatTip += `<br>Adaptation: +${adaptationEffUi.bonusCon || 0} Con from skill levels`;
         }
-        if (skills.isSkillUnlocked("windfallSwagger")) {
+        if (skills.isSkillEquipped("windfallSwagger")) {
             conStatTip += `<br>Windfall Swagger: +${windfallEffUi.bonusCon || 0} Con from skill level`;
         }
         view.updateVal("conStatTip", conStatTip, "innerHTML");
@@ -512,11 +512,11 @@ let view = {
         const soulLv = engine.getCloneSoulLevel();
         const ringSoul = engine.getMarketAnchoringRingBought();
         let soulStatTip = `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Anchoring Ring: +${ringSoul} Soul.`;
-        if (skills.isSkillUnlocked("soulSearching")) {
+        if (skills.isSkillEquipped("soulSearching")) {
             const soulSearchingSoul = skills.getSkillEffect("soulSearching").bonusSoul || 0;
             soulStatTip += `<br>Soul Searching: +${soulSearchingSoul} Soul from skill levels`;
         }
-        if (skills.isSkillUnlocked("vicarious")) {
+        if (skills.isSkillEquipped("vicarious")) {
             const vicariousSoul = skills.getSkillEffect("vicarious").bonusSoul || 0;
             soulStatTip += `<br>Vicarious: +${vicariousSoul} Soul from skill level`;
         }
@@ -556,10 +556,10 @@ let view = {
         const bravadoMultUi = skills.getSkillEffect("bravado").maxAudMultiplier || 1;
         const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").characterExpMultiplier || 1, 2);
         const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").killCoinsMultiplier || 1, 2);
-        const shamelessResearched = skills.isSkillResearchComplete("shameless");
-        const corneredResearched = skills.isSkillResearchComplete("corneredEgo");
-        const forceResearched = skills.isSkillResearchComplete("force");
-        const alacrityResearched = skills.isSkillResearchComplete("alacrity");
+        const shamelessEquipped = skills.isSkillEquipped("shameless");
+        const corneredEquipped = skills.isSkillEquipped("corneredEgo");
+        const forceEquipped = skills.isSkillEquipped("force");
+        const alacrityEquipped = skills.isSkillEquipped("alacrity");
         const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
         const hasSandal = !!(data.progress.base && data.progress.base.atelier && data.progress.base.atelier.sandalBuilt);
         const runDensity = (data.battle && data.battle.cloneDensity) || 0;
@@ -590,22 +590,22 @@ let view = {
         }
         const skillAudLines = [];
         let skillAudSum = 0;
-        if (shamelessResearched) {
+        if (shamelessEquipped) {
             skillAudLines.push(`Shameless: +${fortInner} max; additionally recover ${shamelessRecover} when leveling`);
             skillAudSum += fortInner;
         }
-        const corneredAmt = corneredResearched ? tenB : 0;
-        if (corneredResearched) {
+        const corneredAmt = corneredEquipped ? tenB : 0;
+        if (corneredEquipped) {
             const corneredRecover = skills.getSkillEffect("corneredEgo").audRecoverBonus || 0;
             skillAudLines.push(`Cornered Ego: +${corneredAmt} max; additionally recover ${corneredRecover}`);
             skillAudSum += corneredAmt;
         }
-        if (skills.isSkillUnlocked("mountingEgo")) {
+        if (skills.isSkillEquipped("mountingEgo")) {
             skillAudLines.push(`Mounting Ego: +${mountingAudUi} max Aud`);
             skillAudSum += mountingAudUi;
         }
         let valAud = 0;
-        if (skills.isSkillUnlocked("validation")) {
+        if (skills.isSkillEquipped("validation")) {
             valAud = skillEngine.getValidationAudFromKills();
             const valCap = validationEffStats.audCap || 0;
             const valCur = validationEffStats.currentAudOnMaxIncrease || 0;
@@ -613,7 +613,7 @@ let view = {
             skillAudSum += valAud;
         }
         let padAud = 0;
-        if (skills.isSkillUnlocked("paddingResume")) {
+        if (skills.isSkillEquipped("paddingResume")) {
             const padEffUi = skills.getSkillEffect("paddingResume");
             padAud = padEffUi.audBonus || 0;
             skillAudLines.push(`Padding the Resume: +${padAud} (${padEffUi.audPerCharLevel || 0} per character level)`);
@@ -645,16 +645,13 @@ let view = {
         const audTip = audTipParts.join("<br><br>");
         view.updateVal("statsAudText", `${intToStringRound(p.maxAud)} Aud`);
         view.updateVal("statsAudTip", audTip, "innerHTML");
-        const regenVal = p.regenPerSecond || 0;
-        view.updateVal("statsRegenText", `${round2(regenVal)}/s`);
-        view.updateVal("statsRegenTip", "From Self-Affirmations skill level (Aud/s).", "innerHTML");
-        view.updateVal("statsRegenCard", regenVal > 0 ? "" : "none", "style.display");
-        const forceRaw = forceResearched ? (skills.getSkillEffect("force").baseDamage || 0) : 0;
-        const mcRaw = (skills.isSkillUnlocked("mainCharacter") && typeof skillEngine.getMainCharacterFlatDamage === "function")
+        view.updateHealingStat();
+        const forceRaw = forceEquipped ? (skills.getSkillEffect("force").baseDamage || 0) : 0;
+        const mcRaw = (skills.isSkillEquipped("mainCharacter") && typeof skillEngine.getMainCharacterFlatDamage === "function")
             ? skillEngine.getMainCharacterFlatDamage() : 0;
-        const sadismRaw = (skills.isSkillUnlocked("sadism") && typeof skillEngine.getSadismFlatDamage === "function")
+        const sadismRaw = (skills.isSkillEquipped("sadism") && typeof skillEngine.getSadismFlatDamage === "function")
             ? skillEngine.getSadismFlatDamage() : 0;
-        const slowBurnRaw = (skills.isSkillUnlocked("slowBurn") && typeof skillEngine.getSlowBurnFlatDamage === "function")
+        const slowBurnRaw = (skills.isSkillEquipped("slowBurn") && typeof skillEngine.getSlowBurnFlatDamage === "function")
             ? skillEngine.getSlowBurnFlatDamage() : 0;
         const attackBaseLines = [];
         const denseSlapUi = (gc.baseSlapDamage + cardSlap + columnSlap) * densMult;
@@ -670,17 +667,17 @@ let view = {
         if (runDensity > 0) {
             attackBaseLines.push(`Dense Clones: x${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base) → ${roundNearestDecimals(denseSlapUi, 2)}`);
         }
-        if (forceResearched) {
+        if (forceEquipped) {
             attackBaseLines.push(`Force (flat): +${roundNearestDecimals(forceRaw, 2)}`);
         }
-        if (skills.isSkillUnlocked("mainCharacter")) {
+        if (skills.isSkillEquipped("mainCharacter")) {
             const vis = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             attackBaseLines.push(`Main Character: +${roundNearestDecimals(mcRaw, 2)} from ${vis} visible ${vis === 1 ? "enemy" : "enemies"}`);
         }
-        if (skills.isSkillUnlocked("sadism")) {
+        if (skills.isSkillEquipped("sadism")) {
             attackBaseLines.push(`Sadism (flat): +${roundNearestDecimals(sadismRaw, 2)}`);
         }
-        if (skills.isSkillUnlocked("slowBurn")) {
+        if (skills.isSkillEquipped("slowBurn")) {
             const sbSecs = (data.battle && data.battle.slowBurnSeconds) || 0;
             attackBaseLines.push(`Slow Burn (flat): +${roundNearestDecimals(slowBurnRaw, 2)} after ${sbSecs}s in slap range`);
         }
@@ -690,7 +687,7 @@ let view = {
         if (growthUnlocked || strTotal > 0) {
             attackMultLines.push(`Brutality: x${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
         }
-        if (skills.isSkillUnlocked("bitterRivalry")) {
+        if (skills.isSkillEquipped("bitterRivalry")) {
             const brPct = skills.getSkillEffect("bitterRivalry").damagePercentPerSecond || 0;
             let brLine = `Bitter Rivalry: +${round2(brPct)}% damage per second an enemy is in slap range`;
             const brTarget = typeof engine.findIntruderById === "function"
@@ -706,17 +703,17 @@ let view = {
             }
             attackMultLines.push(brLine);
         }
-        if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAtMaxAud === "function" && engine.isPlayerAtMaxAud()) {
+        if (skills.isSkillEquipped("highHorse") && typeof engine.isPlayerAtMaxAud === "function" && engine.isPlayerAtMaxAud()) {
             const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
             attackMultLines.push(`High Horse: x${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% at full Aud)`);
             afterAttack *= (1 + hhFrac);
         }
-        if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtMaxAud === "function" && !engine.isPlayerAtMaxAud()) {
+        if (skills.isSkillEquipped("underdog") && typeof engine.isPlayerAtMaxAud === "function" && !engine.isPlayerAtMaxAud()) {
             const udFrac = skills.getSkillEffect("underdog").damageBonusFraction || 0;
             attackMultLines.push(`Underdog: x${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% while not at full Aud)`);
             afterAttack *= (1 + udFrac);
         }
-        if (skills.isSkillUnlocked("peerPressure")) {
+        if (skills.isSkillEquipped("peerPressure")) {
             const ppFrac = (typeof skillEngine.getPeerPressureDamageBonusFraction === "function")
                 ? skillEngine.getPeerPressureDamageBonusFraction() : 0;
             const closeNow = (typeof engine.countVisibleIntrudersCloserThan === "function")
@@ -726,7 +723,7 @@ let view = {
                 afterAttack *= (1 + ppFrac);
             }
         }
-        if (skills.isSkillUnlocked("crowdWork")) {
+        if (skills.isSkillEquipped("crowdWork")) {
             const cwFrac = (typeof skillEngine.getCrowdWorkDamageBonusFraction === "function")
                 ? skillEngine.getCrowdWorkDamageBonusFraction() : 0;
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
@@ -735,7 +732,7 @@ let view = {
                 afterAttack *= (1 + cwFrac);
             }
         }
-        if (skills.isSkillUnlocked("marathonEgo")) {
+        if (skills.isSkillEquipped("marathonEgo")) {
             const mePct = skills.getSkillEffect("marathonEgo").damagePercentPerTenSec || 0;
             const tens = Math.floor((data.battle.cloneAliveMs || 0) / 10000);
             const meFactor = 1 + (mePct / 100) * tens;
@@ -756,10 +753,10 @@ let view = {
         const armorFlat = toughnessArmor + thickSkinArmor;
         view.updateVal("statsArmorText", `${round2(armorFlat)} flat`);
         let armorTip = "";
-        if (skills.isSkillUnlocked("toughness_condescend")) {
+        if (skills.isSkillEquipped("toughness_condescend")) {
             armorTip += `Condescend Toughness: +${round2(toughnessArmor)} flat damage reduction`;
         }
-        if (skills.isSkillUnlocked("thickSkin")) {
+        if (skills.isSkillEquipped("thickSkin")) {
             if (armorTip) {
                 armorTip += "<br>";
             }
@@ -774,7 +771,7 @@ let view = {
         const alaEff = skills.getSkillEffect("alacrity");
         const alaLv = alaEff.effectiveLevel || 0;
         let slapTip = `Base: ${round2(cdCfg.slapBaseMs / 1000)}s`;
-        if (alacrityResearched) {
+        if (alacrityEquipped) {
             slapTip += `<br>Alacrity reduction: ${alaLv * cdCfg.alacritySlapReductionPerLevelMs} ms`;
         }
         const glovesMs = engine.getMarketMysticalGlovesBought() * 100;
@@ -782,9 +779,53 @@ let view = {
         slapTip += `<br>Floor: ${round2(cdCfg.slapFloorMs / 1000)}s`;
         view.updateVal("statsSlapTip", slapTip, "innerHTML");
         view.updateVal("statsSandalText", hasSandal ? `${round2((p.sandalAttackCooldownMs || 0) / 1000)}s` : "Locked");
-        view.updateVal("statsSandalTip", hasSandal ? `Base: ${round2(cdCfg.sandalBaseMs / 1000)}s<br>Alacrity reduction: ${alaLv * cdCfg.alacritySandalReductionPerLevelMs} ms<br>Floor: ${round2(cdCfg.sandalFloorMs / 1000)}s` : "Requires Spare sandal upgrade", "innerHTML");
+        let sandalTip = "Requires Spare sandal upgrade";
+        if (hasSandal) {
+            sandalTip = `Base: ${round2(cdCfg.sandalBaseMs / 1000)}s`;
+            if (alacrityEquipped) {
+                sandalTip += `<br>Alacrity reduction: ${alaLv * cdCfg.alacritySandalReductionPerLevelMs} ms`;
+            }
+            sandalTip += `<br>Floor: ${round2(cdCfg.sandalFloorMs / 1000)}s`;
+        }
+        view.updateVal("statsSandalTip", sandalTip, "innerHTML");
         view.updateVal("statsSandalCard", hasSandal ? "" : "none", "style.display");
         view.updateExtraCoinsDroppedStat();
+    },
+    updateHealingStat: function() {
+        const bySkill = (data.battle && data.battle.healBySkill) || {};
+        const order = (data.battle && data.battle.healSkillOrder) || [];
+        let total = 0;
+        const lines = [];
+        const seen = {};
+        for (let i = 0; i < order.length; i++) {
+            const key = order[i];
+            seen[key] = true;
+            const amt = bySkill[key] || 0;
+            if (!(amt > 0)) {
+                continue;
+            }
+            total += amt;
+            const sk = data.progress.skills && data.progress.skills[key];
+            const name = (sk && sk.name) || key;
+            lines.push(`${name}: ${intToString(amt, 2)}`);
+        }
+        const extraKeys = Object.keys(bySkill);
+        for (let j = 0; j < extraKeys.length; j++) {
+            const key = extraKeys[j];
+            if (seen[key]) {
+                continue;
+            }
+            const amt = bySkill[key] || 0;
+            if (!(amt > 0)) {
+                continue;
+            }
+            total += amt;
+            const sk = data.progress.skills && data.progress.skills[key];
+            const name = (sk && sk.name) || key;
+            lines.push(`${name}: ${intToString(amt, 2)}`);
+        }
+        view.updateVal("statsHealingText", intToString(total, 2));
+        view.updateVal("statsHealingTip", lines.length ? lines.join("<br>") : "No healing this battle.", "innerHTML");
     },
     updateExtraCoinsDroppedStat: function() {
         const nickel = skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
@@ -792,7 +833,7 @@ let view = {
         const cardEffects = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? shrineCards.getAggregatedEffects() : {};
         const coinCard = cardEffects.killCoinsFlatAdd || 0;
-        const flat = nickel + column + coinCard;
+        const flat = nickel + coinCard;
         const gEff = skills.getSkillEffect("extortion");
         const greed = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
         const cardAdd = cardEffects.intruderCoinAdd || 0;
@@ -805,7 +846,7 @@ let view = {
             lines.push(`Nickel and Dime: +${nickel} base coins`);
         }
         if (column) {
-            lines.push(`Utility column: +${column} base coins`);
+            lines.push(`Utility column: +${column}% coins`);
         }
         if (coinCard) {
             lines.push(`More Coin Drop: +${coinCard} base coins`);
@@ -877,7 +918,7 @@ let view = {
             view.updateVal(`mapActionCurrent_${map.key}`, onThisMap ? "" : "none", "style.display");
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
-            view.updateVal(`mapShardDrop_${map.key}`, round1(mapData.getMapShardDropAmount(map)));
+            view.updateVal(`mapShardDrop_${map.key}`, intToString(mapData.getMapShardDropAmount(map), 2));
             const workersFound = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[map.key]) || 0;
             const workersMax = 6;
             view.updateVal(`mapWorkers_${map.key}`, `${workersFound}/${workersMax}`);
@@ -1395,9 +1436,9 @@ let view = {
         const speedPct = round1Fixed(engine.getScrollArchivesSilverResearchSpeedMult() * 100);
         const gainPct = round1Fixed(engine.getScrollArchivesGoldResearchGainMult() * 100);
         view.updateVal("scrollArchivesStarEffects_row",
-            `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>x${mapStars.bronze} cost ${costPct}% · `
-            + `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>x${mapStars.silver} speed ${speedPct}% · `
-            + `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>x${mapStars.gold} gain ${gainPct}%`,
+            `<span class="star-bronze">★</span>: ${mapStars.bronze} cost ${costPct}% | `
+            + `<span class="star-silver">★</span>: ${mapStars.silver} speed ${speedPct}% | `
+            + `<span class="star-gold">★</span>: ${mapStars.gold} gain ${gainPct}%`,
             "innerHTML");
         view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
         if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
@@ -4533,7 +4574,7 @@ let view = {
         }
         const shown = Math.floor(have);
         const pct = cost > 0 ? Math.max(0, Math.min(100, (have / cost) * 100)) : 0;
-        view.updateVal("skillsShardSlotProgressLabel", `${shown}/${Math.floor(cost)} Shards until next Skill Slot`);
+        view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)}/${intToString(Math.floor(cost), 1)} Shards until next Skill Slot`);
         view.updateVal("skillsShardSlotProgressFill", `${pct}%`, "style.width");
     },
     updateUnequipChargesText: function() {
@@ -4560,7 +4601,7 @@ let view = {
             return `+${value} base Audacity (multiplied by density)`;
         }
         if (column === "utility") {
-            return `+${value} base coins`;
+            return `+${value}% coins`;
         }
         return `+${value}% skill exp`;
     },
@@ -4570,7 +4611,7 @@ let view = {
         }
         const reward = skills.columnReward(column);
         const label = createView._skillSlotColumnLabel(column);
-        const shown = column === "any" ? `+${reward.value}%` : `+${reward.value}`;
+        const shown = (column === "any" || column === "utility") ? `+${reward.value}%` : `+${reward.value}`;
         view.updateVal(`skillSlotColumnTitleText_${viewName}_${column}`, `${label}: ${shown}`);
         const tip = `${reward.total} equipped talent. ${view.columnTalentRewardPhrase(column, reward.value)}.<br>Next at ${reward.nextAt} talent: ${view.columnTalentRewardPhrase(column, reward.nextValue)}.`;
         view.updateVal(`skillSlotColumnTitleTip_${viewName}_${column}`, tip, "innerHTML");
@@ -4586,6 +4627,27 @@ let view = {
         const rect = el.getBoundingClientRect();
         const margin = 8;
         const width = 260;
+        let left = rect.left;
+        if (left + width > window.innerWidth - margin) {
+            left = Math.max(margin, window.innerWidth - margin - width);
+        }
+        if (left < margin) {
+            left = margin;
+        }
+        tip.style.left = left + "px";
+        tip.style.top = (rect.bottom + 4) + "px";
+    },
+    positionLevelingStatTip: function(el) {
+        if (!el || !el.querySelector) {
+            return;
+        }
+        const tip = el.querySelector(".showthis");
+        if (!tip) {
+            return;
+        }
+        const rect = el.getBoundingClientRect();
+        const margin = 8;
+        const width = 280;
         let left = rect.left;
         if (left + width > window.innerWidth - margin) {
             left = Math.max(margin, window.innerWidth - margin - width);
@@ -4850,16 +4912,16 @@ let view = {
             data.progress.selectedEquippedSkillKey = "";
         }
         const skillKey = data.progress.selectedEquippedSkillKey;
-        if (!skillKey || !skills.isSkillEquipped(skillKey)) {
-            view.updateVal("skillInfoPanel", "none", "style.display");
-            return;
+        const skill = (skillKey && skills.isSkillEquipped(skillKey)) ? data.progress.skills[skillKey] : null;
+        const pane = viewData.cached.skillsEquippedPane;
+        if (pane) {
+            pane.classList.toggle("skills-equipped-pane--no-selection", !skill);
         }
-        view.updateVal("skillInfoPanel", "", "style.display");
-        const skill = data.progress.skills[skillKey];
         if (!skill) {
             view.updateVal("skillInfoPanel", "none", "style.display");
             return;
         }
+        view.updateVal("skillInfoPanel", "", "style.display");
         const parts = skills.skillExpGainParts(skill);
         const equippedMult = typeof skills.equippedSkillExpMultiplier === "function"
             ? skills.equippedSkillExpMultiplier(skillKey)
@@ -5400,15 +5462,7 @@ let view = {
             const dmgLine = intruderEl.querySelector(".intruder-stat-dmg");
             const atkFill = intruderEl.querySelector(".intruder-stat-atk-fill");
             if (audLine) {
-                const lowAud = (intruder.maxAud || 0) < 100;
-                let audText;
-                if (lowAud) {
-                    const cur = Math.max(0, roundNearestDecimals(intruder.aud, 1));
-                    const mxInt = Math.round(Math.max(0, intruder.maxAud || 0));
-                    audText = `${cur.toFixed(1)}/${mxInt} Aud`;
-                } else {
-                    audText = `${Math.round(intruder.aud)}/${intruder.maxAud} Aud`;
-                }
+                const audText = view.formatAudLine(intruder.aud, intruder.maxAud);
                 if (renderCache.audText !== audText) {
                     audLine.textContent = audText;
                     renderCache.audText = audText;

@@ -795,7 +795,7 @@ let offline = {
         return { changed: combat || economy, combat: combat, economy: economy };
     },
 
-    /** Any scales skill and talent rates once. Utility adds the flat delta onto sampled coin awards. */
+    /** Any scales skill and talent rates once. Utility percent scales every measured battle coin rate. */
     scaleRatesAfterColumnStep: function(rates, before) {
         if (!rates) {
             return;
@@ -818,12 +818,10 @@ let offline = {
         }
         const utilNow = skills.columnReward("utility").value || 0;
         const utilOld = before.utility || 0;
-        if (utilNow !== utilOld) {
-            const calls = rates.awardCallsPerSec || 0;
-            const splash = rates.splashFlatsPerSec || 0;
-            const deltaFlat = utilNow - utilOld;
-            rates.coinsPerSec += deltaFlat * calls * engine.intruderCoinMultiplier();
-            rates.coinsPerSec += deltaFlat * splash;
+        const oldFactor = 1 + utilOld / 100;
+        const newFactor = 1 + utilNow / 100;
+        if (oldFactor > 0 && newFactor !== oldFactor) {
+            rates.coinsPerSec *= newFactor / oldFactor;
         }
     },
 

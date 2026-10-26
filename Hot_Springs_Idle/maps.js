@@ -85,8 +85,8 @@ let mapData = {
         const expMult = tm.exp || 1;
         const totalDifficulty = (mapDefinition.baseDifficulty || 1) * combatMult;
         const N = ratio * totalDifficulty;
-        const rawAud = gameData.battle.intruderBaseAud * Math.pow(N, 1.2) * trade;
-        const rawDamage = gameData.battle.intruderAttackDamage * N / trade;
+        const rawAud = gameData.battle.intruderBaseAud * Math.pow(N, 1.3) * trade;
+        const rawDamage = gameData.battle.intruderAttackDamage * Math.pow(N, 1.2) / trade;
         const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
         const perIntruderGain = Math.ceil(coinsPerIntruderBase * coinsMult);
         const expBasePerIntruder = Math.max(0, (mapDefinition.baseDifficulty || 1) * ratio * expMult);

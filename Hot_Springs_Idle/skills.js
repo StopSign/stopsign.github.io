@@ -1,87 +1,3 @@
-const SKILL_PRIORITY = {
-    force: 1,
-    nickelAndDime: 1,
-    pickpocket: 1,
-    selfAffirmations: 1,
-    corneredEgo: 2,
-    insultFatigue: 2,
-    mainCharacter: 2,
-    aboveItAll: 3,
-    hindsight: 3,
-    mountingEgo: 3,
-    shameless: 3,
-    brokenRecord: 4,
-    grudge: 4,
-    seethe: 4,
-    bitterRivalry: 5,
-    extortion: 5,
-    runningTab: 5,
-    shockValue: 5,
-    adaptation: 6,
-    bravado: 6,
-    savageLessons: 6,
-    soulSearching: 6,
-    validation: 6,
-    echoChamber: 7,
-    narcissism: 7,
-    numbingCrowds: 7,
-    reflection: 7,
-    temper: 7,
-    vicarious: 7,
-    applyTearDrops: 8,
-    crowdWork: 8,
-    rubbernecking: 8,
-    walkingItOff: 8,
-    publicApology: 9,
-    secondWind: 9,
-    slowBurn: 9,
-    closingArgument: 10,
-    experienceHog: 10,
-    socialArmor: 10,
-    bloodRush: 20,
-    imposterSyndrome: 20,
-    levelHeaded: 20,
-    recognition: 20,
-    retailTherapy: 20,
-    sadism: 20,
-    windfallSwagger: 20,
-    secondhandEmbarrassment: 20,
-    brandRecognition: 900,
-    heckled: 900,
-    highHorse: 900,
-    hotTake: 900,
-    peerPressure: 900,
-    repeatOffender: 900,
-    righteousRant: 900,
-    simmer: 900,
-    sobStory: 900,
-    stageSob: 900,
-    stoic: 900,
-    thickSkin: 900,
-    thinIce: 900,
-    underdog: 900,
-    borrowedGlory: 990,
-    marathonEgo: 990,
-    paddingResume: 990,
-    stiffUpperLip: 990,
-    studyGroup: 990,
-    adrenaline: 999,
-    alacrity: 999,
-    cleave: 999,
-    execute: 999,
-    exploit: 999,
-    impact: 999,
-    longshot: 999,
-    marksmanship: 999,
-    overkill: 999,
-    precision: 999,
-    preparation: 999,
-    second_wind: 999,
-    sneak_attack: 999,
-    thorns: 999,
-    toughness_condescend: 999
-};
-
 // All skill definitions, runtime state shape, exp/talent formulas, and UI copy in one place.
 const SKILL_DEFINITION_ROWS = [
     {
@@ -95,11 +11,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"To love oneself is the beginning of a lifelong romance." - Oscar Wilde',
         shortDescription: "Restore Audacity every second while the battle runs.",
         rewardText: function() {
-            return "Reward: +0.5 (+0.25 per skill level) Audacity per second is healed.";
+            return "Reward: +1 (+0.5 per skill level) Audacity per second is healed.";
         },
         triggerText: "Trigger: 1 skill exp per second while Audacity is not full.",
         getEffect: function(sk) {
-            return { audPerSec: 0.5 + (sk.level || 0) * 0.25 };
+            return { audPerSec: 1 + (sk.level || 0) * 0.5 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals(e.audPerSec || 0, 2).toFixed(2)} Audacity per second`;
@@ -222,14 +138,17 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Your wallet called. It wants to defect.\"",
         shortDescription: "Coins each time you slap.",
         rewardText: function() {
-            return "Reward: +2 (+1 per skill level) coins per slap. This is a separate coin gain from intruder removal.";
+            return "Reward: +2 (+1 per skill level) coins per slap, multiplied by coin bonuses. Flat coin bonuses are not added. This is a separate coin gain from intruder removal.";
         },
         triggerText: "Trigger: 1 skill exp each time you slap.",
         getEffect: function(sk) {
             return { attackCoins: 2 + (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
-            return `Current: +${e.attackCoins || 0} coins per slap`;
+            const base = e.attackCoins || 0;
+            const mult = (typeof engine !== "undefined" && engine.intruderCoinMultiplier)
+                ? engine.intruderCoinMultiplier() : 1;
+            return `Current: +${roundNearestDecimals(base * mult, 2)} coins per slap`;
         }
     },
     {
@@ -638,7 +557,7 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"The coins are collected while the shame is watched."',
         shortDescription: "When an intruder is removed, other slap-range intruders pay out coins.",
         rewardText: function() {
-            return "Reward: when an intruder is removed, gain coins from each other intruder in slap range equal to 10% (+2% per skill level) of their base coins plus flat coin bonuses. Each drop counts as a coin gain, for other skills that use that trigger.";
+            return "Reward: when an intruder is removed, gain coins from each other intruder in slap range equal to 10% (+2% per skill level) of their base coins plus flat coin bonuses, then multiplied by the coin multiplier. Each drop counts as a coin gain, for other skills that use that trigger.";
         },
         triggerText: "Trigger: +0.25 skill exp per visible enemy per second.",
         getEffect: function(sk) {
@@ -648,7 +567,9 @@ const SKILL_DEFINITION_ROWS = [
             const flat = (typeof skillEngine !== "undefined" && skillEngine.getKillCoinsFlatBonus)
                 ? skillEngine.getKillCoinsFlatBonus() : 0;
             const pct = roundNearestDecimals((e.splashCoinFraction || 0) * 100, 1);
-            return `Current: ${pct}% of each in-range enemy's base coins + ${flat} flat when an intruder is removed`;
+            const mult = (typeof engine !== "undefined" && engine.intruderCoinMultiplier)
+                ? engine.intruderCoinMultiplier() : 1;
+            return `Current: ${pct}% of each in-range enemy's base coins + ${flat} flat, then x${roundNearestDecimals(mult, 2)} coin bonus`;
         }
     },
     {
@@ -1849,7 +1770,7 @@ let skills = {
     })(),
 
     /** Multiplier applied per skill level for exp-to-next-level. */
-    expToLevelScale: 1.2,
+    expToLevelScale: 1.3,
     defaultInitialExpToLevel: 5,
 
     getInitialExpToLevel: function(skillKey) {
@@ -2553,6 +2474,9 @@ let skills = {
         if (column === "any") {
             return v * 2;
         }
+        if (column === "utility") {
+            return v * 3;
+        }
         return v;
     },
 
@@ -2563,7 +2487,7 @@ let skills = {
 
     /**
      * Current column reward from equipped talent.
-     * Offense: base slap. Defense: base Audacity. Utility: base coins. Any: skill-exp percent.
+     * Offense: base slap. Defense: base Audacity. Utility: percent coins. Any: skill-exp percent.
      */
     columnReward: function(column) {
         const total = skills.columnTalentTotal(column);

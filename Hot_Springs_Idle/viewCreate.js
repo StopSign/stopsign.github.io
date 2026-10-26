@@ -1099,7 +1099,7 @@ let createView = {
                 : null;
             const count = Array.isArray(arr) ? arr.length : (col === "any" ? 0 : 1);
             html += `<div class="skills-slot-column skills-slot-column--${col}" data-column="${col}">`;
-            const bonusSuffix = col === "any" ? ": +0%" : ": +0";
+            const bonusSuffix = (col === "any" || col === "utility") ? ": +0%" : ": +0";
             html += `<div id="skillSlotColumnTitle_${viewName}_${col}" class="skills-slot-column-title showthat" onmouseenter="view.positionColumnTalentTip(this)">`;
             html += `<span id="skillSlotColumnTitleText_${viewName}_${col}">${createView._skillSlotColumnLabel(col)}${bonusSuffix}</span>`;
             html += `<div id="skillSlotColumnTitleTip_${viewName}_${col}" class="showthis skills-column-talent-tip"></div>`;
@@ -1573,13 +1573,13 @@ let createView = {
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
             "base_bonfire_planned_row", "base_bonfire_planned_btn", "base_bonfire_planned_extra",
             "base_bonfire_assign_one_btn", "base_bonfire_assign_ten_btn", "base_bonfire_assign_all_btn", "base_bonfire_unassign_one_btn", "base_bonfire_unassign_ten_btn", "base_bonfire_unassign_all_btn", "base_bonfire_workers_label", "base_bonfire_worker_prod_text", "base_bonfire_worker_prod_wrap", "base_bonfire_worker_prog_fill", "base_bonfire_assign_okami_btn",
-            "scrollArchivesResearchProgressText", "scrollArchivesResearchRequiredText", "scrollArchivesResearchEtaText", "scrollArchivesResearchPaused_row",
+            "scrollArchivesResearchProgressText", "scrollArchivesResearchRequiredText", "scrollArchivesResearchEtaText", "scrollArchivesStarEffects_row", "scrollArchivesResearchPaused_row",
             "scrollArchivesResearchesToChoose", "scrollArchivesChoicesWrap",
             "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
             "base_garden_empty",
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
-            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
+            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",

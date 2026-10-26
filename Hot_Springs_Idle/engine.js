@@ -561,7 +561,8 @@ let engine = {
         }
         engine.addSkillExp("force", 1);
         engine.addSkillExp("alacrity", 1);
-        const pickpocketCoins = skills.getSkillEffect("pickpocket").attackCoins || 0;
+        const pickpocketBase = skills.getSkillEffect("pickpocket").attackCoins || 0;
+        const pickpocketCoins = pickpocketBase * engine.intruderCoinMultiplier();
         if (pickpocketCoins > 0) {
             engine.grantBattleCoins(pickpocketCoins);
         }
@@ -673,7 +674,7 @@ let engine = {
                     const swEff = skills.getSkillEffect("second_wind");
                     const secondWindHeal = swEff.blockHeal || 0;
                     if (secondWindHeal > 0) {
-                        engine.grantPlayerCurrentAudGain(secondWindHeal);
+                        engine.grantPlayerCurrentAudGain(secondWindHeal * engine.getConfidenceMultiplier(), "second_wind");
                     }
                 }
                 incoming = engine.applyIncomingDamageBeforeClout(incoming);
@@ -896,7 +897,7 @@ let engine = {
             const paEff = skills.getSkillEffect("publicApology");
             const heal = paEff.audPerKill || 0;
             if (heal > 0) {
-                engine.grantPlayerCurrentAudGain(heal);
+                engine.grantPlayerCurrentAudGain(heal * engine.getConfidenceMultiplier(), "publicApology");
             }
             engine.addSkillExp("publicApology", 1);
         }
@@ -926,7 +927,7 @@ let engine = {
                 validationExtraCurrent = curGain - valRise;
             }
         }
-        initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: validationExtraCurrent });
+        initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: validationExtraCurrent, healSource: "validation" });
         if (data.battle.state === "running") {
             engine.updateCurrentZoneInfo();
         }
@@ -969,17 +970,18 @@ let engine = {
     expDisplayFromIntruderExpBase: function(expBase) {
         return engine.expAwardFromIntruderExpBase(expBase) * engine.getLevelingExpCardMultiplier();
     },
-    /** Extortion x intruder-coin cards x Charisma. Charisma is +5% per point, multiplied with the other bonuses. Flat bonuses are multiplied by this on a normal drop. */
+    /** Extortion x intruder-coin cards x Charisma x Utility column. Charisma is +5% per point, multiplied with the other bonuses. Flat bonuses are multiplied by this on a normal drop. */
     intruderCoinMultiplier: function() {
         const gEff = skills.getSkillEffect("extortion");
         const greedMult = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
-        // Extortion and intruder-coin cards multiply. Charisma is +5% per point with itself, then multiplies that product.
-        return greedMult * (1 + cardAdd) * (1 + 0.05 * engine.getCharismaPoints());
+        const utilityPct = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
+        // Extortion and intruder-coin cards multiply. Charisma is +5% per point with itself, then multiplies that product. Utility column is a percent on the same product.
+        return greedMult * (1 + cardAdd) * (1 + 0.05 * engine.getCharismaPoints()) * (1 + utilityPct / 100);
     },
     /**
-     * Weighted coin-award events during a run, so offline can step the Utility flat.
+     * Weighted coin-award events during a run, so offline can step coin rates.
      * equiv is 1 for a kill, 0.5 for Outrage, and the banked fraction for Running Tab.
      */
     noteCoinAwardSample: function(equiv, preFlatGain) {
@@ -989,14 +991,14 @@ let engine = {
         data.battle.coinAwardEquiv = (data.battle.coinAwardEquiv || 0) + equiv;
         data.battle.coinPreFlatGainSum = (data.battle.coinPreFlatGainSum || 0) + (preFlatGain || 0) * equiv;
     },
-    /** Secondhand Embarrassment adds the kill flat once per splash, without the coin multiplier. */
+    /** Secondhand Embarrassment splash count. The drop itself is (fraction + flats) times the coin multiplier. */
     noteCoinSplashFlat: function() {
         if (!data.battle) {
             return;
         }
         data.battle.coinSplashFlats = (data.battle.coinSplashFlats || 0) + 1;
     },
-    /** Matches `onIntruderKilled`: Nickel and Dime, Utility column, and More Coin Drop flats, then the coin multiplier over stored zone gain. */
+    /** Matches `onIntruderKilled`: Nickel and Dime and More Coin Drop flats, then the coin multiplier (including Utility percent) over stored zone gain. */
     coinsAwardFromIntruderGain: function(storedGain) {
         const gain = storedGain !== undefined ? storedGain : 1;
         const scavFlat = skillEngine.getKillCoinsFlatBonus();
@@ -1239,8 +1241,11 @@ let engine = {
         }
         return null;
     },
+    getPlanLevelCap: function() {
+        return (data.progress.highestLevelReached || 0) + 10;
+    },
     getNextUnplannedLevel: function() {
-        const maxLevel = data.progress.highestLevelReached || 0;
+        const maxLevel = engine.getPlanLevelCap();
         const plan = data.progress.attributePlan || [];
         for (let lvl = 1; lvl <= maxLevel; lvl++) {
             if (!engine.getPlanEntryForLevel(lvl, plan)) {
@@ -1551,7 +1556,39 @@ let engine = {
         const div = gameData.battle.combat.conStrStatDivisor || 10;
         return 1 + totalStr / div;
     },
-    grantPlayerCurrentAudGain: function(amount) {
+    /** Same Confidence total as max Audacity: level Con + Windfall Swagger + Adaptation. */
+    getConfidenceMultiplier: function() {
+        const ls = data.battle && data.battle.levelState;
+        if (!ls) {
+            return 1;
+        }
+        let totalCon = ls.levelCon || 0;
+        totalCon += skills.getSkillEffect("windfallSwagger").bonusCon || 0;
+        totalCon += skills.getSkillEffect("adaptation").bonusCon || 0;
+        const div = (gameData.battle.combat && gameData.battle.combat.conStrStatDivisor) || 10;
+        return 1 + totalCon / div;
+    },
+    /** Remember the Audacity that actually landed this battle. Amount is already past the max-Aud clamp. */
+    noteBattleHeal: function(skillKey, amount) {
+        if (!data.battle || !skillKey || !(amount > 0)) {
+            return;
+        }
+        if (!data.battle.healBySkill) {
+            data.battle.healBySkill = {};
+        }
+        if (!data.battle.healSkillOrder) {
+            data.battle.healSkillOrder = [];
+        }
+        if (data.battle.healSkillOrder.indexOf(skillKey) < 0) {
+            data.battle.healSkillOrder.push(skillKey);
+        }
+        data.battle.healBySkill[skillKey] = (data.battle.healBySkill[skillKey] || 0) + amount;
+    },
+    /**
+     * Add current Audacity, clamped to max. amount is the final heal (flat heals already include Confidence).
+     * sourceKey records the real delta on the Healed card.
+     */
+    grantPlayerCurrentAudGain: function(amount, sourceKey) {
         if (!amount || amount <= 0) {
             return 0;
         }
@@ -1561,6 +1598,7 @@ let engine = {
         const gained = Math.max(0, p.aud - before);
         if (gained > 0) {
             engine.spawnAudGainFloat(gained, "right");
+            engine.noteBattleHeal(sourceKey, gained);
         }
         return gained;
     },
@@ -2907,7 +2945,7 @@ let engine = {
             engine.syncPlayerCooldownFields();
         } else if (skill.key === "shameless" || skill.key === "corneredEgo") {
             // Equal recover covers the max rise. Extra heal is 3 x the new level, and is not boosted by Narcissism.
-            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: 3 * (skill.level || 0) });
+            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: 3 * (skill.level || 0), healSource: skill.key });
         } else if (skill.key === "force" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "windfallSwagger" || skill.key === "shockValue" || skill.key === "validation" || skill.key === "paddingResume" || skill.key === "adaptation" || skill.key === "savageLessons" || skill.key === "mountingEgo" || skill.key === "bravado") {
@@ -12773,7 +12811,7 @@ let engine = {
     getScrollArchivesResearchCoinCost: function(lib) {
         const archives = lib || data.progress.base.scrollArchives;
         const n = engine.getScrollArchivesCompletedResearchCount(archives);
-        const base = 49 + Math.pow(1 + n / 10, 11);
+        const base = 49 + Math.pow(1 + n / 10, 10);
         return Math.floor(base * engine.getScrollArchivesBronzeResearchCostMult());
     },
     syncScrollArchivesResearchCost: function(lib) {

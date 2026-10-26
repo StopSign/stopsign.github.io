@@ -31,22 +31,33 @@
     display: inline-block;
 }
 
-.sh-toolbar,
-.sh-section-head,
-.sh-card-head {
+.sh-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin: 16px 0 12px;
+    padding: 8px 0 10px;
+    background: #070a0f;
+}
+
+.sh-counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.sh-radio-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 10px;
-}
-
-.sh-toolbar {
-    margin: 16px 0 12px;
-}
-
-.sh-section-head {
-    justify-content: space-between;
-    margin-bottom: 10px;
+    gap: 6px 14px;
+    font-size: 12px;
 }
 
 .sh-card {
@@ -56,14 +67,31 @@
     margin-bottom: 12px;
 }
 
-.sh-card h2 {
-    margin: 0;
-    font-size: 16px;
+.sh-group-head {
+    margin: 18px 0 8px;
+    font-size: 15px;
+}
+
+.sh-group-head:first-child {
+    margin-top: 0;
 }
 
 .sh-card-head {
-    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
     margin-bottom: 8px;
+}
+
+.sh-card-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.sh-card-title-row .scroll-archives-choice-slot-cat {
+    margin-bottom: 0;
 }
 
 .sh-card-title {
@@ -74,21 +102,6 @@
 .sh-card-meta {
     font-size: 12px;
     color: #a6adc8;
-}
-
-.sh-priority-field {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-}
-
-.sh-priority-field input {
-    width: 72px;
-    background: #1f2b3e;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 4px 6px;
 }
 
 .sh-blurb {
@@ -124,18 +137,4 @@
 .sh-table .sh-num {
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
-}
-
-.sh-export {
-    width: 100%;
-    min-height: 280px;
-    box-sizing: border-box;
-    background: #11151f;
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    padding: 10px;
-    font-family: Consolas, "Courier New", monospace;
-    font-size: 12px;
-    line-height: 1.4;
-    resize: vertical;
 }

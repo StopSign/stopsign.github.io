@@ -204,7 +204,7 @@ let skillEngine = {
                 const walkEff = skills.getSkillEffect("walkingItOff");
                 const regen = walkEff.audPerSec || 0;
                 if (regen > 0) {
-                    engine.grantPlayerCurrentAudGain(regen);
+                    engine.grantPlayerCurrentAudGain(regen * engine.getConfidenceMultiplier(), "walkingItOff");
                 }
                 engine.addSkillExp("walkingItOff", 1);
             }
@@ -260,12 +260,13 @@ let skillEngine = {
         }
         const swEff = skills.getSkillEffect("secondWind");
         const maxAud = (data.battle.player && data.battle.player.maxAud) || 0;
-        const heal = (swEff.restoreAudFlat || 0) + (swEff.restoreAudMaxFraction || 0) * maxAud;
+        const heal = ((swEff.restoreAudFlat || 0) * engine.getConfidenceMultiplier())
+            + ((swEff.restoreAudMaxFraction || 0) * maxAud);
         if (!(heal > 0)) {
             return;
         }
         data.battle.secondWindRestoreUsed = true;
-        engine.grantPlayerCurrentAudGain(heal);
+        engine.grantPlayerCurrentAudGain(heal, "secondWind");
     },
     onPlayerTookDamage: function() {
         engine.addSkillExp("secondWind", 1);
@@ -291,7 +292,7 @@ let skillEngine = {
             const rEff = skills.getSkillEffect("selfAffirmations");
             const regen = rEff.audPerSec || 0;
             if (regen > 0) {
-                engine.grantPlayerCurrentAudGain(regen);
+                engine.grantPlayerCurrentAudGain(regen * engine.getConfidenceMultiplier(), "selfAffirmations");
             }
             const mx = Math.max(1, p.maxAud || 1);
             if (p.aud < mx) {
@@ -379,17 +380,16 @@ let skillEngine = {
         }
         return skills.getSkillEffect("validation").currentAudOnMaxIncrease || 0;
     },
-    /** Flat coin bonus from Nickel and Dime, the Utility column, and More Coin Drop, excluding %/mult and zone base. */
+    /** Flat coin bonus from Nickel and Dime and More Coin Drop, excluding %/mult and zone base. */
     getKillCoinsFlatBonus: function() {
         const nickel = skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
-        const column = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
         const cardFlat = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().killCoinsFlatAdd || 0) : 0;
-        return nickel + column + cardFlat;
+        return nickel + cardFlat;
     },
     /**
-     * Secondhand Embarrassment: other slap-range intruders pay (10% base coins + flat coin bonuses).
-     * Each splash is its own grantBattleCoins call so coin-gain triggers fire per drop.
+     * Secondhand Embarrassment: other slap-range intruders pay (splash fraction of base coins + flat coin bonuses),
+     * then the full coin multiplier. Each splash is its own grantBattleCoins call so coin-gain triggers fire per drop.
      * Returns total coins granted (0 if none).
      */
     applySecondhandEmbarrassmentCoins: function(killedIntruder) {
@@ -401,6 +401,7 @@ let skillEngine = {
             return 0;
         }
         const flat = skillEngine.getKillCoinsFlatBonus();
+        const mult = engine.intruderCoinMultiplier();
         const killedId = killedIntruder && killedIntruder.id;
         let total = 0;
         for (let i = 0; i < data.battle.enemies.length; i++) {
@@ -408,7 +409,7 @@ let skillEngine = {
             if (!e.alive || !e.inRange || e.id === killedId) {
                 continue;
             }
-            const drop = ((e.gain || 1) * frac) + flat;
+            const drop = (((e.gain || 1) * frac) + flat) * mult;
             if (drop > 0) {
                 engine.noteCoinSplashFlat();
                 engine.grantBattleCoins(drop);

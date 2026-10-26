@@ -259,22 +259,22 @@
                 <div class="prog-label-row">Exp <span id="levelExpText"></span></div>
                 <div class="prog-track"><div id="levelTabExpFill" class="prog-fill prog-fill-level"></div></div>
                 <div class="leveling-stat-grid">
-                    <div class="leveling-stat-card showthat">
+                    <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
                         <div class="leveling-stat-name">Bru</div>
                         <div class="leveling-stat-val" id="strText"></div>
                         <div class="showthis" id="strStatTip">Brutality - +10% damage per point.<br>Damage is always rounded up.</div>
                     </div>
-                    <div class="leveling-stat-card showthat">
+                    <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
                         <div class="leveling-stat-name">Con</div>
                         <div class="leveling-stat-val" id="conText"></div>
-                        <div class="showthis" id="conStatTip">Confidence - +10% current and max Aud per point</div>
+                        <div class="showthis" id="conStatTip">Confidence - +10% max Audacity per point. +10% healing per point</div>
                     </div>
-                    <div class="leveling-stat-card showthat">
+                    <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
                         <div class="leveling-stat-name">Cha</div>
                         <div class="leveling-stat-val" id="spdText"></div>
                         <div class="showthis" id="chaStatTip">Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.</div>
                     </div>
-                    <div class="leveling-stat-card showthat">
+                    <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
                         <div class="leveling-stat-name">Soul</div>
                         <div class="leveling-stat-val" id="soulText"></div>
                         <div class="showthis" id="soulStatTip"></div>
@@ -318,12 +318,12 @@
                 <div class="pane-title">Stats</div>
                 <div class="leveling-stat-grid">
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Audacity</div><div class="leveling-stat-val" id="statsAudText"></div><div class="showthis" id="statsAudTip"></div></div>
-                    <div id="statsRegenCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Regen</div><div class="leveling-stat-val" id="statsRegenText"></div><div class="showthis" id="statsRegenTip"></div></div>
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Shame Attack</div><div class="leveling-stat-val" id="statsAttackText"></div><div class="showthis" id="statsAttackTip"></div></div>
                     <div id="statsArmorCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Armor</div><div class="leveling-stat-val" id="statsArmorText"></div><div class="showthis" id="statsArmorTip"></div></div>
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Slap Speed</div><div class="leveling-stat-val" id="statsSlapText"></div><div class="showthis" id="statsSlapTip"></div></div>
                     <div id="statsSandalCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Sandal Throw Speed</div><div class="leveling-stat-val" id="statsSandalText"></div><div class="showthis" id="statsSandalTip"></div></div>
                     <div id="statsExtraCoinsCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Extra Coins Dropped</div><div class="leveling-stat-val" id="statsExtraCoinsText"></div><div class="showthis" id="statsExtraCoinsTip"></div></div>
+                    <div id="statsHealingCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Healed</div><div class="leveling-stat-val" id="statsHealingText"></div><div class="showthis" id="statsHealingTip"></div></div>
                 </div>
             </div>
 

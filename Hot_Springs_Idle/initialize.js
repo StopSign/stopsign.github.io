@@ -603,6 +603,8 @@ let initials = {
             numbingCrowdsSecondAccMs: 0,
             slowBurnAccMs: 0,
             slowBurnSeconds: 0,
+            healBySkill: {},
+            healSkillOrder: [],
             combatSkillHalfSecondAccMs: 0,
             combatSkillSecondAccMs: 0,
             combatSkillTwoSecondAccMs: 0,
@@ -1704,13 +1706,20 @@ let initialize = {
                     engine.addSkillExp("borrowedGlory", 1);
                 }
             }
-            // Additional recovers (Validation, Cornered Ego, …) - not boosted by Narcissism.
-            const extraOnMaxRise = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
-                ? opts.extraCurrentOnMaxRise : 0;
-            if (extraOnMaxRise > 0) {
-                newAud = Math.min(maxAud, newAud + extraOnMaxRise);
+            // Additional recovers (Validation, Cornered Ego, Shameless) - not boosted by Narcissism.
+            // Flat extra heals are multiplied by Confidence. Equal recover is not.
+            const extraRequested = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
+                ? opts.extraCurrentOnMaxRise * engine.getConfidenceMultiplier() : 0;
+            let extraHealed = 0;
+            if (extraRequested > 0) {
+                const beforeExtra = newAud;
+                newAud = Math.min(maxAud, newAud + extraRequested);
+                extraHealed = newAud - beforeExtra;
             }
             data.battle.player.aud = newAud;
+            if (extraHealed > 0 && opts && opts.healSource) {
+                engine.noteBattleHeal(opts.healSource, extraHealed);
+            }
             const healed = newAud - oldAud;
             // Left float = current Aud from max increase (equal recover + Narcissism + extras).
             if (maxRise > 0 && healed > 0) {

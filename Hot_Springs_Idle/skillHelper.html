@@ -18,24 +18,30 @@
                 <h1>Skill Data Helper</h1>
                 <a class="tab-button sh-back" href="index.html">Back to game</a>
             </div>
-            <p class="muted-text sh-lede">Effects and exp at levels 0 / 50 / 100 from <code>skills.js</code>. Set priority numbers, sort, then copy <code>SKILL_PRIORITY</code> back to the top of that file. Edits here do not write the file.</p>
+            <p class="muted-text sh-lede">Combat skill effects and exp at levels 0 / 50 / 100 from <code>skills.js</code>.</p>
         </header>
 
         <section class="sh-toolbar">
-            <button type="button" class="tab-button" id="shSortBtn">Sort by priority</button>
-            <button type="button" class="tab-button" id="shCopyBtn">Copy SKILL_PRIORITY</button>
-            <span id="shCopyStatus" class="muted-text"></span>
-        </section>
-
-        <div id="shSkillList" class="sh-skill-list"></div>
-
-        <section class="sh-card">
-            <div class="sh-section-head">
-                <h2>Export</h2>
+            <div class="sh-counts">
+                <span id="shTotal">Total skills: 0</span>
+                <span id="shShowing" hidden>Showing 0</span>
             </div>
-            <p class="muted-text">Paste this over the <code>SKILL_PRIORITY</code> block at the top of <code>skills.js</code>.</p>
-            <textarea id="shExport" class="sh-export" spellcheck="false" readonly></textarea>
+            <input type="search" id="shSearch" class="skills-list-search" placeholder="Search skills…" autocomplete="off" spellcheck="false">
+            <div class="sh-radio-row">
+                <span class="muted-text">Slot</span>
+                <label><input type="radio" name="shSlot" value="all" checked> All</label>
+                <label><input type="radio" name="shSlot" value="offense"> Offense</label>
+                <label><input type="radio" name="shSlot" value="defense"> Defense</label>
+                <label><input type="radio" name="shSlot" value="utility"> Utility</label>
+            </div>
+            <div class="sh-radio-row">
+                <label><input type="radio" name="shSort" value="alpha" checked> Sort Alphabetically</label>
+                <label><input type="radio" name="shSort" value="slot"> Sort by Slot Category</label>
+            </div>
         </section>
+
+        <p id="shEmpty" class="muted-text" hidden>No skills match.</p>
+        <div id="shSkillList" class="sh-skill-list"></div>
     </div>
 
     <script>

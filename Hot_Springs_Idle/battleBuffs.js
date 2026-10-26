@@ -159,10 +159,11 @@ var battleBuffs = {
             tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + Okami level x 5)<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
         } else if (key === "outrage") {
             const counter = entry.counter || 0;
+            const cap = battleBuffs.getOutrageCap();
             const ready = counter >= 10;
             bottomRight = intToString(counter, 1);
             topRight = ready ? "/2" : "";
-            tooltipExtra = `Counter: ${round2(counter)}<br>${ready ? "Next slap or sandal spends 10: cooldown halved, and that hit pays 50% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
+            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + The Orb level)<br>${ready ? "Next slap or sandal spends 10: cooldown halved, and that hit pays 50% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
         } else if (key === "fakeTears") {
             const pct = def.effectPercent || 0;
             const capMs = battleBuffs.getFakeTearsCapMs();
@@ -242,6 +243,10 @@ var battleBuffs = {
     getMaliceCap: function() {
         return 10 + (battleBuffs.getOkamiLevel() * 5);
     },
+    getOutrageCap: function() {
+        const orb = data.progress.base && data.progress.base.mage_tower;
+        return 10 + ((orb && orb.level) || 0);
+    },
     getDurationCapMs: function(key) {
         if (key === "fakeTears") {
             return battleBuffs.getFakeTearsCapMs();
@@ -261,6 +266,11 @@ var battleBuffs = {
         const maliceCap = battleBuffs.getMaliceCap();
         if (malice && (malice.counter || 0) > maliceCap) {
             malice.counter = maliceCap;
+        }
+        const outrage = state.byKey.outrage;
+        const outrageCap = battleBuffs.getOutrageCap();
+        if (outrage && (outrage.counter || 0) > outrageCap) {
+            outrage.counter = outrageCap;
         }
     },
     addFuryStacks: function(amount) {
@@ -352,7 +362,7 @@ var battleBuffs = {
         if (!state.byKey.outrage) {
             state.byKey.outrage = { counter: 0 };
         }
-        state.byKey.outrage.counter = (state.byKey.outrage.counter || 0) + amount;
+        state.byKey.outrage.counter = Math.min(battleBuffs.getOutrageCap(), (state.byKey.outrage.counter || 0) + amount);
         battleBuffs.ensureInQueue(state, "outrage");
     },
     /** Spend 10 Outrage when the counter is at least 10. Returns true if spent. */
