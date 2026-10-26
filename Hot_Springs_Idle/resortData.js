@@ -34,7 +34,7 @@ var resortData = {
     attributeDisplay: {
         str: { short: "Bru", name: "Brutality" },
         con: { short: "Con", name: "Confidence" },
-        spd: { short: "Spd", name: "Speed" },
+        spd: { short: "Cha", name: "Charisma" },
         soul: { short: "Soul", name: "Soul" }
     },
 
@@ -1883,7 +1883,7 @@ var resortData = {
                 carryingCapacity: {
                     key: "carrying_capacity",
                     name: "Encourage Water Tension",
-                    description: "Water spirits carry more water per droplet (×1.5 per upgrade).",
+                    description: "Water spirits carry more water per droplet (x1.5 per upgrade).",
                     getCost: function() {
                         const bought = data.progress.base.hiddenSpring.carryingCapacityBought || 0;
                         return { starBeads: 50000 * Math.pow(5, bought) };
@@ -1911,7 +1911,7 @@ var resortData = {
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
                         const mult = engine.getWaterDropletCapacityMultiplier();
-                        return `Droplet capacity: ×${mult}`;
+                        return `Droplet capacity: x${mult}`;
                     },
                     rowVisible: function() {
                         const hs = data.progress.base.hiddenSpring;
@@ -2423,7 +2423,7 @@ var resortData = {
                 collectShards: {
                     key: "collect_shards",
                     name: "Collect Shards",
-                    description: "Unlock shard drops from intruders. Each level multiplies shard drop amount by x1.5. Shards unlock extra skill slots.",
+                    description: "Unlock shard drops from intruders. Each level multiplies shard drop amount by x1.3. Shards unlock extra skill slots.",
                     getCost: function() {
                         const n = data.progress.base.scrollArchives.collectShardsLevel || 0;
                         const mult = Math.pow(2, n);
@@ -2445,7 +2445,7 @@ var resortData = {
                         if (lv <= 0) {
                             return "Unlocks shard drops and skill-slot progress";
                         }
-                        return `Shard drop amount: x${round1(Math.pow(1.5, lv - 1))}`;
+                        return `Shard drop amount: x${round1(Math.pow(1.3, lv - 1))}`;
                     },
                     rowVisible: function() {
                         return !!(data.progress && data.progress.showBattle);
@@ -2521,9 +2521,9 @@ var resortData = {
                         const n = engine.getLargerForgeBought();
                         if (n > 0) {
                             const mult = round2(1 + 0.5 * n);
-                            return `Build a forge below the Atelier where fire spirits smelt ceil(√spirit power × ${mult}) ore into bars every 60s, gaining exp equal to bars × 3. Requires Fire Spirit to work.`;
+                            return `Build a forge below the Atelier where fire spirits smelt ceil(√spirit power x ${mult}) ore into bars every 60s, gaining exp equal to bars x 3. Requires Fire Spirit to work.`;
                         }
-                        return "Build a forge below the Atelier where fire spirits smelt floor(√spirit power) ore into bars every 60s, gaining exp equal to bars × 3. Requires Fire Spirit to work.";
+                        return "Build a forge below the Atelier where fire spirits smelt floor(√spirit power) ore into bars every 60s, gaining exp equal to bars x 3. Requires Fire Spirit to work.";
                     },
                     cost: { stone: 600 },
                     weavingTime: 240,

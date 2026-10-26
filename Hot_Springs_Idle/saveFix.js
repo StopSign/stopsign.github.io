@@ -1,14 +1,14 @@
 // Save-file one-time migrations and content-version wipes.
 //
-// CODE_SAVE_VERSION — stamped onto data.saveVersion for new games and after a successful load.
-// data.saveVersion / loadedSaveVersion — what the save blob had (missing/null treated as 0).
+// CODE_SAVE_VERSION - stamped onto data.saveVersion for new games and after a successful load.
+// data.saveVersion / loadedSaveVersion - what the save blob had (missing/null treated as 0).
 //
 // When adding a one-time fix for saves still at version N:
 //   if (loadedSaveVersion === N) { ...fix... }
 // Then bump CODE_SAVE_VERSION to N+1 so the next save stamps past N.
 // Prefer saveVersion gates over permanent progress flags for new fixups.
 
-const CODE_SAVE_VERSION = 2;
+const CODE_SAVE_VERSION = 3;
 
 let saveFix = {
     STAR_TYPES: ["bronze", "silver", "gold"],
@@ -29,6 +29,9 @@ let saveFix = {
         }
         if (loadedSaveVersion < 2) {
             saveFix.migrateGlobalShardsRework();
+        }
+        if (loadedSaveVersion < 3) {
+            saveFix.migrateEquippedStatSkillsOffCounters();
         }
     },
 
@@ -106,6 +109,22 @@ let saveFix = {
             delete lib.researchCoinCosts;
             engine.syncScrollArchivesResearchCost(lib);
         }
+    },
+
+    /**
+     * Adaptation and Savage Lessons now grant their tooltip bonus while equipped.
+     * skillConBonus was only Adaptation's old +1 per level-up. skillStrBonus still
+     * holds Adrenaline's +1 per level-up, so subtract Savage Lessons' old share.
+     */
+    migrateEquippedStatSkillsOffCounters: function() {
+        const ls = data.battle && data.battle.levelState;
+        if (!ls) {
+            return;
+        }
+        ls.skillConBonus = 0;
+        const savage = data.progress.skills && data.progress.skills.savageLessons;
+        const savageLevels = savage ? (savage.level || 0) : 0;
+        ls.skillStrBonus = Math.max(0, (ls.skillStrBonus || 0) - savageLevels);
     },
 
     /** One-time fixes for saves that still have saveVersion 0. */

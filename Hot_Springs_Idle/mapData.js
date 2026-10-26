@@ -275,7 +275,7 @@ mapData.getMapZoneDifficultySum = function(mapDef) {
 
 /**
  * Base per-kill shard chance for a zone (before shrine additive bonus / 100% cap).
- * pool × (zoneDifficulty / sumDifficulties) / enemyCount
+ * pool x (zoneDifficulty / sumDifficulties) / enemyCount
  */
 mapData.getZoneShardDropChance = function(mapDef, zoneIndex, mapTier) {
     if (!mapDef || !mapDef.zones || zoneIndex < 0 || zoneIndex >= mapDef.zones.length) {
@@ -304,5 +304,5 @@ mapData.getMapShardDropAmount = function(mapDef) {
     const starCount = (typeof engine !== "undefined" && engine.countAchievedStars)
         ? engine.countAchievedStars()
         : 0;
-    return base * amountMult * Math.pow(1.3, starCount);
+    return base * amountMult * Math.pow(1.1, starCount);
 };

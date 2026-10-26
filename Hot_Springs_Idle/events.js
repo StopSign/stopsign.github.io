@@ -307,7 +307,7 @@ let events = {
     },
     /** Slot click: Equipped pane uses equipped selection; Library pane uses library selection. */
     selectSkillSlotSkill: function(viewName, column, index, ev) {
-        // Only ignore the star buttons themselves — not the whole stars row hitbox.
+        // Only ignore the star buttons themselves - not the whole stars row hitbox.
         if (ev && ev.target && ev.target.closest && ev.target.closest(".skill-star-btn")) {
             return;
         }
@@ -372,6 +372,7 @@ let events = {
         if (result.ok) {
             view.updateVal("libSkillInfo_equipError", "none", "style.display");
             view.updateVal("libSkillInfo_equipError", "");
+            initialize.calcPlayerStats(false);
             view.updateSkillsTab();
             return;
         }
@@ -395,6 +396,7 @@ let events = {
             return;
         }
         data.progress.selectedEquippedSkillKey = "";
+        initialize.calcPlayerStats(false);
         view.updateSkillsTab();
     },
     toggleEquippedSlotStar: function(column, index, starType) {
@@ -522,6 +524,7 @@ let events = {
                 view.flashSkillEquipFail(slot);
                 return;
             }
+            initialize.calcPlayerStats(false);
             view.updateSkillsTab();
             return;
         }
@@ -545,6 +548,7 @@ let events = {
                     return;
                 }
             }
+            initialize.calcPlayerStats(false);
             view.updateSkillsTab();
         }
     },
@@ -1416,6 +1420,12 @@ let events = {
             return;
         }
         const isSameSlot = (selected.location || "") === "spiritTraining" && (selected.slot || 0) === 0;
+        if (isSameSlot && occupant && occupant.id === selected.id
+            && (data.progress.selectedResortInfoType || "") === "spirit") {
+            events.clearBaseBuildingSelection();
+            view.updateResortMapTokens();
+            return;
+        }
         if (isSameSlot) {
             refresh();
             return;
@@ -1466,6 +1476,12 @@ let events = {
         const isSameSlot = selected
             && (selected.location || defaultLoc) === location
             && (selected.slot || 0) === slotIndex;
+        if (occupant && selected && occupant.id === selected.id && isSameSlot
+            && (data.progress.selectedResortInfoType || "") === "spirit") {
+            events.clearBaseBuildingSelection();
+            view.updateResortMapTokens();
+            return;
+        }
         if (occupant && (!selected || occupant.id !== selected.id)) {
             data.progress.selectedSpiritId = occupant.id;
             data.progress.selectedBaseBuilding = "spirit";
@@ -1535,6 +1551,13 @@ let events = {
             data.progress.selectedResortInfoType = "spirit";
             events.refreshBaseBuildingPanels();
             view.updateSpiritInfo();
+            view.updateResortMapTokens();
+            return;
+        }
+        if (occupant && selected && occupant.id === selected.id
+            && (selected.location || "bonfire") === location && (selected.slot || 0) === 0
+            && (data.progress.selectedResortInfoType || "") === "spirit") {
+            events.clearBaseBuildingSelection();
             view.updateResortMapTokens();
             return;
         }

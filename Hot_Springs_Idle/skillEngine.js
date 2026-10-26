@@ -111,17 +111,21 @@ let skillEngine = {
             return;
         }
         const enemies = data.battle.enemies || [];
+        let inSlap = 0;
         for (let i = 0; i < enemies.length; i++) {
             const e = enemies[i];
             if (!e.alive || !e.inRange) {
                 continue;
             }
+            inSlap++;
             e.bitterRivalryInRangeAccMs = (e.bitterRivalryInRangeAccMs || 0) + tickMs;
             while (e.bitterRivalryInRangeAccMs >= 1000) {
                 e.bitterRivalryInRangeAccMs -= 1000;
                 e.bitterRivalrySeconds = (e.bitterRivalrySeconds || 0) + 1;
-                engine.addSkillExp("bitterRivalry", 0.5);
             }
+        }
+        if (inSlap > 0) {
+            engine.addSkillExp("bitterRivalry", 0.5 * inSlap * (tickMs / 1000));
         }
     },
     updateNumbingCrowdsEachSecond: function(tickMs) {
@@ -194,17 +198,8 @@ let skillEngine = {
     updateCombatSkillPeriodics: function(tickMs) {
         const moving = engine.isPlayerMovingForward();
         const atMax = engine.isPlayerAtMaxAud();
-        const slapCount = engine.countIntrudersInSlapRange();
 
         skillEngine.advanceBattleAccMs("combatSkillSecondAccMs", tickMs, 1000, function() {
-            if (moving && skills.isSkillUnlocked("righteousRant")) {
-                const rantEff = skills.getSkillEffect("righteousRant");
-                const ms = rantEff.outrageMs || 0;
-                if (ms > 0) {
-                    engine.addOutrageMs(ms);
-                }
-                engine.addSkillExp("righteousRant", 1);
-            }
             if (moving && skills.isSkillUnlocked("walkingItOff")) {
                 const walkEff = skills.getSkillEffect("walkingItOff");
                 const regen = walkEff.audPerSec || 0;
@@ -218,9 +213,9 @@ let skillEngine = {
                 engine.addSkillExp("simmer", 1);
                 if (skills.isSkillUnlocked("simmer")) {
                     const simEff = skills.getSkillEffect("simmer");
-                    const maliceAmt = simEff.malicePerLevel || 0;
-                    if (maliceAmt > 0) {
-                        engine.addMalice(maliceAmt);
+                    const outrageAmt = simEff.outragePerSecond || 0;
+                    if (outrageAmt > 0) {
+                        engine.addOutrage(outrageAmt);
                     }
                 }
             } else {
@@ -249,16 +244,6 @@ let skillEngine = {
                     engine.addCloutStacks(clout);
                 }
                 engine.addSkillExp("brandRecognition", 1);
-            }
-            if (slapCount >= 3) {
-                if (skills.isSkillUnlocked("heckled")) {
-                    const heckEff = skills.getSkillEffect("heckled");
-                    const ms = heckEff.outrageMsPerLevel || 0;
-                    if (ms > 0) {
-                        engine.addOutrageMs(ms);
-                    }
-                    engine.addSkillExp("heckled", 1);
-                }
             }
         });
 
@@ -394,9 +379,13 @@ let skillEngine = {
         }
         return skills.getSkillEffect("validation").currentAudOnMaxIncrease || 0;
     },
-    /** Flat coin bonus from skills (e.g. Nickel and Dime), excluding %/mult and zone base. */
+    /** Flat coin bonus from Nickel and Dime, the Utility column, and More Coin Drop, excluding %/mult and zone base. */
     getKillCoinsFlatBonus: function() {
-        return skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
+        const nickel = skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
+        const column = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
+        const cardFlat = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().killCoinsFlatAdd || 0) : 0;
+        return nickel + column + cardFlat;
     },
     /**
      * Secondhand Embarrassment: other slap-range intruders pay (10% base coins + flat coin bonuses).
@@ -421,6 +410,7 @@ let skillEngine = {
             }
             const drop = ((e.gain || 1) * frac) + flat;
             if (drop > 0) {
+                engine.noteCoinSplashFlat();
                 engine.grantBattleCoins(drop);
                 total += drop;
             }
@@ -656,6 +646,125 @@ let skillEngine = {
                 });
             }
         }
+    },
+    updateRighteousRant: function(tickMs) {
+        if (!skills.isSkillUnlocked("righteousRant")) {
+            return;
+        }
+        if (!engine.isPlayerMovingForward()) {
+            return;
+        }
+        if (data.battle.righteousRantAccMs === undefined || data.battle.righteousRantAccMs === null) {
+            data.battle.righteousRantAccMs = 0;
+        }
+        data.battle.righteousRantAccMs += tickMs;
+        while (data.battle.righteousRantAccMs >= 1000) {
+            data.battle.righteousRantAccMs -= 1000;
+            const amt = skills.getSkillEffect("righteousRant").outragePerSecond || 0;
+            if (amt > 0) {
+                engine.addOutrage(amt);
+            }
+            engine.addSkillExp("righteousRant", 1);
+        }
+    },
+    updateHeckled: function(tickMs) {
+        if (!skills.isSkillUnlocked("heckled")) {
+            return;
+        }
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount <= 0) {
+            return;
+        }
+        const sec = tickMs / 1000;
+        engine.addSkillExp("heckled", 0.5 * closeCount * sec);
+        const per = skills.getSkillEffect("heckled").outragePerEnemy || 0;
+        if (per > 0) {
+            engine.addOutrage(per * closeCount * sec);
+        }
+    },
+    updateReflection: function(tickMs) {
+        if (!skills.isSkillUnlocked("reflection")) {
+            return;
+        }
+        const perSec = skills.getSkillEffect("reflection").expPerSec || 0;
+        if (!(perSec > 0)) {
+            return;
+        }
+        engine.grantCloneCharacterExp(perSec * (tickMs / 1000));
+    },
+    updateRubbernecking: function(tickMs) {
+        if (!skills.isSkillUnlocked("rubbernecking")) {
+            return;
+        }
+        const sec = tickMs / 1000;
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount > 0) {
+            engine.addSkillExp("rubbernecking", 0.5 * closeCount * sec);
+        }
+        const frac = skills.getSkillEffect("rubbernecking").cloneExpFractionPerSec || 0;
+        if (!(frac > 0) || !(sec > 0)) {
+            return;
+        }
+        let exp = 0;
+        const enemies = data.battle.enemies || [];
+        for (let i = 0; i < enemies.length; i++) {
+            const e = enemies[i];
+            if (!e.alive || !e.inRange) {
+                continue;
+            }
+            const expBase = e.expBase !== undefined ? e.expBase : 1;
+            exp += engine.expAwardFromIntruderExpBase(expBase) * frac;
+        }
+        const award = exp * sec;
+        if (!(award > 0)) {
+            return;
+        }
+        engine.addPendingOkamiExpFromClone(award);
+        if (bonfire.isGrowthBlessingUnlocked()) {
+            engine.addCloneLevelExp(award);
+            engine.resolveLevelUps();
+        }
+    },
+    updateRunningTab: function(tickMs) {
+        if (!skills.isSkillUnlocked("runningTab")) {
+            return;
+        }
+        const sec = tickMs / 1000;
+        const closeCount = engine.countVisibleIntrudersCloserThan(200);
+        if (closeCount > 0) {
+            engine.addSkillExp("runningTab", 0.5 * closeCount * sec);
+        }
+        const frac = skills.getSkillEffect("runningTab").coinFractionPerSec || 0;
+        if (!(frac > 0) || !(sec > 0)) {
+            return;
+        }
+        const enemies = data.battle.enemies || [];
+        for (let i = 0; i < enemies.length; i++) {
+            const e = enemies[i];
+            if (!e.alive || !e.inRange) {
+                continue;
+            }
+            const storedGain = e.gain !== undefined ? e.gain : 1;
+            engine.noteCoinAwardSample(frac * sec, storedGain);
+            const payout = engine.coinsAwardFromIntruderGain(storedGain);
+            e.runningTabBank = (e.runningTabBank || 0) + payout * frac * sec;
+        }
+    },
+    /** Pay a Running Tab bank without coin-gain skill triggers. Returns coins added. */
+    payRunningTabBank: function(intruder) {
+        if (!intruder) {
+            return 0;
+        }
+        const bank = intruder.runningTabBank || 0;
+        intruder.runningTabBank = 0;
+        if (!(bank > 0)) {
+            return 0;
+        }
+        data.progress.coins = (data.progress.coins || 0) + bank;
+        if (data.battle) {
+            data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + bank;
+        }
+        return bank;
     },
     getShockValueTriggerExp: function(egoDamage) {
         const dmg = Math.max(0, egoDamage || 0);

@@ -489,11 +489,18 @@ let offline = {
         const runCoins0 = runStart && runStart.runCoins !== undefined ? runStart.runCoins : (before.runCoins || 0);
         const kills0 = runStart && runStart.kills !== undefined ? runStart.kills : (before.kills || 0);
         const char0 = runStart && runStart.characterExp !== undefined ? runStart.characterExp : (before.characterExp || 0);
+        const battle = data.battle || {};
+        const award0 = runStart && runStart.coinAwardEquiv !== undefined ? runStart.coinAwardEquiv : 0;
+        const preFlat0 = runStart && runStart.coinPreFlatGainSum !== undefined ? runStart.coinPreFlatGainSum : 0;
+        const splash0 = runStart && runStart.coinSplashFlats !== undefined ? runStart.coinSplashFlats : 0;
         return {
             durationSec: T,
             coinsPerSec: Math.max(0, (after.runCoins || 0) - runCoins0) / T,
             characterExpPerSec: Math.max(0, (after.characterExp || 0) - char0) / T,
             killsPerSec: Math.max(0, (after.kills || 0) - kills0) / T,
+            awardCallsPerSec: Math.max(0, (battle.coinAwardEquiv || 0) - award0) / T,
+            preFlatGainPerSec: Math.max(0, (battle.coinPreFlatGainSum || 0) - preFlat0) / T,
+            splashFlatsPerSec: Math.max(0, (battle.coinSplashFlats || 0) - splash0) / T,
             skillRates: skillRates,
             manaCost: manaCost
         };
@@ -639,7 +646,7 @@ let offline = {
         offline.shardBank += expected;
     },
 
-    /** EV shards for one kill × scale (fractional kills supported). */
+    /** EV shards for one kill x scale (fractional kills supported). */
     applyExpectedShardsForOneKill: function(map, scale) {
         const mult = scale === undefined ? 1 : scale;
         if (mult <= 0 || !map) {
@@ -682,6 +689,163 @@ let offline = {
         offline.applyShardEvForKills(kills);
     },
 
+    captureColumnRewards: function() {
+        const out = {};
+        const cols = skills.SLOT_COLUMNS;
+        for (let i = 0; i < cols.length; i++) {
+            const col = cols[i];
+            out[col] = skills.columnReward(col).value || 0;
+        }
+        return out;
+    },
+
+    /**
+     * In-combat seconds until an equipped talent level changes a column reward.
+     * Talent rates are the sample's in-combat rates.
+     */
+    secondsUntilColumnRewardChange: function(rates) {
+        const eq = skills.ensureSkillEquip();
+        if (!eq || !rates || !rates.skillRates) {
+            return Infinity;
+        }
+        const sims = [];
+        const totals = {};
+        const rewardValues = {};
+        const cols = skills.SLOT_COLUMNS;
+        for (let c = 0; c < cols.length; c++) {
+            const col = cols[c];
+            totals[col] = 0;
+            const arr = eq.slots[col] || [];
+            for (let i = 0; i < arr.length; i++) {
+                const key = arr[i];
+                if (!key) {
+                    continue;
+                }
+                const skill = data.progress.skills[key];
+                if (!skill) {
+                    continue;
+                }
+                totals[col] += Math.floor(skill.talentLevel || 0);
+                const rate = (rates.skillRates[key] && rates.skillRates[key].talentPerSec) || 0;
+                if (rate > 0) {
+                    sims.push({
+                        column: col,
+                        talent: skill.talent || 0,
+                        toLevel: skill.talentToLevel > 0 ? skill.talentToLevel : 10,
+                        rate: rate
+                    });
+                }
+            }
+            rewardValues[col] = skills.columnRewardValueForTotal(col, totals[col]);
+        }
+        if (!sims.length) {
+            return Infinity;
+        }
+        let elapsed = 0;
+        for (let step = 0; step < 20000; step++) {
+            let best = -1;
+            let bestDt = Infinity;
+            for (let i = 0; i < sims.length; i++) {
+                if (!(sims[i].rate > 0)) {
+                    continue;
+                }
+                const need = sims[i].toLevel - sims[i].talent;
+                const dt = need > 0 ? need / sims[i].rate : 0;
+                if (dt < bestDt) {
+                    bestDt = dt;
+                    best = i;
+                }
+            }
+            if (best < 0 || !isFinite(bestDt)) {
+                return Infinity;
+            }
+            elapsed += bestDt;
+            for (let i = 0; i < sims.length; i++) {
+                sims[i].talent += sims[i].rate * bestDt;
+            }
+            const sim = sims[best];
+            sim.talent = 0;
+            sim.toLevel *= 1.05;
+            totals[sim.column] += 1;
+            const nextVal = skills.columnRewardValueForTotal(sim.column, totals[sim.column]);
+            if (nextVal !== rewardValues[sim.column]) {
+                return elapsed;
+            }
+            rewardValues[sim.column] = nextVal;
+        }
+        return Infinity;
+    },
+
+    columnStepKind: function(before) {
+        const now = offline.captureColumnRewards();
+        let combat = false;
+        let economy = false;
+        const cols = skills.SLOT_COLUMNS;
+        for (let i = 0; i < cols.length; i++) {
+            const col = cols[i];
+            if ((now[col] || 0) === (before[col] || 0)) {
+                continue;
+            }
+            if (col === "offense" || col === "defense") {
+                combat = true;
+            } else {
+                economy = true;
+            }
+        }
+        return { changed: combat || economy, combat: combat, economy: economy };
+    },
+
+    /** Any scales skill and talent rates once. Utility adds the flat delta onto sampled coin awards. */
+    scaleRatesAfterColumnStep: function(rates, before) {
+        if (!rates) {
+            return;
+        }
+        const anyNow = skills.columnReward("any").value || 0;
+        const anyOld = before.any || 0;
+        const newMult = 1 + anyNow / 100;
+        const oldMult = 1 + anyOld / 100;
+        if (oldMult > 0 && newMult !== oldMult) {
+            const factor = newMult / oldMult;
+            const keys = Object.keys(rates.skillRates || {});
+            for (let i = 0; i < keys.length; i++) {
+                const r = rates.skillRates[keys[i]];
+                if (!r) {
+                    continue;
+                }
+                r.expPerSec *= factor;
+                r.talentPerSec *= factor;
+            }
+        }
+        const utilNow = skills.columnReward("utility").value || 0;
+        const utilOld = before.utility || 0;
+        if (utilNow !== utilOld) {
+            const calls = rates.awardCallsPerSec || 0;
+            const splash = rates.splashFlatsPerSec || 0;
+            const deltaFlat = utilNow - utilOld;
+            rates.coinsPerSec += deltaFlat * calls * engine.intruderCoinMultiplier();
+            rates.coinsPerSec += deltaFlat * splash;
+        }
+    },
+
+    /** Wall-clock slice of resort time, then combat rates for the uptime portion. */
+    applyRateSlice: async function(rates, wallSec) {
+        if (!rates || !(wallSec > 0)) {
+            return;
+        }
+        const whole = Math.floor(wallSec);
+        if (whole > 0) {
+            await offline.runGameSecondsChunked(whole, { nonCombatOnly: true });
+        }
+        const fracMs = Math.round((wallSec - whole) * 1000);
+        if (fracMs > 0) {
+            offline.markProcessed(fracMs);
+        }
+        const uptime = offline.getManaUptime(rates);
+        const combatSec = wallSec * uptime;
+        offline.applyCombatRates(rates, combatSec);
+        offline.applyShardRates(rates, combatSec);
+    },
+
     processHourChunk: async function(chunkMs) {
         let remainingInChunk = chunkMs;
 
@@ -690,12 +854,8 @@ let offline = {
             return;
         }
 
-        const alreadyRunning = !!(data.battle && data.battle.state === "running");
-        // Snapshot skill/talent BEFORE starting a new sample so start-of-run grants
-        // (shards, immediate level-up chains into paddingResume/savageLessons/etc.) are included.
-        let before = null;
+        let alreadyRunning = !!(data.battle && data.battle.state === "running");
         if (!alreadyRunning) {
-            before = offline.snapshotProgress();
             let waited = 0;
             while (remainingInChunk >= 1000 && !bonfire.canAffordCreateClone()) {
                 offline.runOneGameSecond({ nonCombatOnly: true });
@@ -709,46 +869,88 @@ let offline = {
             if (remainingInChunk <= 0) {
                 return;
             }
-            // Re-snapshot after mana wait so resort gains during wait aren't blamed on combat rates.
-            before = offline.snapshotProgress();
-            if (!offline.startSampleCloneIfNeeded()) {
-                await offline.runGameSecondsChunked(remainingInChunk / 1000, { nonCombatOnly: true });
-                return;
-            }
-        } else {
-            before = offline.snapshotProgress();
         }
 
-        const runStart = {
-            runCoins: (data.battle && data.battle.runCoinsFromKills) || 0,
-            kills: (data.battle && data.battle.enemiesKilled) || 0,
-            characterExp: offline.characterExpLifetime(data.battle && data.battle.levelState)
-        };
-
-        const sampleUsedSec = await offline.advanceBattleSeconds(remainingInChunk / 1000);
-        remainingInChunk -= sampleUsedSec * 1000;
-
-        const after = offline.snapshotProgress();
-        after.runCoins = (data.battle && data.battle.runCoinsFromKills) || 0;
-        after.kills = (data.battle && data.battle.enemiesKilled) || 0;
-        after.characterExp = offline.characterExpLifetime(data.battle && data.battle.levelState);
-        offline.accumulateGainsFromSnapshots(before, after);
-        // Character exp is per-run: undo snapshot delta (may use a prior dead run's level) and use post-start baseline.
-        const charSnapDelta = Math.max(0, (after.characterExp || 0) - (before.characterExp || 0));
-        const charRunDelta = Math.max(0, (after.characterExp || 0) - (runStart.characterExp || 0));
-        offline.gains.characterExp += charRunDelta - charSnapDelta;
-
-        if (remainingInChunk > 0) {
-            const bulkSec = remainingInChunk / 1000;
-            await offline.runGameSecondsChunked(bulkSec, { nonCombatOnly: true });
-            if (sampleUsedSec > 0 && !(data.battle && data.battle.state === "running")) {
-                // Only apply bulk combat rates when the sample run fully finished.
-                const rates = offline.measureRunRates(before, after, sampleUsedSec, runStart);
-                const uptime = offline.getManaUptime(rates);
-                const combatSec = bulkSec * uptime;
-                offline.applyCombatRates(rates, combatSec);
-                offline.applyShardRates(rates, combatSec);
+        while (remainingInChunk >= 1000) {
+            const wasRunning = !!(data.battle && data.battle.state === "running");
+            const before = offline.snapshotProgress();
+            if (!wasRunning) {
+                if (!offline.startSampleCloneIfNeeded()) {
+                    await offline.runGameSecondsChunked(remainingInChunk / 1000, { nonCombatOnly: true });
+                    return;
+                }
             }
+
+            const runStart = {
+                runCoins: (data.battle && data.battle.runCoinsFromKills) || 0,
+                kills: (data.battle && data.battle.enemiesKilled) || 0,
+                characterExp: offline.characterExpLifetime(data.battle && data.battle.levelState),
+                coinAwardEquiv: (data.battle && data.battle.coinAwardEquiv) || 0,
+                coinPreFlatGainSum: (data.battle && data.battle.coinPreFlatGainSum) || 0,
+                coinSplashFlats: (data.battle && data.battle.coinSplashFlats) || 0
+            };
+
+            const sampleUsedSec = await offline.advanceBattleSeconds(remainingInChunk / 1000);
+            remainingInChunk -= sampleUsedSec * 1000;
+
+            const after = offline.snapshotProgress();
+            after.runCoins = (data.battle && data.battle.runCoinsFromKills) || 0;
+            after.kills = (data.battle && data.battle.enemiesKilled) || 0;
+            after.characterExp = offline.characterExpLifetime(data.battle && data.battle.levelState);
+            offline.accumulateGainsFromSnapshots(before, after);
+            const charSnapDelta = Math.max(0, (after.characterExp || 0) - (before.characterExp || 0));
+            const charRunDelta = Math.max(0, (after.characterExp || 0) - (runStart.characterExp || 0));
+            offline.gains.characterExp += charRunDelta - charSnapDelta;
+
+            const sampleFinished = sampleUsedSec > 0 && !(data.battle && data.battle.state === "running");
+            if (!sampleFinished || remainingInChunk <= 0) {
+                break;
+            }
+
+            let rates = offline.measureRunRates(before, after, sampleUsedSec, runStart);
+            let resample = false;
+            while (remainingInChunk > 0 && !resample) {
+                const remainingBefore = remainingInChunk;
+                const beforeRewards = offline.captureColumnRewards();
+                const uptime = offline.getManaUptime(rates);
+                const combatDt = offline.secondsUntilColumnRewardChange(rates);
+                let wallSec;
+                if (!(uptime > 0) || !isFinite(combatDt)) {
+                    wallSec = remainingInChunk / 1000;
+                } else if (combatDt <= 0) {
+                    wallSec = Math.min(remainingInChunk / 1000, 0.05);
+                } else {
+                    wallSec = Math.min(remainingInChunk / 1000, combatDt / uptime);
+                }
+                if (wallSec > 0) {
+                    await offline.applyRateSlice(rates, wallSec);
+                    remainingInChunk -= wallSec * 1000;
+                }
+                const step = offline.columnStepKind(beforeRewards);
+                const consumedAll = wallSec * 1000 >= remainingBefore - 1;
+                if (!(uptime > 0) || !isFinite(combatDt) || consumedAll && !step.changed) {
+                    break;
+                }
+                if (!step.changed) {
+                    if (wallSec <= 0) {
+                        break;
+                    }
+                    continue;
+                }
+                if (step.combat) {
+                    initialize.calcPlayerStats(false);
+                    resample = true;
+                    break;
+                }
+                offline.scaleRatesAfterColumnStep(rates, beforeRewards);
+                if (wallSec <= 0) {
+                    break;
+                }
+            }
+            if (!resample) {
+                break;
+            }
+            await offline.yieldToBrowser();
         }
     },
 

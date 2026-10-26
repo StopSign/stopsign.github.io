@@ -56,7 +56,7 @@
         <div id="manaProgressBar" class="game-progress-bar" style="display:none">
             <div class="prog-track game-progress-track mana-progress-track">
                 <div id="manaFill" class="prog-fill prog-fill-mana"></div>
-                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">—</span></div>
+                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">-</span></div>
             </div>
         </div>
         <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
@@ -85,7 +85,7 @@
         </div>
         <div id="menuContent">
             <div id="tabPane_base" class="tab-pane">
-                <div class="pane-title"><span class="pane-title-left"><span class="showthat" onmouseenter="events.refreshKitsuneAssignmentTooltip()"><img class="inline-res-icon" src="img/foxWorker.svg" alt="" draggable="false"> Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><div id="kitsuneAssignTooltip" class="showthis kitsune-assign-tooltip"><div id="kitsuneAssignTooltipList"></div></div></span><span id="basePaneTitleCoins"> | <img class="inline-res-icon" src="img/coins.svg" alt="" draggable="false">Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | <img class="inline-res-icon" src="img/starBead.svg" alt="" draggable="false">Star Beads: <span id="baseStarBeadsText"></span></span></span><span id="baseBuyableWrap" class="showthat pane-title-buyable" style="display:none" onmouseenter="events.setBuyableTooltipOpen(true)" onmouseleave="events.setBuyableTooltipOpen(false)">Buyable: <span id="baseBuyableCount">0</span><div id="baseBuyableTooltip" class="showthis kitsune-assign-tooltip"><div id="baseBuyableTooltipList"></div></div></span></div>
+                <div class="pane-title"><span class="pane-title-left"><span class="showthat" onmouseenter="events.refreshKitsuneAssignmentTooltip()"><img class="inline-res-icon" src="img/foxWorker.svg" alt="" draggable="false"> Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><div id="kitsuneAssignTooltip" class="showthis kitsune-assign-tooltip"><div id="kitsuneAssignTooltipList"></div></div></span><span id="basePaneTitleCoins"> | <img class="inline-res-icon" src="img/coins.svg" alt="" draggable="false">Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | <img class="inline-res-icon" src="img/starBead.svg" alt="" draggable="false">Star Beads: <span id="baseStarBeadsText"></span></span><span id="basePaneTitleEssence" style="display:none"> | <img class="inline-res-icon" src="img/essence.svg" alt="" draggable="false">Essence: <span id="baseEssenceText"></span></span></span><span id="baseBuyableWrap" class="showthat pane-title-buyable" style="display:none" onmouseenter="events.setBuyableTooltipOpen(true)" onmouseleave="events.setBuyableTooltipOpen(false)">Buyable: <span id="baseBuyableCount">0</span><div id="baseBuyableTooltip" class="showthis kitsune-assign-tooltip"><div id="baseBuyableTooltipList"></div></div></span></div>
                 <div id="baseResortMap" class="base-map-wrap">
                     <div class="resort-map-cave" aria-hidden="true"></div>
                     <svg id="dirtRoadLayer" class="dirt-road-svg" aria-hidden="true"></svg>
@@ -270,9 +270,9 @@
                         <div class="showthis" id="conStatTip">Confidence - +10% current and max Aud per point</div>
                     </div>
                     <div class="leveling-stat-card showthat">
-                        <div class="leveling-stat-name">Spd</div>
+                        <div class="leveling-stat-name">Cha</div>
                         <div class="leveling-stat-val" id="spdText"></div>
-                        <div class="showthis">+10% move speed per point</div>
+                        <div class="showthis" id="chaStatTip">Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.</div>
                     </div>
                     <div class="leveling-stat-card showthat">
                         <div class="leveling-stat-name">Soul</div>
@@ -283,7 +283,7 @@
                 <div id="levelingAssignButtons" class="row-buttons row-buttons-wrap">
                     <button class="tab-button" onclick="events.assignAttribute('str')">+ Bru</button>
                     <button class="tab-button" onclick="events.assignAttribute('con')">+ Con</button>
-                    <button class="tab-button" onclick="events.assignAttribute('spd')">+ Spd</button>
+                    <button class="tab-button" onclick="events.assignAttribute('spd')">+ Cha</button>
                     <button class="tab-button" onclick="events.assignAttribute('soul')">+ Soul</button>
                     <button class="tab-button" onclick="events.clearAttributePlan()">Clear Plan</button>
                 </div>
@@ -323,6 +323,7 @@
                     <div id="statsArmorCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Armor</div><div class="leveling-stat-val" id="statsArmorText"></div><div class="showthis" id="statsArmorTip"></div></div>
                     <div class="leveling-stat-card showthat"><div class="leveling-stat-name">Slap Speed</div><div class="leveling-stat-val" id="statsSlapText"></div><div class="showthis" id="statsSlapTip"></div></div>
                     <div id="statsSandalCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Sandal Throw Speed</div><div class="leveling-stat-val" id="statsSandalText"></div><div class="showthis" id="statsSandalTip"></div></div>
+                    <div id="statsExtraCoinsCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Extra Coins Dropped</div><div class="leveling-stat-val" id="statsExtraCoinsText"></div><div class="showthis" id="statsExtraCoinsTip"></div></div>
                 </div>
             </div>
 

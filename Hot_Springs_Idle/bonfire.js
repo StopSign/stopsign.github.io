@@ -45,7 +45,7 @@ var bonfireClassDefs = {
         name: "Scold",
         shortLabel: "Scold",
         image: "img/scold.svg",
-        description: "Placeholder - berate intruders into hesitation. +1 Spd per level.",
+        description: "Placeholder - berate intruders into hesitation. +1 Cha per level.",
         perLevel: { str: 0, con: 0, spd: 1 }
     },
     shun: {

@@ -17,22 +17,21 @@ var battleBuffDefs = {
         label: "Desensitized",
         img: "img/desensitized.svg",
         kind: "stackTimed",
-        description: "Incoming damage is multiplied by 1 / (1 + 0.03 × stacks). Each stack expires on its own timer."
+        description: "Incoming damage is multiplied by 1 / (1 + 0.03 x stacks). Each stack expires on its own timer."
     },
     outrage: {
         key: "outrage",
         label: "Outrage",
         img: "img/outrage.svg",
-        kind: "duration",
-        effectPercent: 50,
-        description: "Your attack timer recharges 50% faster while active. Its timer counts down only while your slap cooldown is not full. Additional time extends the buff. Duration is capped at 2 seconds + Okami's level / 5."
+        kind: "counter",
+        description: "When Outrage is 10 or higher, your next slap or sandal spends 10. That attack's cooldown is halved, and when it lands you gain 50% of the coins that intruder would drop. That coin gain counts for other skills that trigger when coins are gained."
     },
     malice: {
         key: "malice",
         label: "Malice",
         img: "img/malice.svg",
         kind: "counter",
-        description: "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level × 5."
+        description: "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level x 5."
     },
     fakeTears: {
         key: "fakeTears",
@@ -157,14 +156,19 @@ var battleBuffs = {
             const cap = battleBuffs.getMaliceCap();
             bottomRight = intToString(counter, 1);
             topRight = `+${strikePct}%`;
-            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + Okami level × 5)<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
-        } else if (key === "outrage" || key === "fakeTears") {
+            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + Okami level x 5)<br>Next attack: +${strikePct}% damage${bonus.consume > 0 ? `, consume ${bonus.consume}` : " (need 1 Malice)"}`;
+        } else if (key === "outrage") {
+            const counter = entry.counter || 0;
+            const ready = counter >= 10;
+            bottomRight = intToString(counter, 1);
+            topRight = ready ? "/2" : "";
+            tooltipExtra = `Counter: ${round2(counter)}<br>${ready ? "Next slap or sandal spends 10: cooldown halved, and that hit pays 50% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
+        } else if (key === "fakeTears") {
             const pct = def.effectPercent || 0;
-            const capMs = key === "fakeTears" ? battleBuffs.getFakeTearsCapMs() : battleBuffs.getOutrageCapMs();
-            const capRule = key === "fakeTears" ? "10s + Okami level" : "2s + Okami level / 5";
+            const capMs = battleBuffs.getFakeTearsCapMs();
             bottomRight = battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0);
             topRight = `${pct}%`;
-            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}<br>Cap: ${battleBuffs.formatDurationCapLabel(capMs)} (${capRule})`;
+            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}<br>Cap: ${battleBuffs.formatDurationCapLabel(capMs)} (10s + Okami level)`;
         } else if (key === "clout") {
             const stacks = entry.stacks || 0;
             bottomRight = intToString(stacks, 2);
@@ -222,14 +226,7 @@ var battleBuffs = {
                 }
                 entry.stacks = nextStacks;
             } else if (def.kind === "duration") {
-                // Outrage only drains while the slap cooldown bar is still filling.
-                const outragePaused = key === "outrage"
-                    && typeof engine !== "undefined"
-                    && engine.slapAttackReady
-                    && engine.slapAttackReady();
-                if (!outragePaused) {
-                    entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
-                }
+                entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
             }
         }
         battleBuffs.clampCappedBuffs(state);
@@ -242,18 +239,12 @@ var battleBuffs = {
     getFakeTearsCapMs: function() {
         return (10 + battleBuffs.getOkamiLevel()) * 1000;
     },
-    getOutrageCapMs: function() {
-        return 2000 + (battleBuffs.getOkamiLevel() * 200);
-    },
     getMaliceCap: function() {
         return 10 + (battleBuffs.getOkamiLevel() * 5);
     },
     getDurationCapMs: function(key) {
         if (key === "fakeTears") {
             return battleBuffs.getFakeTearsCapMs();
-        }
-        if (key === "outrage") {
-            return battleBuffs.getOutrageCapMs();
         }
         return null;
     },
@@ -265,11 +256,6 @@ var battleBuffs = {
         const tearsCap = battleBuffs.getFakeTearsCapMs();
         if (tears && (tears.remainingMs || 0) > tearsCap) {
             tears.remainingMs = tearsCap;
-        }
-        const outrage = state.byKey.outrage;
-        const outrageCap = battleBuffs.getOutrageCapMs();
-        if (outrage && (outrage.remainingMs || 0) > outrageCap) {
-            outrage.remainingMs = outrageCap;
         }
         const malice = state.byKey.malice;
         const maliceCap = battleBuffs.getMaliceCap();
@@ -358,14 +344,28 @@ var battleBuffs = {
         }
         return 1 / (1 + 0.03 * count);
     },
-    getOutrageRechargeMultiplier: function() {
+    addOutrage: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.outrage) {
+            state.byKey.outrage = { counter: 0 };
+        }
+        state.byKey.outrage.counter = (state.byKey.outrage.counter || 0) + amount;
+        battleBuffs.ensureInQueue(state, "outrage");
+    },
+    /** Spend 10 Outrage when the counter is at least 10. Returns true if spent. */
+    trySpendOutrage: function() {
         const state = battleBuffs.getState();
         const entry = state.byKey.outrage;
-        if (entry && (entry.remainingMs || 0) > 0) {
-            const pct = (battleBuffDefs.outrage && battleBuffDefs.outrage.effectPercent) || 0;
-            return 1 + pct / 100;
+        const counter = entry ? (entry.counter || 0) : 0;
+        if (counter < 10) {
+            return false;
         }
-        return 1;
+        entry.counter = counter - 10;
+        battleBuffs.pruneQueue(state);
+        return true;
     },
     addMalice: function(amount) {
         if (!amount || amount <= 0) {

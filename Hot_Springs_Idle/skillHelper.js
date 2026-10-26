@@ -75,7 +75,7 @@ let skillHelper = {
 
     fmtExp: function(n) {
         if (!isFinite(n)) {
-            return "—";
+            return "-";
         }
         if (Math.abs(n) >= 10000) {
             return n.toExponential(2).replace("+", "");
@@ -236,7 +236,7 @@ let skillHelper = {
         document.getElementById("shExport").value = text;
         const status = document.getElementById("shCopyStatus");
         const done = function(ok) {
-            status.textContent = ok ? "Copied." : "Copy failed — select the text manually.";
+            status.textContent = ok ? "Copied." : "Copy failed - select the text manually.";
             if (skillHelper.copyStatusTimer) {
                 clearTimeout(skillHelper.copyStatusTimer);
             }

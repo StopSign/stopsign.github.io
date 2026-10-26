@@ -1571,7 +1571,7 @@ let initialize = {
     },
     getClassPerLevelText: function(classKey) {
         const d = initialize.getClassDef(classKey);
-        return `+${d.perLevel.str} Bru, +${d.perLevel.con} Con, +${d.perLevel.spd} Spd per level`;
+        return `+${d.perLevel.str} Bru, +${d.perLevel.con} Con, +${d.perLevel.spd} Cha per level`;
     },
     snapshotRunSkillTalent: function() {
         const snap = {};
@@ -1645,12 +1645,16 @@ let initialize = {
         const oldMax = data.battle.player.maxAud;
         const oldAud = data.battle.player.aud;
         const missingAud = oldMax - oldAud;
-        let totalCon = data.battle.levelState.levelCon + data.battle.levelState.skillConBonus;
+        let totalCon = data.battle.levelState.levelCon;
         let totalStr = data.battle.levelState.levelStr + data.battle.levelState.skillStrBonus;
         const shockEff = skills.getSkillEffect("shockValue");
         totalStr += shockEff.bonusStr || 0;
+        const savageEff = skills.getSkillEffect("savageLessons");
+        totalStr += savageEff.bonusStr || 0;
         const windfallEff = skills.getSkillEffect("windfallSwagger");
         totalCon += windfallEff.bonusCon || 0;
+        const adaptationEff = skills.getSkillEffect("adaptation");
+        totalCon += adaptationEff.bonusCon || 0;
         const prevCon = data.battle.borrowedGlorySeenCon;
         if (prevCon !== undefined && prevCon !== null && totalCon > prevCon && skills.isSkillUnlocked("borrowedGlory")) {
             const bgEff = skills.getSkillEffect("borrowedGlory");
@@ -1666,20 +1670,25 @@ let initialize = {
         const fortLvl = fortEff.baseAudBonus || 0;
         const tenEff = skills.getSkillEffect("corneredEgo");
         const tenInner = tenEff.audInnerBonus || 0;
+        const mountingEff = skills.getSkillEffect("mountingEgo");
+        const mountingAud = mountingEff.baseAudBonus || 0;
         const dens = data.battle.cloneDensity || 0;
         const densMult = bonfire.getCloneDensityStatMult(dens);
         const cardEff = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? shrineCards.getAggregatedEffects() : {};
-        const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0)) * densMult;
-        const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0)) * densMult;
+        const columnAud = (typeof skills.columnReward === "function") ? (skills.columnReward("defense").value || 0) : 0;
+        const columnSlap = (typeof skills.columnReward === "function") ? (skills.columnReward("offense").value || 0) : 0;
+        const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0) + columnAud) * densMult;
+        const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0) + columnSlap) * densMult;
         const conMult = 1 + totalCon / div;
+        const bravadoMult = skills.getSkillEffect("bravado").maxAudMultiplier || 1;
         const validationAud = skillEngine.getValidationAudFromKills();
         const padEff = skills.getSkillEffect("paddingResume");
         const paddingAud = padEff.audBonus || 0;
-        // ((base + cards) × density + skill Aud) × Confidence
+        // ((base + cards) x density + skill Aud) x Confidence x Bravado
         // Skill Aud is max only; "additionally recover" heals are applied as current, not max.
-        const skillAud = fortLvl + tenInner + validationAud + paddingAud;
-        const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult));
+        const skillAud = fortLvl + tenInner + validationAud + paddingAud + mountingAud;
+        const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult * bravadoMult));
         data.battle.player.maxAud = maxAud;
         if (fullHeal) {
             data.battle.player.aud = data.battle.player.maxAud;
@@ -1687,7 +1696,7 @@ let initialize = {
             // Equal recover: when max rises by X, current rises by X (missing Aud preserved).
             let newAud = Math.max(1, maxAud - missingAud);
             const maxRise = maxAud - oldMax;
-            // Narcissism only boosts the equal recover from the max increase — not extra recovers.
+            // Narcissism only boosts the equal recover from the max increase - not extra recovers.
             if (maxRise > 0) {
                 newAud = skillEngine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
                 engine.addSkillExp("narcissism", 1);
@@ -1695,7 +1704,7 @@ let initialize = {
                     engine.addSkillExp("borrowedGlory", 1);
                 }
             }
-            // Additional recovers (Validation, Cornered Ego, …) — not boosted by Narcissism.
+            // Additional recovers (Validation, Cornered Ego, …) - not boosted by Narcissism.
             const extraOnMaxRise = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
                 ? opts.extraCurrentOnMaxRise : 0;
             if (extraOnMaxRise > 0) {
@@ -1708,7 +1717,7 @@ let initialize = {
                 engine.spawnAudGainFloat(healed, "left");
             }
         }
-        // Ego damage: ((base + cards) × density + Force flat) × Brutality.
+        // Ego damage: ((base + cards) x density + Force flat) x Brutality.
         // Other skill flats and damage mults apply on hit in engine.applyCombatOutgoingDamage.
         let atk = (denseSlap + forceFlat) * (1 + (totalStr / div));
         atk = Math.max(1, roundNearestDecimals(atk, 1));

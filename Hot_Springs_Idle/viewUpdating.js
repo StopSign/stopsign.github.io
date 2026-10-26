@@ -66,7 +66,7 @@ let view = {
         } else if (data.progress && data.progress.showBattle) {
             view.consumeLineFxQueue();
         }
-        // Map-only DOM (baseResortMap carriers / okami sprites / weaving) — skip when base map not visible
+        // Map-only DOM (baseResortMap carriers / okami sprites / weaving) - skip when base map not visible
         if (view.isResortMapVisible()) {
             view.updateActiveWeavingButtons();
             view.updateOkamiMapVisuals();
@@ -91,7 +91,7 @@ let view = {
         createView.showCurrentTab();
         view.updateMenuNumbers();
         view.updateGlobals();
-        // Progress bars (okami/mana/divinity) — 10 Hz is enough
+        // Progress bars (okami/mana/divinity) - 10 Hz is enough
         view.updateOkamiPanel();
     },
     updateViewOnSecond: function() { //Updates once a second
@@ -103,7 +103,7 @@ let view = {
         if (rate > 0 && remain > 0) {
             view.updateVal(id, remain / rate, "textContent", "time");
         } else {
-            view.updateVal(id, "—");
+            view.updateVal(id, "-");
         }
     },
     setFoxTravelMirror: function(img, goingEast) {
@@ -230,7 +230,7 @@ let view = {
             const audLineText = lowAud
                 ? `${Math.max(0, roundNearestDecimals(audCur, 1)).toFixed(1)}/${maxAudInt} Aud`
                 : `${Math.round(audCur)}/${maxAudInt} Aud`;
-            view.updateVal("playerStatAudLine", audLineText);
+            view.updateVal("playerStatAudLine", audLineText, "textContent", 1);
             view.updatePlayerStatDmgLine();
             const twEff = skills.getSkillEffect("toughness_condescend");
             const armorFlat = twEff.armorFlat !== undefined ? round2(twEff.armorFlat) : 0;
@@ -475,9 +475,15 @@ let view = {
         if (skills.isSkillUnlocked("shockValue")) {
             strDisplay += shockEffUi.bonusStr || 0;
         }
-        let conDisplay = (ls.levelCon || 0) + (ls.skillConBonus || 0);
+        if (skills.isSkillUnlocked("savageLessons")) {
+            strDisplay += savageLessonsEffUi.bonusStr || 0;
+        }
+        let conDisplay = ls.levelCon || 0;
         if (skills.isSkillUnlocked("windfallSwagger")) {
             conDisplay += windfallEffUi.bonusCon || 0;
+        }
+        if (skills.isSkillUnlocked("adaptation")) {
+            conDisplay += adaptationEffUi.bonusCon || 0;
         }
         view.updateVal("strText", strDisplay, "textContent", 1);
         view.updateVal("conText", conDisplay, "textContent", 1);
@@ -497,31 +503,57 @@ let view = {
             conStatTip += `<br>Windfall Swagger: +${windfallEffUi.bonusCon || 0} Con from skill level`;
         }
         view.updateVal("conStatTip", conStatTip, "innerHTML");
-        view.updateVal("spdText", ls.levelSpd || 0, "textContent", 1);
+        const chaPts = ls.levelSpd || 0;
+        view.updateVal("spdText", chaPts, "textContent", 1);
+        const chaCoinFactor = 1 + chaPts * 0.05;
+        const chaWaveFactor = engine.getCharismaWaveFactor(chaPts);
+        view.updateVal("chaStatTip", `Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.<br>Current: enemies +${chaPts * 5}% speed, coins x${roundNearestDecimals(chaCoinFactor, 2)}, waves x${roundNearestDecimals(chaWaveFactor, 2)}.`, "innerHTML");
         view.updateVal("soulText", engine.getCloneSoulLevel(), "textContent", 1);
         const soulLv = engine.getCloneSoulLevel();
         const ringSoul = engine.getMarketAnchoringRingBought();
-        view.updateVal("soulStatTip", `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Anchoring Ring: +${ringSoul} Soul.<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`, "innerHTML");
+        let soulStatTip = `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Anchoring Ring: +${ringSoul} Soul.`;
+        if (skills.isSkillUnlocked("soulSearching")) {
+            const soulSearchingSoul = skills.getSkillEffect("soulSearching").bonusSoul || 0;
+            soulStatTip += `<br>Soul Searching: +${soulSearchingSoul} Soul from skill levels`;
+        }
+        if (skills.isSkillUnlocked("vicarious")) {
+            const vicariousSoul = skills.getSkillEffect("vicarious").bonusSoul || 0;
+            soulStatTip += `<br>Vicarious: +${vicariousSoul} Soul from skill level`;
+        }
+        soulStatTip += `<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`;
+        view.updateVal("soulStatTip", soulStatTip, "innerHTML");
         view.renderAttributePlanList();
     },
     updateStatsTab: function() {
         const p = data.battle.player;
         const lsMult = data.battle.levelState || {};
-        let conTotal = (lsMult.levelCon || 0) + (lsMult.skillConBonus || 0);
+        let conTotal = lsMult.levelCon || 0;
         let strTotal = (lsMult.levelStr || 0) + (lsMult.skillStrBonus || 0);
         const shockEffStats = skills.getSkillEffect("shockValue");
         const windfallEffStats = skills.getSkillEffect("windfallSwagger");
+        const adaptationEffStats = skills.getSkillEffect("adaptation");
+        const savageEffStats = skills.getSkillEffect("savageLessons");
         const validationEffStats = skills.getSkillEffect("validation");
         if (skills.isSkillUnlocked("shockValue")) {
             strTotal += shockEffStats.bonusStr || 0;
         }
+        if (skills.isSkillUnlocked("savageLessons")) {
+            strTotal += savageEffStats.bonusStr || 0;
+        }
         if (skills.isSkillUnlocked("windfallSwagger")) {
             conTotal += windfallEffStats.bonusCon || 0;
         }
+        if (skills.isSkillUnlocked("adaptation")) {
+            conTotal += adaptationEffStats.bonusCon || 0;
+        }
         const gc = gameData.battle.combat;
         const cdCfg = gameData.battle.cooldowns;
-        const fortInner = skills.getSkillEffect("shameless").baseAudBonus || 0;
+        const shamelessEffStats = skills.getSkillEffect("shameless");
+        const fortInner = shamelessEffStats.baseAudBonus || 0;
+        const shamelessRecover = shamelessEffStats.audRecoverBonus || 0;
         const tenB = skills.getSkillEffect("corneredEgo").audInnerBonus || 0;
+        const mountingAudUi = skills.getSkillEffect("mountingEgo").baseAudBonus || 0;
+        const bravadoMultUi = skills.getSkillEffect("bravado").maxAudMultiplier || 1;
         const wisMult = roundNearestDecimals(skills.getSkillEffect("hindsight").characterExpMultiplier || 1, 2);
         const greedMult = roundNearestDecimals(skills.getSkillEffect("extortion").killCoinsMultiplier || 1, 2);
         const shamelessResearched = skills.isSkillResearchComplete("shameless");
@@ -540,28 +572,37 @@ let view = {
         const statDiv = gc.conStrStatDivisor;
         const conMult = 1 + (conTotal / statDiv);
         const strMult = 1 + (strTotal / statDiv);
-        // Tip mirrors ((base + cards) × density + skill Aud) × Confidence
+        const columnAud = (typeof skills.columnReward === "function") ? (skills.columnReward("defense").value || 0) : 0;
+        const columnSlap = (typeof skills.columnReward === "function") ? (skills.columnReward("offense").value || 0) : 0;
+        // Tip mirrors ((base + cards + column) x density + skill Aud) x Confidence x Bravado
         const audBaseLines = [];
-        let densBaseSum = gc.baseAudInner + cardAud;
+        let densBaseSum = gc.baseAudInner + cardAud + columnAud;
         audBaseLines.push(`Base Aud: +${gc.baseAudInner}`);
         if (cardAud) {
             audBaseLines.push(`Base Audacity: +${cardAud}`);
         }
+        if (columnAud) {
+            audBaseLines.push(`Column talent: +${columnAud}`);
+        }
         const denseAudUi = densBaseSum * densMult;
         if (runDensity > 0) {
-            audBaseLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base Aud) → ${roundNearestDecimals(denseAudUi, 2)}`);
+            audBaseLines.push(`Dense Clones: x${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base Aud) → ${roundNearestDecimals(denseAudUi, 2)}`);
         }
         const skillAudLines = [];
         let skillAudSum = 0;
         if (shamelessResearched) {
-            skillAudLines.push(`Shameless: +${fortInner} max; additionally recover ${fortInner} when leveling`);
+            skillAudLines.push(`Shameless: +${fortInner} max; additionally recover ${shamelessRecover} when leveling`);
             skillAudSum += fortInner;
         }
         const corneredAmt = corneredResearched ? tenB : 0;
         if (corneredResearched) {
-            const corneredRecover = skills.getSkillEffect("corneredEgo").audRecoverBonus || (corneredAmt * 2);
+            const corneredRecover = skills.getSkillEffect("corneredEgo").audRecoverBonus || 0;
             skillAudLines.push(`Cornered Ego: +${corneredAmt} max; additionally recover ${corneredRecover}`);
             skillAudSum += corneredAmt;
+        }
+        if (skills.isSkillUnlocked("mountingEgo")) {
+            skillAudLines.push(`Mounting Ego: +${mountingAudUi} max Aud`);
+            skillAudSum += mountingAudUi;
         }
         let valAud = 0;
         if (skills.isSkillUnlocked("validation")) {
@@ -583,15 +624,19 @@ let view = {
             skillAudLines.push(`Total from skills: ${skillAudSum}`);
         }
         audBaseLines.push(`After density + skills: ${roundNearestDecimals(preConSum, 2)}`);
-        const finalAud = Math.max(1, Math.ceil(preConSum * conMult));
+        const finalAud = Math.max(1, Math.ceil(preConSum * conMult * bravadoMultUi));
         const audMultExtra = finalAud - preConSum;
         const audEffective = preConSum > 0 ? finalAud / preConSum : 1;
         const audMultLines = [];
         if (growthUnlocked || conTotal > 0) {
-            audMultLines.push(`Confidence: ×${roundNearestDecimals(conMult, 2)} (+${Math.round(conTotal * (100 / statDiv))}%)`);
+            audMultLines.push(`Confidence: x${roundNearestDecimals(conMult, 2)} (+${Math.round(conTotal * (100 / statDiv))}%)`);
+        }
+        if (bravadoMultUi !== 1) {
+            const bravadoPct = roundNearestDecimals((bravadoMultUi - 1) * 100, 1);
+            audMultLines.push(`Bravado: x${roundNearestDecimals(bravadoMultUi, 2)} (+${bravadoPct}%)`);
         }
         const audExtraText = audMultExtra > 0 ? ` (+${audMultExtra} Aud)` : "";
-        audMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(audEffective, 2)}${audExtraText}`);
+        audMultLines.push(`Total multiplier effect: x${roundNearestDecimals(audEffective, 2)}${audExtraText}`);
         const audTipParts = [audBaseLines.join("<br>")];
         if (skillAudLines.length) {
             audTipParts.push(skillAudLines.join("<br>"));
@@ -612,15 +657,18 @@ let view = {
         const slowBurnRaw = (skills.isSkillUnlocked("slowBurn") && typeof skillEngine.getSlowBurnFlatDamage === "function")
             ? skillEngine.getSlowBurnFlatDamage() : 0;
         const attackBaseLines = [];
-        const denseSlapUi = (gc.baseSlapDamage + cardSlap) * densMult;
+        const denseSlapUi = (gc.baseSlapDamage + cardSlap + columnSlap) * densMult;
         const skillFlatSum = forceRaw + mcRaw + sadismRaw + slowBurnRaw;
         const attackPreBru = denseSlapUi + skillFlatSum;
         attackBaseLines.push(`Base slap: +${gc.baseSlapDamage}`);
         if (cardSlap) {
             attackBaseLines.push(`Base ego damage: +${roundNearestDecimals(cardSlap, 2)}`);
         }
+        if (columnSlap) {
+            attackBaseLines.push(`Column talent: +${columnSlap}`);
+        }
         if (runDensity > 0) {
-            attackBaseLines.push(`Dense Clones: ×${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base) → ${roundNearestDecimals(denseSlapUi, 2)}`);
+            attackBaseLines.push(`Dense Clones: x${roundNearestDecimals(densMult, 2)} (+${Math.round(runDensity * 10)}% to base) → ${roundNearestDecimals(denseSlapUi, 2)}`);
         }
         if (forceResearched) {
             attackBaseLines.push(`Force (flat): +${roundNearestDecimals(forceRaw, 2)}`);
@@ -640,7 +688,7 @@ let view = {
         let afterAttack = attackPreBru * strMult;
         const attackMultLines = [];
         if (growthUnlocked || strTotal > 0) {
-            attackMultLines.push(`Brutality: ×${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
+            attackMultLines.push(`Brutality: x${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
         }
         if (skills.isSkillUnlocked("bitterRivalry")) {
             const brPct = skills.getSkillEffect("bitterRivalry").damagePercentPerSecond || 0;
@@ -651,7 +699,7 @@ let view = {
             if (brTarget && brTarget.alive) {
                 const brSecs = brTarget.bitterRivalrySeconds || 0;
                 const brFactor = 1 + (brPct / 100) * brSecs;
-                brLine += ` (current target ×${roundNearestDecimals(brFactor, 2)})`;
+                brLine += ` (current target x${roundNearestDecimals(brFactor, 2)})`;
                 if (brSecs > 0) {
                     afterAttack *= brFactor;
                 }
@@ -660,12 +708,12 @@ let view = {
         }
         if (skills.isSkillUnlocked("highHorse") && typeof engine.isPlayerAtMaxAud === "function" && engine.isPlayerAtMaxAud()) {
             const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
-            attackMultLines.push(`High Horse: ×${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% at full Aud)`);
+            attackMultLines.push(`High Horse: x${roundNearestDecimals(1 + hhFrac, 2)} (+${roundNearestDecimals(hhFrac * 100, 1)}% at full Aud)`);
             afterAttack *= (1 + hhFrac);
         }
         if (skills.isSkillUnlocked("underdog") && typeof engine.isPlayerAtMaxAud === "function" && !engine.isPlayerAtMaxAud()) {
             const udFrac = skills.getSkillEffect("underdog").damageBonusFraction || 0;
-            attackMultLines.push(`Underdog: ×${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% while not at full Aud)`);
+            attackMultLines.push(`Underdog: x${roundNearestDecimals(1 + udFrac, 2)} (+${roundNearestDecimals(udFrac * 100, 1)}% while not at full Aud)`);
             afterAttack *= (1 + udFrac);
         }
         if (skills.isSkillUnlocked("peerPressure")) {
@@ -674,7 +722,7 @@ let view = {
             const closeNow = (typeof engine.countVisibleIntrudersCloserThan === "function")
                 ? engine.countVisibleIntrudersCloserThan(200) : 0;
             if (ppFrac > 0) {
-                attackMultLines.push(`Peer Pressure: ×${roundNearestDecimals(1 + ppFrac, 2)} (+${roundNearestDecimals(ppFrac * 100, 1)}% from ${closeNow} closer than 200 ft)`);
+                attackMultLines.push(`Peer Pressure: x${roundNearestDecimals(1 + ppFrac, 2)} (+${roundNearestDecimals(ppFrac * 100, 1)}% from ${closeNow} closer than 200 ft)`);
                 afterAttack *= (1 + ppFrac);
             }
         }
@@ -683,7 +731,7 @@ let view = {
                 ? skillEngine.getCrowdWorkDamageBonusFraction() : 0;
             const visNow = typeof engine.countVisibleIntruders === "function" ? engine.countVisibleIntruders() : 0;
             if (cwFrac > 0) {
-                attackMultLines.push(`Crowd Work: ×${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% from ${visNow} visible)`);
+                attackMultLines.push(`Crowd Work: x${roundNearestDecimals(1 + cwFrac, 2)} (+${roundNearestDecimals(cwFrac * 100, 1)}% from ${visNow} visible)`);
                 afterAttack *= (1 + cwFrac);
             }
         }
@@ -691,13 +739,13 @@ let view = {
             const mePct = skills.getSkillEffect("marathonEgo").damagePercentPerTenSec || 0;
             const tens = Math.floor((data.battle.cloneAliveMs || 0) / 10000);
             const meFactor = 1 + (mePct / 100) * tens;
-            attackMultLines.push(`Marathon Ego: ×${roundNearestDecimals(meFactor, 2)} (+${round2(mePct * tens)}% from ${tens * 10}s)`);
+            attackMultLines.push(`Marathon Ego: x${roundNearestDecimals(meFactor, 2)} (+${round2(mePct * tens)}% from ${tens * 10}s)`);
             afterAttack *= meFactor;
         }
         const atkExtra = afterAttack - attackPreBru;
         const atkEffective = attackPreBru > 0 ? afterAttack / attackPreBru : 1;
         const atkExtraText = Math.abs(atkExtra) >= 0.05 ? ` (${atkExtra > 0 ? "+" : ""}${roundNearestDecimals(atkExtra, 2)} ego dmg)` : "";
-        attackMultLines.push(`Total multiplier effect: ×${roundNearestDecimals(atkEffective, 2)}${atkExtraText}`);
+        attackMultLines.push(`Total multiplier effect: x${roundNearestDecimals(atkEffective, 2)}${atkExtraText}`);
         const attackTip = attackBaseLines.join("<br>") + "<br><br>" + attackMultLines.join("<br>");
         view.updateVal("statsAttackText", `${roundNearestDecimals(p.attackDamage, 1).toFixed(1)} ego dmg`);
         view.updateVal("statsAttackTip", attackTip, "innerHTML");
@@ -736,6 +784,44 @@ let view = {
         view.updateVal("statsSandalText", hasSandal ? `${round2((p.sandalAttackCooldownMs || 0) / 1000)}s` : "Locked");
         view.updateVal("statsSandalTip", hasSandal ? `Base: ${round2(cdCfg.sandalBaseMs / 1000)}s<br>Alacrity reduction: ${alaLv * cdCfg.alacritySandalReductionPerLevelMs} ms<br>Floor: ${round2(cdCfg.sandalFloorMs / 1000)}s` : "Requires Spare sandal upgrade", "innerHTML");
         view.updateVal("statsSandalCard", hasSandal ? "" : "none", "style.display");
+        view.updateExtraCoinsDroppedStat();
+    },
+    updateExtraCoinsDroppedStat: function() {
+        const nickel = skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
+        const column = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
+        const cardEffects = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? shrineCards.getAggregatedEffects() : {};
+        const coinCard = cardEffects.killCoinsFlatAdd || 0;
+        const flat = nickel + column + coinCard;
+        const gEff = skills.getSkillEffect("extortion");
+        const greed = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
+        const cardAdd = cardEffects.intruderCoinAdd || 0;
+        const coinMult = engine.intruderCoinMultiplier();
+        const extraPct = (coinMult - 1) * 100;
+        const pctText = roundNearestDecimals(extraPct, 2);
+        view.updateVal("statsExtraCoinsText", `+${flat}, and +${pctText}%`);
+        const lines = [];
+        if (nickel) {
+            lines.push(`Nickel and Dime: +${nickel} base coins`);
+        }
+        if (column) {
+            lines.push(`Utility column: +${column} base coins`);
+        }
+        if (coinCard) {
+            lines.push(`More Coin Drop: +${coinCard} base coins`);
+        }
+        if (greed !== 1) {
+            const greedPct = roundNearestDecimals((greed - 1) * 100, 2);
+            lines.push(`Extortion: x${roundNearestDecimals(greed, 2)} (+${greedPct}%)`);
+        }
+        if (cardAdd) {
+            lines.push(`Intruder coin cards: +${roundNearestDecimals(cardAdd * 100, 2)}%`);
+        }
+        const chaPts = engine.getCharismaPoints();
+        if (chaPts) {
+            lines.push(`Charisma: x${roundNearestDecimals(1 + chaPts * 0.05, 2)} coins`);
+        }
+        view.updateVal("statsExtraCoinsTip", lines.length ? lines.join("<br>") : "Extra coins on intruder drops.", "innerHTML");
     },
     updateTravelTab: function() {
         const clsMenu = data.progress.currentClassKey || "none";
@@ -1309,15 +1395,15 @@ let view = {
         const speedPct = round1Fixed(engine.getScrollArchivesSilverResearchSpeedMult() * 100);
         const gainPct = round1Fixed(engine.getScrollArchivesGoldResearchGainMult() * 100);
         view.updateVal("scrollArchivesStarEffects_row",
-            `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>×${mapStars.bronze} cost ${costPct}% · `
-            + `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>×${mapStars.silver} speed ${speedPct}% · `
-            + `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>×${mapStars.gold} gain ${gainPct}%`,
+            `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>x${mapStars.bronze} cost ${costPct}% · `
+            + `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>x${mapStars.silver} speed ${speedPct}% · `
+            + `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>x${mapStars.gold} gain ${gainPct}%`,
             "innerHTML");
         view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
         if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
             view.updateEtaText("scrollArchivesResearchEtaText", remain, gainedRate);
         } else {
-            view.updateVal("scrollArchivesResearchEtaText", "—");
+            view.updateVal("scrollArchivesResearchEtaText", "-");
         }
         const toChoose = lib.researchesToChoose || 0;
         view.updateVal("scrollArchivesResearchesToChoose", toChoose);
@@ -1507,7 +1593,7 @@ let view = {
             if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
                 view.updateEtaText(`${wpt}_eta`, remain, gainedRate);
             } else {
-                view.updateVal(`${wpt}_eta`, "—");
+                view.updateVal(`${wpt}_eta`, "-");
             }
             view.updateVal(`${wpt}_cost_coins`, round1(researchRate));
             view.updateVal(`${wpt}_cost_beads`, round1(researchRate * 3));
@@ -3262,7 +3348,7 @@ let view = {
         }
         view.updateVal("spiritInfoExp", round2(spirit.exp || 0));
         view.updateVal("spiritInfoExpReq", round2(spirit.expToLevel || 15));
-        view.updateVal("spiritInfoExpNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? "(×1.8/lvl)" : "", "textContent");
+        view.updateVal("spiritInfoExpNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? "(x1.8/lvl)" : "", "textContent");
         view.updateVal("spiritInfoEarthExtras", kind === "earth" ? "" : "none", "style.display");
         view.updateVal("spiritInfoWaterExtras", kind === "water" ? "" : "none", "style.display");
         view.updateVal("spiritInfoFireExtras", kind === "fire" ? "" : "none", "style.display");
@@ -3417,8 +3503,8 @@ let view = {
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
                 const effPower = round2(engine.getEffectiveSpiritPower(spirit) || 1);
                 const forgeNote = forgeLevel > 0
-                    ? `Smelting ceil(√effective power × ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s (effective power ${effPower}). +50% per Larger Forge, rounded up. Exp = bars × 3.`
-                    : `Smelting floor(√effective power) = ${batchSize} ore into bars every 60s (effective power ${effPower}). Exp = bars × 3.`;
+                    ? `Smelting ceil(√effective power x ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s (effective power ${effPower}). +50% per Larger Forge, rounded up. Exp = bars x 3.`
+                    : `Smelting floor(√effective power) = ${batchSize} ore into bars every 60s (effective power ${effPower}). Exp = bars x 3.`;
                 view.updateVal("spiritInfoFireNote", forgeNote);
                 view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s, +${forgeExpPerSec} exp/s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
@@ -3458,7 +3544,7 @@ let view = {
                 }
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
-                view.updateVal("spiritInfoTaskText", `+${trainExpPerSec} exp/s (waiting — need mana and training below spirit power)`);
+                view.updateVal("spiritInfoTaskText", `+${trainExpPerSec} exp/s (waiting - need mana and training below spirit power)`);
                 if (taskEl) {
                     taskEl.classList.add("muted-text");
                 }
@@ -3580,6 +3666,11 @@ let view = {
         }
         view.updateVal("baseCoinsText", data.progress.coins, "textContent", "floor");
         view.updateVal("baseStarBeadsText", data.progress.starBeads, "textContent", "floor");
+        const essenceAmt = (base.cistern && base.cistern.essence) || 0;
+        view.updateVal("basePaneTitleEssence", essenceAmt > 0 ? "" : "none", "style.display");
+        if (essenceAmt > 0) {
+            view.updateVal("baseEssenceText", round2(essenceAmt));
+        }
                 view.updateVal("baseWorkersAssigned", engine.getAvailableWorkers(), "textContent", 1);
         view.updateVal("baseWorkersFound", engine.getTotalFoundWorkers(), "textContent", 1);
         view.updateVal("basePaneTitleStarBeads", engine.isInnBuiltFromFoxDen() ? "" : "none", "style.display");
@@ -3824,12 +3915,6 @@ let view = {
             const curVol = cistern.waterVolume || 0;
             view.updateVal("cisternInfoWater", `${round2(curVol)}L`);
             view.updateVal("cisternInfoTemperature", `${round1Fixed(cistern.temperature || 0)}C`);
-            const launcherBuilt = !!((base.atelier && base.atelier.fireLaunchersBought) >= 1);
-            view.updateVal("cisternInfoEssence_row", launcherBuilt ? "" : "none", "style.display");
-            view.updateVal("cisternInfoEssenceNote", launcherBuilt ? "" : "none", "style.display");
-            if (launcherBuilt) {
-                view.updateVal("cisternInfoEssence", round2(cistern.essence || 0));
-            }
             view.updateVal("cisternInfoCapacity", `${round2(curVol)}/${round2(maxCap)}L`);
             const wellCoins = engine.getWishingWellCoinRate ? engine.getWishingWellCoinRate() : 0;
             view.updateVal("cisternWishingWell_row", wellCoins > 0 ? "" : "none", "style.display");
@@ -4264,7 +4349,7 @@ let view = {
                 return "Con";
             }
             if (key === "spd") {
-                return "Spd";
+                return "Cha";
             }
             if (key === "soul") {
                 return "Soul";
@@ -4307,9 +4392,9 @@ let view = {
             const run = runs[i];
             const lvl = run.level !== undefined ? run.level : 0;
             const kills = run.kills !== undefined ? run.kills : 0;
-            const mapName = run.mapKey ? view.getMapDisplayName(run.mapKey) : "—";
+            const mapName = run.mapKey ? view.getMapDisplayName(run.mapKey) : "-";
             const okamiExp = run.okamiExpGained !== undefined ? run.okamiExpGained : 0;
-            const density = run.cloneDensity !== undefined && run.cloneDensity !== null ? run.cloneDensity : "—";
+            const density = run.cloneDensity !== undefined && run.cloneDensity !== null ? run.cloneDensity : "-";
             let starHtml = "";
             if (run.starCleared === "bronze" || run.starCleared === "silver" || run.starCleared === "gold") {
                 starHtml = ` <span class="history-duration-star skill-star-${run.starCleared} skill-star-filled">★</span>`;
@@ -4353,10 +4438,6 @@ let view = {
         }
         const slotCat = skills.getSlotCategory(skillKey);
         if (slotCat && (slotCat.indexOf(queryLower) >= 0 || queryLower === slotCat)) {
-            return true;
-        }
-        const current = view.stripHtmlForSearch(skills.skillEffectUiSummary(skillKey, skill, { ignoreEquip: true })).toLowerCase();
-        if (current.indexOf(queryLower) >= 0) {
             return true;
         }
         const reward = view.stripHtmlForSearch(skills.getSkillRewardText(skillKey, skill)).toLowerCase();
@@ -4471,6 +4552,50 @@ let view = {
         }
         view.updateVal("unequipChargesText", text);
     },
+    columnTalentRewardPhrase: function(column, value) {
+        if (column === "offense") {
+            return `+${value} base slap damage (multiplied by density)`;
+        }
+        if (column === "defense") {
+            return `+${value} base Audacity (multiplied by density)`;
+        }
+        if (column === "utility") {
+            return `+${value} base coins`;
+        }
+        return `+${value}% skill exp`;
+    },
+    updateColumnTalentTitle: function(viewName, column) {
+        if (typeof skills.columnReward !== "function") {
+            return;
+        }
+        const reward = skills.columnReward(column);
+        const label = createView._skillSlotColumnLabel(column);
+        const shown = column === "any" ? `+${reward.value}%` : `+${reward.value}`;
+        view.updateVal(`skillSlotColumnTitleText_${viewName}_${column}`, `${label}: ${shown}`);
+        const tip = `${reward.total} equipped talent. ${view.columnTalentRewardPhrase(column, reward.value)}.<br>Next at ${reward.nextAt} talent: ${view.columnTalentRewardPhrase(column, reward.nextValue)}.`;
+        view.updateVal(`skillSlotColumnTitleTip_${viewName}_${column}`, tip, "innerHTML");
+    },
+    positionColumnTalentTip: function(el) {
+        if (!el || !el.querySelector) {
+            return;
+        }
+        const tip = el.querySelector(".showthis");
+        if (!tip) {
+            return;
+        }
+        const rect = el.getBoundingClientRect();
+        const margin = 8;
+        const width = 260;
+        let left = rect.left;
+        if (left + width > window.innerWidth - margin) {
+            left = Math.max(margin, window.innerWidth - margin - width);
+        }
+        if (left < margin) {
+            left = margin;
+        }
+        tip.style.left = left + "px";
+        tip.style.top = (rect.bottom + 4) + "px";
+    },
     updateSkillEquipSlots: function() {
         const eq = skills.ensureSkillEquip();
         if (!eq) {
@@ -4483,6 +4608,7 @@ let view = {
             const compact = viewName === "library";
             for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
                 const column = skills.SLOT_COLUMNS[c];
+                view.updateColumnTalentTitle(viewName, column);
                 const arr = eq.slots[column] || [];
                 for (let i = 0; i < arr.length; i++) {
                     const key = arr[i];
@@ -4635,7 +4761,7 @@ let view = {
         }
         emptyEl.textContent = "No classified skills researched yet. Visit the Scroll Archives in Base.";
     },
-// Temporary patch fragment — applied by script then deleted.
+// Temporary patch fragment - applied by script then deleted.
     applySkillListSortRadiosOnly: function() {
         const sortMode = data.progress.skillListSort;
         const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping"
@@ -4735,11 +4861,13 @@ let view = {
             return;
         }
         const parts = skills.skillExpGainParts(skill);
-        const intMultOthers = typeof skills.getOtherSkillExpMultiplier === "function"
-            ? skills.getOtherSkillExpMultiplier(skillKey)
-            : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1);
+        const equippedMult = typeof skills.equippedSkillExpMultiplier === "function"
+            ? skills.equippedSkillExpMultiplier(skillKey)
+            : (typeof skills.getOtherSkillExpMultiplier === "function"
+                ? skills.getOtherSkillExpMultiplier(skillKey)
+                : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1));
         const soulMult = engine.getSoulSkillExpMultiplier();
-        const expPerTrigger = skills.expGainForSkillTrigger(skill, 1) * intMultOthers * soulMult;
+        const expPerTrigger = skills.expGainForSkillTrigger(skill, 1) * equippedMult * soulMult;
         const expPct = Math.min(100, Math.max(0, (skill.exp / skill.expToLevel) * 100));
         const talPct = Math.min(100, Math.max(0, (skill.talent / skill.talentToLevel) * 100));
         const tipsVal = skill.tips || 0;
@@ -4766,26 +4894,25 @@ let view = {
         const baseTalentExp = def && def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
         view.updateVal("skillInfo_base_exp", `Base Skill Exp: ${baseSkillExp}, Base Talent Exp: ${baseTalentExp}`);
         view.updateVal("skillInfo_exp_on_trigger", `Exp on trigger: ${round2(expPerTrigger)}`);
-        view.updateVal("skillInfo_exp_mults", `· Skill level ×${parts.levelMult.toFixed(4)}`);
+        view.updateVal("skillInfo_exp_mults", `· Skill level x${parts.levelMult.toFixed(4)}`);
         view.updateVal("skillInfo_exp_text", `${round1Fixed(skill.exp)} / ${round1Fixed(skill.expToLevel)}`);
         view.updateVal("skillInfo_exp_fill", `${expPct}%`, "style.width");
-        view.updateVal("skillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
+        view.updateVal("skillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp x${parts.talentMult.toFixed(4)}`);
         view.updateVal("skillInfo_talent_fill", `${talPct}%`, "style.width");
         const starMult = parts.starMult || 1;
         view.updateVal("skillInfo_star_effect_row", starMult > 1 ? "" : "none", "style.display");
-        view.updateVal("skillInfo_star_effect", `×${starMult.toFixed(4)}`);
+        view.updateVal("skillInfo_star_effect", `x${starMult.toFixed(4)}`);
         view.updateVal("skillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("skillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
         view.updateVal("skillInfo_tips_mults", "");
-        const showOtherSkillMult = (skills.isSkillUnlocked("echoChamber") && skillKey !== "echoChamber")
-            || (skills.isSkillUnlocked("studyGroup") && skillKey !== "studyGroup");
+        const showOtherSkillMult = equippedMult > 1.0000001;
         if (showOtherSkillMult) {
-            view.updateVal("skillInfo_integration_mult", `×${intMultOthers.toFixed(4)}`);
+            view.updateVal("skillInfo_integration_mult", `x${equippedMult.toFixed(4)}`);
             view.updateVal("skillInfo_integration_row", "", "style.display");
         } else {
             view.updateVal("skillInfo_integration_row", "none", "style.display");
         }
-        view.updateVal("skillInfo_combined_mults", `×${(parts.combinedMult * intMultOthers).toFixed(4)}`);
+        view.updateVal("skillInfo_combined_mults", `x${(parts.combinedMult * equippedMult).toFixed(4)}`);
         view.updateVal("skillInfo_flavor", skills.getSkillFlavorText(skillKey), "innerHTML");
     },
     updateLibrarySkillInfoPanel: function() {
@@ -4821,7 +4948,7 @@ let view = {
         const baseSkillExp = def && def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
         const baseTalentExp = def && def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
         view.updateVal("libSkillInfo_base_exp", `Base Skill Exp: ${baseSkillExp}, Base Talent Exp: ${baseTalentExp}`);
-        view.updateVal("libSkillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp ×${parts.talentMult.toFixed(4)}`);
+        view.updateVal("libSkillInfo_talent_text", `${round1Fixed(skill.talent)} / ${round1Fixed(skill.talentToLevel)} (Lv ${skill.talentLevel}) · exp x${parts.talentMult.toFixed(4)}`);
         view.updateVal("libSkillInfo_talent_fill", `${talPct}%`, "style.width");
         view.updateVal("libSkillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("libSkillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
@@ -5421,7 +5548,6 @@ let view = {
         const fx = typeof engine.ensureIntruderAttackFx === "function" ? engine.ensureIntruderAttackFx() : (data.battle && data.battle.intruderAttackFx);
         const slots = (fx && fx.slots) || [];
         const half = ((typeof engine !== "undefined" && engine.INTRUDER_ATTACK_GFX_SIZE_PX) ? engine.INTRUDER_ATTACK_GFX_SIZE_PX : 42) / 2;
-        const raisingDifficulty = (data.battle.transitionCountdownMs || 0) > 0 && !data.battle.endRunAfterCountdown;
         if (!viewData.intruderAttackGfxRender.length) {
             viewData.intruderAttackGfxRender = [];
         }
@@ -5432,7 +5558,7 @@ let view = {
                 render = viewData.intruderAttackGfxRender[i] = { active: false, kind: "", opacity: "" };
             }
             const slot = slots[i];
-            if (raisingDifficulty || !slot || !slot.active) {
+            if (!slot || !slot.active) {
                 if (render.active) {
                     el.style.display = "none";
                     render.active = false;
@@ -5477,14 +5603,6 @@ let view = {
             return;
         }
         const cache = viewData.slapFxRender;
-        const raisingDifficulty = (data.battle.transitionCountdownMs || 0) > 0 && !data.battle.endRunAfterCountdown;
-        if (raisingDifficulty) {
-            view.applySlapHandImg(outerEl, false, 0, 0, false);
-            view.applySlapHandImg(sideEl, false, 0, 0, false);
-            view.applySlapHandImg(innerEl, false, 0, 0, false);
-            cache.pose = "hidden";
-            return;
-        }
         const phase = fx.phase || "idle";
         const pose = phase === "windup" ? "outer" : (phase === "side" ? "side" : (phase === "inner" ? "inner" : "none"));
         let x = fx.x || 0;

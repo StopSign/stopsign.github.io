@@ -519,7 +519,7 @@ let mapHelper = {
             html += `<button type="button" class="tab-button" data-action="up" title="Move up">↑</button>`;
             html += `<button type="button" class="tab-button" data-action="down" title="Move down">↓</button>`;
             html += `<button type="button" class="tab-button" data-action="dup" title="Duplicate">⧉</button>`;
-            html += `<button type="button" class="tab-button" data-action="del" title="Delete">×</button>`;
+            html += `<button type="button" class="tab-button" data-action="del" title="Delete">x</button>`;
             html += `</td></tr>`;
         }
         if (!analysis.waves.length) {
@@ -844,7 +844,7 @@ let mapHelper = {
         const text = document.getElementById("mhExport").value;
         const status = document.getElementById("mhCopyStatus");
         const done = function(ok) {
-            status.textContent = ok ? "Copied." : "Copy failed — select the text manually.";
+            status.textContent = ok ? "Copied." : "Copy failed - select the text manually.";
             if (mapHelper.copyStatusTimer) {
                 clearTimeout(mapHelper.copyStatusTimer);
             }

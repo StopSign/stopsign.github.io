@@ -50,7 +50,9 @@ let engine = {
         const dt = tickMs * engine.getBattleTimeRateMultiplier();
         data.battle.cloneAliveMs += dt;
         if (engine.updateMapTransitionCountdown(tickMs)) {
-            return;
+            if (data.battle.endRunAfterCountdown || (data.battle.transitionCountdownMs || 0) <= 0) {
+                return;
+            }
         }
         data.battle.elapsedMs += dt;
 
@@ -69,6 +71,11 @@ let engine = {
         skillEngine.updateNumbingCrowdsEachSecond(tickMs);
         skillEngine.updatePeerPressureSkillExp(tickMs);
         skillEngine.updateSlowBurn(tickMs);
+        skillEngine.updateRighteousRant(tickMs);
+        skillEngine.updateHeckled(tickMs);
+        skillEngine.updateReflection(tickMs);
+        skillEngine.updateRubbernecking(tickMs);
+        skillEngine.updateRunningTab(tickMs);
         skillEngine.updateCombatSkillPeriodics(tickMs);
         skillEngine.updatePassiveSkillExp(tickMs);
         engine.updateClassEffects(tickMs);
@@ -126,11 +133,13 @@ let engine = {
         }
         const tierMult = mapData.getTierDifficultyMultiplier(data.battle.mapTier || 0);
         const gd = gameData.battle;
+        engine.ensureZoneSpawnSchedule();
+        const spacingScale = engine.getCharismaWaveFactor();
         for (let i = 0; i < map.zones.length; i++) {
             if (data.battle.zoneSpawnedInCycle[i]) {
                 continue;
             }
-            if (data.battle.elapsedMs < map.zones[i].startTimeMs) {
+            if (data.battle.elapsedMs < data.battle.zoneSpawnAtMs[i]) {
                 continue;
             }
             const z = map.zones[i];
@@ -138,9 +147,9 @@ let engine = {
             const laneSeedBase = (data.battle.generatedFromSeed || data.battle.seed || 1337);
             const laneRng = gameData.seededRandomFactory((laneSeedBase + ((i + 1) * 92821)) >>> 0);
             const lm = engine.getBattleLaneMetrics();
-            const spdMult = 1 + ((data.battle.levelState && data.battle.levelState.levelSpd) || 0) * 0.1;
+            const chaMult = engine.getCharismaMoveMultiplier();
             const travelSpd = gd.intruderTravelSpeedPxPerSecond;
-            const spacingPx = rows.length > 1 ? Math.max(0, z.distanceBetweenUnits || 0) : 0;
+            const spacingPx = rows.length > 1 ? Math.max(0, (z.distanceBetweenUnits || 0) * spacingScale) : 0;
             for (let ri = 0; ri < rows.length; ri++) {
                 const row = rows[ri];
                 row.lane = Math.floor(laneRng() * gd.laneCount);
@@ -158,7 +167,7 @@ let engine = {
                 data.battle.enemies.push({
                     id: intruderId,
                     lane: row.lane,
-                    spawnTimeMs: z.startTimeMs,
+                    spawnTimeMs: data.battle.zoneSpawnAtMs[i],
                     zoneIndex: row.zoneIndex,
                     intruderType: row.intruderType || "scoundrel",
                     yPx: yPx,
@@ -166,7 +175,7 @@ let engine = {
                     sizePx: intruderSize,
                     aud: maxAud,
                     maxAud: maxAud,
-                    speedPxPerSecond: row.speedPxPerSecond * spdMult,
+                    speedPxPerSecond: row.speedPxPerSecond * chaMult,
                     attackDamage: attackDamage,
                     attackCooldownMs: row.attackCooldownMs,
                     attackTimerMs: row.attackTimerMs,
@@ -343,8 +352,7 @@ let engine = {
             }
         }
         if ((data.progress.currentClassKey || "none") === "mock" && (data.battle.classRetreatMs || 0) > 0) {
-            const spd = data.battle.levelState.levelSpd || 0;
-            const retreatRate = (gameData.battle.intruderTravelSpeedPxPerSecond + gameData.battle.idlePushBonusPxPerSecond) * (1 + (spd * 0.1));
+            const retreatRate = (gameData.battle.intruderTravelSpeedPxPerSecond + gameData.battle.idlePushBonusPxPerSecond) * engine.getCharismaMoveMultiplier();
             const retreatDy = retreatRate * deltaSeconds;
             for (let i = 0; i < data.battle.enemies.length; i++) {
                 const intruder = data.battle.enemies[i];
@@ -397,7 +405,7 @@ let engine = {
     getSlapRechargeMultiplier: function() {
         const pEff = skills.getSkillEffect("preparation");
         const prepBonus = pEff.idleRechargeFraction || 0;
-        let mult = engine.getOutrageRechargeMultiplier();
+        let mult = 1;
         if (engine.anyIntruderInSlapRange()) {
             return mult;
         }
@@ -503,7 +511,7 @@ let engine = {
             data.battle.classPowerB -= 1000;
             data.battle.scoldFlurryMs = 2000;
         }
-        // ((base+cards)×density + Force + other flats) × Brutality × damage mults
+        // ((base+cards)xdensity + Force + other flats) x Brutality x damage mults
         slapDamage = engine.applyCombatOutgoingDamage(slapDamage, target, {
             consumeFury: true,
             flatBonus: exploitFlat
@@ -542,7 +550,7 @@ let engine = {
         if (exploitStep > 0 && priorHits > 0) {
             engine.addSkillExp("exploit", 1);
         }
-        const cd = engine.getEffectiveSlapCooldownMs();
+        const cd = engine.cooldownAfterOutrageSpend(engine.getEffectiveSlapCooldownMs(), target);
         p.attackTimerMs = cd + Math.min(0, p.attackTimerMs);
         if (!isPowerStrike) {
             if (cls === "condescend") engine.addClassBarProgress("A", 100);
@@ -553,6 +561,11 @@ let engine = {
         }
         engine.addSkillExp("force", 1);
         engine.addSkillExp("alacrity", 1);
+        const pickpocketCoins = skills.getSkillEffect("pickpocket").attackCoins || 0;
+        if (pickpocketCoins > 0) {
+            engine.grantBattleCoins(pickpocketCoins);
+        }
+        engine.addSkillExp("pickpocket", 1);
         if (target.aud <= 0) {
             target.aud = 0;
             target.alive = false;
@@ -580,7 +593,10 @@ let engine = {
             }
             const z = map.zones[i];
             const cr = mapData.computeZoneCombatAndRewards(map, i, tierMult);
-            const lastSpawnT = mapData.getZoneLastSpawnTimeMs(z);
+            const scheduled = data.battle.zoneSpawnAtMs && data.battle.zoneSpawnAtMs[i];
+            const lastSpawnT = scheduled !== undefined && scheduled !== null
+                ? scheduled
+                : mapData.getZoneLastSpawnTimeMs(z);
             let shardDropChance = 0;
             if (engine.isShardLootUnlocked()) {
                 const baseChance = mapData.getZoneShardDropChance(map, i, data.battle.mapTier || 0);
@@ -706,9 +722,9 @@ let engine = {
                     engine.addSkillExp("thickSkin", 1);
                     if (skills.isSkillUnlocked("hotTake")) {
                         const htEff = skills.getSkillEffect("hotTake");
-                        const outrageMs = htEff.outrageMsPerLevel || 0;
-                        if (outrageMs > 0) {
-                            engine.addOutrageMs(outrageMs);
+                        const outrageAmt = htEff.outragePerHit || 0;
+                        if (outrageAmt > 0) {
+                            engine.addOutrage(outrageAmt);
                         }
                         engine.addSkillExp("hotTake", 1);
                     }
@@ -766,12 +782,15 @@ let engine = {
         if (data.battle.state !== "running") {
             return;
         }
+        if ((data.battle.transitionCountdownMs || 0) > 0) {
+            return;
+        }
         const map = initialize.getCurrentMapDefinition();
         const allSpawned = data.battle.zoneSpawnedInCycle && data.battle.zoneSpawnedInCycle.length
             ? data.battle.zoneSpawnedInCycle.every(function(v) { return !!v; })
             : false;
         const noneAlive = data.battle.enemies.length === 0;
-        const cycleDone = data.battle.elapsedMs >= mapData.getMapTotalDurationMs(map);
+        const cycleDone = data.battle.elapsedMs >= engine.getScheduledCycleEndMs(map);
         if (!allSpawned || !noneAlive || !cycleDone) {
             return;
         }
@@ -842,7 +861,11 @@ let engine = {
     },
     getCloneSoulLevel: function() {
         const assigned = (data.battle && data.battle.levelState && data.battle.levelState.levelSoul) || 0;
-        return assigned + engine.getMarketAnchoringRingBought();
+        const soulSearching = (typeof skills !== "undefined")
+            ? (skills.getSkillEffect("soulSearching").bonusSoul || 0) : 0;
+        const vicarious = (typeof skills !== "undefined")
+            ? (skills.getSkillEffect("vicarious").bonusSoul || 0) : 0;
+        return assigned + engine.getMarketAnchoringRingBought() + soulSearching + vicarious;
     },
     getPendingOkamiExpWithSoul: function() {
         return (data.battle && data.battle.pendingOkamiExp) || 0;
@@ -856,7 +879,9 @@ let engine = {
         const expBase = intruder.expBase !== undefined ? intruder.expBase : 1;
         const expGain = engine.expAwardFromIntruderExpBase(expBase);
         const coinsGain = engine.coinsAwardFromIntruderGain(gain);
+        engine.noteCoinAwardSample(1, gain);
         engine.grantBattleCoins(coinsGain);
+        const tabCoins = skillEngine.payRunningTabBank(intruder);
         const splashCoins = skillEngine.applySecondhandEmbarrassmentCoins(intruder);
         engine.addPendingOkamiExpFromClone(expGain);
         if (growthUnlocked) {
@@ -908,7 +933,7 @@ let engine = {
         if (typeof view !== "undefined" && view.spawnKillRewardFloater) {
             const pos = engine.getKillFloaterScreenPosition(intruder);
             const expDisplay = expGain * engine.getLevelingExpCardMultiplier();
-            const totalCoins = coinsGain + (splashCoins || 0);
+            const totalCoins = coinsGain + (splashCoins || 0) + (tabCoins || 0);
             const parts = [
                 `${intToStringRound(totalCoins)} coins`,
                 `+${round1(expDisplay)} exp`
@@ -940,21 +965,43 @@ let engine = {
         const b = expBase !== undefined ? expBase : 1;
         return b * skillEngine.getCharacterExpMultiplier();
     },
-    /** Wave/floater display: skill/Soul award × Leveling Exp shrine card (matches `addCloneLevelExp`). */
+    /** Wave/floater display: skill/Soul award x Leveling Exp shrine card (matches `addCloneLevelExp`). */
     expDisplayFromIntruderExpBase: function(expBase) {
         return engine.expAwardFromIntruderExpBase(expBase) * engine.getLevelingExpCardMultiplier();
     },
-    /** Matches `onIntruderKilled`: nickelAndDime flat + extortion coins multiplier over stored zone gain. */
-    coinsAwardFromIntruderGain: function(storedGain) {
-        const gain = storedGain !== undefined ? storedGain : 1;
-        const sEff = skills.getSkillEffect("nickelAndDime");
+    /** Extortion x intruder-coin cards x Charisma. Charisma is +5% per point, multiplied with the other bonuses. Flat bonuses are multiplied by this on a normal drop. */
+    intruderCoinMultiplier: function() {
         const gEff = skills.getSkillEffect("extortion");
-        const scavFlat = sEff.killCoinsFlat || 0;
-        const baseCoinsPart = gain + scavFlat;
         const greedMult = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
-        return baseCoinsPart * greedMult * (1 + cardAdd);
+        // Extortion and intruder-coin cards multiply. Charisma is +5% per point with itself, then multiplies that product.
+        return greedMult * (1 + cardAdd) * (1 + 0.05 * engine.getCharismaPoints());
+    },
+    /**
+     * Weighted coin-award events during a run, so offline can step the Utility flat.
+     * equiv is 1 for a kill, 0.5 for Outrage, and the banked fraction for Running Tab.
+     */
+    noteCoinAwardSample: function(equiv, preFlatGain) {
+        if (!data.battle || !(equiv > 0)) {
+            return;
+        }
+        data.battle.coinAwardEquiv = (data.battle.coinAwardEquiv || 0) + equiv;
+        data.battle.coinPreFlatGainSum = (data.battle.coinPreFlatGainSum || 0) + (preFlatGain || 0) * equiv;
+    },
+    /** Secondhand Embarrassment adds the kill flat once per splash, without the coin multiplier. */
+    noteCoinSplashFlat: function() {
+        if (!data.battle) {
+            return;
+        }
+        data.battle.coinSplashFlats = (data.battle.coinSplashFlats || 0) + 1;
+    },
+    /** Matches `onIntruderKilled`: Nickel and Dime, Utility column, and More Coin Drop flats, then the coin multiplier over stored zone gain. */
+    coinsAwardFromIntruderGain: function(storedGain) {
+        const gain = storedGain !== undefined ? storedGain : 1;
+        const scavFlat = skillEngine.getKillCoinsFlatBonus();
+        const baseCoinsPart = gain + scavFlat;
+        return baseCoinsPart * engine.intruderCoinMultiplier();
     },
     /**
      * Award coins and grant Windfall Swagger / Extortion / Retail Therapy 1 skill exp when amount > 0.
@@ -1002,13 +1049,13 @@ let engine = {
         }
     },
 
-    /** Collect Shards level → amount multiplier (0 if locked). L1 = ×1, L2 = ×1.5, … */
+    /** Collect Shards level → amount multiplier (0 if locked). L1 = x1, L2 = x1.3, … */
     getShardLootAmountMultiplier: function() {
         const lv = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.collectShardsLevel) || 0;
         if (lv <= 0) {
             return 0;
         }
-        return Math.pow(1.5, lv - 1);
+        return Math.pow(1.3, lv - 1);
     },
     /** @deprecated Use getShardLootAmountMultiplier; kept for call-site migration. */
     getShardLootChanceMultiplier: function() {
@@ -1043,7 +1090,7 @@ let engine = {
         let unlockedAny = false;
         while ((data.progress.shards || 0) >= data.progress.nextSkillSlotShardCost) {
             data.progress.shards -= data.progress.nextSkillSlotShardCost;
-            data.progress.nextSkillSlotShardCost *= 2;
+            data.progress.nextSkillSlotShardCost *= 1.5;
             const col = cycle[data.progress.skillSlotUnlockIndex % cycle.length];
             data.progress.skillSlotUnlockIndex++;
             const eq = data.progress.skillEquip;
@@ -1128,6 +1175,8 @@ let engine = {
             }
             engine.addSkillExp("adaptation", 2);
             engine.addSkillExp("savageLessons", 2);
+            engine.addSkillExp("soulSearching", 2);
+            engine.addSkillExp("bravado", 2);
             engine.addSkillExp("paddingResume", 2);
             engine.addSkillExp("hindsight", 2);
             engine.addSkillExp("studyGroup", 2);
@@ -1353,8 +1402,27 @@ let engine = {
     addDesensitizedStack: function(durationMs) {
         battleBuffs.addDesensitizedStack(durationMs);
     },
-    addOutrageMs: function(ms) {
-        battleBuffs.addDurationMs("outrage", ms);
+    addOutrage: function(amount) {
+        battleBuffs.addOutrage(amount);
+    },
+    /**
+     * If Outrage is at least 10, spend 10, halve this attack's cooldown, and pay 50% of the
+     * target's kill coins through the normal coin-gain trigger.
+     */
+    cooldownAfterOutrageSpend: function(cooldownMs, intruder) {
+        if (!engine.trySpendOutrage()) {
+            return cooldownMs;
+        }
+        const stored = intruder && intruder.gain !== undefined ? intruder.gain : 1;
+        engine.noteCoinAwardSample(0.5, stored);
+        const coins = engine.coinsAwardFromIntruderGain(stored) * 0.5;
+        if (coins > 0) {
+            engine.grantBattleCoins(coins);
+        }
+        return cooldownMs / 2;
+    },
+    trySpendOutrage: function() {
+        return battleBuffs.trySpendOutrage();
     },
     addMalice: function(amount) {
         battleBuffs.addMalice(amount);
@@ -1389,9 +1457,6 @@ let engine = {
     },
     getDesensitizedIncomingMultiplier: function() {
         return battleBuffs.getDesensitizedIncomingMultiplier();
-    },
-    getOutrageRechargeMultiplier: function() {
-        return battleBuffs.getOutrageRechargeMultiplier();
     },
     consumeMaliceOnAttack: function() {
         return battleBuffs.consumeMaliceOnAttack();
@@ -1482,6 +1547,7 @@ let engine = {
         const ls = data.battle.levelState || {};
         let totalStr = (ls.levelStr || 0) + (ls.skillStrBonus || 0);
         totalStr += skills.getSkillEffect("shockValue").bonusStr || 0;
+        totalStr += skills.getSkillEffect("savageLessons").bonusStr || 0;
         const div = gameData.battle.combat.conStrStatDivisor || 10;
         return 1 + totalStr / div;
     },
@@ -1499,7 +1565,7 @@ let engine = {
         return gained;
     },
     applyCombatOutgoingDamage: function(baseDamage, target, opts) {
-        // baseDamage is already ((base + cards) × density + Force) × Brutality.
+        // baseDamage is already ((base + cards) x density + Force) x Brutality.
         // Extra flats (MC, Sadism, Repeat Offender, Exploit, …) also get Brutality,
         // then skill / buff / card damage multipliers apply.
         const o = opts || {};
@@ -1521,13 +1587,112 @@ let engine = {
         out = engine.applyBattleBuffsToOutgoingDamage(out, o);
         return out;
     },
+    getCharismaPoints: function() {
+        const ls = data.battle && data.battle.levelState;
+        return (ls && ls.levelSpd) || 0;
+    },
+    /** Enemies approach 5% faster per Charisma. */
+    getCharismaMoveMultiplier: function() {
+        return 1 + engine.getCharismaPoints() * 0.05;
+    },
+    /**
+     * Each Charisma point leaves 95% of the remaining wave wait and of the spacing inside a wave.
+     * At 40s with a wave due at 60s, going from 0 to 10 Charisma sets that wave to about 52s.
+     */
+    getCharismaWaveFactor: function(points) {
+        const cha = points === undefined || points === null ? engine.getCharismaPoints() : points;
+        if (!cha) {
+            return 1;
+        }
+        return Math.pow(0.95, cha);
+    },
+    ensureZoneSpawnSchedule: function() {
+        const map = initialize.getCurrentMapDefinition();
+        if (!map || !map.zones) {
+            return;
+        }
+        const zones = map.zones;
+        const schedule = data.battle.zoneSpawnAtMs;
+        const valid = schedule && schedule.length === zones.length;
+        if (!valid) {
+            const next = [];
+            for (let i = 0; i < zones.length; i++) {
+                next.push(zones[i].startTimeMs || 0);
+            }
+            data.battle.zoneSpawnAtMs = next;
+            data.battle.charismaSpawnScheduleCha = 0;
+        }
+        engine.applyCharismaToSpawnSchedule();
+    },
+    applyCharismaToSpawnSchedule: function() {
+        const cha = engine.getCharismaPoints();
+        const prev = data.battle.charismaSpawnScheduleCha || 0;
+        if (prev === cha) {
+            return;
+        }
+        const factor = Math.pow(0.95, cha - prev);
+        const elapsed = data.battle.elapsedMs || 0;
+        const schedule = data.battle.zoneSpawnAtMs || [];
+        const spawned = data.battle.zoneSpawnedInCycle || [];
+        for (let i = 0; i < schedule.length; i++) {
+            if (spawned[i]) {
+                continue;
+            }
+            const remaining = schedule[i] - elapsed;
+            schedule[i] = elapsed + remaining * factor;
+        }
+        engine.tightenLiveWaveSpacing(factor);
+        data.battle.charismaSpawnScheduleCha = cha;
+    },
+    /** Pull each live wave's trailing units toward its front by the Charisma spacing factor. */
+    tightenLiveWaveSpacing: function(factor) {
+        if (!(factor > 0) || factor === 1) {
+            return;
+        }
+        const enemies = data.battle.enemies || [];
+        const fronts = {};
+        for (let i = 0; i < enemies.length; i++) {
+            const e = enemies[i];
+            if (!e.alive) {
+                continue;
+            }
+            const zi = e.zoneIndex;
+            if (fronts[zi] === undefined || e.yPx > fronts[zi]) {
+                fronts[zi] = e.yPx;
+            }
+        }
+        for (let i = 0; i < enemies.length; i++) {
+            const e = enemies[i];
+            if (!e.alive) {
+                continue;
+            }
+            const front = fronts[e.zoneIndex];
+            const gap = front - e.yPx;
+            if (gap <= 0) {
+                continue;
+            }
+            e.yPx = front - gap * factor;
+            e.prevYPx = e.yPx;
+        }
+    },
+    getScheduledCycleEndMs: function(map) {
+        const schedule = data.battle.zoneSpawnAtMs;
+        if (!schedule || !schedule.length) {
+            return mapData.getMapTotalDurationMs(map);
+        }
+        let end = 0;
+        for (let i = 0; i < schedule.length; i++) {
+            if (schedule[i] > end) {
+                end = schedule[i];
+            }
+        }
+        return end;
+    },
     getIntruderPushBonusPxPerSecond: function() {
         if (engine.anyIntruderInPlayerRange() || engine.countAliveEnemies() === 0) {
             return 0;
         }
-        const spd = data.battle.levelState.levelSpd || 0;
-        const spdMult = 1 + (spd * 0.1);
-        let out = gameData.battle.idlePushBonusPxPerSecond * spdMult;
+        let out = gameData.battle.idlePushBonusPxPerSecond * engine.getCharismaMoveMultiplier();
         if ((data.progress.currentClassKey || "none") === "scold" && data.battle.scoldDashActive) {
             out *= 10;
         }
@@ -1537,8 +1702,8 @@ let engine = {
         if (!engine.areActiveZonesCleared()) {
             return 1;
         }
-        const spd = data.battle.levelState.levelSpd || 0;
-        let out = 1 + (spd * 0.1);
+        // Charisma no longer speeds the wave clock. Scold Dash still does, while the field is empty.
+        let out = 1;
         if ((data.progress.currentClassKey || "none") === "scold" && data.battle.scoldDashActive) {
             out *= 10;
         }
@@ -1595,7 +1760,7 @@ let engine = {
             data.battle.transitionMessage = "Bronze star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 1;
             data.battle.endRunAfterCountdown = false;
-            data.battle.transitionCountdownMs = 5000;
+            data.battle.transitionCountdownMs = 3000;
             engine.idleSlapHand();
             return;
         }
@@ -1610,7 +1775,7 @@ let engine = {
             data.battle.transitionMessage = "Silver star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 2;
             data.battle.endRunAfterCountdown = false;
-            data.battle.transitionCountdownMs = 5000;
+            data.battle.transitionCountdownMs = 3000;
             engine.idleSlapHand();
             return;
         }
@@ -1631,6 +1796,8 @@ let engine = {
         data.battle.elapsedMs = 0;
         data.battle.zoneSpawnedInCycle = [];
         data.battle.zoneRewardGrantedInCycle = [];
+        data.battle.zoneSpawnAtMs = null;
+        data.battle.charismaSpawnScheduleCha = null;
         const map = initialize.getCurrentMapDefinition();
         for (let i = 0; i < map.zones.length; i++) {
             data.battle.zoneSpawnedInCycle.push(false);
@@ -2607,7 +2774,7 @@ let engine = {
             }
         }
         engine.enqueueSandalLineFx(rt);
-        const rcd = engine.getEffectiveSandalCooldownMs();
+        const rcd = engine.cooldownAfterOutrageSpend(engine.getEffectiveSandalCooldownMs(), rt);
         p.sandalAttackTimerMs = rcd + Math.min(0, p.sandalAttackTimerMs);
         if (cls === "mock") {
             engine.addClassBarProgress("A", 200);
@@ -2665,11 +2832,17 @@ let engine = {
             return;
         }
         const gainBase = skills.expGainForSkillTrigger(skill, amount);
-        const intMult = typeof skills.getOtherSkillExpMultiplier === "function"
-            ? skills.getOtherSkillExpMultiplier(skillKey)
-            : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1);
+        const intMult = typeof skills.equippedSkillExpMultiplier === "function"
+            ? skills.equippedSkillExpMultiplier(skillKey)
+            : (typeof skills.getOtherSkillExpMultiplier === "function"
+                ? skills.getOtherSkillExpMultiplier(skillKey)
+                : (skillKey !== "echoChamber" ? skills.getEchoChamberExpMultiplierForOthers() : 1));
         const soulMult = engine.getSoulSkillExpMultiplier();
         const gain = gainBase * intMult * soulMult;
+        const slotForColumn = skills.findSkillEquipSlot(skillKey);
+        const trackColumnReward = slotForColumn && (slotForColumn.column === "offense" || slotForColumn.column === "defense");
+        const offenseRewardBefore = trackColumnReward ? (skills.columnReward("offense").value || 0) : 0;
+        const defenseRewardBefore = trackColumnReward ? (skills.columnReward("defense").value || 0) : 0;
         const cardEff = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? shrineCards.getAggregatedEffects() : {};
         const skillCardAdd = cardEff.skillExpAdd || 0;
@@ -2689,6 +2862,13 @@ let engine = {
             skill.talentLevel++;
             skill.talentToLevel = skill.talentToLevel * 1.05;
         }
+        if (trackColumnReward) {
+            const offenseRewardAfter = skills.columnReward("offense").value || 0;
+            const defenseRewardAfter = skills.columnReward("defense").value || 0;
+            if (offenseRewardAfter !== offenseRewardBefore || defenseRewardAfter !== defenseRewardBefore) {
+                initialize.calcPlayerStats(false);
+            }
+        }
     },
     onSkillLevelUp: function(skill) {
         const def = skills._byKey[skill.key];
@@ -2700,6 +2880,15 @@ let engine = {
             if (skill.key !== "recognition") {
                 engine.addSkillExp("recognition", 0.5);
             }
+            if (skill.key !== "reflection") {
+                engine.addSkillExp("reflection", 0.5);
+            }
+            if (skill.key !== "mountingEgo") {
+                engine.addSkillExp("mountingEgo", 0.5);
+            }
+            if (skill.key !== "vicarious") {
+                engine.addSkillExp("vicarious", 0.5);
+            }
         }
         if (skill.key === "recognition" && skills.isSkillUnlocked("recognition")) {
             const recEff = skills.getSkillEffect("recognition");
@@ -2708,13 +2897,7 @@ let engine = {
                 engine.addCloutStacks(cloutGain);
             }
         }
-        if (skill.key === "adaptation") {
-            data.battle.levelState.skillConBonus++;
-            initialize.calcPlayerStats(false);
-        } else if (skill.key === "savageLessons") {
-            data.battle.levelState.skillStrBonus++;
-            initialize.calcPlayerStats(false);
-        } else if (skill.key === "adrenaline") {
+        if (skill.key === "adrenaline") {
             data.battle.levelState.skillStrBonus++;
             initialize.calcPlayerStats(false);
         } else if (skill.key === "no_skill_yet") {
@@ -2722,15 +2905,12 @@ let engine = {
             initialize.calcPlayerStats(false);
         } else if (skill.key === "alacrity") {
             engine.syncPlayerCooldownFields();
-        } else if (skill.key === "shameless") {
-            // +10 max (equal recover) + additionally recover 10 × skill level (no Narcissism on the extra).
-            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: (skill.level || 0) * 10 });
-        } else if (skill.key === "corneredEgo") {
-            // +4 max (equal recover) + additionally recover 8 current (no Narcissism on the extra).
-            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: 8 });
+        } else if (skill.key === "shameless" || skill.key === "corneredEgo") {
+            // Equal recover covers the max rise. Extra heal is 3 x the new level, and is not boosted by Narcissism.
+            initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: 3 * (skill.level || 0) });
         } else if (skill.key === "force" || skill.key === "longshot") {
             initialize.calcPlayerStats(false);
-        } else if (skill.key === "windfallSwagger" || skill.key === "shockValue" || skill.key === "validation" || skill.key === "paddingResume") {
+        } else if (skill.key === "windfallSwagger" || skill.key === "shockValue" || skill.key === "validation" || skill.key === "paddingResume" || skill.key === "adaptation" || skill.key === "savageLessons" || skill.key === "mountingEgo" || skill.key === "bravado") {
             initialize.calcPlayerStats(false);
         }
     },
@@ -4670,8 +4850,8 @@ let engine = {
             return fallback;
         }
         return {
-            x: (sr.left + sr.width / 2) - mr.left,
-            y: (sr.top + sr.height / 2) - mr.top
+            x: (sr.left + sr.width / 2) - mr.left - (map.clientLeft || 0),
+            y: (sr.top + sr.height / 2) - mr.top - (map.clientTop || 0)
         };
     },
     getDropletMapPosition: function(droplet) {
@@ -5370,7 +5550,7 @@ let engine = {
         }
         return (spirit.spiritPower || 0) + (spirit.training || 0);
     },
-    /** Assumed continuous forge exp/s when always smelting (batch × 3 / 60s). */
+    /** Assumed continuous forge exp/s when always smelting (batch x 3 / 60s). */
     getAtelierForgeExpPerSec: function(spirit) {
         const batch = engine.getForgeSmeltBatch(spirit);
         return (batch * 3) / 60;
@@ -12760,7 +12940,7 @@ let engine = {
                 pool = catPool;
                 break;
             }
-            // No remaining skills in this category to research — treat as satisfied and continue.
+            // No remaining skills in this category to research - treat as satisfied and continue.
         }
         engine.shuffleArrayInPlace(pool, rand);
         const need = Math.min(3, pool.length);

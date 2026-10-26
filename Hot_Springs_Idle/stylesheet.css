@@ -1355,10 +1355,24 @@ button {
 }
 
 .skills-slot-column-title {
+    position: sticky;
+    top: 0;
+    z-index: 5;
     font-size: 12px;
     font-weight: 700;
     text-align: center;
     padding: 2px 0;
+    background: #101621;
+    cursor: help;
+}
+
+.skills-slot-column-title .skills-column-talent-tip {
+    position: fixed;
+    width: max-content;
+    max-width: 260px;
+    white-space: normal;
+    z-index: 1000;
+    margin-top: 0;
 }
 
 .skills-slot-column--offense .skills-slot-column-title { color: #ff4d4d; }
@@ -2058,6 +2072,10 @@ button {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+#tabPane_base .pane-title-left {
+    font-size: 14px;
 }
 
 .pane-title-buyable {
@@ -3057,6 +3075,7 @@ button {
     border: 1px solid rgba(255, 100, 50, 0.6);
     pointer-events: none;
     z-index: 13;
+    box-sizing: border-box;
     animation: fireLauncherAoeFade 0.5s ease-out forwards;
     transform: translate(-50%, -50%);
 }

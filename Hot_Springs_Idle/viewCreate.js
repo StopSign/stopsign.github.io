@@ -116,7 +116,7 @@ let createView = {
         const bronzeStar = `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>`;
         const silverStar = `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>`;
         const goldStar = `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>`;
-        return "<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices — select one and weave it with Finish Research to unlock that skill.</p>"
+        return "<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices - select one and weave it with Finish Research to unlock that skill.</p>"
             + `<p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>`
             + `<p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>`
             + `<p>Each ${goldStar} increases research gain by 10% (does not raise cost). Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>`;
@@ -139,9 +139,9 @@ let createView = {
         );
         createView.createInfoButton(
             "tabPane_stats",
-            "<p><strong>Audacity order:</strong> ((Base Aud + card Base Audacity) × Dense Clones + Aud) × Confidence.</p>"
+            "<p><strong>Audacity order:</strong> ((Base Aud + card Base Audacity) x Dense Clones + Aud) x Confidence.</p>"
             + "<p><strong>Max Aud recover:</strong> Whenever max Aud increases, recover an equal amount of current Audacity (+max and +current)."
-            + "<p><strong>Ego Damage order:</strong> (Base slap + card Base Ego Damage) × Dense Clones, then + flat ego damage from skills, then × Brutality, then × damage multipliers from skills, buffs, and cards.</p>"
+            + "<p><strong>Ego Damage order:</strong> (Base slap + card Base Ego Damage) x Dense Clones, then + flat ego damage from skills, then x Brutality, then x damage multipliers from skills, buffs, and cards.</p>"
             + "<p><strong>Damage reduction order:</strong> (1) Clout absorbs raw incoming damage, (2) flat reduction (Insult Fatigue capped at 50% of raw attack, then Armor and other flats with no such cap), (3) multiplier reductions from skills, buffs, and class.</p>"
         );
     },
@@ -237,7 +237,7 @@ let createView = {
                 return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span></span>`;
             }
             if (siteKey === "scrollArchives") {
-                return `<span id="${id}_worker_prod_text">Researchers: <span id="${id}_wpt_researchers"></span> | Research speed: <span id="${id}_wpt_speed"></span>/s<span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>× from inspiration)</span><br>Research: <span id="${id}_wpt_progress"></span> / <span id="${id}_wpt_required"></span> · ETA: <span id="${id}_wpt_eta"></span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span><span id="${id}_wpt_choose_wrap" style="display:none"><br>Researches to choose: <span id="${id}_wpt_choose"></span></span></span>`;
+                return `<span id="${id}_worker_prod_text">Researchers: <span id="${id}_wpt_researchers"></span> | Research speed: <span id="${id}_wpt_speed"></span>/s<span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>x from inspiration)</span><br>Research: <span id="${id}_wpt_progress"></span> / <span id="${id}_wpt_required"></span> · ETA: <span id="${id}_wpt_eta"></span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span><span id="${id}_wpt_choose_wrap" style="display:none"><br>Researches to choose: <span id="${id}_wpt_choose"></span></span></span>`;
             }
             if (siteKey === "bonfire") {
                 return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span> | Okami speed: <span id="${id}_wpt_okami_speed"></span><br>Heat: <span id="${id}_wpt_heat"></span> / <span id="${id}_wpt_heat_next"></span> | Mana Gain Bonus: <span id="${id}_wpt_heat_bonus"></span></span>`;
@@ -421,7 +421,7 @@ let createView = {
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
             return `
-                <div class="base-row muted-text">Karma/s = (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2×silver + 4×gold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
+                <div class="base-row muted-text">Karma/s = (total talent levels x star score x total spirit levels x Okami level x Okami tails) / 10,000,000. Star score is bronze + 2xsilver + 4xgold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
@@ -475,7 +475,7 @@ let createView = {
         };
         const htmlScrollArchivesPanel = function() {
             return `
-                <div class="base-row">Research: <span id="scrollArchivesResearchProgressText">0</span> / <span id="scrollArchivesResearchRequiredText">10</span><span class="game-progress-sep">|</span>ETA: <span id="scrollArchivesResearchEtaText">—</span></div>
+                <div class="base-row">Research: <span id="scrollArchivesResearchProgressText">0</span> / <span id="scrollArchivesResearchRequiredText">10</span><span class="game-progress-sep">|</span>ETA: <span id="scrollArchivesResearchEtaText">-</span></div>
                 <div id="scrollArchivesStarEffects_row" class="base-row muted-text"></div>
                 <div id="scrollArchivesResearchPaused_row" class="base-row muted-text" style="display:none">Paused - need more coins, star beads, or mana</div>
                 <div class="base-row">Choose Research: <span id="scrollArchivesResearchesToChoose">0</span></div>
@@ -594,7 +594,7 @@ let createView = {
             root.innerHTML = `
                 <div id="baseBuildingInfoHeaderBtns" class="base-info-header-btns">
                     <button type="button" id="baseBuildingInfoHideToggle" class="base-info-hide-btn" title="Hide Info" style="display:none" onclick="events.toggleSpiritInfoCollapsed()">Hide Info</button>
-                    <button type="button" id="baseBuildingInfoClose" class="base-info-close-btn" title="Close" onclick="events.closeBaseBuildingInfo()">×</button>
+                    <button type="button" id="baseBuildingInfoClose" class="base-info-close-btn" title="Close" onclick="events.closeBaseBuildingInfo()">x</button>
                 </div>
                 <div id="baseBuildingInfoScroll" class="base-info-scroll">
                 <div id="resortInfo_empty" class="resort-info-section resort-info-visible"></div>
@@ -617,7 +617,7 @@ let createView = {
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
                     <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span></div>
                     <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least <span id="spiritTrainingMinManaText">500</span> mana and Spirit Training is below Spirit Power, trains for <span id="spiritTrainingDurationText">60</span>s, then spends <span id="spiritTrainingCostText">500</span> Hidden Spring mana to gain <span id="spiritTrainingExpText">60</span> exp and +<span id="spiritTrainingGainText">0.1</span> training. Training cannot exceed Spirit Power. Training adds to Spirit Power for all effects.</div>
-                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(×1.8/lvl)</span></div>
+                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(x1.8/lvl)</span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
                         <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore <span class="muted-text">floor(√effective spirit power), +20% per Pebble Pay, rounded up</span></div>
@@ -823,8 +823,6 @@ let createView = {
                     <div class="base-row muted-text">Collects water from droplets.</div>
                     <div class="base-row">Stored water: <span id="cisternInfoWater"></span></div>
                     <div class="base-row">Temperature: <span id="cisternInfoTemperature"></span></div>
-                    <div id="cisternInfoEssence_row" class="base-row" style="display:none">Essence: <span id="cisternInfoEssence"></span></div>
-                    <div id="cisternInfoEssenceNote" class="base-row muted-text" style="display:none">When droplets arrive, any extra temperature above 100 becomes Essence. That amount is not multiplied by the droplet's capacity.</div>
                     <div class="base-row">Capacity: <span id="cisternInfoCapacity"></span></div>
                     <div id="cisternWishingWell_row" class="base-row" style="display:none">Wishing well: +<span id="cisternWishingWellCoins"></span> coins/s</div>
                     <div id="cisternWaterCarry_row" class="base-row" style="display:none">Water carry: <span id="cisternWaterCarry"></span>L per trip</div>
@@ -1101,7 +1099,11 @@ let createView = {
                 : null;
             const count = Array.isArray(arr) ? arr.length : (col === "any" ? 0 : 1);
             html += `<div class="skills-slot-column skills-slot-column--${col}" data-column="${col}">`;
-            html += `<div class="skills-slot-column-title">${createView._skillSlotColumnLabel(col)}</div>`;
+            const bonusSuffix = col === "any" ? ": +0%" : ": +0";
+            html += `<div id="skillSlotColumnTitle_${viewName}_${col}" class="skills-slot-column-title showthat" onmouseenter="view.positionColumnTalentTip(this)">`;
+            html += `<span id="skillSlotColumnTitleText_${viewName}_${col}">${createView._skillSlotColumnLabel(col)}${bonusSuffix}</span>`;
+            html += `<div id="skillSlotColumnTitleTip_${viewName}_${col}" class="showthis skills-column-talent-tip"></div>`;
+            html += `</div>`;
             for (let i = 0; i < count; i++) {
                 html += createView._buildSkillEquipSlotHtml(viewName, col, i, compact);
             }
@@ -1165,7 +1167,7 @@ let createView = {
                 <div class="prog-track skill-prog-mini skill-info-prog"><div id="skillInfo_talent_fill" class="prog-fill prog-fill-talent"></div></div>
                 <div id="skillInfo_star_effect_row" class="prog-label-row">Star effect: <span id="skillInfo_star_effect"></span></div>
                 <div id="skillInfo_tips_row" class="prog-label-row skill-exp-row"${tipsHiddenStyle}>Tips: <span id="skillInfo_tips_text"></span> <span class="skill-exp-mults" id="skillInfo_tips_mults"></span></div>
-                <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Exp mult from Skills: <span id="skillInfo_integration_mult"></span></div>
+                <div id="skillInfo_integration_row" class="prog-label-row" style="display:none">Exp mult from Equipped Skills: <span id="skillInfo_integration_mult"></span></div>
                 <div class="prog-label-row">Combined exp mult: <span id="skillInfo_combined_mults"></span></div>
                 <div id="skillInfo_flavor" class="skill-info-flavor"></div>
             </aside>`;
@@ -1287,6 +1289,11 @@ let createView = {
             const compact = viewName === "library";
             for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
                 const column = skills.SLOT_COLUMNS[c];
+                createView.queueCache(
+                    `skillSlotColumnTitle_${viewName}_${column}`,
+                    `skillSlotColumnTitleText_${viewName}_${column}`,
+                    `skillSlotColumnTitleTip_${viewName}_${column}`
+                );
                 const count = (data.progress.skillEquip.slots[column] || [null]).length;
                 for (let i = 0; i < count; i++) {
                     const idPrefix = `skillSlot_${viewName}_${column}_${i}`;
@@ -1462,7 +1469,7 @@ let createView = {
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
             "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
-            "baseCoinsText", "baseStarBeadsText", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
+            "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
             "gardenAppraisalAuto_row", "gardenAppraisalAuto_chk", "gardenReviewAuto_row", "gardenReviewAuto_chk", "gardenReviewPaused_row", "gardenReviewPaused_chk",
             "foxDenMapDisplay",
@@ -1480,7 +1487,7 @@ let createView = {
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
-            "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternInfoEssence_row", "cisternInfoEssence", "cisternInfoEssenceNote", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
+            "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
             "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
@@ -1572,7 +1579,7 @@ let createView = {
             "base_garden_empty",
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
-            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip",
+            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsRegenCard", "statsRegenText", "statsRegenTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",

@@ -501,6 +501,26 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         }
     },
     {
+        key: "moreCoinDrop",
+        name: "More Coin Drop",
+        class: "none",
+        category: "buff",
+        rarity: { common: 6, rare: 3, epic: 2 },
+        getEffect: function(rarity) {
+            if (rarity === "common") return { killCoinsFlatAdd: 1 };
+            if (rarity === "rare") return { killCoinsFlatAdd: 3 };
+            if (rarity === "epic") return { killCoinsFlatAdd: 5 };
+            return {};
+        },
+        effectText: function(rarity) {
+            const e = this.getEffect(rarity);
+            return "Coins Dropped: +" + (e.killCoinsFlatAdd || 0);
+        },
+        totalBonusText: function(totalEffect) {
+            return "Coins Dropped: +" + (totalEffect.killCoinsFlatAdd || 0);
+        }
+    },
+    {
         key: "visitorRepetition",
         name: "Visitor Repetition",
         class: "none",
