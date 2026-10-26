@@ -1333,11 +1333,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Let the record show they were already losing.\"",
         shortDescription: "More ego damage to an intruder you have already attacked.",
         rewardText: function(sk) {
-            return `Reward: +20% (+5% per skill level) ego damage against an intruder you have already attacked.`;
+            return `Reward: +24% (+6% per skill level) ego damage against an intruder you have already attacked.`;
         },
         triggerText: "Trigger: 1 skill exp when attacking an intruder you already attacked.",
         getEffect: function(sk) {
-            return { damageBonusFraction: .2 + (sk.level || 0) * 0.05 };
+            return { damageBonusFraction: .24 + (sk.level || 0) * 0.06 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals((e.damageBonusFraction || 0) * 100, 1)}% dmg vs already attacked`;
