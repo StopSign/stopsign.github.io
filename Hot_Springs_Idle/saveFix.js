@@ -16,6 +16,7 @@ let saveFix = {
     /** Sole post-init entry from onLoad.handleLoad. */
     runAfterInitialize: function(loadedSaveVersion) {
         saveFix.renameSkillKey("fakeTearDrops", "applyTearDrops");
+        saveFix.renameSkillKey("stageSob", "stagePresence");
         if (data.battle) {
             if (data.battle.applyTearDropsAccMs === undefined || data.battle.applyTearDropsAccMs === null) {
                 data.battle.applyTearDropsAccMs = data.battle.fakeTearDropsSecondAccMs || 0;
@@ -274,6 +275,58 @@ let saveFix = {
                 data.battle.runSkillTalentStart[newKey] = data.battle.runSkillTalentStart[oldKey];
             }
             delete data.battle.runSkillTalentStart[oldKey];
+        }
+        const eq = data.progress.skillEquip;
+        if (eq && eq.slots) {
+            const cols = Object.keys(eq.slots);
+            for (let c = 0; c < cols.length; c++) {
+                const arr = eq.slots[cols[c]];
+                if (!Array.isArray(arr)) {
+                    continue;
+                }
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i] === oldKey) {
+                        arr[i] = newKey;
+                    }
+                }
+            }
+        }
+        const loadouts = data.progress.skillLoadouts;
+        if (Array.isArray(loadouts)) {
+            for (let li = 0; li < loadouts.length; li++) {
+                const entry = loadouts[li];
+                if (!entry || !entry.slots) {
+                    continue;
+                }
+                const lcols = Object.keys(entry.slots);
+                for (let c = 0; c < lcols.length; c++) {
+                    const arr = entry.slots[lcols[c]];
+                    if (!Array.isArray(arr)) {
+                        continue;
+                    }
+                    for (let i = 0; i < arr.length; i++) {
+                        const cell = arr[i];
+                        if (cell && cell.key === oldKey) {
+                            cell.key = newKey;
+                        } else if (cell === oldKey) {
+                            arr[i] = newKey;
+                        }
+                    }
+                }
+            }
+        }
+        const bar = data.progress.base && data.progress.base.noodleBar;
+        if (bar) {
+            if (Array.isArray(bar.offeredSkillKeys)) {
+                for (let i = 0; i < bar.offeredSkillKeys.length; i++) {
+                    if (bar.offeredSkillKeys[i] === oldKey) {
+                        bar.offeredSkillKeys[i] = newKey;
+                    }
+                }
+            }
+            if (bar.selectedTipSkillKey === oldKey) {
+                bar.selectedTipSkillKey = newKey;
+            }
         }
     },
 

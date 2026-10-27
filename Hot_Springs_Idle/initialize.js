@@ -56,6 +56,7 @@ function debug() {
 
     
     // debugResearchAllSkills()
+    debugSetAllSkillTalent(100)
 }
 
 function debugShowPaths() {
@@ -165,6 +166,37 @@ function debugResearchAllSkills() {
     Object.keys(data.progress.skills).forEach(function(k) {
         lib.unlockedSkills[k] = true;
     });
+}
+
+function debugSetAllSkillTalent(num) {
+    const target = Math.max(0, Math.floor(num || 0));
+    const sks = data.progress.skills || {};
+    const keys = Object.keys(sks);
+    let changed = false;
+    for (let i = 0; i < keys.length; i++) {
+        const skill = sks[keys[i]];
+        if (!skill) {
+            continue;
+        }
+        const current = Math.floor(skill.talentLevel || 0);
+        if (current >= target) {
+            continue;
+        }
+        const def = skills._byKey[skill.key] || skills._byKey[keys[i]] || {};
+        let threshold = skill.talentToLevel;
+        if (!(threshold > 0)) {
+            threshold = def.initialTalentToLevel !== undefined ? def.initialTalentToLevel : 10;
+        }
+        for (let lv = current; lv < target; lv++) {
+            threshold *= 1.05;
+        }
+        skill.talentLevel = target;
+        skill.talentToLevel = threshold;
+        changed = true;
+    }
+    if (changed && data.battle && data.battle.player) {
+        initialize.calcPlayerStats(false);
+    }
 }
 
 function debugAddResources() {
@@ -522,7 +554,7 @@ let initials = {
                 }
             },
             skillLoadouts: [null, null, null, null, null],
-            selectedSkillLoadout: 0,
+            selectedSkillLoadout: null,
             selectedStatsTab: "combat",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,
@@ -604,6 +636,13 @@ let initials = {
             slowBurnSeconds: 0,
             healBySkill: {},
             healSkillOrder: [],
+            flatBlockBySkill: {},
+            flatBlockSkillOrder: [],
+            cloutBySkill: {},
+            cloutSkillOrder: [],
+            cloutLostToCap: 0,
+            extraCoinsBySkill: {},
+            extraCoinsSkillOrder: [],
             combatSkillHalfSecondAccMs: 0,
             combatSkillSecondAccMs: 0,
             combatSkillTwoSecondAccMs: 0,
@@ -1661,7 +1700,7 @@ let initialize = {
             const bgEff = skills.getSkillEffect("borrowedGlory");
             const clout = bgEff.cloutPerLevel || 0;
             if (clout > 0) {
-                engine.addCloutStacks(clout);
+                engine.addCloutStacks(clout, "borrowedGlory");
             }
         }
         data.battle.borrowedGlorySeenCon = totalCon;
@@ -1699,7 +1738,12 @@ let initialize = {
             const maxRise = maxAud - oldMax;
             // Narcissism only boosts the equal recover from the max increase - not extra recovers.
             if (maxRise > 0) {
+                const audBeforeNarcissism = newAud;
                 newAud = skillEngine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
+                const narcissismHealed = newAud - audBeforeNarcissism;
+                if (narcissismHealed > 0) {
+                    engine.noteBattleHeal("narcissism", narcissismHealed);
+                }
                 skills.fireTrigger("onMaxAudIncrease");
             }
             // Additional recovers (Validation, Cornered Ego, Shameless) - not boosted by Narcissism.

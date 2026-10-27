@@ -374,6 +374,7 @@ let events = {
             view.updateVal("libSkillInfo_equipError", "");
             initialize.calcPlayerStats(false);
             view.updateSkillsTab();
+            view.refreshSkillLoadoutRemovalMarks();
             return;
         }
         if (result.reason === "already") {
@@ -386,18 +387,26 @@ let events = {
         showErr(`Unequip ${article} ${label} skill first`);
     },
     unequipSelectedSkill: function() {
-        const key = data.progress.selectedEquippedSkillKey;
+        events._unequipSkillKey(data.progress.selectedEquippedSkillKey, viewData.cached.skillInfo_unequipBtn);
+    },
+    unequipSelectedLibrarySkill: function() {
+        events._unequipSkillKey(data.progress.selectedLibrarySkillKey, viewData.cached.libSkillInfo_unequipBtn);
+    },
+    _unequipSkillKey: function(key, failBtn) {
         if (!key) {
             return;
         }
         const result = skills.unequipSkillByKey(key);
         if (!result.ok) {
-            view.flashSkillEquipFail(viewData.cached.skillInfo_unequipBtn);
+            view.flashSkillEquipFail(failBtn);
             return;
         }
-        data.progress.selectedEquippedSkillKey = "";
+        if (data.progress.selectedEquippedSkillKey === key) {
+            data.progress.selectedEquippedSkillKey = "";
+        }
         initialize.calcPlayerStats(false);
         view.updateSkillsTab();
+        view.refreshSkillLoadoutRemovalMarks();
     },
     selectSkillLoadout: function(index) {
         skills.ensureSkillLoadouts();
@@ -405,23 +414,29 @@ let events = {
         if (!(idx >= 0 && idx < skills.LOADOUT_COUNT)) {
             return;
         }
-        data.progress.selectedSkillLoadout = idx;
+        data.progress.selectedSkillLoadout = data.progress.selectedSkillLoadout === idx ? null : idx;
         view.updateSkillLoadoutButtons();
+        view.refreshSkillLoadoutRemovalMarks();
     },
     saveSkillLoadout: function() {
         skills.saveSelectedSkillLoadout();
         view.updateSkillLoadoutButtons();
+        view.refreshSkillLoadoutRemovalMarks();
     },
     loadSkillLoadout: function() {
-        skills.ensureSkillLoadouts();
-        const idx = data.progress.selectedSkillLoadout || 0;
-        const message = skills.skillLoadoutConfirmMessage(idx);
-        if (message && !window.confirm(message)) {
+        const idx = skills.getSelectedSkillLoadoutIndex();
+        if (idx === null) {
             return;
         }
         skills.applySkillLoadout(idx);
         initialize.calcPlayerStats(false);
         view.updateSkillsTab();
+        view.refreshSkillLoadoutRemovalMarks();
+    },
+    clearSkillLoadout: function() {
+        skills.clearSelectedSkillLoadout();
+        view.updateSkillLoadoutButtons();
+        view.refreshSkillLoadoutRemovalMarks();
     },
     toggleEquippedSlotStar: function(column, index, starType) {
         const eq = skills.ensureSkillEquip();
@@ -533,23 +548,19 @@ let events = {
         }
         if (payload.type === "library") {
             const key = payload.skillKey;
-            if (skills.isSkillEquipped(key)) {
-                view.flashSkillEquipFail(slot);
-                view.updateVal("libSkillInfo_equipError", "", "style.display");
-                view.updateVal("libSkillInfo_equipError", "Already equipped");
-                return;
-            }
-            if (eq.slots[toCol][toIndex]) {
-                view.flashSkillEquipFail(slot);
-                return;
-            }
-            const res = skills.equipSkillToSlot(key, toCol, toIndex);
+            const res = skills.placeLibrarySkillOnSlot(key, toCol, toIndex);
             if (!res.ok) {
                 view.flashSkillEquipFail(slot);
                 return;
             }
+            if (res.reason === "same") {
+                return;
+            }
             initialize.calcPlayerStats(false);
             view.updateSkillsTab();
+            view.refreshSkillLoadoutRemovalMarks();
+            view.updateVal("libSkillInfo_equipError", "none", "style.display");
+            view.updateVal("libSkillInfo_equipError", "");
             return;
         }
         if (payload.type === "slot") {
@@ -574,6 +585,7 @@ let events = {
             }
             initialize.calcPlayerStats(false);
             view.updateSkillsTab();
+            view.refreshSkillLoadoutRemovalMarks();
         }
     },
     /** Legacy name kept for any leftover callers. */
@@ -670,6 +682,68 @@ let events = {
             }
             events.closeBaseBuildingInfo();
         });
+    },
+    /** Filled equip slots and library rows select or toggle on their own click. */
+    _clickIsSkillSelectTarget: function(t) {
+        if (!t || !t.closest) {
+            return false;
+        }
+        if (t.closest(".skill-library-row")) {
+            return true;
+        }
+        const slot = t.closest(".skill-equip-slot");
+        if (!slot) {
+            return false;
+        }
+        const filled = slot.querySelector(".skill-equip-slot-filled");
+        return !!(filled && filled.style.display !== "none");
+    },
+    /**
+     * While a Skills sub-tab is on screen, a click outside its info panel clears that tab's selection.
+     * Equipped/Library switches are ignored, and the other sub-tab's selection is left as it was.
+     */
+    bindSkillInfoDismiss: function() {
+        if (document._skillInfoDismissBound) {
+            return;
+        }
+        document._skillInfoDismissBound = true;
+        document.addEventListener("click", function(e) {
+            if (!data.progress || !data.battle || data.battle.currentTab !== "skills") {
+                return;
+            }
+            const menu = viewData.cached.menuColumn || document.getElementById("menuColumn");
+            if (menu && menu.style.display === "none") {
+                return;
+            }
+            const t = e.target;
+            if (t && t.closest && (t.closest("#skillSubTab_equipped") || t.closest("#skillSubTab_library"))) {
+                return;
+            }
+            if (events._clickIsSkillSelectTarget(t)) {
+                return;
+            }
+            const isLibrary = (data.progress.selectedSkillsTab || "equipped") === "library";
+            const selectedKey = isLibrary ? data.progress.selectedLibrarySkillKey : data.progress.selectedEquippedSkillKey;
+            if (!selectedKey) {
+                return;
+            }
+            const panelId = isLibrary ? "skillInfoPanelLibrary" : "skillInfoPanel";
+            const panel = viewData.cached[panelId] || document.getElementById(panelId);
+            if (events.clickEventHitsElement(e, panel)) {
+                return;
+            }
+            if (isLibrary) {
+                data.progress.selectedLibrarySkillKey = "";
+                view.applySkillDetailSelectionHighlight();
+                view.updateLibrarySkillInfoPanel();
+                view.updateVal("libSkillInfo_equipError", "none", "style.display");
+                view.updateVal("libSkillInfo_equipError", "");
+                return;
+            }
+            data.progress.selectedEquippedSkillKey = "";
+            view.applySkillDetailSelectionHighlight();
+            view.updateSkillInfoPanel();
+        }, true);
     },
     bindBaseMapRightClick: function() {
         const map = document.getElementById("baseResortMap");
@@ -2441,6 +2515,7 @@ let events = {
         }
         if (typeof view !== "undefined") {
             view.updateSkillEquipSlots();
+            view.refreshSkillLoadoutRemovalMarks();
             const starPool = data.progress.stars;
             const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
             view.updateVal("combatStarsCounts", starLine, "innerHTML");

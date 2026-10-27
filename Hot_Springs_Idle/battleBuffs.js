@@ -37,9 +37,8 @@ var battleBuffDefs = {
         key: "fakeTears",
         label: "Fake Tears",
         img: "img/fakeTears.svg",
-        kind: "duration",
-        effectPercent: 20,
-        description: "You take 20% less damage while active. Additional time extends the buff. Duration is capped at 10 seconds + Okami's level."
+        kind: "counter",
+        description: "Incoming damage is divided by 1 + 0.05 x Fake Tears. Each damaging attack removes half of Fake Tears. Only integers of Fake Tears count. Fake Tears is capped at 5 + floor(Orb level / 2)."
     },
     clout: {
         key: "clout",
@@ -82,9 +81,6 @@ var battleBuffs = {
         }
         if (def.kind === "stackTimed") {
             return entry.stacks && entry.stacks.length > 0;
-        }
-        if (def.kind === "duration") {
-            return (entry.remainingMs || 0) > 0;
         }
         return false;
     },
@@ -165,11 +161,17 @@ var battleBuffs = {
             topRight = ready ? "/2" : "";
             tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + The Orb level)<br>${ready ? "Next slap or sandal spends 10: cooldown halved, and that hit pays 50% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
         } else if (key === "fakeTears") {
-            const pct = def.effectPercent || 0;
-            const capMs = battleBuffs.getFakeTearsCapMs();
-            bottomRight = battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0);
-            topRight = `${pct}%`;
-            tooltipExtra = `Effect: ${pct}%<br>Time left: ${battleBuffs.formatBuffRemainingLabel(entry.remainingMs || 0)}<br>Cap: ${battleBuffs.formatDurationCapLabel(capMs)} (10s + Okami level)`;
+            const counter = entry.counter || 0;
+            const whole = battleBuffs.getFakeTearsWhole(counter);
+            const cap = battleBuffs.getFakeTearsCap();
+            const removed = battleBuffs.getFakeTearsRemoved(counter);
+            const divisor = battleBuffs.formatFakeTearsDivisor(whole);
+            bottomRight = intToString(counter, 2);
+            topRight = whole > 0 ? `/${divisor}` : "";
+            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${cap} (5 + floor(Orb level / 2))<br>` +
+                (removed > 0
+                    ? `Incoming: / ${divisor} from ${whole} whole<br>Next Audacity loss removes ${removed}`
+                    : `Incoming: / ${divisor} (need 1 whole Fake Tears)`);
         } else if (key === "clout") {
             const stacks = entry.stacks || 0;
             bottomRight = intToString(stacks, 2);
@@ -226,8 +228,6 @@ var battleBuffs = {
                     }
                 }
                 entry.stacks = nextStacks;
-            } else if (def.kind === "duration") {
-                entry.remainingMs = Math.max(0, (entry.remainingMs || 0) - tickMs);
             }
         }
         battleBuffs.clampCappedBuffs(state);
@@ -237,8 +237,23 @@ var battleBuffs = {
         const okami = data.progress && data.progress.okami;
         return (okami && okami.level) || 0;
     },
-    getFakeTearsCapMs: function() {
-        return (10 + battleBuffs.getOkamiLevel()) * 1000;
+    getFakeTearsCap: function() {
+        const orb = data.progress.base && data.progress.base.mage_tower;
+        return 5 + Math.floor(((orb && orb.level) || 0) / 2);
+    },
+    getFakeTearsWhole: function(counter) {
+        const n = counter || 0;
+        if (n <= 0) {
+            return 0;
+        }
+        return Math.floor(n);
+    },
+    /** Amount removed on Audacity loss: half of floor(counter), rounded up. Fractions stay. */
+    getFakeTearsRemoved: function(counter) {
+        return Math.ceil(battleBuffs.getFakeTearsWhole(counter) / 2);
+    },
+    formatFakeTearsDivisor: function(whole) {
+        return ((100 + (whole || 0) * 5) / 100).toFixed(2);
     },
     getMaliceCap: function() {
         return 10 + (battleBuffs.getOkamiLevel() * 5);
@@ -247,20 +262,11 @@ var battleBuffs = {
         const orb = data.progress.base && data.progress.base.mage_tower;
         return 10 + ((orb && orb.level) || 0);
     },
-    getDurationCapMs: function(key) {
-        if (key === "fakeTears") {
-            return battleBuffs.getFakeTearsCapMs();
-        }
-        return null;
-    },
-    formatDurationCapLabel: function(ms) {
-        return roundNearestDecimals(Math.max(0, ms) / 1000, 2) + "s";
-    },
     clampCappedBuffs: function(state) {
         const tears = state.byKey.fakeTears;
-        const tearsCap = battleBuffs.getFakeTearsCapMs();
-        if (tears && (tears.remainingMs || 0) > tearsCap) {
-            tears.remainingMs = tearsCap;
+        const tearsCap = battleBuffs.getFakeTearsCap();
+        if (tears && (tears.counter || 0) > tearsCap) {
+            tears.counter = tearsCap;
         }
         const malice = state.byKey.malice;
         const maliceCap = battleBuffs.getMaliceCap();
@@ -298,35 +304,22 @@ var battleBuffs = {
         state.byKey.desensitized.stacks.push({ remainingMs: durationMs });
         battleBuffs.ensureInQueue(state, "desensitized");
     },
-    addDurationMs: function(key, ms) {
-        if (!ms || ms <= 0 || !battleBuffDefs[key]) {
-            return;
-        }
-        const state = battleBuffs.getState();
-        if (!state.byKey[key]) {
-            state.byKey[key] = { remainingMs: 0 };
-        }
-        let next = (state.byKey[key].remainingMs || 0) + ms;
-        const cap = battleBuffs.getDurationCapMs(key);
-        if (cap !== null && next > cap) {
-            next = cap;
-        }
-        state.byKey[key].remainingMs = next;
-        battleBuffs.ensureInQueue(state, key);
-    },
+    /** Returns the stacks that actually stuck, after the max-Audacity cap. */
     addCloutStacks: function(amount) {
         if (!amount || amount <= 0) {
-            return;
+            return 0;
         }
         const state = battleBuffs.getState();
         if (!state.byKey.clout) {
             state.byKey.clout = { stacks: 0, lastNegation: 0 };
         }
+        const before = state.byKey.clout.stacks || 0;
         const maxAud = (data.battle && data.battle.player && data.battle.player.maxAud) || 0;
         const cap = Math.max(0, maxAud);
-        const next = (state.byKey.clout.stacks || 0) + amount;
+        const next = before + amount;
         state.byKey.clout.stacks = cap > 0 ? Math.min(next, cap) : next;
         battleBuffs.ensureInQueue(state, "clout");
+        return Math.max(0, (state.byKey.clout.stacks || 0) - before);
     },
     consumeFuryOnAttack: function() {
         const state = battleBuffs.getState();
@@ -416,13 +409,39 @@ var battleBuffs = {
         battleBuffs.pruneQueue(state);
         return bonus.mult;
     },
+    addFakeTears: function(amount) {
+        if (!amount || amount <= 0) {
+            return;
+        }
+        const state = battleBuffs.getState();
+        if (!state.byKey.fakeTears) {
+            state.byKey.fakeTears = { counter: 0 };
+        }
+        const cap = battleBuffs.getFakeTearsCap();
+        state.byKey.fakeTears.counter = Math.min(cap, (state.byKey.fakeTears.counter || 0) + amount);
+        battleBuffs.ensureInQueue(state, "fakeTears");
+    },
     getFakeTearsDamageMultiplier: function() {
         const state = battleBuffs.getState();
         const entry = state.byKey.fakeTears;
-        if (entry && (entry.remainingMs || 0) > 0) {
-            return 0.8;
+        const whole = battleBuffs.getFakeTearsWhole(entry ? entry.counter : 0);
+        if (whole <= 0) {
+            return 1;
         }
-        return 1;
+        return 100 / (100 + whole * 5);
+    },
+    consumeFakeTearsOnAudacityLoss: function() {
+        const state = battleBuffs.getState();
+        const entry = state.byKey.fakeTears;
+        if (!entry) {
+            return;
+        }
+        const removed = battleBuffs.getFakeTearsRemoved(entry.counter);
+        if (removed <= 0) {
+            return;
+        }
+        entry.counter = Math.max(0, (entry.counter || 0) - removed);
+        battleBuffs.pruneQueue(state);
     },
     applyCloutToIncomingDamage: function(damageAfterOtherMitigation) {
         const dmg = Math.max(0, damageAfterOtherMitigation || 0);

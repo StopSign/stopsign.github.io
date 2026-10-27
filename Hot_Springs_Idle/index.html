@@ -260,19 +260,19 @@
                 <div class="prog-track"><div id="levelTabExpFill" class="prog-fill prog-fill-level"></div></div>
                 <div class="leveling-stat-grid">
                     <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
-                        <div class="leveling-stat-name">Bru</div>
+                        <div class="leveling-stat-name">Brutality</div>
                         <div class="leveling-stat-val" id="strText"></div>
                         <div class="showthis" id="strStatTip">Brutality - +10% damage per point.<br>Damage is always rounded up.</div>
                     </div>
                     <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
-                        <div class="leveling-stat-name">Con</div>
+                        <div class="leveling-stat-name">Confidence</div>
                         <div class="leveling-stat-val" id="conText"></div>
-                        <div class="showthis" id="conStatTip">Confidence - +10% max Audacity per point. +10% healing per point</div>
+                        <div class="showthis" id="conStatTip">Confidence - +10% max Audacity per point. +10% healing per point. +5% Clout gain per point.</div>
                     </div>
                     <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
-                        <div class="leveling-stat-name">Cha</div>
+                        <div class="leveling-stat-name">Charisma</div>
                         <div class="leveling-stat-val" id="spdText"></div>
-                        <div class="showthis" id="chaStatTip">Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.</div>
+                        <div class="showthis" id="chaStatTip">Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>+5% Clout gain per point.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.</div>
                     </div>
                     <div class="leveling-stat-card showthat" onmouseenter="view.positionLevelingStatTip(this)">
                         <div class="leveling-stat-name">Soul</div>
@@ -314,18 +314,21 @@
                             <div id="skillsTotalTalentLevelWrap" class="skills-total-talent-level">Total Talent Level: <span id="skillsTotalTalentLevel">0</span></div>
                         </div>
                     </div>
-                    <div class="skills-header-col">
-                        <div class="skills-loadout-label">Loadouts</div>
-                        <div class="row-buttons row-buttons-wrap" id="skillLoadoutSlots">
+                    <div class="skills-header-col skills-loadout-col">
+                        <div class="skills-loadout-row">
+                            <span class="skills-loadout-label">Loadouts</span>
+                            <div class="row-buttons skills-loadout-actions">
+                                <button type="button" id="skillLoadoutSave" class="tab-button" onclick="events.saveSkillLoadout()">Save</button>
+                                <button type="button" id="skillLoadoutLoad" class="tab-button" onclick="events.loadSkillLoadout()">Load</button>
+                                <button type="button" id="skillLoadoutClear" class="tab-button" onclick="events.clearSkillLoadout()">Clear</button>
+                            </div>
+                        </div>
+                        <div class="row-buttons" id="skillLoadoutSlots">
                             <button type="button" id="skillLoadoutBtn_0" class="tab-button" onclick="events.selectSkillLoadout(0)">1</button>
                             <button type="button" id="skillLoadoutBtn_1" class="tab-button" onclick="events.selectSkillLoadout(1)">2</button>
                             <button type="button" id="skillLoadoutBtn_2" class="tab-button" onclick="events.selectSkillLoadout(2)">3</button>
                             <button type="button" id="skillLoadoutBtn_3" class="tab-button" onclick="events.selectSkillLoadout(3)">4</button>
                             <button type="button" id="skillLoadoutBtn_4" class="tab-button" onclick="events.selectSkillLoadout(4)">5</button>
-                        </div>
-                        <div class="row-buttons">
-                            <button type="button" id="skillLoadoutSave" class="tab-button" onclick="events.saveSkillLoadout()">Save</button>
-                            <button type="button" id="skillLoadoutLoad" class="tab-button" onclick="events.loadSkillLoadout()">Load</button>
                         </div>
                     </div>
                 </div>
@@ -341,6 +344,8 @@
                     <div id="statsSandalCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Sandal Throw Speed</div><div class="leveling-stat-val" id="statsSandalText"></div><div class="showthis" id="statsSandalTip"></div></div>
                     <div id="statsExtraCoinsCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Extra Coins Dropped</div><div class="leveling-stat-val" id="statsExtraCoinsText"></div><div class="showthis" id="statsExtraCoinsTip"></div></div>
                     <div id="statsHealingCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Healed</div><div class="leveling-stat-val" id="statsHealingText"></div><div class="showthis" id="statsHealingTip"></div></div>
+                    <div id="statsFlatBlockCard" class="leveling-stat-card showthat"><div class="leveling-stat-name">Flat Damage Blocked</div><div class="leveling-stat-val" id="statsFlatBlockText"></div><div class="showthis" id="statsFlatBlockTip"></div></div>
+                    <div id="statsCloutCard" class="leveling-stat-card showthat" style="display:none"><div class="leveling-stat-name">Clout Gained</div><div class="leveling-stat-val" id="statsCloutText"></div><div class="showthis" id="statsCloutTip"></div></div>
                 </div>
             </div>
 

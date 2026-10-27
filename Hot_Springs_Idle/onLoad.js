@@ -194,6 +194,9 @@ let onLoad = {
         createView.initializeDisplay();
         createView.fixUiAfterLoad();
         view.updateView();
+        if (typeof view.refreshSkillLoadoutRemovalMarks === "function") {
+            view.refreshSkillLoadoutRemovalMarks();
+        }
         if (typeof events !== "undefined" && events.syncHideMaxedToggleFromSave) {
             events.syncHideMaxedToggleFromSave();
         }

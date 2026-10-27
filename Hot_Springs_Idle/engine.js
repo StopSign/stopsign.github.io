@@ -61,7 +61,7 @@ let engine = {
         engine.updateCurrentZoneInfo();
         skillEngine.applyTriggerTicks(tickMs);
         skillEngine.updateSelfAffirmationsEachSecond(tickMs);
-        skillEngine.updateStageSob(tickMs);
+        skillEngine.updateStagePresence(tickMs);
         skillEngine.updateSeetheEachSecond(tickMs);
         skillEngine.updateApplyTearDropsEachSecond(tickMs);
         skillEngine.updateBitterRivalryInRange(tickMs);
@@ -527,9 +527,6 @@ let engine = {
         const audBeforeSlap = target.aud;
         target.aud -= slapDamage;
         engine.onSlapImpact(target, slapDamage);
-        if (target.hasAttackedPlayer) {
-            skills.fireTrigger("onGrudgeHit");
-        }
         skills.fireTrigger("onAttackLogDamage", { damage: slapDamage });
         data.battle.lastPlayerHitIntruderId = target.id;
         data.battle.lastPlayerHitStreak = streak;
@@ -552,6 +549,7 @@ let engine = {
         const pickpocketCoins = pickpocketBase * engine.intruderCoinMultiplier();
         if (pickpocketCoins > 0) {
             engine.grantBattleCoins(pickpocketCoins);
+            engine.noteSkillExtraCoins("pickpocket", pickpocketCoins);
         }
         if (target.aud <= 0) {
             target.aud = 0;
@@ -638,9 +636,25 @@ let engine = {
                 let incoming = engine.applyCloutToIncomingDamage(rawIncoming);
                 const cloutEntry = battleBuffs.getState().byKey.clout;
                 const cloutConsumed = cloutEntry ? (cloutEntry.lastNegation || 0) : 0;
+                const beforeFatigue = incoming;
                 incoming = skillEngine.applyInsultFatigueFlat(intruder, incoming, rawIncoming);
+                const fatigueBlocked = Math.max(0, beforeFatigue - incoming);
+                if (fatigueBlocked > 0) {
+                    engine.noteBattleFlatBlock("insultFatigue", fatigueBlocked);
+                }
                 const armorEff = skills.getSkillEffect("toughness_condescend");
-                const armorFlat = (armorEff.armorFlat || 0) + (skills.getSkillEffect("thickSkin").armorFlat || 0);
+                const thickArmor = skills.getSkillEffect("thickSkin").armorFlat || 0;
+                const toughnessArmor = armorEff.armorFlat || 0;
+                const armorFlat = toughnessArmor + thickArmor;
+                const armorBlocked = Math.min(armorFlat, Math.max(0, incoming));
+                if (armorBlocked > 0 && armorFlat > 0) {
+                    if (toughnessArmor > 0) {
+                        engine.noteBattleFlatBlock("toughness_condescend", armorBlocked * toughnessArmor / armorFlat);
+                    }
+                    if (thickArmor > 0) {
+                        engine.noteBattleFlatBlock("thickSkin", armorBlocked * thickArmor / armorFlat);
+                    }
+                }
                 incoming = Math.max(0, incoming - armorFlat);
                 const endEff = skills.getSkillEffect("aboveItAll");
                 const dmgMultiplier = endEff.incomingDamageMultiplier !== undefined ? endEff.incomingDamageMultiplier : 1;
@@ -675,6 +689,7 @@ let engine = {
                         intruder.aud -= thorns;
                     }
                 }
+                const audBeforeHit = data.battle.player.aud;
                 engine.spawnPlayerHurtFloat(intruder, shownIncoming);
                 data.battle.player.aud -= audLost;
                 intruder.hasAttackedPlayer = true;
@@ -708,26 +723,22 @@ let engine = {
                             engine.addOutrage(outrageAmt);
                         }
                     }
-                    if (skills.isSkillUnlocked("sobStory")) {
-                        const ssEff = skills.getSkillEffect("sobStory");
-                        const clout = ssEff.cloutPerHit || 0;
-                        if (clout > 0) {
-                            engine.addCloutStacks(clout);
-                        }
-                    }
                     if (skills.isSkillUnlocked("socialArmor")) {
                         const closeCount = engine.countVisibleIntrudersCloserThan(200);
                         if (closeCount > 0) {
                             const saEff = skills.getSkillEffect("socialArmor");
                             const clout = (saEff.cloutPerCloseEnemy || 0) * closeCount;
                             if (clout > 0) {
-                                engine.addCloutStacks(clout);
+                                engine.addCloutStacks(clout, "socialArmor");
                             }
                         }
                     }
                 }
                 if (data.battle.player.aud < 0) {
                     data.battle.player.aud = 0;
+                }
+                if (data.battle.player.aud < audBeforeHit) {
+                    engine.consumeFakeTearsOnAudacityLoss();
                 }
                 if (damageApplied) {
                     skillEngine.onPlayerTookDamage();
@@ -859,6 +870,7 @@ let engine = {
         const coinsGain = engine.coinsAwardFromIntruderGain(gain);
         engine.noteCoinAwardSample(1, gain);
         engine.grantBattleCoins(coinsGain);
+        engine.noteSkillExtraCoins("nickelAndDime", engine.nickelExtraCoins(1));
         const tabCoins = skillEngine.payRunningTabBank(intruder);
         const splashCoins = skillEngine.applySecondhandEmbarrassmentCoins(intruder);
         engine.addPendingOkamiExpFromClone(expGain);
@@ -957,7 +969,8 @@ let engine = {
     },
     /**
      * Weighted coin-award events during a run, so offline can step coin rates.
-     * equiv is 1 for a kill, 0.5 for Outrage, and the banked fraction for Running Tab.
+     * equiv is 1 for a kill, 0.5 for Outrage, the banked fraction for Running Tab,
+     * and the splash fraction for Secondhand Embarrassment.
      */
     noteCoinAwardSample: function(equiv, preFlatGain) {
         if (!data.battle || !(equiv > 0)) {
@@ -966,19 +979,36 @@ let engine = {
         data.battle.coinAwardEquiv = (data.battle.coinAwardEquiv || 0) + equiv;
         data.battle.coinPreFlatGainSum = (data.battle.coinPreFlatGainSum || 0) + (preFlatGain || 0) * equiv;
     },
-    /** Secondhand Embarrassment splash count. The drop itself is (fraction + flats) times the coin multiplier. */
-    noteCoinSplashFlat: function() {
-        if (!data.battle) {
-            return;
-        }
-        data.battle.coinSplashFlats = (data.battle.coinSplashFlats || 0) + 1;
-    },
     /** Matches `onIntruderKilled`: Nickel and Dime and More Coin Drop flats, then the coin multiplier (including Utility percent) over stored zone gain. */
     coinsAwardFromIntruderGain: function(storedGain) {
         const gain = storedGain !== undefined ? storedGain : 1;
         const scavFlat = skillEngine.getKillCoinsFlatBonus();
         const baseCoinsPart = gain + scavFlat;
         return baseCoinsPart * engine.intruderCoinMultiplier();
+    },
+    /** Nickel and Dime's flat after the coin multiplier. scale is 1 on a kill and 0.5 on an Outrage payout. The intruder's base drop is not included. */
+    nickelExtraCoins: function(scale) {
+        const nickel = skills.getSkillEffect("nickelAndDime").killCoinsFlat || 0;
+        if (!(nickel > 0)) {
+            return 0;
+        }
+        const scaleN = scale === undefined ? 1 : scale;
+        return nickel * engine.intruderCoinMultiplier() * scaleN;
+    },
+    noteSkillExtraCoins: function(skillKey, amount) {
+        if (!data.battle || !skillKey || !(amount > 0)) {
+            return;
+        }
+        if (!data.battle.extraCoinsBySkill) {
+            data.battle.extraCoinsBySkill = {};
+        }
+        if (!data.battle.extraCoinsSkillOrder) {
+            data.battle.extraCoinsSkillOrder = [];
+        }
+        if (data.battle.extraCoinsSkillOrder.indexOf(skillKey) < 0) {
+            data.battle.extraCoinsSkillOrder.push(skillKey);
+        }
+        data.battle.extraCoinsBySkill[skillKey] = (data.battle.extraCoinsBySkill[skillKey] || 0) + amount;
     },
     /**
      * Award coins and grant 0.5 skill exp to coin-gain triggers when amount > 0.
@@ -1389,6 +1419,7 @@ let engine = {
         const coins = engine.coinsAwardFromIntruderGain(stored) * 0.5;
         if (coins > 0) {
             engine.grantBattleCoins(coins);
+            engine.noteSkillExtraCoins("nickelAndDime", engine.nickelExtraCoins(0.5));
         }
         return cooldownMs / 2;
     },
@@ -1398,11 +1429,21 @@ let engine = {
     addMalice: function(amount) {
         battleBuffs.addMalice(amount);
     },
-    addFakeTearsMs: function(ms) {
-        battleBuffs.addDurationMs("fakeTears", ms);
+    addFakeTears: function(amount) {
+        battleBuffs.addFakeTears(amount);
     },
-    addCloutStacks: function(amount) {
-        battleBuffs.addCloutStacks(amount);
+    /**
+     * Confidence and Charisma each add 5% Clout gain per point. The percents add together.
+     * sourceKey records the full boosted grant. Whatever the max-Audacity cap refuses is counted as lost.
+     */
+    addCloutStacks: function(amount, sourceKey) {
+        if (!amount || amount <= 0) {
+            return 0;
+        }
+        const boosted = amount * engine.getCloutGainMultiplier();
+        const gained = battleBuffs.addCloutStacks(boosted);
+        engine.noteBattleClout(sourceKey, boosted, gained);
+        return gained;
     },
     getBattleBuffDisplayList: function() {
         return battleBuffs.getDisplayList(battleBuffs.getState());
@@ -1438,6 +1479,9 @@ let engine = {
     },
     getFakeTearsDamageMultiplier: function() {
         return battleBuffs.getFakeTearsDamageMultiplier();
+    },
+    consumeFakeTearsOnAudacityLoss: function() {
+        battleBuffs.consumeFakeTearsOnAudacityLoss();
     },
     applyCloutToIncomingDamage: function(damageAfterOtherMitigation) {
         return battleBuffs.applyCloutToIncomingDamage(damageAfterOtherMitigation);
@@ -1524,16 +1568,23 @@ let engine = {
         return 1 + totalStr / div;
     },
     /** Same Confidence total as max Audacity: level Con + Windfall Swagger + Adaptation. */
-    getConfidenceMultiplier: function() {
+    getConfidencePoints: function() {
         const ls = data.battle && data.battle.levelState;
         if (!ls) {
-            return 1;
+            return 0;
         }
         let totalCon = ls.levelCon || 0;
         totalCon += skills.getSkillEffect("windfallSwagger").bonusCon || 0;
         totalCon += skills.getSkillEffect("adaptation").bonusCon || 0;
+        return totalCon;
+    },
+    getConfidenceMultiplier: function() {
         const div = (gameData.battle.combat && gameData.battle.combat.conStrStatDivisor) || 10;
-        return 1 + totalCon / div;
+        return 1 + engine.getConfidencePoints() / div;
+    },
+    /** +5% per Confidence and +5% per Charisma, added together. */
+    getCloutGainMultiplier: function() {
+        return 1 + 0.05 * (engine.getConfidencePoints() + engine.getCharismaPoints());
     },
     /** Remember the Audacity that actually landed this battle. Amount is already past the max-Aud clamp. */
     noteBattleHeal: function(skillKey, amount) {
@@ -1550,6 +1601,45 @@ let engine = {
             data.battle.healSkillOrder.push(skillKey);
         }
         data.battle.healBySkill[skillKey] = (data.battle.healBySkill[skillKey] || 0) + amount;
+    },
+    /** Flat armor that actually reduced incoming damage, after Clout and other earlier reductions. */
+    noteBattleFlatBlock: function(skillKey, amount) {
+        if (!data.battle || !skillKey || !(amount > 0)) {
+            return;
+        }
+        if (!data.battle.flatBlockBySkill) {
+            data.battle.flatBlockBySkill = {};
+        }
+        if (!data.battle.flatBlockSkillOrder) {
+            data.battle.flatBlockSkillOrder = [];
+        }
+        if (data.battle.flatBlockSkillOrder.indexOf(skillKey) < 0) {
+            data.battle.flatBlockSkillOrder.push(skillKey);
+        }
+        data.battle.flatBlockBySkill[skillKey] = (data.battle.flatBlockBySkill[skillKey] || 0) + amount;
+    },
+    /**
+     * supposed is the full grant after Confidence and Charisma.
+     * gained is what stuck under the max-Audacity cap. The rest is Clout lost to the cap.
+     */
+    noteBattleClout: function(skillKey, supposed, gained) {
+        if (!data.battle || !skillKey || !(supposed > 0)) {
+            return;
+        }
+        if (!data.battle.cloutBySkill) {
+            data.battle.cloutBySkill = {};
+        }
+        if (!data.battle.cloutSkillOrder) {
+            data.battle.cloutSkillOrder = [];
+        }
+        if (data.battle.cloutSkillOrder.indexOf(skillKey) < 0) {
+            data.battle.cloutSkillOrder.push(skillKey);
+        }
+        data.battle.cloutBySkill[skillKey] = (data.battle.cloutBySkill[skillKey] || 0) + supposed;
+        const lost = Math.max(0, supposed - (gained || 0));
+        if (lost > 0) {
+            data.battle.cloutLostToCap = (data.battle.cloutLostToCap || 0) + lost;
+        }
     },
     /**
      * Add current Audacity, clamped to max. amount is the final heal (flat heals already include Confidence).
@@ -2720,9 +2810,6 @@ let engine = {
         skillEngine.addCombatOutgoingHitSkillExp(rt, priorHits);
         const audBeforeSandal = rt.aud;
         rt.aud -= sandalDamage;
-        if (rt.hasAttackedPlayer) {
-            skills.fireTrigger("onGrudgeHit");
-        }
         skills.fireTrigger("onAttackLogDamage", { damage: sandalDamage });
         data.battle.lastPlayerHitIntruderId = rt.id;
         data.battle.lastPlayerHitStreak = streak;
@@ -2751,9 +2838,6 @@ let engine = {
                 t2.aud -= sandalDamage;
                 engine.enqueueSandalLineFx(t2);
                 skills.fireTrigger("onAttackLogDamage", { damage: sandalDamage });
-                if (t2.hasAttackedPlayer) {
-                    skills.fireTrigger("onGrudgeHit");
-                }
                 if (t2.aud <= 0) {
                     t2.aud = 0;
                     t2.alive = false;
@@ -2873,7 +2957,7 @@ let engine = {
             const recEff = skills.getSkillEffect("recognition");
             const cloutGain = recEff.cloutPerLevel || 0;
             if (cloutGain > 0) {
-                engine.addCloutStacks(cloutGain);
+                engine.addCloutStacks(cloutGain, "recognition");
             }
         }
         if (skill.key === "adrenaline") {

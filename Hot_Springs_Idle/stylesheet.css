@@ -1305,15 +1305,50 @@ button {
     align-items: start;
 }
 
-.skills-loadout-label {
+.skills-loadout-col .row-buttons {
+    margin-top: 0;
+}
+
+.skills-loadout-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
     margin-top: 8px;
+}
+
+.skills-loadout-label {
+    flex: 0 0 auto;
+    margin-top: 0;
     font-size: 12px;
     font-weight: 700;
     color: #bac2de;
+    line-height: 1;
+}
+
+.skills-loadout-actions {
+    margin-left: auto;
+}
+
+#skillLoadoutSlots {
+    margin-top: 4px;
+}
+
+.skills-loadout-col .tab-button {
+    padding: 2px 7px;
 }
 
 .skill-loadout-btn--filled {
     box-shadow: inset 0 -2px 0 #f9cc45;
+}
+
+.skills-loadout-actions .tab-button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.skills-loadout-actions .tab-button:disabled:hover {
+    background: #1f2b3e !important;
 }
 
 .skills-stars-charges-row {
@@ -1424,12 +1459,19 @@ button {
 }
 
 .skill-equip-slot {
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 6px;
     min-height: 52px;
     background: rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
+    cursor: pointer;
+}
+
+.skill-equip-slot:has(.skill-equip-slot-filled[style*="display: none"]) {
+    cursor: default;
 }
 
 .skill-equip-slot--offense { border-color: #ff4d4d; }
@@ -1451,7 +1493,12 @@ button {
     background: rgba(79, 158, 255, 0.12);
 }
 
+.skill-equip-slot--loadout-remove {
+    background: rgba(255, 0, 0, 0.5);
+}
+
 .skill-equip-slot-empty {
+    flex: 1 1 auto;
     font-size: 11px;
     color: rgba(186, 194, 222, 0.55);
     text-align: center;
@@ -1466,6 +1513,7 @@ button {
 .skill-equip-slot--any .skill-equip-slot-empty { border-color: rgba(167, 139, 250, 0.45); }
 
 .skill-equip-slot-filled {
+    flex: 1 1 auto;
     cursor: grab;
     user-select: none;
 }
@@ -1523,6 +1571,9 @@ button {
 
 .skills-equip-row {
     margin-top: 10px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
 }
 
 .skills-total-talent-level {
@@ -1724,7 +1775,12 @@ button {
 .skill-sort-row {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 6px 14px;
+}
+
+.skill-sort-prefix {
+    margin-right: -6px;
 }
 
 .skill-sort-radios label {
@@ -4497,6 +4553,10 @@ button {
 .skill-star-silver { color: #c0c0c0; }
 .skill-star-gold { color: #ffd700; }
 .skill-star-filled { text-shadow: 0 0 4px rgba(255,255,255,0.35); }
+.skill-star-btn.skill-star-btn--loadout-remove,
+.skill-stars-controls .skill-panel-star-btn.skill-star-btn--loadout-remove:hover {
+    background: rgba(255, 0, 0, 0.5);
+}
 .star-bronze { color: #cd7f32; }
 .star-silver { color: #c0c0c0; }
 .star-gold { color: #ffd700; }

@@ -41,8 +41,8 @@ let skillEngine = {
             skills.fireTrigger(name, ctx);
         }
     },
-    updateStageSob: function(tickMs) {
-        if (!skills.isSkillUnlocked("stageSob")) {
+    updateStagePresence: function(tickMs) {
+        if (!skills.isSkillUnlocked("stagePresence")) {
             return;
         }
         const visible = engine.countVisibleIntruders();
@@ -50,9 +50,9 @@ let skillEngine = {
             return;
         }
         const sec = tickMs / 1000;
-        const per = skills.getSkillEffect("stageSob").cloutPerVisible || 0;
+        const per = skills.getSkillEffect("stagePresence").cloutPerVisible || 0;
         if (per > 0) {
-            engine.addCloutStacks(per * visible * sec);
+            engine.addCloutStacks(per * visible * sec, "stagePresence");
         }
     },
     updateSeetheEachSecond: function(tickMs) {
@@ -67,8 +67,8 @@ let skillEngine = {
             data.battle.seetheSecondAccMs = 0;
         }
         data.battle.seetheSecondAccMs += tickMs;
-        while (data.battle.seetheSecondAccMs >= 500) {
-            data.battle.seetheSecondAccMs -= 500;
+        while (data.battle.seetheSecondAccMs >= 1000) {
+            data.battle.seetheSecondAccMs -= 1000;
             const eff = skills.getSkillEffect("seethe");
             const stacks = (eff.furyPerLevel || 0) * farCount;
             if (stacks > 0) {
@@ -90,9 +90,9 @@ let skillEngine = {
         while (data.battle.applyTearDropsAccMs >= 1000) {
             data.battle.applyTearDropsAccMs -= 1000;
             const eff = skills.getSkillEffect("applyTearDrops");
-            const ms = eff.fakeTearsMs || 0;
-            if (ms > 0) {
-                engine.addFakeTearsMs(ms);
+            const amount = eff.fakeTears || 0;
+            if (amount > 0) {
+                engine.addFakeTears(amount);
             }
         }
     },
@@ -128,9 +128,9 @@ let skillEngine = {
         while (data.battle.numbingCrowdsSecondAccMs >= 1000) {
             data.battle.numbingCrowdsSecondAccMs -= 1000;
             const eff = skills.getSkillEffect("numbingCrowds");
-            const ms = (eff.fakeTearsMsPerLevel || 0) * closeCount;
-            if (ms > 0) {
-                engine.addFakeTearsMs(ms);
+            const amount = (eff.fakeTearsPerEnemy || 0) * closeCount;
+            if (amount > 0) {
+                engine.addFakeTears(amount);
             }
         }
     },
@@ -185,11 +185,20 @@ let skillEngine = {
                         engine.addOutrage(outrageAmt);
                     }
                 }
-            } else if (skills.isSkillUnlocked("imposterSyndrome")) {
-                const isEff = skills.getSkillEffect("imposterSyndrome");
-                const maliceAmt = isEff.malicePerLevel || 0;
-                if (maliceAmt > 0) {
-                    engine.addMalice(maliceAmt);
+            } else {
+                if (skills.isSkillUnlocked("imposterSyndrome")) {
+                    const isEff = skills.getSkillEffect("imposterSyndrome");
+                    const maliceAmt = isEff.malicePerLevel || 0;
+                    if (maliceAmt > 0) {
+                        engine.addMalice(maliceAmt);
+                    }
+                }
+                if (skills.isSkillUnlocked("sobStory")) {
+                    const ssEff = skills.getSkillEffect("sobStory");
+                    const tears = ssEff.fakeTearsPerSecond || 0;
+                    if (tears > 0) {
+                        engine.addFakeTears(tears);
+                    }
                 }
             }
             if (atMax && skills.isSkillUnlocked("stoic")) {
@@ -203,7 +212,7 @@ let skillEngine = {
                 const brEff = skills.getSkillEffect("brandRecognition");
                 const clout = brEff.cloutPerSec || 0;
                 if (clout > 0) {
-                    engine.addCloutStacks(clout);
+                    engine.addCloutStacks(clout, "brandRecognition");
                 }
             }
         });
@@ -316,8 +325,8 @@ let skillEngine = {
         return nickel + cardFlat;
     },
     /**
-     * Secondhand Embarrassment: other slap-range intruders pay (splash fraction of base coins + flat coin bonuses),
-     * then the full coin multiplier. Each splash is its own grantBattleCoins call so coin-gain triggers fire per drop.
+     * Secondhand Embarrassment: each other slap-range intruder pays the splash fraction of the coins they would drop.
+     * Each splash is its own grantBattleCoins call so coin-gain triggers fire per drop.
      * Returns total coins granted (0 if none).
      */
     applySecondhandEmbarrassmentCoins: function(killedIntruder) {
@@ -328,8 +337,6 @@ let skillEngine = {
         if (!(frac > 0)) {
             return 0;
         }
-        const flat = skillEngine.getKillCoinsFlatBonus();
-        const mult = engine.intruderCoinMultiplier();
         const killedId = killedIntruder && killedIntruder.id;
         let total = 0;
         for (let i = 0; i < data.battle.enemies.length; i++) {
@@ -337,10 +344,12 @@ let skillEngine = {
             if (!e.alive || !e.inRange || e.id === killedId) {
                 continue;
             }
-            const drop = (((e.gain || 1) * frac) + flat) * mult;
+            const storedGain = e.gain !== undefined ? e.gain : 1;
+            const drop = engine.coinsAwardFromIntruderGain(storedGain) * frac;
             if (drop > 0) {
-                engine.noteCoinSplashFlat();
+                engine.noteCoinAwardSample(frac, storedGain);
                 engine.grantBattleCoins(drop);
+                engine.noteSkillExtraCoins("secondhandEmbarrassment", drop);
                 total += drop;
             }
         }
@@ -679,6 +688,7 @@ let skillEngine = {
         if (data.battle) {
             data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + bank;
         }
+        engine.noteSkillExtraCoins("runningTab", bank);
         return bank;
     }
 };

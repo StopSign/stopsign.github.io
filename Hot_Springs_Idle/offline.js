@@ -492,7 +492,6 @@ let offline = {
         const battle = data.battle || {};
         const award0 = runStart && runStart.coinAwardEquiv !== undefined ? runStart.coinAwardEquiv : 0;
         const preFlat0 = runStart && runStart.coinPreFlatGainSum !== undefined ? runStart.coinPreFlatGainSum : 0;
-        const splash0 = runStart && runStart.coinSplashFlats !== undefined ? runStart.coinSplashFlats : 0;
         return {
             durationSec: T,
             coinsPerSec: Math.max(0, (after.runCoins || 0) - runCoins0) / T,
@@ -500,7 +499,6 @@ let offline = {
             killsPerSec: Math.max(0, (after.kills || 0) - kills0) / T,
             awardCallsPerSec: Math.max(0, (battle.coinAwardEquiv || 0) - award0) / T,
             preFlatGainPerSec: Math.max(0, (battle.coinPreFlatGainSum || 0) - preFlat0) / T,
-            splashFlatsPerSec: Math.max(0, (battle.coinSplashFlats || 0) - splash0) / T,
             skillRates: skillRates,
             manaCost: manaCost
         };
@@ -884,8 +882,7 @@ let offline = {
                 kills: (data.battle && data.battle.enemiesKilled) || 0,
                 characterExp: offline.characterExpLifetime(data.battle && data.battle.levelState),
                 coinAwardEquiv: (data.battle && data.battle.coinAwardEquiv) || 0,
-                coinPreFlatGainSum: (data.battle && data.battle.coinPreFlatGainSum) || 0,
-                coinSplashFlats: (data.battle && data.battle.coinSplashFlats) || 0
+                coinPreFlatGainSum: (data.battle && data.battle.coinPreFlatGainSum) || 0
             };
 
             const sampleUsedSec = await offline.advanceBattleSeconds(remainingInChunk / 1000);

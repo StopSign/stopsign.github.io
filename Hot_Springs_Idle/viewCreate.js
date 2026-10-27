@@ -133,10 +133,10 @@ let createView = {
             "tabPane_skills",
             "<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</p>"
             + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot. The Equipped and Library slot columns stay in sync.</p>"
-            + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a specific slot equips into that slot only if it is empty and compatible. Invalid drops do nothing.</p>"
+            + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a compatible slot equips that skill there. If the slot already has a skill, that skill is unequipped. If the dragged skill is already equipped, it moves to the new slot and keeps its level and stars. Invalid drops do nothing.</p>"
             + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
             + "<p><strong>Unequip:</strong> Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept.</p>"
-            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Save stores the current skills and stars. Load replaces the board with that slot after a confirmation. Skills in the loadout keep their level even if their slot changes. Equipped skills that are not in the loadout reset. Loading an empty slot clears the board. If there are fewer slots or stars than the loadout needs, as many as possible are applied.</p>"
+            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Click the selected button again to deselect; none is selected by default. Save stores the current skills and stars. Load replaces the board with that slot. Loading an empty slot clears the equipped skills. While a saved slot is selected, skills and stars that Load would remove are marked red. Clear empties the selected slot and does not change your current skills or stars. Skills in the loadout keep their level even if their slot changes. Equipped skills that are not in the loadout reset. If there are fewer slots or stars than the loadout needs, as many as possible are applied.</p>"
         );
         createView.createInfoButton(
             "tabPane_stats",
@@ -1060,16 +1060,14 @@ let createView = {
         if (compact) {
             filled = `
                 <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
-                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
-                    onclick="events.selectSkillSlotSkill('${viewName}', '${column}', ${index}, event)">
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
                     <div class="skill-equip-slot-talent" id="${idPrefix}_talent"></div>
                 </div>`;
         } else {
             filled = `
                 <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
-                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
-                    onclick="events.selectSkillSlotSkill('${viewName}', '${column}', ${index}, event)">
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
                     <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact skill-equip-slot-stars">
                         <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="event.stopPropagation(); events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
@@ -1085,6 +1083,7 @@ let createView = {
         }
         return `
             <div id="${idPrefix}" class="skill-equip-slot ${catClass}" data-column="${column}" data-index="${index}" data-view="${viewName}"
+                onclick="events.selectSkillSlotSkill('${viewName}', '${column}', ${index}, event)"
                 ondragover="events.skillSlotDragOver(event)" ondragleave="events.skillSlotDragLeave(event)" ondrop="events.skillSlotDrop(event)">
                 <div id="${idPrefix}_empty" class="skill-equip-slot-empty">Empty</div>
                 ${filled}
@@ -1188,6 +1187,7 @@ let createView = {
                 <div id="libSkillInfo_equipError" class="skills-equip-error" style="display:none"></div>
                 <div class="skills-equip-row">
                     <button type="button" id="libSkillInfo_equipBtn" class="tab-button" onclick="events.equipSelectedLibrarySkill()">Equip</button>
+                    <button type="button" id="libSkillInfo_unequipBtn" class="tab-button" style="display:none" onclick="events.unequipSelectedLibrarySkill()">Unequip</button>
                 </div>
             </aside>`;
 
@@ -1224,13 +1224,12 @@ let createView = {
         const sortRadios = `
             <div id="skillSortRadios" class="skill-sort-radios">
                 <div class="skill-sort-row">
-                    <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Sort by Oldest</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Sort by Talent</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Sort Alphabetically</label>
-                </div>
-                <div class="skill-sort-row">
-                    <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Sort by Tips</label>
-                    <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Sort by Grouping</label>
+                    <span class="skill-sort-prefix">Sort by...</span>
+                    <label><input type="radio" name="skillListSort" id="skillSortOldest" value="oldest" checked onchange="events.setSkillListSort('oldest')"> Oldest</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortTalent" value="talent" onchange="events.setSkillListSort('talent')"> Talent</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Alphabetically</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Tips</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Grouping</label>
                 </div>
             </div>`;
 
@@ -1278,11 +1277,11 @@ let createView = {
             "skillInfo_unequipBtn",
             "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
             "libSkillInfo_base_exp", "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
-            "libSkillInfo_equipError", "libSkillInfo_equipBtn",
+            "libSkillInfo_equipError", "libSkillInfo_equipBtn", "libSkillInfo_unequipBtn",
             "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel",
             "skillSubTab_equipped", "skillSubTab_library",
             "skillLoadoutSlots", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4",
-            "skillLoadoutSave", "skillLoadoutLoad"
+            "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear"
         ];
         createView.queueCache.apply(createView, cacheIds);
 
@@ -1319,6 +1318,7 @@ let createView = {
                 `skill_${key}_class_tag`, `skill_${key}_equipped_badge`
             );
         }
+        events.bindSkillInfoDismiss();
     },
     createBattleBuffSlots: function() {
         const row = document.getElementById("playerBuffRow");
@@ -1582,9 +1582,9 @@ let createView = {
             "base_garden_empty",
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
-            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
+            "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
