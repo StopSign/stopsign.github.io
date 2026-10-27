@@ -390,12 +390,36 @@ let events = {
         if (!key) {
             return;
         }
-        const result = skills.unequipSkillByKey(key, true);
+        const result = skills.unequipSkillByKey(key);
         if (!result.ok) {
             view.flashSkillEquipFail(viewData.cached.skillInfo_unequipBtn);
             return;
         }
         data.progress.selectedEquippedSkillKey = "";
+        initialize.calcPlayerStats(false);
+        view.updateSkillsTab();
+    },
+    selectSkillLoadout: function(index) {
+        skills.ensureSkillLoadouts();
+        const idx = Math.floor(Number(index));
+        if (!(idx >= 0 && idx < skills.LOADOUT_COUNT)) {
+            return;
+        }
+        data.progress.selectedSkillLoadout = idx;
+        view.updateSkillLoadoutButtons();
+    },
+    saveSkillLoadout: function() {
+        skills.saveSelectedSkillLoadout();
+        view.updateSkillLoadoutButtons();
+    },
+    loadSkillLoadout: function() {
+        skills.ensureSkillLoadouts();
+        const idx = data.progress.selectedSkillLoadout || 0;
+        const message = skills.skillLoadoutConfirmMessage(idx);
+        if (message && !window.confirm(message)) {
+            return;
+        }
+        skills.applySkillLoadout(idx);
         initialize.calcPlayerStats(false);
         view.updateSkillsTab();
     },

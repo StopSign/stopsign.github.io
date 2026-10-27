@@ -1983,30 +1983,17 @@ let skills = {
     },
 
     SLOT_COLUMNS: ["offense", "defense", "utility", "any"],
-    UNEQUIP_CHARGE_MS: 60 * 60 * 1000,
-    UNEQUIP_CHARGE_MS_DEBUG: 5 * 1000,
-
-    getUnequipChargeMs: function() {
-        if (typeof isDebug !== "undefined" && isDebug) {
-            return skills.UNEQUIP_CHARGE_MS_DEBUG;
-        }
-        return skills.UNEQUIP_CHARGE_MS;
-    },
-
-    DEFAULT_UNEQUIP_CHARGES_MAX: 5,
+    LOADOUT_COUNT: 5,
+    STAR_TYPES: ["bronze", "silver", "gold"],
 
     getDefaultSkillEquip: function() {
-        const max = skills.DEFAULT_UNEQUIP_CHARGES_MAX;
         return {
             slots: {
                 offense: [null],
                 defense: [null],
                 utility: [null],
                 any: []
-            },
-            unequipCharges: max,
-            unequipChargesMax: max,
-            unequipChargeReadyAt: 0
+            }
         };
     },
 
@@ -2032,25 +2019,9 @@ let skills = {
         if (!Array.isArray(eq.slots.any)) {
             eq.slots.any = [];
         }
-        const defaultMax = skills.DEFAULT_UNEQUIP_CHARGES_MAX;
-        if (eq.unequipChargesMax === undefined || eq.unequipChargesMax === null || eq.unequipChargesMax < defaultMax) {
-            const prevMax = eq.unequipChargesMax || 0;
-            const wasFull = eq.unequipCharges !== undefined && eq.unequipCharges !== null && eq.unequipCharges >= prevMax;
-            eq.unequipChargesMax = defaultMax;
-            if (wasFull || eq.unequipCharges === undefined || eq.unequipCharges === null) {
-                eq.unequipCharges = defaultMax;
-                eq.unequipChargeReadyAt = 0;
-            }
-        }
-        if (eq.unequipCharges === undefined || eq.unequipCharges === null) {
-            eq.unequipCharges = eq.unequipChargesMax;
-        }
-        if (eq.unequipCharges > eq.unequipChargesMax) {
-            eq.unequipCharges = eq.unequipChargesMax;
-        }
-        if (eq.unequipChargeReadyAt === undefined || eq.unequipChargeReadyAt === null) {
-            eq.unequipChargeReadyAt = 0;
-        }
+        delete eq.unequipCharges;
+        delete eq.unequipChargesMax;
+        delete eq.unequipChargeReadyAt;
         return eq;
     },
 
@@ -2268,7 +2239,7 @@ let skills = {
         return { ok: false, reason: "full", category: slotCat };
     },
 
-    unequipSkillFromSlot: function(column, index, spendCharge) {
+    unequipSkillFromSlot: function(column, index) {
         const eq = skills.ensureSkillEquip();
         if (!eq) {
             return { ok: false, reason: "invalid" };
@@ -2277,11 +2248,6 @@ let skills = {
         if (!arr || index < 0 || index >= arr.length || !arr[index]) {
             return { ok: false, reason: "empty" };
         }
-        if (spendCharge) {
-            if ((eq.unequipCharges || 0) < 1) {
-                return { ok: false, reason: "nocharge" };
-            }
-        }
         const skillKey = arr[index];
         const skill = data.progress.skills[skillKey];
         arr[index] = null;
@@ -2289,21 +2255,15 @@ let skills = {
             skills.returnSkillStarsToPool(skill);
             skills.resetSkillLevelOnUnequip(skill);
         }
-        if (spendCharge) {
-            eq.unequipCharges = Math.max(0, (eq.unequipCharges || 0) - 1);
-            if (eq.unequipCharges < eq.unequipChargesMax && !eq.unequipChargeReadyAt) {
-                eq.unequipChargeReadyAt = Date.now() + skills.getUnequipChargeMs();
-            }
-        }
         return { ok: true, skillKey: skillKey };
     },
 
-    unequipSkillByKey: function(skillKey, spendCharge) {
+    unequipSkillByKey: function(skillKey) {
         const loc = skills.findSkillEquipSlot(skillKey);
         if (!loc) {
             return { ok: false, reason: "notequipped" };
         }
-        return skills.unequipSkillFromSlot(loc.column, loc.index, spendCharge);
+        return skills.unequipSkillFromSlot(loc.column, loc.index);
     },
 
     canSwapSlots: function(colA, indexA, colB, indexB) {
@@ -2362,29 +2322,297 @@ let skills = {
         return { ok: true };
     },
 
-    tickUnequipCharges: function(now) {
-        const eq = skills.ensureSkillEquip();
-        if (!eq) {
-            return;
+    getSkillDisplayName: function(skillKey) {
+        const skill = data.progress && data.progress.skills && data.progress.skills[skillKey];
+        if (skill && skill.name) {
+            return skill.name;
         }
-        now = now || Date.now();
-        if (eq.unequipCharges >= eq.unequipChargesMax) {
-            eq.unequipCharges = eq.unequipChargesMax;
-            eq.unequipChargeReadyAt = 0;
-            return;
+        const def = skills._byKey[skillKey];
+        return (def && def.name) || skillKey;
+    },
+
+    ensureSkillLoadouts: function() {
+        if (!data.progress) {
+            return null;
         }
-        const chargeMs = skills.getUnequipChargeMs();
-        if (!eq.unequipChargeReadyAt) {
-            eq.unequipChargeReadyAt = now + chargeMs;
-            return;
+        if (!Array.isArray(data.progress.skillLoadouts)) {
+            data.progress.skillLoadouts = [];
         }
-        while (eq.unequipCharges < eq.unequipChargesMax && now >= eq.unequipChargeReadyAt) {
-            eq.unequipCharges++;
-            if (eq.unequipCharges >= eq.unequipChargesMax) {
-                eq.unequipChargeReadyAt = 0;
-                break;
+        const list = data.progress.skillLoadouts;
+        while (list.length < skills.LOADOUT_COUNT) {
+            list.push(null);
+        }
+        if (list.length > skills.LOADOUT_COUNT) {
+            list.length = skills.LOADOUT_COUNT;
+        }
+        for (let i = 0; i < list.length; i++) {
+            const entry = list[i];
+            if (entry == null) {
+                list[i] = null;
+                continue;
             }
-            eq.unequipChargeReadyAt += chargeMs;
+            if (typeof entry !== "object" || !entry.slots || typeof entry.slots !== "object") {
+                list[i] = null;
+            }
+        }
+        let idx = data.progress.selectedSkillLoadout;
+        if (typeof idx !== "number" || !isFinite(idx)) {
+            idx = 0;
+        }
+        idx = Math.floor(idx);
+        if (idx < 0 || idx >= skills.LOADOUT_COUNT) {
+            idx = 0;
+        }
+        data.progress.selectedSkillLoadout = idx;
+        return list;
+    },
+
+    copyStarFlags: function(stars) {
+        return {
+            bronze: !!(stars && stars.bronze),
+            silver: !!(stars && stars.silver),
+            gold: !!(stars && stars.gold)
+        };
+    },
+
+    captureSkillLoadout: function() {
+        const eq = skills.ensureSkillEquip();
+        const slots = {};
+        if (!eq) {
+            return { slots: slots };
+        }
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const arr = eq.slots[col] || [];
+            const saved = [];
+            for (let i = 0; i < arr.length; i++) {
+                const key = arr[i];
+                if (!key) {
+                    saved.push(null);
+                    continue;
+                }
+                const sk = data.progress.skills && data.progress.skills[key];
+                saved.push({
+                    key: key,
+                    stars: skills.copyStarFlags(sk && sk.stars)
+                });
+            }
+            slots[col] = saved;
+        }
+        return { slots: slots };
+    },
+
+    saveSelectedSkillLoadout: function() {
+        const list = skills.ensureSkillLoadouts();
+        if (!list) {
+            return;
+        }
+        list[data.progress.selectedSkillLoadout] = skills.captureSkillLoadout();
+    },
+
+    canUseLoadoutSkill: function(skillKey, column) {
+        if (!skillKey || !skills._byKey[skillKey]) {
+            return false;
+        }
+        if (!data.progress || !data.progress.skills || !data.progress.skills[skillKey]) {
+            return false;
+        }
+        const archives = data.progress.base && data.progress.base.scrollArchives;
+        const unlocked = archives && archives.unlockedSkills;
+        if (!unlocked || !unlocked[skillKey]) {
+            return false;
+        }
+        return skills.canPlaceSkillInColumn(skillKey, column);
+    },
+
+    /** Compact a saved loadout into the slots that exist now. */
+    buildLoadoutPlacement: function(loadout) {
+        const eq = skills.ensureSkillEquip();
+        const inLoad = {};
+        const starByKey = {};
+        const columns = {};
+        const savedSlots = (loadout && loadout.slots) || {};
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const saved = Array.isArray(savedSlots[col]) ? savedSlots[col] : [];
+            for (let i = 0; i < saved.length; i++) {
+                const entry = saved[i];
+                if (!entry || !entry.key || inLoad[entry.key]) {
+                    continue;
+                }
+                inLoad[entry.key] = true;
+                starByKey[entry.key] = skills.copyStarFlags(entry.stars);
+            }
+        }
+        const seen = {};
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const saved = Array.isArray(savedSlots[col]) ? savedSlots[col] : [];
+            const built = [];
+            for (let i = 0; i < saved.length; i++) {
+                const entry = saved[i];
+                if (!entry || !entry.key) {
+                    built.push(null);
+                    continue;
+                }
+                const key = entry.key;
+                if (seen[key] || !skills.canUseLoadoutSkill(key, col)) {
+                    continue;
+                }
+                seen[key] = true;
+                built.push(key);
+            }
+            const limit = (eq && eq.slots[col]) ? eq.slots[col].length : 0;
+            const placed = built.slice(0, limit);
+            while (placed.length < limit) {
+                placed.push(null);
+            }
+            columns[col] = placed;
+        }
+        return { columns: columns, inLoad: inLoad, starByKey: starByKey };
+    },
+
+    loadoutSkillNamesInOrder: function(loadout) {
+        const names = [];
+        const seen = {};
+        const savedSlots = (loadout && loadout.slots) || {};
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const saved = Array.isArray(savedSlots[col]) ? savedSlots[col] : [];
+            for (let i = 0; i < saved.length; i++) {
+                const entry = saved[i];
+                if (!entry || !entry.key || seen[entry.key]) {
+                    continue;
+                }
+                seen[entry.key] = true;
+                names.push(skills.getSkillDisplayName(entry.key));
+            }
+        }
+        return names;
+    },
+
+    describeSkillLoadoutApply: function(index) {
+        const list = skills.ensureSkillLoadouts();
+        const loadout = list ? list[index] : null;
+        const placement = skills.buildLoadoutPlacement(loadout);
+        const inLoadNames = skills.loadoutSkillNamesInOrder(loadout);
+        const resetNames = [];
+        const equipped = skills.getEquippedSkillKeys();
+        for (let i = 0; i < equipped.length; i++) {
+            const key = equipped[i];
+            if (!placement.inLoad[key]) {
+                resetNames.push(skills.getSkillDisplayName(key));
+            }
+        }
+        return {
+            inLoadNames: inLoadNames,
+            resetNames: resetNames,
+            needsConfirm: inLoadNames.length > 0 || resetNames.length > 0
+        };
+    },
+
+    skillLoadoutConfirmMessage: function(index) {
+        const info = skills.describeSkillLoadoutApply(index);
+        if (!info.needsConfirm) {
+            return "";
+        }
+        const lines = ["Load loadout " + (index + 1) + "?"];
+        if (!info.inLoadNames.length) {
+            lines.push("");
+            lines.push("This clears the equipped skills.");
+        } else {
+            lines.push("");
+            lines.push("In this loadout: " + info.inLoadNames.join(", "));
+        }
+        if (info.resetNames.length) {
+            lines.push("");
+            lines.push("Will reset: " + info.resetNames.join(", "));
+        }
+        return lines.join("\n");
+    },
+
+    returnAllAssignedStarsToPool: function() {
+        const sks = data.progress && data.progress.skills;
+        if (!sks) {
+            return;
+        }
+        const keys = Object.keys(sks);
+        for (let i = 0; i < keys.length; i++) {
+            skills.returnSkillStarsToPool(sks[keys[i]]);
+        }
+    },
+
+    applySkillLoadout: function(index) {
+        const list = skills.ensureSkillLoadouts();
+        const eq = skills.ensureSkillEquip();
+        if (!list || !eq) {
+            return;
+        }
+        if (index < 0 || index >= skills.LOADOUT_COUNT) {
+            return;
+        }
+        const placement = skills.buildLoadoutPlacement(list[index]);
+        const equipped = skills.getEquippedSkillKeys();
+        for (let i = 0; i < equipped.length; i++) {
+            const key = equipped[i];
+            if (!placement.inLoad[key]) {
+                skills.unequipSkillByKey(key);
+            }
+        }
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const arr = eq.slots[col];
+            for (let i = 0; i < arr.length; i++) {
+                arr[i] = null;
+            }
+        }
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const col = skills.SLOT_COLUMNS[c];
+            const arr = eq.slots[col];
+            const placed = placement.columns[col] || [];
+            for (let i = 0; i < arr.length; i++) {
+                arr[i] = placed[i] || null;
+            }
+        }
+        skills.returnAllAssignedStarsToPool();
+        let maxRows = 0;
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const len = (eq.slots[skills.SLOT_COLUMNS[c]] || []).length;
+            if (len > maxRows) {
+                maxRows = len;
+            }
+        }
+        for (let row = 0; row < maxRows; row++) {
+            for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+                const col = skills.SLOT_COLUMNS[c];
+                const key = eq.slots[col] && eq.slots[col][row];
+                if (!key) {
+                    continue;
+                }
+                const wanted = placement.starByKey[key] || {};
+                const sk = data.progress.skills && data.progress.skills[key];
+                if (!sk) {
+                    continue;
+                }
+                if (!sk.stars) {
+                    sk.stars = { bronze: false, silver: false, gold: false };
+                }
+                for (let s = 0; s < skills.STAR_TYPES.length; s++) {
+                    const starType = skills.STAR_TYPES[s];
+                    if (!wanted[starType]) {
+                        continue;
+                    }
+                    if ((data.progress.stars[starType] || 0) <= 0) {
+                        continue;
+                    }
+                    data.progress.stars[starType]--;
+                    sk.stars[starType] = true;
+                }
+            }
+        }
+        const selected = data.progress.selectedEquippedSkillKey;
+        if (selected && !skills.isSkillEquipped(selected)) {
+            data.progress.selectedEquippedSkillKey = "";
         }
     },
 
@@ -2601,7 +2829,7 @@ let skills = {
     columnScaledReward: function(column, raw) {
         const v = raw || 0;
         if (column === "defense") {
-            return v * 5;
+            return v * 3;
         }
         if (column === "any") {
             return v * 2;

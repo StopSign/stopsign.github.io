@@ -519,11 +519,10 @@ let initials = {
                     defense: [null],
                     utility: [null],
                     any: []
-                },
-                unequipCharges: 5,
-                unequipChargesMax: 5,
-                unequipChargeReadyAt: 0
+                }
             },
+            skillLoadouts: [null, null, null, null, null],
+            selectedSkillLoadout: 0,
             selectedStatsTab: "combat",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,

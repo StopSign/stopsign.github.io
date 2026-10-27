@@ -135,7 +135,8 @@ let createView = {
             + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot. The Equipped and Library slot columns stay in sync.</p>"
             + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a specific slot equips into that slot only if it is empty and compatible. Invalid drops do nothing.</p>"
             + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
-            + "<p><strong>Unequip:</strong> Costs one Unequip Skill Charge. Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept. Charges refill one every 60 minutes (including while offline).</p>"
+            + "<p><strong>Unequip:</strong> Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept.</p>"
+            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Save stores the current skills and stars. Load replaces the board with that slot after a confirmation. Skills in the loadout keep their level even if their slot changes. Equipped skills that are not in the loadout reset. Loading an empty slot clears the board. If there are fewer slots or stars than the loadout needs, as many as possible are applied.</p>"
         );
         createView.createInfoButton(
             "tabPane_stats",
@@ -1278,8 +1279,10 @@ let createView = {
             "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
             "libSkillInfo_base_exp", "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
             "libSkillInfo_equipError", "libSkillInfo_equipBtn",
-            "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel", "unequipChargesText",
-            "skillSubTab_equipped", "skillSubTab_library"
+            "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel",
+            "skillSubTab_equipped", "skillSubTab_library",
+            "skillLoadoutSlots", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4",
+            "skillLoadoutSave", "skillLoadoutLoad"
         ];
         createView.queueCache.apply(createView, cacheIds);
 
@@ -1581,7 +1584,7 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "unequipChargesText",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );

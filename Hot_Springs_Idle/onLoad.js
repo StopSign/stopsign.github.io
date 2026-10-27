@@ -102,8 +102,8 @@ let onLoad = {
         }
         delete data.progress.selectedSkillDetailKey;
         skills.ensureSkillEquip();
+        skills.ensureSkillLoadouts();
         // Existing saves start with empty slots (do not auto-equip).
-        skills.tickUnequipCharges(Date.now());
     },
 
     handleLoad: function(data, toLoad) {

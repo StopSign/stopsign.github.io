@@ -414,7 +414,7 @@ let view = {
     },
     updateSkillsTab: function() {
         skills.ensureSkillEquip();
-        skills.tickUnequipCharges(Date.now());
+        skills.ensureSkillLoadouts();
         let skillsTabNow = data.progress.selectedSkillsTab || "equipped";
         if (skillsTabNow !== "equipped" && skillsTabNow !== "library") {
             skillsTabNow = "equipped";
@@ -427,8 +427,8 @@ let view = {
             data.progress.selectedLibrarySkillKey = "";
         }
         view.updateSkillSubTabs();
+        view.updateSkillLoadoutButtons();
         view.updateSkillEquipSlots();
-        view.updateUnequipChargesText();
         view.updateSkillsShardSlotProgress();
         const starPool = data.progress.stars;
         const starLine = `<span class="star-bronze">★</span>: ${starPool.bronze} | <span class="star-silver">★</span>: ${starPool.silver} | <span class="star-gold">★</span>: ${starPool.gold}`;
@@ -4577,21 +4577,17 @@ let view = {
         view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)}/${intToString(Math.floor(cost), 1)} Shards until next Skill Slot`);
         view.updateVal("skillsShardSlotProgressFill", `${pct}%`, "style.width");
     },
-    updateUnequipChargesText: function() {
-        const eq = skills.ensureSkillEquip();
-        if (!eq) {
+    updateSkillLoadoutButtons: function() {
+        const loadouts = skills.ensureSkillLoadouts();
+        if (!loadouts) {
             return;
         }
-        let text = `Unequip Skill Charges: ${eq.unequipCharges}/${eq.unequipChargesMax}`;
-        if (eq.unequipCharges < eq.unequipChargesMax && eq.unequipChargeReadyAt) {
-            const msLeft = Math.max(0, eq.unequipChargeReadyAt - Date.now());
-            const totalSec = Math.ceil(msLeft / 1000);
-            const mm = Math.floor(totalSec / 60);
-            const ss = totalSec % 60;
-            const ssStr = ss < 10 ? `0${ss}` : String(ss);
-            text += ` (next in ${mm}:${ssStr})`;
+        const selected = data.progress.selectedSkillLoadout || 0;
+        for (let i = 0; i < skills.LOADOUT_COUNT; i++) {
+            const id = "skillLoadoutBtn_" + i;
+            view.updateVal(id, i === selected ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+            view.updateVal(id, !!loadouts[i], "classList.toggle", "skill-loadout-btn--filled");
         }
-        view.updateVal("unequipChargesText", text);
     },
     columnTalentRewardPhrase: function(column, value) {
         if (column === "offense") {
