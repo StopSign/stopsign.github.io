@@ -253,7 +253,7 @@ let skillHelper = {
             html += `<span class="${stampClass}">${skillHelper.esc(skillHelper.slotLabel(slotCat))}</span>`;
         }
         html += `</div>`;
-        html += `<div class="sh-card-meta"><code>${skillHelper.esc(key)}</code>${skillHelper.esc(maxBit)} · Base Skill Exp: ${skillHelper.esc(initExp)}, Base Talent Exp: ${skillHelper.esc(initTalent)}</div>`;
+        html += `<div class="sh-card-meta"><code>${skillHelper.esc(key)}</code>${skillHelper.esc(maxBit)} · ${skillHelper.esc(def.triggerType || "")} · Base Skill Exp: ${skillHelper.esc(initExp)}, Base Talent Exp: ${skillHelper.esc(initTalent)}</div>`;
         html += `</div>`;
         if (def.shortDescription) {
             html += `<p class="sh-blurb">${skillHelper.esc(def.shortDescription)}</p>`;

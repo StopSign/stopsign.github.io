@@ -625,7 +625,6 @@ let view = {
         }
         audBaseLines.push(`After density + skills: ${roundNearestDecimals(preConSum, 2)}`);
         const finalAud = Math.max(1, Math.ceil(preConSum * conMult * bravadoMultUi));
-        const audMultExtra = finalAud - preConSum;
         const audEffective = preConSum > 0 ? finalAud / preConSum : 1;
         const audMultLines = [];
         if (growthUnlocked || conTotal > 0) {
@@ -635,8 +634,7 @@ let view = {
             const bravadoPct = roundNearestDecimals((bravadoMultUi - 1) * 100, 1);
             audMultLines.push(`Bravado: x${roundNearestDecimals(bravadoMultUi, 2)} (+${bravadoPct}%)`);
         }
-        const audExtraText = audMultExtra > 0 ? ` (+${audMultExtra} Aud)` : "";
-        audMultLines.push(`Total multiplier effect: x${roundNearestDecimals(audEffective, 2)}${audExtraText}`);
+        audMultLines.push(`Total multiplier effect: x${roundNearestDecimals(audEffective, 2)}`);
         const audTipParts = [audBaseLines.join("<br>")];
         if (skillAudLines.length) {
             audTipParts.push(skillAudLines.join("<br>"));
@@ -682,26 +680,12 @@ let view = {
             attackBaseLines.push(`Slow Burn (flat): +${roundNearestDecimals(slowBurnRaw, 2)} after ${sbSecs}s in slap range`);
         }
         attackBaseLines.push(`After density + flats: ${roundNearestDecimals(attackPreBru, 2)}`);
-        let afterAttack = attackPreBru * strMult;
+        // Same path as the Slap line: stored attack already has Brutality on density + Force,
+        // then the other flats get Brutality, then the always-on multipliers.
+        let afterAttack = (p.attackDamage || 0) + (mcRaw + sadismRaw + slowBurnRaw) * strMult;
         const attackMultLines = [];
         if (growthUnlocked || strTotal > 0) {
             attackMultLines.push(`Brutality: x${roundNearestDecimals(strMult, 2)} (+${Math.round(strTotal * (100 / statDiv))}%)`);
-        }
-        if (skills.isSkillEquipped("bitterRivalry")) {
-            const brPct = skills.getSkillEffect("bitterRivalry").damagePercentPerSecond || 0;
-            let brLine = `Bitter Rivalry: +${round2(brPct)}% damage per second an enemy is in slap range`;
-            const brTarget = typeof engine.findIntruderById === "function"
-                ? engine.findIntruderById(data.battle.activeTargetId)
-                : null;
-            if (brTarget && brTarget.alive) {
-                const brSecs = brTarget.bitterRivalrySeconds || 0;
-                const brFactor = 1 + (brPct / 100) * brSecs;
-                brLine += ` (current target x${roundNearestDecimals(brFactor, 2)})`;
-                if (brSecs > 0) {
-                    afterAttack *= brFactor;
-                }
-            }
-            attackMultLines.push(brLine);
         }
         if (skills.isSkillEquipped("highHorse") && typeof engine.isPlayerAtMaxAud === "function" && engine.isPlayerAtMaxAud()) {
             const hhFrac = skills.getSkillEffect("highHorse").damageBonusFraction || 0;
@@ -739,12 +723,28 @@ let view = {
             attackMultLines.push(`Marathon Ego: x${roundNearestDecimals(meFactor, 2)} (+${round2(mePct * tens)}% from ${tens * 10}s)`);
             afterAttack *= meFactor;
         }
-        const atkExtra = afterAttack - attackPreBru;
+        const maliceMult = (typeof engine.getMaliceDamageMultiplier === "function")
+            ? engine.getMaliceDamageMultiplier() : 1;
+        if (maliceMult !== 1) {
+            const malicePct = roundNearestDecimals((maliceMult - 1) * 100, 1);
+            attackMultLines.push(`Malice: x${roundNearestDecimals(maliceMult, 2)} (+${malicePct}%)`);
+            afterAttack *= maliceMult;
+        }
+        const furyMult = (typeof engine.getFuryDamageMultiplier === "function")
+            ? engine.getFuryDamageMultiplier() : 1;
+        if (furyMult !== 1) {
+            const furyPct = roundNearestDecimals((furyMult - 1) * 100, 1);
+            const furyStacks = Math.round((furyMult - 1) * 100);
+            attackMultLines.push(`Fury: x${roundNearestDecimals(furyMult, 2)} (+${furyPct}% from ${furyStacks} ${furyStacks === 1 ? "stack" : "stacks"})`);
+            afterAttack *= furyMult;
+        }
         const atkEffective = attackPreBru > 0 ? afterAttack / attackPreBru : 1;
-        const atkExtraText = Math.abs(atkExtra) >= 0.05 ? ` (${atkExtra > 0 ? "+" : ""}${roundNearestDecimals(atkExtra, 2)} ego dmg)` : "";
-        attackMultLines.push(`Total multiplier effect: x${roundNearestDecimals(atkEffective, 2)}${atkExtraText}`);
+        attackMultLines.push(`Total multiplier effect: x${roundNearestDecimals(atkEffective, 2)}`);
         const attackTip = attackBaseLines.join("<br>") + "<br><br>" + attackMultLines.join("<br>");
-        view.updateVal("statsAttackText", `${roundNearestDecimals(p.attackDamage, 1).toFixed(1)} ego dmg`);
+        const shownAttack = (typeof engine.getDisplayedSlapDamage === "function")
+            ? engine.getDisplayedSlapDamage()
+            : Math.max(1, roundNearestDecimals(afterAttack, 1));
+        view.updateVal("statsAttackText", `${roundNearestDecimals(shownAttack, 1).toFixed(1)} ego dmg`);
         view.updateVal("statsAttackTip", attackTip, "innerHTML");
         const twEff = skills.getSkillEffect("toughness_condescend");
         const tsEff = skills.getSkillEffect("thickSkin");

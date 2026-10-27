@@ -1701,10 +1701,7 @@ let initialize = {
             // Narcissism only boosts the equal recover from the max increase - not extra recovers.
             if (maxRise > 0) {
                 newAud = skillEngine.applyNarcissismToMaxAudCurrentIncrease(newAud, maxRise, maxAud);
-                engine.addSkillExp("narcissism", 1);
-                if (skills.isSkillUnlocked("borrowedGlory")) {
-                    engine.addSkillExp("borrowedGlory", 1);
-                }
+                skills.fireTrigger("onMaxAudIncrease");
             }
             // Additional recovers (Validation, Cornered Ego, Shameless) - not boosted by Narcissism.
             // Flat extra heals are multiplied by Confidence. Equal recover is not.

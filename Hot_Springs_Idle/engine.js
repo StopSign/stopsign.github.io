@@ -59,17 +59,13 @@ let engine = {
         engine.spawnZonesForTime();
         engine.updateIntruderMovement(tickMs);
         engine.updateCurrentZoneInfo();
-        skillEngine.updateShamelessSkillExp(tickMs);
+        skillEngine.applyTriggerTicks(tickMs);
         skillEngine.updateSelfAffirmationsEachSecond(tickMs);
-        skillEngine.updateMainCharacterSkillExp(tickMs);
-        skillEngine.updateSecondhandEmbarrassmentSkillExp(tickMs);
         skillEngine.updateStageSob(tickMs);
-        skillEngine.updateCrowdWorkSkillExp(tickMs);
         skillEngine.updateSeetheEachSecond(tickMs);
         skillEngine.updateApplyTearDropsEachSecond(tickMs);
         skillEngine.updateBitterRivalryInRange(tickMs);
         skillEngine.updateNumbingCrowdsEachSecond(tickMs);
-        skillEngine.updatePeerPressureSkillExp(tickMs);
         skillEngine.updateSlowBurn(tickMs);
         skillEngine.updateRighteousRant(tickMs);
         skillEngine.updateHeckled(tickMs);
@@ -77,7 +73,6 @@ let engine = {
         skillEngine.updateRubbernecking(tickMs);
         skillEngine.updateRunningTab(tickMs);
         skillEngine.updateCombatSkillPeriodics(tickMs);
-        skillEngine.updatePassiveSkillExp(tickMs);
         engine.updateClassEffects(tickMs);
         engine.updateTargeting();
         engine.updatePlayerAttack(tickMs);
@@ -518,7 +513,6 @@ let engine = {
         });
         if (applyExecute) {
             slapDamage *= 1 + executeFrac;
-            engine.addSkillExp("execute", 1);
         }
         if (sneakFrac > 0 && priorHits === 0) {
             slapDamage *= 1 + sneakFrac;
@@ -534,21 +528,14 @@ let engine = {
         target.aud -= slapDamage;
         engine.onSlapImpact(target, slapDamage);
         if (target.hasAttackedPlayer) {
-            engine.addSkillExp("grudge", 1);
+            skills.fireTrigger("onGrudgeHit");
         }
-        engine.addSkillExp("shockValue", skillEngine.getShockValueTriggerExp(slapDamage));
+        skills.fireTrigger("onAttackLogDamage", { damage: slapDamage });
         data.battle.lastPlayerHitIntruderId = target.id;
         data.battle.lastPlayerHitStreak = streak;
         target.timesHitByPlayer = priorHits + 1;
-        if (skills.isSkillUnlocked("overkill")) {
-            const over = Math.max(0, slapDamage - audBeforeSlap);
-            engine.addSkillExp("overkill", Math.sqrt(over));
-        }
-        if (sneakFrac > 0 && priorHits === 0) {
-            engine.addSkillExp("sneak_attack", 1);
-        }
-        if (exploitStep > 0 && priorHits > 0) {
-            engine.addSkillExp("exploit", 1);
+        if (priorHits === 0) {
+            skills.fireTrigger("onFirstHit");
         }
         const cd = engine.cooldownAfterOutrageSpend(engine.getEffectiveSlapCooldownMs(), target);
         p.attackTimerMs = cd + Math.min(0, p.attackTimerMs);
@@ -556,17 +543,16 @@ let engine = {
             if (cls === "condescend") engine.addClassBarProgress("A", 100);
             if (cls === "mock") engine.addClassBarProgress("A", 100);
         } else {
-            engine.addSkillExp("cleave", 1);
+            skills.fireTrigger("onPowerStrike");
             skillEngine.applyCondescendCleave(target, slapDamage);
         }
-        engine.addSkillExp("force", 1);
-        engine.addSkillExp("alacrity", 1);
+        skills.fireTrigger("onAttack");
+        skills.fireTrigger("onSlap");
         const pickpocketBase = skills.getSkillEffect("pickpocket").attackCoins || 0;
         const pickpocketCoins = pickpocketBase * engine.intruderCoinMultiplier();
         if (pickpocketCoins > 0) {
             engine.grantBattleCoins(pickpocketCoins);
         }
-        engine.addSkillExp("pickpocket", 1);
         if (target.aud <= 0) {
             target.aud = 0;
             target.alive = false;
@@ -670,7 +656,7 @@ let engine = {
                 if ((data.progress.currentClassKey || "none") === "condescend" && (data.battle.classPowerB || 0) >= 1000) {
                     data.battle.classPowerB -= 1000;
                     incoming *= 0.5;
-                    engine.addSkillExp("second_wind", 1);
+                    skills.fireTrigger("onBlock");
                     const swEff = skills.getSkillEffect("second_wind");
                     const secondWindHeal = swEff.blockHeal || 0;
                     if (secondWindHeal > 0) {
@@ -702,12 +688,12 @@ let engine = {
                         engine.addDesensitizedStack(ms);
                     }
                 }
-                engine.addSkillExp("brokenRecord", 1);
+                skills.fireTrigger("onIntruderAttack");
                 if ((intruder.playerAttackCount || 0) >= 2) {
-                    engine.addSkillExp("insultFatigue", 1);
+                    skills.fireTrigger("onIntruderAttackAgain");
                 }
                 if (damageApplied) {
-                    engine.addSkillExp("temper", 1);
+                    skills.fireTrigger("onTakeDamage");
                     if (skills.isSkillUnlocked("temper")) {
                         const tEff = skills.getSkillEffect("temper");
                         const maliceAmt = tEff.malicePerLevel || 0;
@@ -715,19 +701,12 @@ let engine = {
                             engine.addMalice(maliceAmt);
                         }
                     }
-                }
-                engine.addSkillExp("aboveItAll", 1);
-                if (damageApplied) {
-                    engine.addSkillExp("toughness_condescend", 1);
-                    engine.addSkillExp("thorns", 1);
-                    engine.addSkillExp("thickSkin", 1);
                     if (skills.isSkillUnlocked("hotTake")) {
                         const htEff = skills.getSkillEffect("hotTake");
                         const outrageAmt = htEff.outragePerHit || 0;
                         if (outrageAmt > 0) {
                             engine.addOutrage(outrageAmt);
                         }
-                        engine.addSkillExp("hotTake", 1);
                     }
                     if (skills.isSkillUnlocked("sobStory")) {
                         const ssEff = skills.getSkillEffect("sobStory");
@@ -735,7 +714,6 @@ let engine = {
                         if (clout > 0) {
                             engine.addCloutStacks(clout);
                         }
-                        engine.addSkillExp("sobStory", 1);
                     }
                     if (skills.isSkillUnlocked("socialArmor")) {
                         const closeCount = engine.countVisibleIntrudersCloserThan(200);
@@ -745,7 +723,6 @@ let engine = {
                             if (clout > 0) {
                                 engine.addCloutStacks(clout);
                             }
-                            engine.addSkillExp("socialArmor", 0.5 * closeCount);
                         }
                     }
                 }
@@ -890,28 +867,26 @@ let engine = {
         }
         data.battle.enemiesKilled++;
         const shardDrop = engine.trySkillShardDropOnKill(intruder);
-        engine.addSkillExp("experienceHog", 1);
-        engine.addSkillExp("nickelAndDime", 1);
-        engine.addSkillExp("validation", 1);
+        skills.fireTrigger("onKill");
         if (skills.isSkillUnlocked("publicApology")) {
             const paEff = skills.getSkillEffect("publicApology");
             const heal = paEff.audPerKill || 0;
             if (heal > 0) {
                 engine.grantPlayerCurrentAudGain(heal * engine.getConfidenceMultiplier(), "publicApology");
             }
-            engine.addSkillExp("publicApology", 1);
         }
-        if (skills.isSkillUnlocked("bloodRush") && engine.isPlayerAboveHalfAud()) {
-            const brEff = skills.getSkillEffect("bloodRush");
-            const maliceAmt = brEff.malicePerLevel || 0;
-            if (maliceAmt > 0) {
-                engine.addMalice(maliceAmt);
+        if (engine.isPlayerAboveHalfAud()) {
+            skills.fireTrigger("onKillAboveHalf");
+            if (skills.isSkillUnlocked("bloodRush")) {
+                const brEff = skills.getSkillEffect("bloodRush");
+                const maliceAmt = brEff.malicePerLevel || 0;
+                if (maliceAmt > 0) {
+                    engine.addMalice(maliceAmt);
+                }
             }
-            engine.addSkillExp("bloodRush", 1);
         }
-        const overkillDamage = (opts && opts.overkillDamage) ? opts.overkillDamage : 0;
-        const sadismExp = overkillDamage > 0 ? Math.log10(overkillDamage) : 0;
-        engine.addSkillExp("sadism", Math.max(sadismExp, 1));
+        const overkillDamage = (opts && opts.overkillDamage) || 0;
+        skills.fireTrigger("onKillLogOverkill", { overkillDamage: overkillDamage });
         // Validation: +audPerKill max Aud per kill (via calcPlayerStats). When that max rises, additionally
         // heal equal to Validation level. Equal recover already grants that max-rise amount, so pass the
         // rest as extraCurrentOnMaxRise (not boosted by Narcissism).
@@ -1006,7 +981,7 @@ let engine = {
         return baseCoinsPart * engine.intruderCoinMultiplier();
     },
     /**
-     * Award coins and grant Windfall Swagger / Extortion / Retail Therapy 1 skill exp when amount > 0.
+     * Award coins and grant 0.5 skill exp to coin-gain triggers when amount > 0.
      * Retail Therapy also adds its Desensitized stack on each grant.
      * opts.countRunKills (default true): add to battle runCoinsFromKills.
      */
@@ -1020,9 +995,7 @@ let engine = {
         if (o.countRunKills !== false && data.battle) {
             data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + gain;
         }
-        engine.addSkillExp("windfallSwagger", 1);
-        engine.addSkillExp("extortion", 1);
-        engine.addSkillExp("retailTherapy", 1);
+        skills.fireTrigger("onCoins");
         if (skills.isSkillUnlocked("retailTherapy")) {
             const rtEff = skills.getSkillEffect("retailTherapy");
             const desMs = rtEff.desensitizedMsPerLevel || 0;
@@ -1175,13 +1148,7 @@ let engine = {
                     ls.unassignedPoints++;
                 }
             }
-            engine.addSkillExp("adaptation", 2);
-            engine.addSkillExp("savageLessons", 2);
-            engine.addSkillExp("soulSearching", 2);
-            engine.addSkillExp("bravado", 2);
-            engine.addSkillExp("paddingResume", 2);
-            engine.addSkillExp("hindsight", 2);
-            engine.addSkillExp("studyGroup", 2);
+            skills.fireTrigger("onCloneLevel");
             if (skills.isSkillUnlocked("levelHeaded")) {
                 const lhEff = skills.getSkillEffect("levelHeaded");
                 const desMs = lhEff.desensitizedMsPerLevel || 0;
@@ -1190,7 +1157,6 @@ let engine = {
                         engine.addDesensitizedStack(desMs);
                     }
                 }
-                engine.addSkillExp("levelHeaded", 2);
             }
             initialize.calcPlayerStats(false);
         }
@@ -1450,6 +1416,7 @@ let engine = {
     getDisplayedSlapDamage: function() {
         let dmg = data.battle.player.attackDamage || 0;
         dmg = engine.applyCombatOutgoingDamage(dmg, null, { consumeFury: false });
+        dmg *= engine.getFuryDamageMultiplier();
         return Math.max(1, roundNearestDecimals(dmg, 1));
     },
     getDisplayedSandalDamage: function() {
@@ -2754,32 +2721,24 @@ let engine = {
         const audBeforeSandal = rt.aud;
         rt.aud -= sandalDamage;
         if (rt.hasAttackedPlayer) {
-            engine.addSkillExp("grudge", 1);
+            skills.fireTrigger("onGrudgeHit");
         }
-        engine.addSkillExp("shockValue", skillEngine.getShockValueTriggerExp(sandalDamage));
+        skills.fireTrigger("onAttackLogDamage", { damage: sandalDamage });
         data.battle.lastPlayerHitIntruderId = rt.id;
         data.battle.lastPlayerHitStreak = streak;
         rt.timesHitByPlayer = priorHits + 1;
-        if (skills.isSkillUnlocked("overkill")) {
-            const overR = Math.max(0, sandalDamage - audBeforeSandal);
-            engine.addSkillExp("overkill", Math.sqrt(overR));
-        }
-        if (sneakFracR > 0 && priorHits === 0) {
-            engine.addSkillExp("sneak_attack", 1);
-        }
-        if (exploitStepR > 0 && priorHits > 0) {
-            engine.addSkillExp("exploit", 1);
+        if (priorHits === 0) {
+            skills.fireTrigger("onFirstHit");
         }
         const imEff = skills.getSkillEffect("impact");
         const impactTravel = imEff.knockbackTravelSeconds || 0;
+        const battleHeight = viewData.layout.battlefieldHeightPx || 500;
+        const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
+        const line300FtY = playerTopY - 300;
+        if ((rt.yPx + rt.sizePx) >= line300FtY) {
+            skills.fireTrigger("onSandalUpperHalf");
+        }
         if (impactTravel > 0) {
-            const battleHeight = viewData.layout.battlefieldHeightPx || 500;
-            const playerTopY = viewData.layout.playerTopPx || (battleHeight - 65);
-            const line300FtY = playerTopY - 300;
-            const intruderBottomPast300 = (rt.yPx + rt.sizePx) >= line300FtY;
-            if (intruderBottomPast300) {
-                engine.addSkillExp("impact", 1);
-            }
             const knockbackPx = rt.speedPxPerSecond * impactTravel;
             rt.yPx = Math.max(-rt.sizePx, rt.yPx - knockbackPx);
             rt.inRange = false;
@@ -2791,14 +2750,11 @@ let engine = {
                 const audBeforeT2 = t2.aud;
                 t2.aud -= sandalDamage;
                 engine.enqueueSandalLineFx(t2);
-                engine.addSkillExp("shockValue", skillEngine.getShockValueTriggerExp(sandalDamage));
+                skills.fireTrigger("onAttackLogDamage", { damage: sandalDamage });
                 if (t2.hasAttackedPlayer) {
-                    engine.addSkillExp("grudge", 1);
+                    skills.fireTrigger("onGrudgeHit");
                 }
                 if (t2.aud <= 0) {
-                    if (skills.isSkillUnlocked("overkill")) {
-                        engine.addSkillExp("overkill", Math.sqrt(Math.max(0, sandalDamage - audBeforeT2)));
-                    }
                     t2.aud = 0;
                     t2.alive = false;
                     if (data.battle.activeTargetId === t2.id) data.battle.activeTargetId = null;
@@ -2807,7 +2763,7 @@ let engine = {
                         __OVERKILL__BoostKind: "sandal",
                         overkillDamage: Math.max(0, sandalDamage - audBeforeT2)
                     });
-                    engine.addSkillExp("longshot", 1);
+                    skills.fireTrigger("onSandalKill");
                 }
             }
         }
@@ -2817,8 +2773,7 @@ let engine = {
         if (cls === "mock") {
             engine.addClassBarProgress("A", 200);
         }
-        engine.addSkillExp("force", 1);
-        engine.addSkillExp("alacrity", 1);
+        skills.fireTrigger("onAttack");
         if (rt.aud <= 0) {
             rt.aud = 0;
             rt.alive = false;
@@ -2830,7 +2785,7 @@ let engine = {
                 __OVERKILL__BoostKind: "sandal",
                 overkillDamage: Math.max(0, sandalDamage - audBeforeSandal)
             });
-            engine.addSkillExp("longshot", 1);
+            skills.fireTrigger("onSandalKill");
         }
     },
     removeIntruderFromSlapQueue: function(intruderId) {
@@ -2912,21 +2867,7 @@ let engine = {
         const def = skills._byKey[skill.key];
         const cat = def && def.category ? def.category : "combat";
         if (cat === "combat" || cat === "class") {
-            if (skill.key !== "echoChamber") {
-                engine.addSkillExp("echoChamber", 0.5);
-            }
-            if (skill.key !== "recognition") {
-                engine.addSkillExp("recognition", 0.5);
-            }
-            if (skill.key !== "reflection") {
-                engine.addSkillExp("reflection", 0.5);
-            }
-            if (skill.key !== "mountingEgo") {
-                engine.addSkillExp("mountingEgo", 0.5);
-            }
-            if (skill.key !== "vicarious") {
-                engine.addSkillExp("vicarious", 0.5);
-            }
+            skills.fireTrigger("onOtherSkillLevel", { excludeKey: skill.key });
         }
         if (skill.key === "recognition" && skills.isSkillUnlocked("recognition")) {
             const recEff = skills.getSkillEffect("recognition");

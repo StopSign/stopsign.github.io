@@ -3,40 +3,43 @@ let skillEngine = {
         const e = skills.getSkillEffect("alacrity");
         return e.effectiveLevel || 0;
     },
-    /** Shameless skill exp: 1 exp every 5s of combat time. */
-    updateShamelessSkillExp: function(tickMs) {
-        if (!skills.isSkillUnlocked("shameless")) {
-            return;
-        }
-        const dt = tickMs * engine.getBattleTimeRateMultiplier();
-        if (data.battle.shamelessExpAccMs === undefined || data.battle.shamelessExpAccMs === null) {
-            data.battle.shamelessExpAccMs = 0;
-        }
-        data.battle.shamelessExpAccMs += dt;
-        while (data.battle.shamelessExpAccMs >= 5000) {
-            data.battle.shamelessExpAccMs -= 5000;
-            engine.addSkillExp("shameless", 1);
+    /** Advance every clocked trigger and fire every continuous trigger once. */
+    applyTriggerTicks: function(tickMs) {
+        const names = Object.keys(SKILL_TRIGGER_TYPES);
+        for (let i = 0; i < names.length; i++) {
+            const name = names[i];
+            const def = SKILL_TRIGGER_TYPES[name];
+            if (def.periodMs) {
+                skillEngine.advanceTriggerPeriod(name, def, tickMs);
+            } else if (typeof def.tick === "function") {
+                if (!skills.anyEquipped(name)) {
+                    continue;
+                }
+                skills.fireTrigger(name, def.tick(tickMs));
+            }
         }
     },
-    updateMainCharacterSkillExp: function(tickMs) {
-        if (!skills.isSkillUnlocked("mainCharacter")) {
+    advanceTriggerPeriod: function(name, def, tickMs) {
+        if (typeof def.advanceWhen === "function" && !def.advanceWhen()) {
             return;
         }
-        const visible = engine.countVisibleIntruders();
-        if (visible <= 0) {
-            return;
+        const key = "triggerAccMs_" + name;
+        if (data.battle[key] === undefined || data.battle[key] === null) {
+            data.battle[key] = 0;
         }
-        engine.addSkillExp("mainCharacter", 0.25 * visible * (tickMs / 1000));
-    },
-    updateSecondhandEmbarrassmentSkillExp: function(tickMs) {
-        if (!skills.isSkillUnlocked("secondhandEmbarrassment")) {
-            return;
+        const step = def.useBattleTime ? tickMs * engine.getBattleTimeRateMultiplier() : tickMs;
+        data.battle[key] += step;
+        while (data.battle[key] >= def.periodMs) {
+            data.battle[key] -= def.periodMs;
+            if (!skills.anyEquipped(name)) {
+                continue;
+            }
+            if (typeof def.ready === "function" && !def.ready()) {
+                continue;
+            }
+            const ctx = typeof def.context === "function" ? def.context() : {};
+            skills.fireTrigger(name, ctx);
         }
-        const visible = engine.countVisibleIntruders();
-        if (visible <= 0) {
-            return;
-        }
-        engine.addSkillExp("secondhandEmbarrassment", 0.25 * visible * (tickMs / 1000));
     },
     updateStageSob: function(tickMs) {
         if (!skills.isSkillUnlocked("stageSob")) {
@@ -47,21 +50,10 @@ let skillEngine = {
             return;
         }
         const sec = tickMs / 1000;
-        engine.addSkillExp("stageSob", 0.25 * visible * sec);
         const per = skills.getSkillEffect("stageSob").cloutPerVisible || 0;
         if (per > 0) {
             engine.addCloutStacks(per * visible * sec);
         }
-    },
-    updateCrowdWorkSkillExp: function(tickMs) {
-        if (!skills.isSkillUnlocked("crowdWork")) {
-            return;
-        }
-        const visible = engine.countVisibleIntruders();
-        if (visible <= 0) {
-            return;
-        }
-        engine.addSkillExp("crowdWork", 0.25 * visible * (tickMs / 1000));
     },
     updateSeetheEachSecond: function(tickMs) {
         if (!skills.isSkillUnlocked("seethe")) {
@@ -71,7 +63,6 @@ let skillEngine = {
         if (farCount <= 0) {
             return;
         }
-        engine.addSkillExp("seethe", 0.5 * farCount * (tickMs / 1000));
         if (data.battle.seetheSecondAccMs === undefined || data.battle.seetheSecondAccMs === null) {
             data.battle.seetheSecondAccMs = 0;
         }
@@ -103,7 +94,6 @@ let skillEngine = {
             if (ms > 0) {
                 engine.addFakeTearsMs(ms);
             }
-            engine.addSkillExp("applyTearDrops", 1);
         }
     },
     updateBitterRivalryInRange: function(tickMs) {
@@ -111,21 +101,16 @@ let skillEngine = {
             return;
         }
         const enemies = data.battle.enemies || [];
-        let inSlap = 0;
         for (let i = 0; i < enemies.length; i++) {
             const e = enemies[i];
             if (!e.alive || !e.inRange) {
                 continue;
             }
-            inSlap++;
             e.bitterRivalryInRangeAccMs = (e.bitterRivalryInRangeAccMs || 0) + tickMs;
             while (e.bitterRivalryInRangeAccMs >= 1000) {
                 e.bitterRivalryInRangeAccMs -= 1000;
                 e.bitterRivalrySeconds = (e.bitterRivalrySeconds || 0) + 1;
             }
-        }
-        if (inSlap > 0) {
-            engine.addSkillExp("bitterRivalry", 0.5 * inSlap * (tickMs / 1000));
         }
     },
     updateNumbingCrowdsEachSecond: function(tickMs) {
@@ -136,7 +121,6 @@ let skillEngine = {
         if (closeCount <= 0) {
             return;
         }
-        engine.addSkillExp("numbingCrowds", 0.5 * closeCount * (tickMs / 1000));
         if (data.battle.numbingCrowdsSecondAccMs === undefined || data.battle.numbingCrowdsSecondAccMs === null) {
             data.battle.numbingCrowdsSecondAccMs = 0;
         }
@@ -150,23 +134,9 @@ let skillEngine = {
             }
         }
     },
-    updatePeerPressureSkillExp: function(tickMs) {
-        if (!skills.isSkillUnlocked("peerPressure")) {
-            return;
-        }
-        const closeCount = engine.countVisibleIntrudersCloserThan(200);
-        if (closeCount <= 0) {
-            return;
-        }
-        engine.addSkillExp("peerPressure", 0.5 * closeCount * (tickMs / 1000));
-    },
     updateSlowBurn: function(tickMs) {
         if (!skills.isSkillUnlocked("slowBurn")) {
             return;
-        }
-        const closeCount = engine.countVisibleIntrudersCloserThan(200);
-        if (closeCount > 0) {
-            engine.addSkillExp("slowBurn", 0.5 * closeCount * (tickMs / 1000));
         }
         if (!engine.anyIntruderInSlapRange()) {
             data.battle.slowBurnSeconds = 0;
@@ -206,11 +176,8 @@ let skillEngine = {
                 if (regen > 0) {
                     engine.grantPlayerCurrentAudGain(regen * engine.getConfidenceMultiplier(), "walkingItOff");
                 }
-                engine.addSkillExp("walkingItOff", 1);
             }
             if (atMax) {
-                engine.addSkillExp("highHorse", 1);
-                engine.addSkillExp("simmer", 1);
                 if (skills.isSkillUnlocked("simmer")) {
                     const simEff = skills.getSkillEffect("simmer");
                     const outrageAmt = simEff.outragePerSecond || 0;
@@ -218,15 +185,11 @@ let skillEngine = {
                         engine.addOutrage(outrageAmt);
                     }
                 }
-            } else {
-                engine.addSkillExp("underdog", 1);
-                engine.addSkillExp("imposterSyndrome", 1);
-                if (skills.isSkillUnlocked("imposterSyndrome")) {
-                    const isEff = skills.getSkillEffect("imposterSyndrome");
-                    const maliceAmt = isEff.malicePerLevel || 0;
-                    if (maliceAmt > 0) {
-                        engine.addMalice(maliceAmt);
-                    }
+            } else if (skills.isSkillUnlocked("imposterSyndrome")) {
+                const isEff = skills.getSkillEffect("imposterSyndrome");
+                const maliceAmt = isEff.malicePerLevel || 0;
+                if (maliceAmt > 0) {
+                    engine.addMalice(maliceAmt);
                 }
             }
             if (atMax && skills.isSkillUnlocked("stoic")) {
@@ -235,7 +198,6 @@ let skillEngine = {
                 if (ms > 0) {
                     engine.addDesensitizedStack(ms);
                 }
-                engine.addSkillExp("stoic", 1);
             }
             if (atMax && skills.isSkillUnlocked("brandRecognition")) {
                 const brEff = skills.getSkillEffect("brandRecognition");
@@ -243,12 +205,7 @@ let skillEngine = {
                 if (clout > 0) {
                     engine.addCloutStacks(clout);
                 }
-                engine.addSkillExp("brandRecognition", 1);
             }
-        });
-
-        skillEngine.advanceBattleAccMs("combatSkillFiveSecondAccMs", tickMs, 5000, function() {
-            engine.addSkillExp("marathonEgo", 1);
         });
     },
     trySecondWindRestore: function() {
@@ -269,7 +226,6 @@ let skillEngine = {
         engine.grantPlayerCurrentAudGain(heal, "secondWind");
     },
     onPlayerTookDamage: function() {
-        engine.addSkillExp("secondWind", 1);
         skillEngine.trySecondWindRestore();
         if (skills.isSkillUnlocked("thinIce")) {
             const iceEff = skills.getSkillEffect("thinIce");
@@ -277,9 +233,7 @@ let skillEngine = {
             if (iceFury > 0) {
                 engine.addFuryStacks(iceFury);
             }
-            engine.addSkillExp("thinIce", 1);
         }
-        engine.addSkillExp("stiffUpperLip", 1);
     },
     updateSelfAffirmationsEachSecond: function(tickMs) {
         if (data.battle.selfAffirmationsSecondAccMs === undefined) {
@@ -288,37 +242,11 @@ let skillEngine = {
         data.battle.selfAffirmationsSecondAccMs += tickMs;
         while (data.battle.selfAffirmationsSecondAccMs >= 1000) {
             data.battle.selfAffirmationsSecondAccMs -= 1000;
-            const p = data.battle.player;
             const rEff = skills.getSkillEffect("selfAffirmations");
             const regen = rEff.audPerSec || 0;
             if (regen > 0) {
                 engine.grantPlayerCurrentAudGain(regen * engine.getConfidenceMultiplier(), "selfAffirmations");
             }
-            const mx = Math.max(1, p.maxAud || 1);
-            if (p.aud < mx) {
-                engine.addSkillExp("selfAffirmations", 1);
-            }
-            if (skills.isSkillUnlocked("corneredEgo")) {
-                if (p.aud < mx) {
-                    engine.addSkillExp("corneredEgo", 1);
-                }
-            }
-        }
-    },
-    updatePassiveSkillExp: function(tickMs) {
-        const sec = tickMs / 1000;
-        if (!engine.anyIntruderInSlapRange()) {
-            engine.addSkillExp("preparation", sec);
-        }
-        let inSlap = 0;
-        for (let i = 0; i < data.battle.enemies.length; i++) {
-            const e = data.battle.enemies[i];
-            if (e.alive && e.inRange) {
-                inSlap++;
-            }
-        }
-        if (inSlap > 1) {
-            engine.addSkillExp("adrenaline", (inSlap - 1) * sec);
         }
     },
     applyOverkillAttackProgressAfterKill: function(kind) {
@@ -539,8 +467,7 @@ let skillEngine = {
     },
     addCombatOutgoingHitSkillExp: function(target, priorHits) {
         if (priorHits > 0) {
-            engine.addSkillExp("repeatOffender", 1);
-            engine.addSkillExp("closingArgument", 1);
+            skills.fireTrigger("onRepeatHit");
         }
     },
     applyGrudgeOutgoingMultiplier: function(damage, target) {
@@ -632,9 +559,6 @@ let skillEngine = {
             const audBeforeSplash = e.aud;
             e.aud -= splash;
             if (e.aud <= 0) {
-                if (skills.isSkillUnlocked("overkill")) {
-                    engine.addSkillExp("overkill", Math.sqrt(Math.max(0, splash - audBeforeSplash)));
-                }
                 e.aud = 0;
                 e.alive = false;
                 if (data.battle.activeTargetId === e.id) {
@@ -665,7 +589,6 @@ let skillEngine = {
             if (amt > 0) {
                 engine.addOutrage(amt);
             }
-            engine.addSkillExp("righteousRant", 1);
         }
     },
     updateHeckled: function(tickMs) {
@@ -677,7 +600,6 @@ let skillEngine = {
             return;
         }
         const sec = tickMs / 1000;
-        engine.addSkillExp("heckled", 0.5 * closeCount * sec);
         const per = skills.getSkillEffect("heckled").outragePerEnemy || 0;
         if (per > 0) {
             engine.addOutrage(per * closeCount * sec);
@@ -698,10 +620,6 @@ let skillEngine = {
             return;
         }
         const sec = tickMs / 1000;
-        const closeCount = engine.countVisibleIntrudersCloserThan(200);
-        if (closeCount > 0) {
-            engine.addSkillExp("rubbernecking", 0.5 * closeCount * sec);
-        }
         const frac = skills.getSkillEffect("rubbernecking").cloneExpFractionPerSec || 0;
         if (!(frac > 0) || !(sec > 0)) {
             return;
@@ -731,10 +649,6 @@ let skillEngine = {
             return;
         }
         const sec = tickMs / 1000;
-        const closeCount = engine.countVisibleIntrudersCloserThan(200);
-        if (closeCount > 0) {
-            engine.addSkillExp("runningTab", 0.5 * closeCount * sec);
-        }
         const frac = skills.getSkillEffect("runningTab").coinFractionPerSec || 0;
         if (!(frac > 0) || !(sec > 0)) {
             return;
@@ -766,9 +680,5 @@ let skillEngine = {
             data.battle.runCoinsFromKills = (data.battle.runCoinsFromKills || 0) + bank;
         }
         return bank;
-    },
-    getShockValueTriggerExp: function(egoDamage) {
-        const dmg = Math.max(0, egoDamage || 0);
-        return Math.max(Math.log10(dmg), 1);
-    },
+    }
 };
