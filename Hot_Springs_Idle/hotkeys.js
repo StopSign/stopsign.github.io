@@ -16,6 +16,11 @@ document.addEventListener("keydown", function(e) {
         return;
     }
 
+    if (code === "Escape" && typeof viewData !== "undefined" && viewData.packOverlayOpen) {
+        events.closePackOverlay();
+        return;
+    }
+
     keysPressed[code] = true;
     keysPressed['shift'] = e.shiftKey;
 
@@ -26,9 +31,6 @@ document.addEventListener("keydown", function(e) {
 
     if (code === 'Space') {
         if (typeof isDebug === "undefined" || !isDebug) {
-            return;
-        }
-        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
             return;
         }
         data.gameSettings.stop = !data.gameSettings.stop;

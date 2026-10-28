@@ -238,7 +238,7 @@ let createView = {
                 return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span></span>`;
             }
             if (siteKey === "scrollArchives") {
-                return `<span id="${id}_worker_prod_text">Researchers: <span id="${id}_wpt_researchers"></span> | Research speed: <span id="${id}_wpt_speed"></span>/s<span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>x from inspiration)</span><br>Research: <span id="${id}_wpt_progress"></span> / <span id="${id}_wpt_required"></span> · ETA: <span id="${id}_wpt_eta"></span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span><span id="${id}_wpt_choose_wrap" style="display:none"><br>Researches to choose: <span id="${id}_wpt_choose"></span></span></span>`;
+                return `<span id="${id}_worker_prod_text">Inscribers: <span id="${id}_wpt_researchers"></span> | Inscribe Speed: <span id="${id}_wpt_speed"></span>/s | next <span id="${id}_wpt_next_name"></span> ETA: <span id="${id}_wpt_next_eta"></span><span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>x from inspiration)</span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span></span>`;
             }
             if (siteKey === "bonfire") {
                 return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span> | Okami speed: <span id="${id}_wpt_okami_speed"></span><br>Heat: <span id="${id}_wpt_heat"></span> / <span id="${id}_wpt_heat_next"></span> | Mana Gain Bonus: <span id="${id}_wpt_heat_bonus"></span></span>`;
@@ -409,18 +409,6 @@ let createView = {
             </div>`;
         };
         const htmlShrinePanel = function() {
-            let classBtns = "";
-            for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
-                const ck = bonfireClassOrder[ci];
-                const d = bonfire.getClassDef(ck);
-                classBtns += `<button type="button" id="shrine_class_btn_${ck}" class="shrine-class-btn" onclick="events.selectShrineClass('${ck}')"><img class="bonfire-pick-img" src="${d.image}" alt="" draggable="false"><span class="bonfire-pick-label">${d.shortLabel}</span></button>`;
-            }
-            const commonImg = "img/common.svg";
-            const rareImg = "img/rare.svg";
-            const epicImg = "img/epic.svg";
-            const shrineLevelPacks = engine.shrineLevelMilestonePacks.map(function(rarity) { return `img/${rarity}.svg`; });
-            const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
-            const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
             return `
                 <div class="base-row muted-text">Karma/s = (total talent levels x star score x total spirit levels x Okami level x Okami tails) / 10,000,000. Star score is bronze + 2xsilver + 4xgold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
@@ -428,43 +416,66 @@ let createView = {
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span></div>
                 </div>
+                ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
+            `;
+        };
+        const htmlCardsPackSection = function() {
+            const commonImg = "img/common.svg";
+            const rareImg = "img/rare.svg";
+            const epicImg = "img/epic.svg";
+            const shrineLevelPacks = engine.shrineLevelMilestonePacks.map(function(rarity) { return `img/${rarity}.svg`; });
+            const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
+            const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
+            return `
                 <div id="shrinePacksSection" class="shrine-packs-section">
                     <div id="shrinePackStrip" class="shrine-pack-strip">
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${commonImg}" alt="" draggable="false"> Common Packs: <span id="shrinePackCommonCount">0</span></span>
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${rareImg}" alt="" draggable="false"> Rare Packs: <span id="shrinePackRareCount">0</span></span>
                         <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${epicImg}" alt="" draggable="false"> Epic Packs: <span id="shrinePackEpicCount">0</span></span>
                     </div>
+                    <div class="base-row shrine-open-packs-row">
+                        <button type="button" id="shrineOpenPacksBtn" class="tab-button" onclick="events.openOrResumePacks()" disabled>Open Packs</button>
+                    </div>
                     <div id="shrineMilestonesList" class="shrine-milestones-list">
                         ${htmlShrineMilestoneHeading("Capped Milestones", false)}
                         ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
-                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
                         ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
-                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
                         ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
                         ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", commonImg)}
-                        ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
                         ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
                         ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
                         ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
                         ${htmlShrineMilestoneHeading("One Time Milestones", true)}
+                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
+                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
+                        ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
                         ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
-                <div id="shrinePrestigeHeading">
-                    <div class="base-upgrade-divider"></div>
-                    <div class="base-info-title">Prestige</div>
+            `;
+        };
+        const htmlCardsPrestigeSection = function() {
+            let classBtns = "";
+            for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
+                const ck = bonfireClassOrder[ci];
+                const d = bonfire.getClassDef(ck);
+                classBtns += `<button type="button" id="shrine_class_btn_${ck}" class="shrine-class-btn" onclick="events.selectShrineClass('${ck}')"><img class="bonfire-pick-img" src="${d.image}" alt="" draggable="false"><span class="bonfire-pick-label">${d.shortLabel}</span></button>`;
+            }
+            return `
+                <div id="shrineClassDebugBlock" style="display:none">
+                    <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
+                    <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
+                    <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 </div>
-                <div id="shrineClassSelectRow" class="base-row">Select a class:</div>
-                <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
-                <div id="shrinePrestigeNote" class="base-row muted-text">Moving to a new mountain resets the resort to a fresh start. Divinity max increases by the total talent levels of unlocked skills. Card bonuses, noodle bar tips, and that Divinity max are kept.</div>
+                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills, skill talent, research progress, the Orb's level and base mana, spirit levels, shrine level, mine depth, and mine dirt. Mana fills to its new maximum. Divinity is not reset, except for the cost below, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if you have enough stars.</div>
+                <div id="legendRequirementText" class="base-row"></div>
+                <div id="legendStarWarning" class="shrine-move-pack-error" style="display:none">Not enough stars to reach the next milestone. Are you sure?</div>
                 <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
                     <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
-                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.moveToNewMountain()" disabled>Move to a new Mountain (Prestige)</button>
+                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.reduceFame()" disabled>Fade into Legend (Combat Prestige)</button>
                 </div>
-                <div id="shrineMovePackError" class="shrine-move-pack-error" style="display:none">At least 1 pack is required.</div>
-                <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
-                ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
+                <div id="legendList" class="legend-list"></div>
             `;
         };
         const scrollArchivesChoicesHtml = function() {
@@ -474,23 +485,64 @@ let createView = {
             }
             return choiceCols;
         };
+        const inscriptionRowsHtml = function() {
+            const defs = (typeof engine !== "undefined" && engine.INSCRIPTION_ROWS) || [];
+            const coinIcon = resortData.resourceIconHtml("coins");
+            const beadIcon = resortData.resourceIconHtml("starBeads");
+            const manaIcon = resortData.resourceIconHtml("mana");
+            let h = "";
+            for (let i = 0; i < defs.length; i++) {
+                const def = defs[i];
+                const prevName = i > 0 ? defs[i - 1].name : "";
+                h += `
+                    <div id="inscriptionRow_${def.key}" class="inscription-row">
+                        <div class="inscription-row-cols">
+                            <button type="button" id="inscriptionAssign_${def.key}" class="tab-button inscription-assign" onclick="events.selectInscription('${def.key}')">${def.name}</button>
+                            <div class="inscription-progress">
+                                <div class="skills-shard-slot-progress-track labeled-progress-track">
+                                    <div id="inscriptionFill_${def.key}" class="skills-shard-slot-progress-fill"></div>
+                                    <div class="labeled-progress-text labeled-progress-text--small"><span id="inscriptionProg_${def.key}"></span><span class="labeled-progress-sep"> / </span><span id="inscriptionProgNeed_${def.key}"></span></div>
+                                </div>
+                            </div>
+                            <div class="inscription-value"><span id="inscriptionActual_${def.key}"></span> (<span id="inscriptionBought_${def.key}"></span>)</div>
+                            <div class="inscription-output"><span id="inscriptionOutput_${def.key}"></span></div>
+                        </div>
+                        <div class="inscription-detail muted-text"><span id="inscriptionRate_${def.key}" class="inscription-rate-label"></span>Requires <span id="inscriptionReq_${def.key}"></span> Inscription. Costs <span id="inscriptionCoins_${def.key}"></span> ${coinIcon}, <span id="inscriptionBeads_${def.key}"></span> ${beadIcon}, <span id="inscriptionMana_${def.key}"></span> ${manaIcon} per inscription.</div>
+                        <div id="inscriptionLock_${def.key}" class="inscription-lock" style="display:none"><div class="inscription-lock-shade"></div><div class="inscription-lock-text">Requires 10 ${prevName} bought</div></div>
+                    </div>`;
+            }
+            return h;
+        };
         const htmlScrollArchivesPanel = function() {
             return `
-                <div class="base-row">Research: <span id="scrollArchivesResearchProgressText">0</span> / <span id="scrollArchivesResearchRequiredText">10</span><span class="game-progress-sep">|</span>ETA: <span id="scrollArchivesResearchEtaText">-</span></div>
-                <div id="scrollArchivesStarEffects_row" class="base-row muted-text"></div>
-                <div id="scrollArchivesResearchPaused_row" class="base-row muted-text" style="display:none">Paused - need more coins, star beads, or mana</div>
-                <div class="base-row">Choose Research: <span id="scrollArchivesResearchesToChoose">0</span></div>
-                <div id="scrollArchivesChoicesWrap" style="display:none">
-                    <div class="scroll-archives-choices-grid">${scrollArchivesChoicesHtml()}</div>
-                    <div id="base_scrollArchives_row_finish_research" class="base-scrollArchives-row base-upgrade-row">
-                        <div class="base-upgrade-text">
-                            <div class="base-upgrade-name">Finish Research</div>
-                            <div id="base_scrollArchives_extra_finish_research" class="muted-text"></div>
-                        </div>
-                        <button id="base_scrollArchives_finish_research_btn" class="tab-button" onclick="events.buyUpgrade('scrollArchives','finishResearch')">Finish Research</button>
-                    </div>
+                <div class="row-buttons row-buttons-wrap">
+                    <button type="button" id="scrollArchivesSubTab_find" class="tab-button" onclick="events.switchScrollArchivesSubTab('find')">Find Scrolls</button>
+                    <button type="button" id="scrollArchivesSubTab_research" class="tab-button" onclick="events.switchScrollArchivesSubTab('research')">Research - 0</button>
                 </div>
-                ${resortUpgradeRowsHtml("scrollArchives", ["finishResearch"])}
+                <div id="scrollArchivesFindPane">
+                    <div id="scrollArchivesStarEffects_row" class="base-row muted-text"></div>
+                    <div id="scribingsProgressWrap" class="skills-shard-slot-progress-wrap">
+                        <div class="skills-shard-slot-progress-track labeled-progress-track">
+                            <div id="scribingsProgressFill" class="skills-shard-slot-progress-fill"></div>
+                            <div class="labeled-progress-text"><span id="scribingsAmountText"></span><span class="labeled-progress-sep"> / </span><span id="scribingsRequiredText"></span><span class="labeled-progress-sep"> Scribings</span></div>
+                        </div>
+                    </div>
+                    <div id="inscriptionRows">${inscriptionRowsHtml()}</div>
+                    <div id="workerDock_scrollArchives" class="base-info-worker-dock-section">${workerControls("scrollArchives")}</div>
+                </div>
+                <div id="scrollArchivesResearchPane" style="display:none">
+                    <div id="scrollArchivesChoicesWrap" style="display:none">
+                        <div class="scroll-archives-choices-grid">${scrollArchivesChoicesHtml()}</div>
+                        <div id="base_scrollArchives_row_finish_research" class="base-scrollArchives-row base-upgrade-row">
+                            <div class="base-upgrade-text">
+                                <div class="base-upgrade-name">Finish Research</div>
+                                <div id="base_scrollArchives_extra_finish_research" class="muted-text"></div>
+                            </div>
+                            <button id="base_scrollArchives_finish_research_btn" class="tab-button" onclick="events.buyUpgrade('scrollArchives','finishResearch')">Finish Research</button>
+                        </div>
+                    </div>
+                    ${resortUpgradeRowsHtml("scrollArchives", ["finishResearch"])}
+                </div>
             `;
         };
         const htmlMarketTradeRows = function() {
@@ -586,6 +638,9 @@ let createView = {
             let h = "";
             for (let wi = 0; wi < keys.length; wi++) {
                 const sk = keys[wi];
+                if (sk === "scrollArchives") {
+                    continue;
+                }
                 h += `<div id="workerDock_${sk}" class="base-info-worker-dock-section" style="display:none">${workerControls(sk)}</div>`;
             }
             return h;
@@ -617,7 +672,7 @@ let createView = {
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
                     <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span></div>
-                    <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least <span id="spiritTrainingMinManaText">500</span> mana and Spirit Training is below Spirit Power, trains for <span id="spiritTrainingDurationText">60</span>s, then spends <span id="spiritTrainingCostText">500</span> Hidden Spring mana to gain <span id="spiritTrainingExpText">60</span> exp and +<span id="spiritTrainingGainText">0.1</span> training. Training cannot exceed Spirit Power. Training adds to Spirit Power for all effects.</div>
+                    <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least <span id="spiritTrainingMinManaText">500</span> mana, trains for <span id="spiritTrainingDurationText">60</span>s, then spends <span id="spiritTrainingCostText">500</span> Hidden Spring mana to gain <span id="spiritTrainingExpText">60</span> exp and +<span id="spiritTrainingGainText">0.1</span> training. Training can rise above Spirit Power. Effects use Spirit Power plus Spirit Training, up to an equal amount of Spirit Training.</div>
                     <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(x1.8/lvl)</span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
@@ -1033,6 +1088,14 @@ let createView = {
                 h += `<div id="mineBlock_${i}" class="mine-block"><div id="mineBlockFill_${i}" class="mine-block-fill"></div></div>`;
             }
             mineGrid.innerHTML = h;
+        }
+        const cardsPacksMount = document.getElementById("cardsPacksMount");
+        if (cardsPacksMount) {
+            cardsPacksMount.innerHTML = htmlCardsPackSection();
+        }
+        const cardsPrestigeMount = document.getElementById("cardsPrestigeMount");
+        if (cardsPrestigeMount) {
+            cardsPrestigeMount.innerHTML = htmlCardsPrestigeSection();
         }
     },
     fixUiAfterLoad: function() {
@@ -1471,6 +1534,7 @@ let createView = {
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
             "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
+            "cardsSubTab_get", "cardsSubTab_prestige", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_prestige", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineOpenPacksBtn", "shrineClassDebugBlock",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
@@ -1549,11 +1613,12 @@ let createView = {
             "base_inn_openGuests_row", "base_inn_openGuests_btn", "base_inn_openGuests_extra", "base_inn_open_row", "base_inn_next_row", "base_inn_adv_btn", "base_inn_adv_cd_wrap", "base_inn_adv_cd_fill", "base_inn_adv_cd_text", "base_inn_empty",
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
-            "shrinePrestigeHeading", "shrineClassSelectRow", "shrineClassRow", "shrinePrestigeNote", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineMovePackError", "shrineClassDemoNote",
+            "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
+            "legendResetExplain", "legendRequirementText", "legendStarWarning", "legendList",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
-            "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackSummary", "prestigeFinishBtn",
+            "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackAutoChoose", "prestigePackAutoChoose_chk", "prestigePackSummary", "prestigeFinishBtn",
             "shrineMilestonesList",
             "shrineMs_shrineLevel_fill", "shrineMs_shrineLevel_check", "shrineMs_totalStars_fill", "shrineMs_totalStars_check",
             "shrineMs_okamiLevel_fill", "shrineMs_okamiLevel_check",
@@ -1576,8 +1641,9 @@ let createView = {
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
             "base_bonfire_planned_row", "base_bonfire_planned_btn", "base_bonfire_planned_extra",
             "base_bonfire_assign_one_btn", "base_bonfire_assign_ten_btn", "base_bonfire_assign_all_btn", "base_bonfire_unassign_one_btn", "base_bonfire_unassign_ten_btn", "base_bonfire_unassign_all_btn", "base_bonfire_workers_label", "base_bonfire_worker_prod_text", "base_bonfire_worker_prod_wrap", "base_bonfire_worker_prog_fill", "base_bonfire_assign_okami_btn",
-            "scrollArchivesResearchProgressText", "scrollArchivesResearchRequiredText", "scrollArchivesResearchEtaText", "scrollArchivesStarEffects_row", "scrollArchivesResearchPaused_row",
-            "scrollArchivesResearchesToChoose", "scrollArchivesChoicesWrap",
+            "scrollArchivesSubTab_find", "scrollArchivesSubTab_research", "scrollArchivesFindPane", "scrollArchivesResearchPane",
+            "scrollArchivesStarEffects_row", "scribingsProgressWrap", "scribingsProgressFill", "scribingsAmountText", "scribingsRequiredText",
+            "scrollArchivesChoicesWrap",
             "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
             "base_garden_empty",
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
@@ -1709,6 +1775,16 @@ let createView = {
                     createView.queueCache(nested[ni].id);
                 }
             }
+        }
+        const inscriptionDefs = (typeof engine !== "undefined" && engine.INSCRIPTION_ROWS) || [];
+        for (let iri = 0; iri < inscriptionDefs.length; iri++) {
+            const ik = inscriptionDefs[iri].key;
+            createView.queueCache(
+                `inscriptionRow_${ik}`, `inscriptionAssign_${ik}`, `inscriptionFill_${ik}`, `inscriptionProg_${ik}`, `inscriptionProgNeed_${ik}`,
+                `inscriptionActual_${ik}`, `inscriptionBought_${ik}`, `inscriptionRate_${ik}`, `inscriptionOutput_${ik}`,
+                `inscriptionReq_${ik}`, `inscriptionCoins_${ik}`, `inscriptionBeads_${ik}`, `inscriptionMana_${ik}`,
+                `inscriptionLock_${ik}`
+            );
         }
         const resortBuildingKeys = Object.keys(resortData.buildings || {});
         for (let rbi = 0; rbi < resortBuildingKeys.length; rbi++) {
@@ -1923,7 +1999,7 @@ let createView = {
     ensureTabNotifyBadges: function() {
         const tabLabels = {
             base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
-            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Card Bonuses", options: "Options"
+            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Cards", options: "Options"
         };
         for (const tabKey in tabLabels) {
             const btnId = "tabButton_" + tabKey;

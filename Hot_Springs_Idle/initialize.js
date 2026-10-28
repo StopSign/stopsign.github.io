@@ -24,8 +24,8 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
 let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
@@ -56,7 +56,8 @@ function debug() {
 
     
     // debugResearchAllSkills()
-    debugSetAllSkillTalent(100)
+    // debugSetAllSkillTalent(100)
+    debugGrantMaxShrineCards()
 }
 
 function debugShowPaths() {
@@ -268,6 +269,76 @@ function debugBuyAtelierUpgrades() {
     // debugBuyAtelierUpgrade("spareSandals", 1);
     // debugBuyAtelierUpgrade("sprinkleOre", 1);
     debugAtelierUpgradesFree = false;
+}
+
+function debugGrantMaxShrineCards() {
+    const shrine = data.progress.base && data.progress.base.shrine;
+    if (!shrine || typeof shrineCards === "undefined") {
+        return;
+    }
+    if (!shrine.cards || typeof shrine.cards !== "object") {
+        shrine.cards = shrineCards.createFreshCardsState();
+    }
+    const keys = shrineCards.keysInOrder;
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const def = shrineCards._byKey[key];
+        if (!def || !def.rarity) {
+            continue;
+        }
+        if (!shrine.cards[key] || typeof shrine.cards[key] !== "object") {
+            shrine.cards[key] = shrineCards.createFreshCardOwned(key);
+        }
+        const rarities = def.rarityKeys || Object.keys(def.rarity);
+        for (let ri = 0; ri < rarities.length; ri++) {
+            const rarity = rarities[ri];
+            if (rarity !== "common" && rarity !== "rare" && rarity !== "epic") {
+                continue;
+            }
+            const max = def.rarity[rarity];
+            if (typeof max !== "number") {
+                continue;
+            }
+            shrine.cards[key][rarity] = max < 0 ? 10 : max;
+        }
+    }
+    shrineCards.invalidateAggregatedEffects();
+    data.progress.hasMovedToNewMountain = true;
+    shrine.prestigeSession = null;
+    if (data.gameSettings) {
+        data.gameSettings.prestigePackOpen = false;
+    }
+    shrineCards.applyPrestigeStartBonuses();
+    if (typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
+        engine.refreshBambooForestBaseChips();
+    }
+    const archives = data.progress.base && data.progress.base.scrollArchives;
+    if (archives && (archives.researchesToChoose || 0) > 0 && !(archives.researchChoices && archives.researchChoices.length)) {
+        if (typeof engine !== "undefined" && engine.rollScrollArchivesResearchChoices) {
+            engine.rollScrollArchivesResearchChoices();
+        }
+    }
+    if (typeof initialize !== "undefined" && initialize.calcPlayerStats) {
+        initialize.calcPlayerStats(false);
+    }
+    if (typeof view !== "undefined") {
+        const tab = (data.battle && data.battle.currentTab) || "base";
+        if (view.updateTabButtons) {
+            view.updateTabButtons(tab);
+        }
+        if (view.updateCardBonusesTab) {
+            view.updateCardBonusesTab();
+        }
+        if (view.updateDirtRoadLayer) {
+            view.updateDirtRoadLayer();
+        }
+        if (view.renderPrestigePackPanel) {
+            view.renderPrestigePackPanel();
+        }
+        if (view.updateView) {
+            view.updateView();
+        }
+    }
 }
 
 let initials = {
@@ -539,6 +610,8 @@ let initials = {
                 paused: null
             },
             selectedSkillsTab: "equipped",
+            selectedCardsSubTab: "get",
+            selectedScrollArchivesSubTab: "find",
             skillListSort: "oldest",
             selectedEquippedSkillKey: "",
             selectedLibrarySkillKey: "",
@@ -560,13 +633,16 @@ let initials = {
             autoRetryCountdownSec: 0,
             options: {
                 hideMaxedUpgrades: true,
-                disableCompactLayout: false
+                disableCompactLayout: false,
+                autoChoosePackCards: false
             },
             currentMapKey: mapData.defaultStartingMapKey(),
             selectedTravelMapKey: mapData.defaultStartingMapKey(),
             selectedTravelSubTab: "maps",
             mapDefinitions: mapData.getDefaultMaps(),
             mapStars: {},
+            mapStarsEver: {},
+            legendsWritten: 0,
             mapWorkersFound: {},
             currentClassKey: "none",
             pendingClassKey: "",
@@ -732,6 +808,9 @@ let initialize = {
             lib.finishWeaveCostQueue = [];
         }
         engine.ensureSavedSeed(lib, "researchSeed", "scrollArchives");
+        if (typeof engine.ensureInscriptionState === "function") {
+            engine.ensureInscriptionState();
+        }
         if ((lib.researchesToChoose || 0) > 0 && !lib.researchChoices.length) {
             engine.rollScrollArchivesResearchChoices();
         }
@@ -1253,6 +1332,15 @@ let initialize = {
         if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
             data.progress.hasMovedToNewMountain = false;
         }
+        if (typeof data.progress.legendsWritten !== "number" || data.progress.legendsWritten < 0) {
+            data.progress.legendsWritten = 0;
+        }
+        if (typeof engine !== "undefined" && engine.ensureMapStarsEver) {
+            engine.ensureMapStarsEver();
+        }
+        if (typeof shrineCards !== "undefined" && shrineCards.applyFinishedLegends) {
+            shrineCards.applyFinishedLegends();
+        }
         const prestigeSession = shrine.prestigeSession;
         if (!prestigeSession || typeof prestigeSession !== "object" || !prestigeSession.active) {
             shrine.prestigeSession = null;
@@ -1270,7 +1358,7 @@ let initialize = {
                 prestigeSession.openPack = null;
             }
             if (data.gameSettings) {
-                data.gameSettings.prestigePackOpen = true;
+                data.gameSettings.prestigePackOpen = false;
             }
         }
         const msDef = (def && def.milestones) || {};

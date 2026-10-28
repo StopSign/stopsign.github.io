@@ -89,6 +89,19 @@ let onLoad = {
         if (typeof data.progress.selectedLibrarySkillKey !== "string") {
             data.progress.selectedLibrarySkillKey = "";
         }
+        const cardsSubTab = data.progress.selectedCardsSubTab;
+        if (cardsSubTab !== "get" && cardsSubTab !== "prestige" && cardsSubTab !== "bonuses") {
+            data.progress.selectedCardsSubTab = "get";
+        }
+        if (data.progress.selectedScrollArchivesSubTab !== "find" && data.progress.selectedScrollArchivesSubTab !== "research") {
+            data.progress.selectedScrollArchivesSubTab = "find";
+        }
+        if (!data.progress.options) {
+            data.progress.options = {};
+        }
+        if (typeof data.progress.options.autoChoosePackCards !== "boolean") {
+            data.progress.options.autoChoosePackCards = false;
+        }
         // Migrate legacy shared selection into the two independent keys once.
         if (typeof data.progress.selectedSkillDetailKey === "string" && data.progress.selectedSkillDetailKey) {
             const legacy = data.progress.selectedSkillDetailKey;
@@ -123,9 +136,7 @@ let onLoad = {
             data.currentGameState.offlineShardBank = 0;
         }
         data.gameSettings = toLoad.gameSettings ?? initials.gameSettings();
-        if (data.gameSettings.prestigePackOpen === undefined || data.gameSettings.prestigePackOpen === null) {
-            data.gameSettings.prestigePackOpen = false;
-        }
+        data.gameSettings.prestigePackOpen = false;
         // Debug pause / x3 / x10 should not persist across loads
         data.gameSettings.gameSpeed = 1;
         data.gameSettings.debugSpeedMultiplier = 0;

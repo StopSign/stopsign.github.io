@@ -1149,6 +1149,30 @@ var shrineCards = {
         epic: "rgba(188, 7, 237, 0.5)"
     },
 
+    buyPackDivinityCost: 20000,
+    legendDivinityCost: 20000,
+    /** Legend N is index N - 1. Each entry is { text, apply }. Empty until effects are designed. */
+    legendEffects: [],
+    legendStarRequirement: function(legendsWritten) {
+        return 15 + 3 * Math.max(0, Math.floor(legendsWritten || 0));
+    },
+    legendEffectText: function(legendNumber) {
+        const def = shrineCards.legendEffects[Math.floor(legendNumber || 0) - 1];
+        if (!def || !def.text) {
+            return "No remaining Legends to write (WIP)";
+        }
+        return def.text;
+    },
+    applyFinishedLegends: function() {
+        const written = Math.max(0, Math.floor((data.progress && data.progress.legendsWritten) || 0));
+        for (let n = 1; n <= written; n++) {
+            const def = shrineCards.legendEffects[n - 1];
+            if (def && typeof def.apply === "function") {
+                def.apply();
+            }
+        }
+    },
+
     packDefs: {
         common: {
             slots: 6,

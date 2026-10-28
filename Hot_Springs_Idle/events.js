@@ -93,7 +93,7 @@ let events = {
             if (events.guestsTabUnlocked()) {
                 preTabs.splice(2, 0, "guests");
             }
-            if (data.progress.hasMovedToNewMountain) {
+            if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
                 const optIx = preTabs.indexOf("options");
                 if (optIx >= 0) {
                     preTabs.splice(optIx, 0, "cardBonuses");
@@ -113,7 +113,7 @@ let events = {
             const ix = tabs.indexOf("skills");
             if (ix >= 0) tabs.splice(ix, 1);
         }
-        if (data.progress.hasMovedToNewMountain) {
+        if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
             const optIx = tabs.indexOf("options");
             if (optIx >= 0) {
                 tabs.splice(optIx, 0, "cardBonuses");
@@ -304,6 +304,42 @@ let events = {
         viewData.libraryListOrderSig = null;
         view.updateSkillsTab();
         createView.updateLayoutMeasurements();
+    },
+    switchScrollArchivesSubTab: function(tabKey) {
+        data.progress.selectedScrollArchivesSubTab = tabKey === "research" ? "research" : "find";
+        if (typeof view !== "undefined" && view.updateScrollArchivesInscriptions) {
+            view.updateScrollArchivesInscriptions();
+        }
+        if (typeof createView !== "undefined" && createView.updateLayoutMeasurements) {
+            createView.updateLayoutMeasurements();
+        }
+    },
+    selectInscription: function(key) {
+        const lib = engine.ensureInscriptionState();
+        if (!lib) {
+            return;
+        }
+        const index = engine.inscriptionIndex(key);
+        if (index < 0 || index > (lib.inscriptionUnlockedThrough || 0)) {
+            return;
+        }
+        lib.selectedInscription = key;
+        if (typeof view !== "undefined" && view.updateScrollArchivesInscriptions) {
+            view.updateScrollArchivesInscriptions();
+        }
+        if (typeof view !== "undefined" && view.updateResortWorkerControls) {
+            view.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
+        }
+    },
+    switchCardsSubTab: function(tabKey) {
+        const t = (tabKey === "prestige" || tabKey === "bonuses") ? tabKey : "get";
+        data.progress.selectedCardsSubTab = t;
+        if (typeof view !== "undefined" && view.updateCardBonusesTab) {
+            view.updateCardBonusesTab();
+        }
+        if (typeof createView !== "undefined" && createView.updateLayoutMeasurements) {
+            createView.updateLayoutMeasurements();
+        }
     },
     /** Slot click: Equipped pane uses equipped selection; Library pane uses library selection. */
     selectSkillSlotSkill: function(viewName, column, index, ev) {
@@ -1111,24 +1147,15 @@ let events = {
     },
     clearBaseBuildingSelection: function() {
         events.finishSpiritRename();
-        const wasShrine = data.progress.selectedBaseBuilding === "shrine"
-            || data.progress.selectedResortInfoType === "shrine";
         data.progress.selectedBaseBuilding = "";
         data.progress.selectedPathSegmentIndex = null;
         data.progress.selectedResortInfoType = "";
         data.progress.selectedSpiritId = null;
         data.progress.selectedFireLauncherKey = null;
-        if (wasShrine) {
-            events.clearShrineMoveConfirm();
-        }
         events.refreshBaseBuildingPanels();
     },
     openBaseBuilding: function(buildingKey, pathSegmentIndex) {
         events.finishSpiritRename();
-        const prevBuilding = data.progress.selectedBaseBuilding || "";
-        if (prevBuilding === "shrine" && buildingKey !== "shrine") {
-            events.clearShrineMoveConfirm();
-        }
         if (buildingKey === "path") {
             const idx = pathSegmentIndex;
             if (idx === undefined || idx === null || isNaN(idx)) {
@@ -2145,28 +2172,125 @@ let events = {
         view.updateBasePanelShrine();
     },
     syncShrineMoveControls: function() {
-        const shrine = data.progress.base && data.progress.base.shrine;
-        const classLocked = !!(shrine && (shrine.selectedClassKey || "none") !== "none");
         const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
         const btn = viewData.cached.shrineMoveMountainBtn || document.getElementById("shrineMoveMountainBtn");
-        const err = viewData.cached.shrineMovePackError || document.getElementById("shrineMovePackError");
         if (chk) {
-            chk.disabled = classLocked;
-            if (classLocked) {
-                chk.checked = false;
-            }
+            chk.disabled = false;
         }
         const checked = !!(chk && chk.checked);
-        const noPacks = !shrine || shrineCards.totalPacks(shrine) < 1;
+        const cost = shrineCards.legendDivinityCost || 20000;
+        const afford = typeof resortData !== "undefined" && resortData.canAffordCost({ divinity: cost });
         if (btn) {
-            btn.disabled = classLocked || !checked || noPacks;
-        }
-        if (err) {
-            err.style.display = (checked && noPacks && !classLocked) ? "" : "none";
+            const amountHtml = resortData.formatCostAmountHtml(cost, "divinity", "divinity");
+            const label = `Fade into Legend (Combat Prestige) for [${amountHtml}]`;
+            view.updateVal("shrineMoveMountainBtn", label, "innerHTML");
+            view.updateVal("shrineMoveMountainBtn", !checked || !afford, "disabled");
+            btn.classList.toggle("upgrade-btn-ready", !!afford);
         }
     },
     toggleShrineMoveConfirm: function() {
         events.syncShrineMoveControls();
+    },
+    reduceFame: function() {
+        const chk = viewData.cached.shrineMoveConfirm_chk || document.getElementById("shrineMoveConfirm_chk");
+        if (!chk || !chk.checked) {
+            return;
+        }
+        const cost = shrineCards.legendDivinityCost || 20000;
+        if (!resortData.canAffordCost({ divinity: cost })) {
+            return;
+        }
+        engine.performCombatPrestige();
+        chk.checked = false;
+        events.syncShrineMoveControls();
+        view.updateView();
+    },
+    buyShrineCard: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine || typeof engine === "undefined" || !engine.isShrineBuilt()) {
+            return;
+        }
+        const cost = { divinity: shrineCards.buyPackDivinityCost };
+        if (!resortData.canAffordCost(cost)) {
+            return;
+        }
+        resortData.deductCost(cost);
+        engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
+        const roll = engine.nextSeededFloat(shrine, "packSeed") * 100;
+        let rarity = "epic";
+        if (roll < 94) {
+            rarity = "common";
+        } else if (roll < 99) {
+            rarity = "rare";
+        }
+        engine.grantShrinePack(rarity);
+        saving.save();
+        if (typeof view !== "undefined") {
+            if (view.updateShrinePackDisplays) {
+                view.updateShrinePackDisplays();
+            }
+            if (view.updateBuyCardButton) {
+                view.updateBuyCardButton();
+            }
+            if (view.updateOpenPacksButton) {
+                view.updateOpenPacksButton();
+            }
+            if (viewData.packOverlayOpen && view.syncOpenPackSession) {
+                view.syncOpenPackSession();
+            }
+        }
+    },
+    openOrResumePacks: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine) {
+            return;
+        }
+        let session = shrine.prestigeSession;
+        if (!session || !session.active) {
+            if (shrineCards.totalPacks(shrine) < 1) {
+                return;
+            }
+            session = shrineCards.createPrestigeSession(shrine);
+            shrine.prestigeSession = session;
+            viewData.prestigeSelection = [];
+            viewData.prestigePackError = "";
+        }
+        viewData.packOverlayOpen = true;
+        if (session.phase !== "summary" && !session.openPack) {
+            if (!events.openNextPrestigePack(shrine, session)) {
+                session.phase = "summary";
+                session.openPack = null;
+            }
+        }
+        if (data.gameSettings) {
+            data.gameSettings.prestigePackOpen = false;
+        }
+        saving.save();
+        view.renderPrestigePackPanel();
+        if (view.updateOpenPacksButton) {
+            view.updateOpenPacksButton();
+        }
+    },
+    closePackOverlay: function(ev) {
+        if (ev && ev.target && ev.target.id !== "prestigePackOverlay") {
+            return;
+        }
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const session = shrine && shrine.prestigeSession;
+        viewData.packOverlayOpen = false;
+        if (session && session.active && session.phase === "summary") {
+            shrine.prestigeSession = null;
+            viewData.prestigeSelection = [];
+            viewData.prestigePackError = "";
+            saving.save();
+        }
+        if (data.gameSettings) {
+            data.gameSettings.prestigePackOpen = false;
+        }
+        view.renderPrestigePackPanel();
+        if (view.updateOpenPacksButton) {
+            view.updateOpenPacksButton();
+        }
     },
     moveToNewMountain: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
@@ -2248,8 +2372,19 @@ let events = {
         }
         if (sel.length === need) {
             viewData.prestigePackError = "";
+            if (at < 0 && data.progress.options && data.progress.options.autoChoosePackCards) {
+                events.prestigePackAction();
+                return;
+            }
         }
         view.renderPrestigePackPanel();
+    },
+    toggleAutoChoosePackCards: function(enabled) {
+        if (!data.progress.options) {
+            data.progress.options = {};
+        }
+        data.progress.options.autoChoosePackCards = !!enabled;
+        saving.save();
     },
     prestigePackAction: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
@@ -2291,6 +2426,12 @@ let events = {
         }
         saving.save();
         view.renderPrestigePackPanel();
+        if (view.updateShrinePackDisplays) {
+            view.updateShrinePackDisplays();
+        }
+        if (view.updateOpenPacksButton) {
+            view.updateOpenPacksButton();
+        }
     },
     finishPrestige: function() {
         const progress = data.progress;
@@ -2314,6 +2455,7 @@ let events = {
         const prevOptions = progress.options || {};
         const hideMaxed = prevOptions.hideMaxedUpgrades;
         const disableCompact = prevOptions.disableCompactLayout;
+        const autoChoosePackCards = prevOptions.autoChoosePackCards;
 
         data.progress = initials.progress();
         data.battle = initials.battle();
@@ -2326,6 +2468,9 @@ let events = {
         }
         if (disableCompact !== undefined) {
             data.progress.options.disableCompactLayout = !!disableCompact;
+        }
+        if (autoChoosePackCards !== undefined) {
+            data.progress.options.autoChoosePackCards = !!autoChoosePackCards;
         }
         data.progress.hasMovedToNewMountain = true;
         const newShrine = data.progress.base.shrine;
@@ -2399,16 +2544,23 @@ let events = {
     restorePrestigePackOverlay: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
         const session = shrine && shrine.prestigeSession;
-        if (session && session.active) {
-            data.gameSettings.prestigePackOpen = true;
-            viewData.prestigeSelection = [];
-            viewData.prestigePackError = "";
-            view.renderPrestigePackPanel();
-            return;
-        }
         if (data.gameSettings) {
             data.gameSettings.prestigePackOpen = false;
         }
+        if (session && session.active) {
+            viewData.packOverlayOpen = true;
+            viewData.prestigeSelection = [];
+            viewData.prestigePackError = "";
+            if (session.phase !== "summary" && !session.openPack) {
+                if (!events.openNextPrestigePack(shrine, session)) {
+                    session.phase = "summary";
+                    session.openPack = null;
+                }
+            }
+            view.renderPrestigePackPanel();
+            return;
+        }
+        viewData.packOverlayOpen = false;
         if (typeof view !== "undefined" && view.renderPrestigePackPanel) {
             view.renderPrestigePackPanel();
         }

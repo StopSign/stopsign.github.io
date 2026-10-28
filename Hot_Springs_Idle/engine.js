@@ -13,9 +13,6 @@ let engine = {
         return { battleWidth: bw, playableWidth: playable, laneWidth, inset, laneCount: n };
     },
     runResortTick: function(elapsedMs) {
-        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
-            return;
-        }
         engine.updateResortTimers(elapsedMs);
         engine.updateBaseProduction(elapsedMs);
         engine.updateZenkoResort(elapsedMs);
@@ -28,7 +25,7 @@ let engine = {
         data.progress.classSwitchCooldownMs = Math.max(0, (data.progress.classSwitchCooldownMs || 0) - elapsedMs);
     },
     gameTick: function() {
-        if(data.gameSettings.stop || data.gameSettings.prestigePackOpen) {
+        if(data.gameSettings.stop) {
             return;
         }
         data.gameSettings.ticksForSeconds++;
@@ -38,9 +35,6 @@ let engine = {
         engine.runBattleTick(tickMs);
     },
     runBattleTick: function(tickMs) {
-        if (data.gameSettings && data.gameSettings.prestigePackOpen) {
-            return;
-        }
         if (data.battle.state !== "running") {
             return;
         }
@@ -211,6 +205,229 @@ let engine = {
             data.progress.kitsune = { total: 2 };
         }
         data.progress.kitsune.total = (data.progress.kitsune.total || 0) + gained;
+    },
+    ensureMapStarsEver: function() {
+        if (!data.progress || data.progress.mapStarsEver) {
+            return;
+        }
+        const ever = {};
+        const current = data.progress.mapStars || {};
+        const keys = Object.keys(current);
+        for (let i = 0; i < keys.length; i++) {
+            const stars = current[keys[i]] || {};
+            ever[keys[i]] = {
+                bronze: !!stars.bronze,
+                silver: !!stars.silver,
+                gold: !!stars.gold
+            };
+        }
+        data.progress.mapStarsEver = ever;
+    },
+    rememberMapStarEver: function(mapKey, tier) {
+        if (!mapKey || !tier) {
+            return;
+        }
+        engine.ensureMapStarsEver();
+        if (!data.progress.mapStarsEver[mapKey]) {
+            data.progress.mapStarsEver[mapKey] = { bronze: false, silver: false, gold: false };
+        }
+        data.progress.mapStarsEver[mapKey][tier] = true;
+    },
+    hasMapStarEver: function(mapKey, tier) {
+        engine.ensureMapStarsEver();
+        const ever = data.progress.mapStarsEver[mapKey];
+        return !!(ever && ever[tier]);
+    },
+    absorbMapStarsIntoEver: function() {
+        engine.ensureMapStarsEver();
+        const current = data.progress.mapStars || {};
+        const keys = Object.keys(current);
+        for (let i = 0; i < keys.length; i++) {
+            const stars = current[keys[i]] || {};
+            if (stars.bronze) {
+                engine.rememberMapStarEver(keys[i], "bronze");
+            }
+            if (stars.silver) {
+                engine.rememberMapStarEver(keys[i], "silver");
+            }
+            if (stars.gold) {
+                engine.rememberMapStarEver(keys[i], "gold");
+            }
+        }
+    },
+    claimMapStar: function(mapKey, tier, workerAmount) {
+        if (!mapKey || !tier) {
+            return;
+        }
+        engine.ensureMapStarsEver();
+        if (!data.progress.mapStars) {
+            data.progress.mapStars = {};
+        }
+        if (!data.progress.mapStars[mapKey]) {
+            data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
+        }
+        const stars = data.progress.mapStars[mapKey];
+        if (stars[tier]) {
+            return;
+        }
+        const already = engine.hasMapStarEver(mapKey, tier);
+        stars[tier] = true;
+        if (!data.progress.stars) {
+            data.progress.stars = { bronze: 0, silver: 0, gold: 0 };
+        }
+        data.progress.stars[tier] = (data.progress.stars[tier] || 0) + 1;
+        engine.rememberMapStarEver(mapKey, tier);
+        if (!already) {
+            engine.grantWorkersForMapStar(mapKey, workerAmount);
+        }
+        engine.syncScrollArchivesResearchCost();
+    },
+    performCombatPrestige: function() {
+        const cost = (typeof shrineCards !== "undefined" && shrineCards.legendDivinityCost) || 20000;
+        if (typeof resortData === "undefined" || !resortData.canAffordCost({ divinity: cost })) {
+            return false;
+        }
+        const talentTotal = (typeof skills !== "undefined" && skills.unlockedTalentLevelTotal)
+            ? skills.unlockedTalentLevelTotal()
+            : 0;
+        const starTotal = engine.getTotalEarnedStarsCount();
+        engine.endCloneRun("dead", { skipManaBonus: true, skipRetry: true });
+        if (!data.progress.divinity) {
+            data.progress.divinity = { amount: 0, capacity: 0 };
+        }
+        data.progress.divinity.capacity = (data.progress.divinity.capacity || 0) + Math.pow(Math.max(0, talentTotal), 1.2);
+        const written = Math.max(0, Math.floor(data.progress.legendsWritten || 0));
+        const req = shrineCards.legendStarRequirement(written);
+        if (starTotal >= req) {
+            data.progress.legendsWritten = written + 1;
+        }
+        resortData.deductCost({ divinity: cost });
+        engine.applyCombatPrestigeResets();
+        if (typeof shrineCards !== "undefined" && shrineCards.applyFinishedLegends) {
+            shrineCards.applyFinishedLegends();
+        }
+        if (typeof initialize !== "undefined" && initialize.calcPlayerStats) {
+            initialize.calcPlayerStats(false);
+        }
+        if (typeof saving !== "undefined" && saving.save) {
+            saving.save();
+        }
+        return true;
+    },
+    applyCombatPrestigeResets: function() {
+        engine.absorbMapStarsIntoEver();
+        data.progress.mapStars = {};
+        data.progress.stars = { bronze: 0, silver: 0, gold: 0 };
+        const firstMap = (typeof mapData !== "undefined" && mapData.defaultStartingMapKey)
+            ? mapData.defaultStartingMapKey()
+            : "map_1";
+        data.progress.currentMapKey = firstMap;
+        data.progress.selectedTravelMapKey = firstMap;
+        if (data.battle) {
+            data.battle.mapTier = 0;
+            if (data.battle.cloneRunSettings) {
+                data.battle.cloneRunSettings.mapKey = firstMap;
+            }
+        }
+
+        const oldSkills = data.progress.skills || {};
+        const tips = {};
+        const skillKeys = Object.keys(oldSkills);
+        for (let si = 0; si < skillKeys.length; si++) {
+            const sk = oldSkills[skillKeys[si]];
+            tips[skillKeys[si]] = (sk && sk.tips) || 0;
+        }
+        data.progress.skills = skills.getDefaultSkills();
+        for (let si = 0; si < skillKeys.length; si++) {
+            if (tips[skillKeys[si]] && data.progress.skills[skillKeys[si]]) {
+                data.progress.skills[skillKeys[si]].tips = tips[skillKeys[si]];
+            }
+        }
+        data.progress.shards = 0;
+        data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
+        data.progress.skillSlotUnlockIndex = 0;
+        data.progress.skillEquip = skills.getDefaultSkillEquip();
+        data.progress.selectedEquippedSkillKey = "";
+        data.progress.selectedLibrarySkillKey = "";
+
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (lib) {
+            lib.unlockedSkills = {};
+            lib.researchTaskProgress = 0;
+            lib.researchChoices = [];
+            lib.selectedResearchChoice = "";
+            lib.finishWeaveCostQueue = [];
+            const freeN = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+                ? (shrineCards.getAggregatedEffects().freeResearchLevelsFlat || 0)
+                : 0;
+            lib.researchesToChoose = freeN;
+            lib.freeResearchCostCredit = freeN;
+            engine.syncScrollArchivesResearchCost(lib);
+            if (freeN > 0) {
+                engine.rollScrollArchivesResearchChoices();
+            }
+            engine.resetInscriptionsForPrestige(lib);
+        }
+
+        const orb = data.progress.base && data.progress.base.mage_tower;
+        if (orb) {
+            const orbDef = resortData.buildings.mage_tower.progressDefaults;
+            orb.level = orbDef.level || 0;
+            orb.exp = orbDef.exp || 0;
+            orb.expToLevel = orbDef.expToLevel || 200;
+        }
+        if (data.progress.mana) {
+            data.progress.mana.capacityBonus = 0;
+            data.progress.mana.amount = engine.getManaCapacity();
+        }
+
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        const spirits = (hs && hs.spirits) || [];
+        for (let i = 0; i < spirits.length; i++) {
+            const spirit = spirits[i];
+            spirit.level = 1;
+            spirit.exp = 0;
+            spirit.expToLevel = 15;
+            spirit.spiritPower = engine.getSpiritPowerForLevel(1);
+        }
+
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.level = 0;
+            shrine.exp = 0;
+            shrine.expToLevel = 10000;
+            if (!shrine.milestones) {
+                shrine.milestones = {};
+            }
+            const ms = shrine.milestones;
+            ms.shrineLevelClaimed = {};
+            ms.totalStarsClaimed = {};
+            ms.depthReachedReq = 10;
+            ms.orbLevelReq = 35;
+            ms.maxManaReq = 200000;
+            ms.divinityAmountReq = 30000;
+            ms.totalGoldStarsReq = 1;
+        }
+
+        const mine = data.progress.base && data.progress.base.mine;
+        if (mine) {
+            mine.currentDepth = 0;
+            mine.clearsByDepth = { 0: 0 };
+            mine.playTimerMs = 0;
+            mine.readyConsumedByDepth = {};
+            mine.readyNotifySeenByDepth = {};
+            if (mine.resources) {
+                mine.resources.dirt = 0;
+            }
+            mine.blocks = engine.createMineBlocksForDepth(0);
+        }
+
+        if (typeof createView !== "undefined" && createView.createSkillElements) {
+            createView.createSkillElements();
+            if (createView.clearCacheQueue) {
+                createView.clearCacheQueue();
+            }
+        }
     },
     updateIntruderMovement: function(tickMs) {
         const battleHeight = viewData.layout.battlefieldHeightPx || 500;
@@ -791,8 +1008,12 @@ let engine = {
         }
         engine.endCloneRun("dead");
     },
-    endCloneRun: function(reason) {
+    endCloneRun: function(reason, opts) {
+        opts = opts || {};
         if (!data.battle || data.battle.state !== "running") {
+            if (opts.skipRetry) {
+                data.progress.autoRetryCountdownSec = 0;
+            }
             return;
         }
         engine.saveRunHistoryIfNeeded();
@@ -808,10 +1029,13 @@ let engine = {
             data.battle.pendingOkamiExp = 0;
         }
         engine.applyOkamiLevelUps();
-        if (typeof bonfire !== "undefined" && bonfire.grantRunEndManaCapacityBonus) {
+        if (!opts.skipManaBonus && typeof bonfire !== "undefined" && bonfire.grantRunEndManaCapacityBonus) {
             bonfire.grantRunEndManaCapacityBonus();
         }
         engine.beginPostBattleCloneCountdown();
+        if (opts.skipRetry) {
+            data.progress.autoRetryCountdownSec = 0;
+        }
     },
     beginPostBattleCloneCountdown: function() {
         if (!data.battle || (data.battle.state !== "dead" && data.battle.state !== "completed")) {
@@ -871,6 +1095,7 @@ let engine = {
         engine.noteCoinAwardSample(1, gain);
         engine.grantBattleCoins(coinsGain);
         engine.noteSkillExtraCoins("nickelAndDime", engine.nickelExtraCoins(1));
+        engine.noteSkillExtraCoins("cardCoinDrop", engine.cardCoinDropExtra(1));
         const tabCoins = skillEngine.payRunningTabBank(intruder);
         const splashCoins = skillEngine.applySecondhandEmbarrassmentCoins(intruder);
         engine.addPendingOkamiExpFromClone(expGain);
@@ -994,6 +1219,16 @@ let engine = {
         }
         const scaleN = scale === undefined ? 1 : scale;
         return nickel * engine.intruderCoinMultiplier() * scaleN;
+    },
+    /** More Coin Drop card's flat after the coin multiplier. scale is 1 on a kill and 0.5 on an Outrage payout. The intruder's base drop is not included. */
+    cardCoinDropExtra: function(scale) {
+        const cardFlat = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().killCoinsFlatAdd || 0) : 0;
+        if (!(cardFlat > 0)) {
+            return 0;
+        }
+        const scaleN = scale === undefined ? 1 : scale;
+        return cardFlat * engine.intruderCoinMultiplier() * scaleN;
     },
     noteSkillExtraCoins: function(skillKey, amount) {
         if (!data.battle || !skillKey || !(amount > 0)) {
@@ -1420,6 +1655,7 @@ let engine = {
         if (coins > 0) {
             engine.grantBattleCoins(coins);
             engine.noteSkillExtraCoins("nickelAndDime", engine.nickelExtraCoins(0.5));
+            engine.noteSkillExtraCoins("cardCoinDrop", engine.cardCoinDropExtra(0.5));
         }
         return cooldownMs / 2;
     },
@@ -1839,19 +2075,10 @@ let engine = {
     beginTierTransition: function() {
         const map = initialize.getCurrentMapDefinition();
         const mapKey = map ? map.key : data.progress.currentMapKey;
-        if (!data.progress.mapStars[mapKey]) {
-            data.progress.mapStars[mapKey] = { bronze: false, silver: false, gold: false };
-        }
-        const stars = data.progress.mapStars[mapKey];
         const tier = data.battle.mapTier || 0;
         if (tier === 0) {
             data.battle.runStarCleared = "bronze";
-            if (!stars.bronze) {
-                stars.bronze = true;
-                data.progress.stars.bronze++;
-                engine.grantWorkersForMapStar(mapKey, 1);
-                engine.syncScrollArchivesResearchCost();
-            }
+            engine.claimMapStar(mapKey, "bronze", 1);
             data.battle.transitionMessage = "Bronze star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 1;
             data.battle.endRunAfterCountdown = false;
@@ -1861,12 +2088,7 @@ let engine = {
         }
         if (tier === 1) {
             data.battle.runStarCleared = "silver";
-            if (!stars.silver) {
-                stars.silver = true;
-                data.progress.stars.silver++;
-                engine.grantWorkersForMapStar(mapKey, 2);
-                engine.syncScrollArchivesResearchCost();
-            }
+            engine.claimMapStar(mapKey, "silver", 2);
             data.battle.transitionMessage = "Silver star received! Raising difficulty...";
             data.battle.nextTierAfterCountdown = 2;
             data.battle.endRunAfterCountdown = false;
@@ -1875,12 +2097,7 @@ let engine = {
             return;
         }
         data.battle.runStarCleared = "gold";
-        if (!stars.gold) {
-            stars.gold = true;
-            data.progress.stars.gold++;
-            engine.grantWorkersForMapStar(mapKey, 3);
-            engine.syncScrollArchivesResearchCost();
-        }
+        engine.claimMapStar(mapKey, "gold", 3);
         data.battle.transitionMessage = "Gold star received! Map complete.";
         data.battle.nextTierAfterCountdown = 0;
         data.battle.endRunAfterCountdown = true;
@@ -5611,7 +5828,8 @@ let engine = {
         if (!spirit) {
             return 0;
         }
-        return (spirit.spiritPower || 0) + (spirit.training || 0);
+        const power = spirit.spiritPower || 0;
+        return power + Math.min(spirit.training || 0, power);
     },
     /** Assumed continuous forge exp/s when always smelting (batch x 3 / 60s). */
     getAtelierForgeExpPerSec: function(spirit) {
@@ -5694,7 +5912,7 @@ let engine = {
         if (!hs || (hs.mana || 0) < need) {
             return false;
         }
-        return (spirit.training || 0) < (spirit.spiritPower || 0);
+        return true;
     },
     updateSpiritTraining: function(tickMs) {
         if (!engine.isSpiritTrainingSpotBought()) {
@@ -5718,10 +5936,6 @@ let engine = {
         hs.mana = Math.max(0, (hs.mana || 0) - trainFx.cost);
         engine.grantSpiritExp(spirit, trainFx.exp);
         spirit.training = round1((spirit.training || 0) + trainFx.training);
-        const power = spirit.spiritPower || 0;
-        if (spirit.training > power) {
-            spirit.training = power;
-        }
     },
     sanitizeSpiritName: function(raw) {
         return String(raw == null ? "" : raw).replace(/[^a-zA-Z0-9]/g, "").slice(0, 24);
@@ -13039,47 +13253,293 @@ let engine = {
         }
         return true;
     },
-    updateScrollArchivesResearch: function(tickMs) {
-        const lib = data.progress.base.scrollArchives;
-        engine.syncScrollArchivesResearchCost(lib);
-        const rate = engine.getScrollArchivesResearchRate();
-        if (rate <= 0) {
-            return;
+    INSCRIPTION_ROWS: [
+        { key: "strokes", name: "Strokes", coins: 1, beads: 5, mana: 10, progressStart: 20, rateNum: 1, rateDen: 1, product: "Scribings", target: "scribings" },
+        { key: "characters", name: "Characters", coins: 5, beads: 15, mana: 20, progressStart: 200, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
+        { key: "words", name: "Words", coins: 20, beads: 40, mana: 35, progressStart: 500, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
+        { key: "phrases", name: "Phrases", coins: 50, beads: 100, mana: 60, progressStart: 1000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
+        { key: "clauses", name: "Clauses", coins: 100, beads: 250, mana: 90, progressStart: 2500, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
+        { key: "sentences", name: "Sentences", coins: 300, beads: 1000, mana: 150, progressStart: 10000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
+        { key: "paragraphs", name: "Paragraphs", coins: 1000, beads: 2500, mana: 250, progressStart: 20000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
+        { key: "scrolls", name: "Scrolls", coins: 3000, beads: 10000, mana: 400, progressStart: 30000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
+        { key: "codices", name: "Codices", coins: 10000, beads: 25000, mana: 1000, progressStart: 50000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
+        { key: "archives", name: "Archives", coins: 100000, beads: 250000, mana: 3000, progressStart: 100000, rateNum: 1, rateDen: 10000, product: "Codices", target: "codices" }
+    ],
+    inscriptionIndex: function(key) {
+        const defs = engine.INSCRIPTION_ROWS;
+        for (let i = 0; i < defs.length; i++) {
+            if (defs[i].key === key) {
+                return i;
+            }
         }
-        const sec = tickMs / 1000;
-        const cost = rate * sec;
-        const beadCost = cost * 3;
-        const manaCost = cost * 10;
-        const coins = data.progress.coins || 0;
-        const beads = data.progress.starBeads || 0;
-        const manaAmt = (data.progress.mana && data.progress.mana.amount) || 0;
-        const shortCoins = coins < cost;
-        const shortBeads = beads < beadCost;
-        const shortMana = manaAmt < manaCost;
-        if (shortCoins || shortBeads || shortMana) {
-            if (!lib.researchPaused) {
-                lib.researchPaused = true;
-                if (shortCoins || shortBeads) {
-                    events.markNewBaseContent("scrollArchives");
+        return -1;
+    },
+    inscriptionRate: function(def) {
+        return def.rateNum / def.rateDen;
+    },
+    ensureInscriptionState: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib) {
+            return null;
+        }
+        const firstTime = !lib.inscriptionMigrated;
+        if (!lib.inscriptions) {
+            lib.inscriptions = {};
+        }
+        const defs = engine.INSCRIPTION_ROWS;
+        for (let i = 0; i < defs.length; i++) {
+            const key = defs[i].key;
+            if (!lib.inscriptions[key]) {
+                lib.inscriptions[key] = {
+                    actual: 0,
+                    bought: 0,
+                    progress: 0,
+                    required: defs[i].progressStart
+                };
+            } else {
+                const row = lib.inscriptions[key];
+                if (row.actual === undefined || row.actual === null) {
+                    row.actual = 0;
+                }
+                if (row.bought === undefined || row.bought === null) {
+                    row.bought = 0;
+                }
+                if (row.progress === undefined || row.progress === null) {
+                    row.progress = 0;
+                }
+                if (!(row.required > 0)) {
+                    row.required = defs[i].progressStart;
                 }
             }
-            return;
         }
-        if (lib.researchPaused) {
-            lib.researchPaused = false;
+        if (lib.scribings === undefined || lib.scribings === null) {
+            lib.scribings = 0;
         }
-        data.progress.coins -= cost;
-        data.progress.starBeads -= beadCost;
-        data.progress.mana.amount = manaAmt - manaCost;
-        const gainMult = engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
-        lib.researchTaskProgress = (lib.researchTaskProgress) + (rate * sec * gainMult);
-        while (true) {
-            const required = lib.researchTaskRequired;
-            if ((lib.researchTaskProgress) < required) {
+        if (!(lib.scribingsRequired > 0)) {
+            lib.scribingsRequired = 300;
+        }
+        if (lib.scribingsCompleted === undefined || lib.scribingsCompleted === null) {
+            lib.scribingsCompleted = 0;
+        }
+        if (lib.inscriptionSecondMs === undefined || lib.inscriptionSecondMs === null) {
+            lib.inscriptionSecondMs = 0;
+        }
+        if (lib.inscriptionUnlockedThrough === undefined || lib.inscriptionUnlockedThrough === null) {
+            lib.inscriptionUnlockedThrough = 0;
+        }
+        if (!lib.selectedInscription) {
+            lib.selectedInscription = "strokes";
+        }
+        if (firstTime) {
+            engine.migrateInscriptionResearchGrant(lib);
+            lib.inscriptionMigrated = true;
+            lib.researchTaskProgress = 0;
+        }
+        engine.refreshInscriptionUnlock(lib);
+        const selectedIndex = engine.inscriptionIndex(lib.selectedInscription);
+        if (selectedIndex < 0 || selectedIndex > (lib.inscriptionUnlockedThrough || 0)) {
+            lib.selectedInscription = "strokes";
+        }
+        return lib;
+    },
+    migrateInscriptionResearchGrant: function(lib) {
+        const unlocked = (typeof onLoad !== "undefined" && onLoad.countUnlockedSkills)
+            ? onLoad.countUnlockedSkills(lib.unlockedSkills)
+            : 0;
+        const owned = unlocked + (lib.researchesToChoose || 0);
+        const freeN = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+            ? (shrineCards.getAggregatedEffects().freeResearchLevelsFlat || 0)
+            : 0;
+        const lost = engine.getLostScrollsBought();
+        const newSystem = (lib.scribingsCompleted || 0) + freeN + lost;
+        if (newSystem > owned) {
+            lib.researchesToChoose = (lib.researchesToChoose || 0) + (newSystem - owned);
+            if ((lib.researchesToChoose || 0) > 0 && !(lib.researchChoices && lib.researchChoices.length)) {
+                engine.rollScrollArchivesResearchChoices();
+            }
+        }
+    },
+    refreshInscriptionUnlock: function(lib) {
+        const defs = engine.INSCRIPTION_ROWS;
+        let through = Math.max(0, lib.inscriptionUnlockedThrough || 0);
+        while (through + 1 < defs.length) {
+            const prev = lib.inscriptions[defs[through].key];
+            if ((prev.bought || 0) >= 10) {
+                through++;
+            } else {
                 break;
             }
-            lib.researchTaskProgress -= required;
+        }
+        lib.inscriptionUnlockedThrough = through;
+    },
+    getSelectedInscriptionDef: function(lib) {
+        const defs = engine.INSCRIPTION_ROWS;
+        const key = (lib && lib.selectedInscription) || "strokes";
+        for (let i = 0; i < defs.length; i++) {
+            if (defs[i].key === key) {
+                return defs[i];
+            }
+        }
+        return defs[0];
+    },
+    getInscriptionUnitCost: function(def) {
+        const bronze = engine.getScrollArchivesBronzeResearchCostMult();
+        return {
+            coins: def.coins * bronze,
+            beads: def.beads * bronze,
+            mana: def.mana * bronze
+        };
+    },
+    getInscriptionSpendPerSecond: function() {
+        const lib = engine.ensureInscriptionState();
+        const spendRate = engine.getScrollArchivesResearchRate();
+        const unit = engine.getInscriptionUnitCost(engine.getSelectedInscriptionDef(lib));
+        return {
+            coins: unit.coins * spendRate,
+            beads: unit.beads * spendRate,
+            mana: unit.mana * spendRate
+        };
+    },
+    getInscriptionProgressPerSecond: function() {
+        return engine.getScrollArchivesResearchRate()
+            * engine.getLiteracyResearchMultiplier()
+            * engine.getScrollArchivesGoldResearchGainMult();
+    },
+    resetInscriptionsForPrestige: function(lib) {
+        if (!lib) {
+            return;
+        }
+        engine.ensureInscriptionState();
+        const defs = engine.INSCRIPTION_ROWS;
+        let keep = -1;
+        for (let i = 0; i < defs.length; i++) {
+            const row = lib.inscriptions[defs[i].key];
+            if ((row.actual || 0) >= 1) {
+                keep = i;
+            }
+        }
+        const kept = keep >= 0 ? {
+            key: defs[keep].key,
+            actual: lib.inscriptions[defs[keep].key].actual,
+            bought: lib.inscriptions[defs[keep].key].bought,
+            progress: lib.inscriptions[defs[keep].key].progress,
+            required: lib.inscriptions[defs[keep].key].required
+        } : null;
+        for (let i = 0; i < defs.length; i++) {
+            lib.inscriptions[defs[i].key] = {
+                actual: 0,
+                bought: 0,
+                progress: 0,
+                required: defs[i].progressStart
+            };
+        }
+        if (kept) {
+            lib.inscriptions[kept.key] = {
+                actual: kept.actual,
+                bought: kept.bought,
+                progress: kept.progress,
+                required: kept.required
+            };
+            lib.inscriptionUnlockedThrough = keep;
+            if ((kept.bought || 0) >= 10 && keep + 1 < defs.length) {
+                lib.inscriptionUnlockedThrough = keep + 1;
+            }
+            lib.selectedInscription = kept.key;
+        } else {
+            lib.inscriptionUnlockedThrough = 0;
+            lib.selectedInscription = "strokes";
+        }
+        lib.scribings = 0;
+        lib.scribingsRequired = 300;
+        lib.scribingsCompleted = 0;
+        lib.inscriptionSecondMs = 0;
+        engine.refreshInscriptionUnlock(lib);
+    },
+    applyInscriptionFrame: function(lib, elapsedMs) {
+        const sec = (elapsedMs || 0) / 1000;
+        if (sec <= 0) {
+            return;
+        }
+        const spendRate = engine.getScrollArchivesResearchRate();
+        const progressRate = engine.getInscriptionProgressPerSecond();
+        const def = engine.getSelectedInscriptionDef(lib);
+        const row = lib.inscriptions[def.key];
+        if (!row) {
+            return;
+        }
+        if (spendRate > 0) {
+            const unit = engine.getInscriptionUnitCost(def);
+            const coinCost = unit.coins * spendRate * sec;
+            const beadCost = unit.beads * spendRate * sec;
+            const manaCost = unit.mana * spendRate * sec;
+            const coins = data.progress.coins || 0;
+            const beads = data.progress.starBeads || 0;
+            const manaAmt = (data.progress.mana && data.progress.mana.amount) || 0;
+            const shortCoins = coins < coinCost;
+            const shortBeads = beads < beadCost;
+            const shortMana = manaAmt < manaCost;
+            if (shortCoins || shortBeads || shortMana) {
+                if (!lib.researchPaused) {
+                    lib.researchPaused = true;
+                    if (shortCoins || shortBeads) {
+                        events.markNewBaseContent("scrollArchives");
+                    }
+                }
+            } else {
+                lib.researchPaused = false;
+                data.progress.coins -= coinCost;
+                data.progress.starBeads -= beadCost;
+                if (data.progress.mana) {
+                    data.progress.mana.amount = manaAmt - manaCost;
+                }
+                row.progress = (row.progress || 0) + progressRate * sec;
+                let guard = 0;
+                while (row.progress >= row.required && row.required > 0 && guard < 10000) {
+                    row.progress -= row.required;
+                    row.bought = (row.bought || 0) + 1;
+                    row.actual = (row.actual || 0) + 1;
+                    row.required = row.required * 1.1;
+                    guard++;
+                }
+            }
+        } else if (lib.researchPaused) {
+            lib.researchPaused = false;
+        }
+        engine.refreshInscriptionUnlock(lib);
+    },
+    runInscriptionProduction: function(lib) {
+        const defs = engine.INSCRIPTION_ROWS;
+        const snap = [];
+        for (let i = 0; i < defs.length; i++) {
+            snap.push(lib.inscriptions[defs[i].key].actual || 0);
+        }
+        lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]);
+        for (let i = 1; i < defs.length; i++) {
+            const above = lib.inscriptions[defs[i - 1].key];
+            above.actual = (above.actual || 0) + snap[i] * engine.inscriptionRate(defs[i]);
+        }
+        let sGuard = 0;
+        while ((lib.scribings || 0) >= lib.scribingsRequired && lib.scribingsRequired > 0 && sGuard < 10000) {
+            lib.scribings -= lib.scribingsRequired;
+            lib.scribingsRequired *= 2;
+            lib.scribingsCompleted = (lib.scribingsCompleted || 0) + 1;
             engine.onScrollArchivesResearchTaskComplete(lib);
+            sGuard++;
+        }
+    },
+    updateScrollArchivesResearch: function(tickMs) {
+        const lib = engine.ensureInscriptionState();
+        if (!lib) {
+            return;
+        }
+        const elapsed = tickMs || 0;
+        engine.applyInscriptionFrame(lib, elapsed);
+        lib.inscriptionSecondMs = (lib.inscriptionSecondMs || 0) + elapsed;
+        let guard = 0;
+        while (lib.inscriptionSecondMs >= 1000 && guard < 100000) {
+            lib.inscriptionSecondMs -= 1000;
+            engine.runInscriptionProduction(lib);
+            guard++;
         }
     }
 }

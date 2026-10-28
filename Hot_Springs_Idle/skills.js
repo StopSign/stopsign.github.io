@@ -398,11 +398,11 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Every new trick is proof the old me was too humble.\"",
         shortDescription: "Max Audacity that grows faster each skill level.",
         rewardText: function() {
-            return "Reward: +5 x skill level max Audacity each skill level (level 1 is +5, level 2 adds +10 for +15 total, and so on).";
+            return "Reward: +(10 x skill level) max Audacity each skill level.";
         },
         getEffect: function(sk) {
             const lv = sk.level || 0;
-            return { baseAudBonus: 5 * lv * (lv + 1) / 2 };
+            return { baseAudBonus: 10 * lv * (lv + 1) / 2 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${e.baseAudBonus || 0} max Aud`;
@@ -632,15 +632,15 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"The deepest principle in human nature is the craving to be appreciated." - William James',
         shortDescription: "Gain max Audacity per kill. Additionally heal equal to the skill level.",
         rewardText: function(sk) {
-            return `Reward: +10 max Audacity per intruder removal, up to 30 per skill level. When this occurs, additionally heal equal to 3 x skill level.`;
+            return `Reward: +5 max Audacity per intruder removal, up to 15 per skill level. When this occurs, additionally heal equal to 3 x skill level.`;
         },
         getEffect: function(sk) {
             const lv = sk.level || 0;
-            return { audPerKill: 10, audCap: lv * 30, currentAudOnMaxIncrease: lv * 3 };
+            return { audPerKill: 5, audCap: lv * 15, currentAudOnMaxIncrease: lv * 3 };
         },
         effectUiSummary: function(sk, e) {
             const cap = e.audCap || 0;
-            const per = e.audPerKill || 10;
+            const per = e.audPerKill || 5;
             const kills = (data.battle && data.battle.enemiesKilled) || 0;
             const n = Math.min(kills * per, cap);
             const curGain = e.currentAudOnMaxIncrease || 0;

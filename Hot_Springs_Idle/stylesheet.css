@@ -1449,13 +1449,43 @@ button {
 .skills-shard-slot-progress-fill {
     height: 100%;
     width: 0%;
-    background: #A78BFA;
+    background: #7c2f5e;
     border-radius: 3px;
     transition: width 0.15s ease-out;
 }
 .skills-shard-slot-progress-label {
     margin-top: 4px;
     font-size: 12px;
+}
+
+.labeled-progress-track {
+    position: relative;
+    height: 27px;
+}
+
+.labeled-progress-text {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 6px;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.labeled-progress-text--small {
+    font-size: 12px;
+}
+
+.labeled-progress-sep {
+    white-space: pre;
 }
 
 .skill-equip-slot {
@@ -2091,7 +2121,7 @@ button {
 
 .history-row {
     display: grid;
-    grid-template-columns: minmax(11em, 1.6fr) 7.2em 3.6em 3.6em minmax(4.2em, 1fr) 5.5em 4.2em;
+    grid-template-columns: minmax(11em, 1.6fr) 7.2em 3.6em 3.6em minmax(4.2em, 1fr) 4.8em 5.5em 4.2em;
     column-gap: 10px;
     margin-bottom: 0;
     font-size: 13px;
@@ -2107,6 +2137,20 @@ button {
 .history-header {
     font-weight: bold;
     margin-bottom: 8px;
+    align-items: center;
+}
+
+.history-header > span {
+    display: flex;
+    align-items: center;
+    gap: 0.25em;
+}
+
+.history-header .inline-res-icon {
+    height: 1em;
+    width: 1em;
+    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .history-entry {
@@ -2114,11 +2158,6 @@ button {
 }
 
 .history-talent {
-    margin: 0;
-    font-size: 11px;
-}
-
-.history-shards {
     margin: 0;
     font-size: 11px;
 }
@@ -2658,6 +2697,42 @@ button {
     margin: 0 0 8px;
 }
 
+#legendResetExplain {
+    margin: 0 0 8px;
+}
+
+.legend-list {
+    margin-top: 12px;
+}
+
+.legend-card {
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin: 0 0 8px;
+}
+
+.legend-card--ready {
+    border-color: #2ad15f;
+}
+
+.legend-card--short {
+    border-color: #ef4444;
+}
+
+.legend-card--written {
+    border-color: #ffffff;
+}
+
+.legend-card-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+#shrineMoveMountainBtn {
+    white-space: normal;
+}
+
 .shrine-move-confirm {
     display: inline-flex;
     align-items: center;
@@ -2712,6 +2787,24 @@ button {
     gap: 16px;
     align-items: center;
     margin-bottom: 12px;
+}
+
+.shrine-open-packs-row {
+    margin: 0 0 12px;
+}
+
+#shrineBuyCardBtn:disabled,
+#shrineOpenPacksBtn:disabled,
+#shrineMoveMountainBtn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+#shrineBuyCardBtn:disabled:hover,
+#shrineOpenPacksBtn:disabled:hover,
+#shrineMoveMountainBtn:disabled:hover {
+    background: #1f2b3e !important;
+    cursor: default;
 }
 
 .shrine-pack-strip-item {
@@ -4101,6 +4194,85 @@ button {
     background: #222b42;
 }
 
+.inscription-row {
+    position: relative;
+    margin: 0 0 10px;
+}
+
+.inscription-row-cols {
+    display: grid;
+    grid-template-columns: 90px 140px auto auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.inscription-assign {
+    width: 90px;
+    box-sizing: border-box;
+    padding: 4px 2px;
+}
+
+.inscription-progress {
+    width: 140px;
+}
+
+.inscription-progress .skills-shard-slot-progress-track {
+    width: 140px;
+    height: 27px;
+}
+
+.inscription-detail {
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.inscription-rate-label {
+    margin-right: 8px;
+}
+
+.inscription-lock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.inscription-lock-shade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: grey;
+    opacity: 0.5;
+}
+
+.inscription-lock-text {
+    position: relative;
+    z-index: 1;
+    color: #ef4444;
+}
+
+.inscription-output {
+    white-space: nowrap;
+}
+
+button[id^="inscriptionAssign_"]:disabled,
+button[id^="inscriptionAssign_"]:disabled:hover {
+    cursor: default;
+    background: #1f2b3e !important;
+}
+
+#base_scrollArchives_worker_prod_wrap {
+    display: none;
+}
+
 .scroll-archives-choices-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4687,6 +4859,15 @@ button {
 #prestigePackActionBtn,
 #prestigeFinishBtn {
     align-self: center;
+}
+
+.prestige-pack-auto-choose {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 8px;
+    cursor: pointer;
 }
 
 #tutorialToastStack {

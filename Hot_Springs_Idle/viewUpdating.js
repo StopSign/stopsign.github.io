@@ -44,6 +44,7 @@ let viewData = {
     deathOverlayFilled: false,
     prestigeSelection: [],
     prestigePackError: "",
+    packOverlayOpen: false,
     spiritInfoCollapsedCompact: false,
     spiritDrag: {
         pointerId: null,
@@ -90,6 +91,7 @@ let view = {
         }
         createView.showCurrentTab();
         view.updateMenuNumbers();
+        view.syncOpenPackSession();
         view.updateGlobals();
         // Progress bars (okami/mana/divinity) - 10 Hz is enough
         view.updateOkamiPanel();
@@ -579,9 +581,9 @@ let view = {
         // Tip mirrors ((base + cards + column) x density + skill Aud) x Confidence x Bravado
         const audBaseLines = [];
         let densBaseSum = gc.baseAudInner + cardAud + columnAud;
-        audBaseLines.push(`Base Aud: +${intToString(gc.baseAudInner, 2, true)}`);
+        audBaseLines.push(`Base Audacity: +${intToString(gc.baseAudInner, 2, true)}`);
         if (cardAud) {
-            audBaseLines.push(`Base Audacity: +${intToString(cardAud, 2, true)}`);
+            audBaseLines.push(`Card Audacity: +${intToString(cardAud, 2, true)}`);
         }
         if (columnAud) {
             audBaseLines.push(`Column talent: +${intToString(columnAud, 2, true)}`);
@@ -661,9 +663,9 @@ let view = {
         const denseSlapUi = (gc.baseSlapDamage + cardSlap + columnSlap) * densMult;
         const skillFlatSum = forceRaw + mcRaw + sadismRaw + slowBurnRaw;
         const attackPreBru = denseSlapUi + skillFlatSum;
-        attackBaseLines.push(`Base slap: +${intToString(gc.baseSlapDamage, 2, true)}`);
+        attackBaseLines.push(`Base Shame Attack: +${intToString(gc.baseSlapDamage, 2, true)}`);
         if (cardSlap) {
-            attackBaseLines.push(`Base ego damage: +${intToString(cardSlap, 2, true)}`);
+            attackBaseLines.push(`Card Shame Attack: +${intToString(cardSlap, 2, true)}`);
         }
         if (columnSlap) {
             attackBaseLines.push(`Column talent: +${intToString(columnSlap, 2, true)}`);
@@ -917,7 +919,6 @@ let view = {
         const column = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
         const cardEffects = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? shrineCards.getAggregatedEffects() : {};
-        const coinCard = cardEffects.killCoinsFlatAdd || 0;
         const gEff = skills.getSkillEffect("extortion");
         const greed = gEff.killCoinsMultiplier !== undefined ? gEff.killCoinsMultiplier : 1;
         const cardAdd = cardEffects.intruderCoinAdd || 0;
@@ -925,6 +926,13 @@ let view = {
         const extraPct = (coinMult - 1) * 100;
         const bySkill = (data.battle && data.battle.extraCoinsBySkill) || {};
         const order = (data.battle && data.battle.extraCoinsSkillOrder) || [];
+        const extraCoinSourceName = function(key) {
+            if (key === "cardCoinDrop") {
+                return "Card Coin Drop";
+            }
+            const sk = data.progress.skills && data.progress.skills[key];
+            return (sk && sk.name) || key;
+        };
         let total = 0;
         const lines = [];
         const seen = {};
@@ -936,9 +944,7 @@ let view = {
                 continue;
             }
             total += amt;
-            const sk = data.progress.skills && data.progress.skills[key];
-            const name = (sk && sk.name) || key;
-            lines.push(`${name}: ${intToString(amt, 2, true)}`);
+            lines.push(`${extraCoinSourceName(key)}: ${intToString(amt, 2, true)}`);
         }
         const extraKeys = Object.keys(bySkill);
         for (let j = 0; j < extraKeys.length; j++) {
@@ -951,16 +957,11 @@ let view = {
                 continue;
             }
             total += amt;
-            const sk = data.progress.skills && data.progress.skills[key];
-            const name = (sk && sk.name) || key;
-            lines.push(`${name}: ${intToString(amt, 2, true)}`);
+            lines.push(`${extraCoinSourceName(key)}: ${intToString(amt, 2, true)}`);
         }
         const multLines = [];
         if (column) {
             multLines.push(`Utility column: +${intToString(column, 2, true)}% coins`);
-        }
-        if (coinCard) {
-            multLines.push(`More Coin Drop: +${intToString(coinCard, 2, true)} base coins`);
         }
         if (greed !== 1) {
             multLines.push(`Extortion: x${intToString(greed, 2, true)}`);
@@ -1445,26 +1446,7 @@ let view = {
         if (typeof engine.updateShrineMilestones === "function") {
             engine.updateShrineMilestones();
         }
-        const shrine = data.progress.base.shrine || {};
-        const shrineBuilt = engine.isShrineBuilt();
-        const selected = shrine.selectedClassKey || "none";
-        view.updateVal("shrinePrestigeHeading", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrineClassSelectRow", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrineClassRow", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrineMoveMountainRow", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrinePrestigeNote", shrineBuilt ? "" : "none", "style.display");
-        view.updateVal("shrinePacksSection", shrineBuilt ? "" : "none", "style.display");
-        const classLocked = selected !== "none";
-        for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
-            const ck = bonfireClassOrder[ci];
-            view.updateVal(`shrine_class_btn_${ck}`, selected === ck, "classList.toggle", "shrine-class-btn--selected");
-            view.updateVal(`shrine_class_btn_${ck}`, classLocked && selected === ck, "classList.toggle", "shrine-class-btn--demo-locked");
-        }
-        view.updateVal("shrineMoveMountainRow", classLocked, "classList.toggle", "shrine-move-row--locked");
-        view.updateVal("shrineClassDemoNote", shrineBuilt && classLocked ? "" : "none", "style.display");
-        if (typeof events !== "undefined" && events.syncShrineMoveControls) {
-            events.syncShrineMoveControls();
-        }
+        view.updateShrineClassControls();
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         tShrine.refreshOrderedPurchasables("shrine", (resortData.buildings.shrine && resortData.buildings.shrine.upgradesOrder) || [], { hideMaxed: tShrine.hideMaxed });
@@ -1536,33 +1518,67 @@ let view = {
         view.updateVal("innRestfulnessPerSecond", engine.getInnRestfulnessPerSecond());
     },
 
-    updateBasePanelScrollArchives: function(base, t) {
-        const lib = base.scrollArchives;
-        this.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
-        const researchRate = engine.getScrollArchivesResearchRate();
-        const gainedRate = researchRate * engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
-        const progress = lib.researchTaskProgress || 0;
-        const required = lib.researchTaskRequired || 10;
-        const remain = Math.max(0, required - progress);
-        view.updateVal("scrollArchivesResearchProgressText", round1Fixed(progress));
-        view.updateVal("scrollArchivesResearchRequiredText", round1Fixed(required));
-        const mapStars = engine.countAchievedMapStarsByType();
-        const costPct = round1Fixed(engine.getScrollArchivesBronzeResearchCostMult() * 100);
-        const speedPct = round1Fixed(engine.getScrollArchivesSilverResearchSpeedMult() * 100);
-        const gainPct = round1Fixed(engine.getScrollArchivesGoldResearchGainMult() * 100);
-        view.updateVal("scrollArchivesStarEffects_row",
-            `<span class="star-bronze">★</span>: ${mapStars.bronze} cost ${costPct}% | `
-            + `<span class="star-silver">★</span>: ${mapStars.silver} speed ${speedPct}% | `
-            + `<span class="star-gold">★</span>: ${mapStars.gold} gain ${gainPct}%`,
-            "innerHTML");
-        view.updateVal("scrollArchivesResearchPaused_row", lib.researchPaused ? "" : "none", "style.display");
-        if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
-            view.updateEtaText("scrollArchivesResearchEtaText", remain, gainedRate);
-        } else {
-            view.updateVal("scrollArchivesResearchEtaText", "-");
+    updateScrollArchivesInscriptions: function() {
+        const lib = engine.ensureInscriptionState();
+        if (!lib) {
+            return;
         }
+        const tab = data.progress.selectedScrollArchivesSubTab === "research" ? "research" : "find";
+        view.updateVal("scrollArchivesSubTab_find", tab === "find" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("scrollArchivesSubTab_research", tab === "research" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("scrollArchivesSubTab_research", `Research - ${intToStringRound(lib.researchesToChoose || 0)}`);
+        view.updateVal("scrollArchivesFindPane", tab === "find" ? "" : "none", "style.display");
+        view.updateVal("scrollArchivesResearchPane", tab === "research" ? "" : "none", "style.display");
+        const scribingsNeed = lib.scribingsRequired || 300;
+        const scribingsPct = scribingsNeed > 0 ? Math.max(0, Math.min(100, ((lib.scribings || 0) / scribingsNeed) * 100)) : 0;
+        view.updateVal("scribingsAmountText", lib.scribings || 0, "textContent", 3);
+        view.updateVal("scribingsRequiredText", scribingsNeed, "textContent", 3);
+        view.updateVal("scribingsProgressFill", `${scribingsPct}%`, "style.width");
+        const defs = engine.INSCRIPTION_ROWS;
+        const unlockedThrough = lib.inscriptionUnlockedThrough || 0;
+        const selected = lib.selectedInscription || "strokes";
+        for (let i = 0; i < defs.length; i++) {
+            const def = defs[i];
+            const row = lib.inscriptions[def.key];
+            const assignable = i <= unlockedThrough;
+            const preview = i === unlockedThrough + 1;
+            view.updateVal(`inscriptionRow_${def.key}`, assignable || preview ? "" : "none", "style.display");
+            const btn = viewData.cached[`inscriptionAssign_${def.key}`];
+            if (btn) {
+                btn.disabled = !assignable;
+                btn.classList.toggle("upgrade-btn-ready", assignable && selected === def.key);
+            }
+            const need = row.required || def.progressStart;
+            const pct = need > 0 ? Math.max(0, Math.min(100, ((row.progress || 0) / need) * 100)) : 0;
+            view.updateVal(`inscriptionFill_${def.key}`, `${pct}%`, "style.width");
+            view.updateVal(`inscriptionProg_${def.key}`, row.progress || 0, "textContent", 1);
+            view.updateVal(`inscriptionProgNeed_${def.key}`, need, "textContent", 1);
+            view.updateVal(`inscriptionActual_${def.key}`, row.actual || 0, "textContent", 3);
+            view.updateVal(`inscriptionBought_${def.key}`, row.bought || 0, "textContent", 2);
+            view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product}`);
+            view.updateVal(`inscriptionOutput_${def.key}`, `+${intToString(engine.inscriptionRate(def) * (row.actual || 0), 3)}/s`);
+            view.updateVal(`inscriptionReq_${def.key}`, need, "textContent", 3);
+            const unit = engine.getInscriptionUnitCost(def);
+            view.updateVal(`inscriptionCoins_${def.key}`, unit.coins, "textContent", 3);
+            view.updateVal(`inscriptionBeads_${def.key}`, unit.beads, "textContent", 3);
+            view.updateVal(`inscriptionMana_${def.key}`, unit.mana, "textContent", 3);
+            view.updateVal(`inscriptionLock_${def.key}`, preview ? "" : "none", "style.display");
+        }
+    },
+    updateBasePanelScrollArchives: function(base, t) {
+        const lib = engine.ensureInscriptionState() || base.scrollArchives;
+        this.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
+        view.updateScrollArchivesInscriptions();
+        const mapStars = engine.countAchievedMapStarsByType();
+        const costPct = intToString(engine.getScrollArchivesBronzeResearchCostMult() * 100, 2);
+        const speedPct = intToString(engine.getScrollArchivesSilverResearchSpeedMult() * 100, 2);
+        const gainPct = intToString(engine.getScrollArchivesGoldResearchGainMult() * 100, 2);
+        view.updateVal("scrollArchivesStarEffects_row",
+            `<span class="star-bronze">★</span>: ${intToStringRound(mapStars.bronze)} cost ${costPct}% | `
+            + `<span class="star-silver">★</span>: ${intToStringRound(mapStars.silver)} speed ${speedPct}% | `
+            + `<span class="star-gold">★</span>: ${intToStringRound(mapStars.gold)} gain ${gainPct}%`,
+            "innerHTML");
         const toChoose = lib.researchesToChoose || 0;
-        view.updateVal("scrollArchivesResearchesToChoose", toChoose);
         view.updateVal("scrollArchivesChoicesWrap", toChoose > 0 ? "" : "none", "style.display");
         view.updateVal("base_scrollArchives_row_finish_research", toChoose > 0 ? "" : "none", "style.display");
         const choices = lib.researchChoices || [];
@@ -1729,38 +1745,27 @@ let view = {
             return;
         }
         if (siteKey === "scrollArchives") {
-            const lib = base.scrollArchives;
+            const lib = engine.ensureInscriptionState() || base.scrollArchives;
             const researcherCount = assigned + (okamiHere ? 1 : 0);
-            const researchRate = engine.getScrollArchivesResearchRate();
-            const gainedRate = researchRate * engine.getLiteracyResearchMultiplier() * engine.getScrollArchivesGoldResearchGainMult();
-            const progress = lib.researchTaskProgress || 0;
-            const taskRequired = lib.researchTaskRequired || 10;
-            const remain = Math.max(0, taskRequired - progress);
-            const pct = taskRequired > 0 ? Math.max(0, Math.min(100, (progress / taskRequired) * 100)) : 0;
-            const toChoose = lib.researchesToChoose || 0;
-            view.updateVal(`${wpt}_researchers`, researcherCount);
-            view.updateVal(`${wpt}_speed`, round1(gainedRate));
+            const spend = engine.getInscriptionSpendPerSecond();
+            const speed = engine.getInscriptionProgressPerSecond();
+            const def = engine.getSelectedInscriptionDef(lib);
+            const row = lib.inscriptions && lib.inscriptions[def.key];
+            const need = row ? (row.required || def.progressStart) : def.progressStart;
+            const remain = Math.max(0, need - ((row && row.progress) || 0));
+            view.updateVal(`${wpt}_researchers`, researcherCount, "textContent", 2);
+            view.updateVal(`${wpt}_speed`, speed, "textContent", 3);
+            view.updateVal(`${wpt}_next_name`, def.name);
+            view.updateEtaText(`${wpt}_next_eta`, remain, lib.researchPaused ? 0 : speed);
             view.updateVal(`${wpt}_okami_wrap`, okamiHere ? "" : "none", "style.display");
             if (okamiHere) {
-                view.updateVal(`${wpt}_okami`, round1(engine.getOkamiInspirationBonus()));
+                view.updateVal(`${wpt}_okami`, engine.getOkamiInspirationBonus(), "textContent", 3);
             }
-            view.updateVal(`${wpt}_progress`, round1Fixed(progress));
-            view.updateVal(`${wpt}_required`, round1(taskRequired));
-            if (!lib.researchPaused && gainedRate > 0 && remain > 0) {
-                view.updateEtaText(`${wpt}_eta`, remain, gainedRate);
-            } else {
-                view.updateVal(`${wpt}_eta`, "-");
-            }
-            view.updateVal(`${wpt}_cost_coins`, round1(researchRate));
-            view.updateVal(`${wpt}_cost_beads`, round1(researchRate * 3));
-            view.updateVal(`${wpt}_cost_mana`, round1(researchRate * 10));
+            view.updateVal(`${wpt}_cost_coins`, spend.coins, "textContent", 3);
+            view.updateVal(`${wpt}_cost_beads`, spend.beads, "textContent", 3);
+            view.updateVal(`${wpt}_cost_mana`, spend.mana, "textContent", 3);
             view.updateVal(`${wpt}_paused`, lib.researchPaused ? "" : "none", "style.display");
-            view.updateVal(`${wpt}_choose_wrap`, toChoose > 0 ? "" : "none", "style.display");
-            if (toChoose > 0) {
-                view.updateVal(`${wpt}_choose`, toChoose);
-            }
-            view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
-            view.updateVal(`base_${siteKey}_worker_prog_fill`, `${pct}%`, "style.width");
+            view.updateVal(`base_${siteKey}_worker_prod_wrap`, "none", "style.display");
             return;
         }
         if (siteKey === "bonfire") {
@@ -2163,10 +2168,10 @@ let view = {
         view.updateVal("manaCap", cap, "textContent", "manaCap");
         view.updateVal("manaRate", round1Fixed(rate), "textContent");
         const lib = data.progress.base && data.progress.base.scrollArchives;
-        const researchRate = typeof engine.getScrollArchivesResearchRate === "function" ? engine.getScrollArchivesResearchRate() : 0;
-        const researching = researchRate > 0 && lib && !lib.researchPaused;
-        const drain = researching ? researchRate * 10 : 0;
-        view.updateVal("manaRateArchiveDrain", researching ? ` (-${round1Fixed(drain)}/s)` : "");
+        const spend = (typeof engine.getInscriptionSpendPerSecond === "function") ? engine.getInscriptionSpendPerSecond() : null;
+        const researching = !!(spend && spend.mana > 0 && lib && !lib.researchPaused);
+        const drain = researching ? spend.mana : 0;
+        view.updateVal("manaRateArchiveDrain", researching ? ` (-${intToString(drain, 3)}/s)` : "");
         const remainMana = Math.max(0, cap - amount);
         const netRate = rate - drain;
         view.updateEtaText("manaEtaText", remainMana, netRate);
@@ -4540,7 +4545,7 @@ let view = {
     updateHistoryList: function() {
         const el = viewData.cached.historyList;
         const runs = data.progress.runHistory || [];
-        let html = `<div class="history-row history-header"><span>Map</span><span>Duration</span><span>Level</span><span>Kills</span><span>${resortData.resourceIconHtml("coins")} Coins</span><span>Okami Exp</span><span>Density</span></div>`;
+        let html = `<div class="history-row history-header"><span>Map</span><span>Duration</span><span>Level</span><span>Kills</span><span>${resortData.resourceIconHtml("coins")} Coins</span><span>Shards</span><span>Okami Exp</span><span>Density</span></div>`;
         if (!runs.length) {
             html += `<div class="muted-text">No runs yet.</div>`;
         }
@@ -4555,7 +4560,7 @@ let view = {
             if (run.starCleared === "bronze" || run.starCleared === "silver" || run.starCleared === "gold") {
                 starHtml = ` <span class="history-duration-star skill-star-${run.starCleared} skill-star-filled">★</span>`;
             }
-            html += `<div class="history-entry"><div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s${starHtml}</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${round2(okamiExp)}</span><span>${density}</span></div>`;
+            html += `<div class="history-entry"><div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s${starHtml}</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${round1(run.shardsGained || 0)}</span><span>${round2(okamiExp)}</span><span>${density}</span></div>`;
             const talents = run.talentRows || [];
             if (talents.length > 0) {
                 const talentText = talents.map(function(row) {
@@ -4566,9 +4571,6 @@ let view = {
                     return row;
                 }).join(" | ");
                 html += `<div class="history-talent muted-text">Talent Levels: ${talentText}</div>`;
-            }
-            if ((run.shardsGained || 0) > 0) {
-                html += `<div class="history-shards muted-text">Shards Gained: ${round1(run.shardsGained)}</div>`;
             }
             html += `</div>`;
         }
@@ -4689,7 +4691,7 @@ let view = {
         }
         const shown = Math.floor(have);
         const pct = cost > 0 ? Math.max(0, Math.min(100, (have / cost) * 100)) : 0;
-        view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)}/${intToString(Math.floor(cost), 1)} Shards until next Skill Slot`);
+        view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)} / ${intToString(Math.floor(cost), 1)} Shards until next Skill Slot`);
         view.updateVal("skillsShardSlotProgressFill", `${pct}%`, "style.width");
     },
     updateSkillLoadoutButtons: function() {
@@ -4965,6 +4967,7 @@ let view = {
             view.updateVal(`skill_${k}_class_tag`, (def && def.category === "class") ? "" : "none", "style.display");
             view.updateVal(`skill_${k}_equipped_badge`, skills.isSkillEquipped(k) ? "" : "none", "style.display");
         }
+        view.updateVal("skillsLibraryResearchedTitle", `Researched Skills - Showing: ${orderedVisible.length}`);
         view.applySkillListSortRadiosOnly();
         const emptyEl = viewData.cached.skillsListEmpty;
         if (!emptyEl) {
@@ -5295,7 +5298,103 @@ let view = {
             }
         }
     },
+    updateCardsSubTabs: function() {
+        let tab = data.progress.selectedCardsSubTab || "get";
+        if (tab !== "get" && tab !== "prestige" && tab !== "bonuses") {
+            tab = "get";
+        }
+        data.progress.selectedCardsSubTab = tab;
+        view.updateVal("cardsSubTab_get", tab === "get" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("cardsSubTab_prestige", tab === "prestige" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("cardsSubTab_bonuses", tab === "bonuses" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("cardsPane_get", tab === "get" ? "" : "none", "style.display");
+        view.updateVal("cardsPane_prestige", tab === "prestige" ? "" : "none", "style.display");
+        view.updateVal("cardsPane_bonuses", tab === "bonuses" ? "" : "none", "style.display");
+    },
+    updateBuyCardButton: function() {
+        const cost = { divinity: (typeof shrineCards !== "undefined" && shrineCards.buyPackDivinityCost) || 20000 };
+        const label = resortData.buyForFromCost(cost);
+        const afford = resortData.canAffordCost(cost);
+        view.updateVal("shrineBuyCardBtn", label, "innerHTML");
+        view.updateVal("shrineBuyCardBtn", !afford, "disabled");
+        const btn = viewData.cached.shrineBuyCardBtn;
+        if (btn) {
+            btn.classList.toggle("upgrade-btn-ready", afford);
+        }
+    },
+    updateOpenPacksButton: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const session = shrine && shrine.prestigeSession;
+        const active = !!(session && session.active);
+        const unfinished = active && session.phase !== "summary";
+        const resumable = unfinished && !viewData.packOverlayOpen;
+        const packs = shrine && typeof shrineCards !== "undefined" ? shrineCards.totalPacks(shrine) : 0;
+        view.updateVal("shrineOpenPacksBtn", resumable ? "Resume Opening Packs" : "Open Packs");
+        view.updateVal("shrineOpenPacksBtn", !resumable && packs < 1, "disabled");
+    },
+    updateShrineClassControls: function() {
+        const shrine = (data.progress.base && data.progress.base.shrine) || {};
+        const selected = shrine.selectedClassKey || "none";
+        const showClass = typeof isDebug !== "undefined" && !!isDebug;
+        view.updateVal("shrineClassDebugBlock", showClass ? "" : "none", "style.display");
+        const classLocked = selected !== "none";
+        if (typeof bonfireClassOrder !== "undefined") {
+            for (let ci = 0; ci < bonfireClassOrder.length; ci++) {
+                const ck = bonfireClassOrder[ci];
+                view.updateVal(`shrine_class_btn_${ck}`, selected === ck, "classList.toggle", "shrine-class-btn--selected");
+                view.updateVal(`shrine_class_btn_${ck}`, classLocked && selected === ck, "classList.toggle", "shrine-class-btn--demo-locked");
+            }
+        }
+        view.updateVal("shrineClassDemoNote", showClass && classLocked ? "" : "none", "style.display");
+        view.updateLegendPanel();
+        if (typeof events !== "undefined" && events.syncShrineMoveControls) {
+            events.syncShrineMoveControls();
+        }
+    },
+    updateLegendPanel: function() {
+        const written = Math.max(0, Math.floor((data.progress && data.progress.legendsWritten) || 0));
+        const nextNumber = written + 1;
+        const req = shrineCards.legendStarRequirement(written);
+        const stars = engine.getTotalEarnedStarsCount();
+        const ready = stars >= req;
+        const legendText = function(n) {
+            return String(shrineCards.legendEffectText(n))
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        };
+        view.updateVal("legendRequirementText", `Write Legend ${nextNumber}: ${req} stars`);
+        view.updateVal("legendStarWarning", ready ? "none" : "", "style.display");
+        const parts = [];
+        parts.push(`<div class="legend-card ${ready ? "legend-card--ready" : "legend-card--short"}"><div class="legend-card-title">Legend ${nextNumber}</div><div class="legend-card-text">${legendText(nextNumber)}</div></div>`);
+        for (let n = written; n >= 1; n--) {
+            parts.push(`<div class="legend-card legend-card--written"><div class="legend-card-title">Legend ${n}</div><div class="legend-card-text">${legendText(n)}</div></div>`);
+        }
+        view.updateVal("legendList", parts.join(""), "innerHTML");
+    },
+    syncOpenPackSession: function() {
+        if (!viewData.packOverlayOpen) {
+            return;
+        }
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const session = shrine && shrine.prestigeSession;
+        if (!session || !session.active) {
+            viewData.packOverlayOpen = false;
+            view.renderPrestigePackPanel();
+            return;
+        }
+        if (session.phase === "summary" && shrineCards.nextUnopenedPackRarity(shrine)) {
+            events.openNextPrestigePack(shrine, session);
+            saving.save();
+        }
+        view.renderPrestigePackPanel();
+    },
     updateCardBonusesTab: function() {
+        view.updateCardsSubTabs();
+        view.updateBuyCardButton();
+        view.updateOpenPacksButton();
+        view.updateShrineClassControls();
+        view.updateShrinePackDisplays();
         const list = viewData.cached.cardBonusesList || document.getElementById("cardBonusesList");
         const emptyEl = viewData.cached.cardBonusesEmpty || document.getElementById("cardBonusesEmpty");
         if (!list) {
@@ -5427,6 +5526,13 @@ let view = {
             }
             if (sk === "market" && !engine.isMarketBuilt()) {
                 show = false;
+            }
+            if (sk === "scrollArchives") {
+                const sectionOnly = viewData.cached[`workerDock_${sk}`] || document.getElementById(`workerDock_${sk}`);
+                if (sectionOnly) {
+                    sectionOnly.style.display = selected === sk ? "" : "none";
+                }
+                continue;
             }
             const sectionEl = viewData.cached[`workerDock_${sk}`] || document.getElementById(`workerDock_${sk}`);
             if (sectionEl) {
@@ -6182,7 +6288,7 @@ let view = {
         }
         const shrine = data.progress.base && data.progress.base.shrine;
         const session = shrine && shrine.prestigeSession;
-        const open = !!(data.gameSettings && data.gameSettings.prestigePackOpen && session && session.active);
+        const open = !!(viewData.packOverlayOpen && session && session.active);
         overlay.style.display = open ? "flex" : "none";
         if (!open) {
             return;
@@ -6192,6 +6298,14 @@ let view = {
         view.updateVal("prestigePackCards", summary ? "none" : "", "style.display");
         view.updateVal("prestigePackError", summary ? "none" : "", "style.display");
         view.updateVal("prestigePackActionBtn", summary ? "none" : "", "style.display");
+        view.updateVal("prestigePackAutoChoose", summary ? "none" : "flex", "style.display");
+        const autoChk = viewData.cached.prestigePackAutoChoose_chk || document.getElementById("prestigePackAutoChoose_chk");
+        if (autoChk) {
+            const wantAuto = !!(data.progress.options && data.progress.options.autoChoosePackCards);
+            if (autoChk.checked !== wantAuto) {
+                autoChk.checked = wantAuto;
+            }
+        }
         view.updateVal("prestigePackSummary", "flex", "style.display");
         view.updateVal("prestigeFinishBtn", summary ? "" : "none", "style.display");
         const summaryEl = viewData.cached.prestigePackSummary || document.getElementById("prestigePackSummary");
@@ -6199,13 +6313,6 @@ let view = {
         let summaryHtml = "";
         for (let bi = 0; bi < lines.length; bi++) {
             summaryHtml += `<div>${view.escapeHtml(lines[bi])}</div>`;
-        }
-        if (summary) {
-            const talentAdd = (typeof skills !== "undefined" && skills.unlockedTalentLevelTotal)
-                ? skills.unlockedTalentLevelTotal() : 0;
-            summaryHtml += `<div class="prestige-pack-summary-sep"></div>`;
-            summaryHtml += `<div>Divinity max: +${talentAdd}</div>`;
-            summaryHtml += `<div class="muted-text">From the total talent levels of unlocked skills.</div>`;
         }
         if (summaryEl && summaryEl.innerHTML !== summaryHtml) {
             summaryEl.innerHTML = summaryHtml;

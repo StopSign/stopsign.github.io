@@ -173,7 +173,7 @@ function intToString(value, amount, hideSmall) {
             }
             return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         }
-        return (isNeg?"-":"") + parseFloat(value).toPrecision(baseValue);
+        return (isNeg?"-":"") + parseFloat(value).toFixed(baseValue - 1);
     }
 
     return (isNeg?"-":"") + parseFloat(value).toFixed(baseValue - 1);
