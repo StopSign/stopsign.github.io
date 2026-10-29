@@ -416,7 +416,7 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "defense",
         flavorText: '"We are what we repeatedly do. Excellence, then, is not an act, but a habit." - Aristotle',
-        shortDescription: "More Confidence, gaining exp on levels.",
+        shortDescription: "More Confidence, gaining exp on clone levels.",
         rewardText: function() {
             return "Reward: +2 (+1 per skill level) Confidence.";
         },
@@ -435,7 +435,7 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "defense",
         flavorText: "\"If I say I'm fine loud enough, the math agrees.\"",
-        shortDescription: "Multiplies max Audacity, gaining exp on levels.",
+        shortDescription: "Multiplies max Audacity, gaining exp on clone levels.",
         rewardText: function() {
             return "Reward: +10% (+3% per skill level) total max Audacity, after Confidence.";
         },
@@ -454,7 +454,7 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "offense",
         flavorText: '"Experience is a hard teacher because she gives the test first, the lesson afterward." - Vernon Law',
-        shortDescription: "More Brutality, gaining exp on levels.",
+        shortDescription: "More Brutality, gaining exp on clone levels.",
         rewardText: function() {
             return "Reward: +2 (+1 per skill level) Brutality.";
         },
@@ -473,7 +473,7 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "utility",
         flavorText: "\"The level-up is nice. The existential crisis is the point.\"",
-        shortDescription: "More Soul, gaining exp on levels.",
+        shortDescription: "More Soul, gaining exp on clone levels.",
         rewardText: function() {
             return "Reward: +2 (+1 per skill level) Soul.";
         },
@@ -513,10 +513,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"I don't copy them. I absorb the lesson and improve it.\"",
         shortDescription: "Clone exp over time.",
         rewardText: function() {
-            return "Reward: +0.5 (+0.25 per skill level) base clone exp per second. Clone exp multipliers apply.";
+            return "Reward: +0.2 (+0.1 per skill level) base clone exp per second. Clone exp multipliers apply.";
         },
         getEffect: function(sk) {
-            return { expPerSec: 0.5 + 0.25 * (sk.level || 0) };
+            return { expPerSec: 0.2 + 0.1 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${roundNearestDecimals(e.expPerSec || 0, 2)} base clone exp per second`;
@@ -1269,7 +1269,7 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "utility",
         flavorText: "\"Your breakthrough is my group project.\"",
-        shortDescription: "Increase the exp gain of other skills.",
+        shortDescription: "Increase the exp gain of other skills, gaining exp on clone levels.",
         rewardText: function(sk) {
             return `Reward: +10% (+5% per skill level) exp for every other skill.`;
         },

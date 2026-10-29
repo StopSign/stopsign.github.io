@@ -750,17 +750,17 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         category: "buff",
         rarity: { common: 12, rare: 6, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "common") return { shardDropChanceAdd: 0.05 };
-            if (rarity === "rare") return { shardDropChanceAdd: 0.15 };
-            if (rarity === "epic") return { shardDropChanceAdd: 0.40 };
+            if (rarity === "common") return { shardDropAmountAdd: 0.05 };
+            if (rarity === "rare") return { shardDropAmountAdd: 0.15 };
+            if (rarity === "epic") return { shardDropAmountAdd: 0.40 };
             return {};
         },
         effectText: function(rarity) {
             const e = this.getEffect(rarity);
-            return "Shard Drop Chance: +" + Math.round((e.shardDropChanceAdd || 0) * 100) + "%";
+            return "Shard Drop Amount: +" + Math.round((e.shardDropAmountAdd || 0) * 100) + "%";
         },
         totalBonusText: function(totalEffect) {
-            return "Shard Drop Chance: +" + Math.round((totalEffect.shardDropChanceAdd || 0) * 100) + "%";
+            return "Shard Drop Amount: +" + Math.round((totalEffect.shardDropAmountAdd || 0) * 100) + "%";
         }
     },
     {

@@ -2451,7 +2451,19 @@ var resortData = {
                         return !!(data.progress && data.progress.showBattle);
                     }
                 }
-            }
+            },
+            inscriptionRows: [
+                { key: "strokes", name: "Strokes", coins: 1, beads: 5, mana: 10, progressStart: 50, rateNum: 1, rateDen: 1, product: "Scribings", target: "scribings" },
+                { key: "characters", name: "Characters", coins: 3, beads: 10, mana: 15, progressStart: 300, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
+                { key: "words", name: "Words", coins: 5, beads: 15, mana: 20, progressStart: 1000, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
+                { key: "phrases", name: "Phrases", coins: 10, beads: 50, mana: 30, progressStart: 5000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
+                { key: "clauses", name: "Clauses", coins: 25, beads: 100, mana: 40, progressStart: 20000, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
+                { key: "sentences", name: "Sentences", coins: 50, beads: 200, mana: 55, progressStart: 50000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
+                { key: "paragraphs", name: "Paragraphs", coins: 150, beads: 500, mana: 75, progressStart: 100000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
+                { key: "scrolls", name: "Scrolls", coins: 500, beads: 1000, mana: 100, progressStart: 300000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
+                { key: "codices", name: "Codices", coins: 1000, beads: 2000, mana: 125, progressStart: 1000000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
+                { key: "archives", name: "Archives", coins: 3000, beads: 4000, mana: 200, progressStart: 3000000, rateNum: 1, rateDen: 10000, product: "Codices", target: "codices" }
+            ]
         },
 
         atelier: {

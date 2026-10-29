@@ -527,6 +527,9 @@ let view = {
         soulStatTip += `<br>Current: +${soulLv * 3}% skill exp, +${soulLv * 10}% character exp.`;
         view.updateVal("soulStatTip", soulStatTip, "innerHTML");
         view.renderAttributePlanList();
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("tabPane_leveling");
+        }
     },
     updateStatsTab: function() {
         const p = data.battle.player;
@@ -1046,6 +1049,9 @@ let view = {
             view.updateVal(`mapStar_${map.key}_silver`, !!stars.silver, "classList.toggle", "skill-star-filled");
             view.updateVal(`mapStar_${map.key}_gold`, !!stars.gold, "classList.toggle", "skill-star-filled");
         }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("tabPane_travel");
+        }
     },
     updateHistoryTab: function() {
         view.updateHistoryList();
@@ -1430,14 +1436,12 @@ let view = {
         if (sparkBought) {
             view.updateVal("bonfireFireSpiritPower", engine.getBonfireAssignedFireSpiritPowerTotal());
         }
-        const showHeatFormula = !!bf.tendTheFlameUnlocked && sparkBought;
-        view.updateVal("bonfireFireSpiritHeat_row", showHeatFormula ? "" : "none", "style.display");
-        if (showHeatFormula) {
-            view.updateVal("bonfireFireSpiritHeat_row", "Fire spirits: √(excess heat / 10) / 10 exp/s (excess = heat − assigned fire spirit power)");
-        }
         const t = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         t.refreshOrderedPurchasables("bonfire", resortData.buildings.bonfire.upgradesOrder, { hideMaxed: t.hideMaxed });
         this.updateResortWorkerControls("bonfire", (bf.assignedWorkers || 0) > 0 || engine.getOkami().assignedBuildingKey === "bonfire");
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_bonfire");
+        }
     },
 
     updateBasePanelShrine: function() {
@@ -1450,6 +1454,9 @@ let view = {
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         tShrine.refreshOrderedPurchasables("shrine", (resortData.buildings.shrine && resortData.buildings.shrine.upgradesOrder) || [], { hideMaxed: tShrine.hideMaxed });
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_shrine");
+        }
     },
 
     updateShrinePackDisplays: function() {
@@ -1530,9 +1537,13 @@ let view = {
         view.updateVal("scrollArchivesFindPane", tab === "find" ? "" : "none", "style.display");
         view.updateVal("scrollArchivesResearchPane", tab === "research" ? "" : "none", "style.display");
         const scribingsNeed = lib.scribingsRequired || 300;
-        const scribingsPct = scribingsNeed > 0 ? Math.max(0, Math.min(100, ((lib.scribings || 0) / scribingsNeed) * 100)) : 0;
-        view.updateVal("scribingsAmountText", lib.scribings || 0, "textContent", 3);
+        const scribingsHave = lib.scribings || 0;
+        const scribingsPct = scribingsNeed > 0 ? Math.max(0, Math.min(100, (scribingsHave / scribingsNeed) * 100)) : 0;
+        const strokes = lib.inscriptions && lib.inscriptions.strokes;
+        const scribingsPerSecond = ((strokes && strokes.actual) || 0) * engine.inscriptionRate(engine.INSCRIPTION_ROWS[0]);
+        view.updateVal("scribingsAmountText", scribingsHave, "textContent", 3);
         view.updateVal("scribingsRequiredText", scribingsNeed, "textContent", 3);
+        view.updateEtaText("scribingsEtaText", Math.max(0, scribingsNeed - scribingsHave), scribingsPerSecond);
         view.updateVal("scribingsProgressFill", `${scribingsPct}%`, "style.width");
         const defs = engine.INSCRIPTION_ROWS;
         const unlockedThrough = lib.inscriptionUnlockedThrough || 0;
@@ -1555,7 +1566,7 @@ let view = {
             view.updateVal(`inscriptionProgNeed_${def.key}`, need, "textContent", 1);
             view.updateVal(`inscriptionActual_${def.key}`, row.actual || 0, "textContent", 3);
             view.updateVal(`inscriptionBought_${def.key}`, row.bought || 0, "textContent", 2);
-            view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product}`);
+            view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product} each`);
             view.updateVal(`inscriptionOutput_${def.key}`, `+${intToString(engine.inscriptionRate(def) * (row.actual || 0), 3)}/s`);
             view.updateVal(`inscriptionReq_${def.key}`, need, "textContent", 3);
             const unit = engine.getInscriptionUnitCost(def);
@@ -1646,7 +1657,7 @@ let view = {
         }
         t.refreshOrderedPurchasables("scrollArchives", ["collectShards"], { hideMaxed: t.hideMaxed });
         if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
-            createView.refreshInfoButtonPanel("baseBuildingInfoScroll");
+            createView.refreshInfoButtonPanel("resortInfo_scrollArchives");
         }
     },
 
@@ -2195,19 +2206,6 @@ let view = {
     updateBuildingManaRow: function(buildingKey) {
         const visible = engine.isBuildingManaRowVisible(buildingKey);
         view.updateVal(`${buildingKey}ManaRow`, visible ? "" : "none", "style.display");
-        view.updateVal(`${buildingKey}ManaExplain_row`, visible ? "" : "none", "style.display");
-        if (buildingKey === "inn" && visible) {
-            const bonus = engine.getInnGentleLightsRestfulnessBonus();
-            view.updateVal(`${buildingKey}ManaExplain_row`, `Gentle Lights use 5 mana/s per occupied room and grant +${bonus} restfulness/s while mana is available. Fill Mana weaves Okami to transfer global mana into this reservoir.`);
-        }
-        if (buildingKey === "stonePile" && visible) {
-            const batch = engine.getStoneDuplicatorBatch();
-            const costText = batch.stone === 1 ? "100 mana" : "10 stone and 500 mana";
-            const resultText = batch.stone === 1
-                ? "one unduplicated stone into two duplicated stone"
-                : `${batch.stone} unduplicated stone into ${batch.stone * 2} duplicated stone`;
-            view.updateVal(`${buildingKey}ManaExplain_row`, `Every 10 seconds, uses ${costText} to turn ${resultText}. Fill Mana weaves Okami to transfer global mana into this reservoir.`);
-        }
         const garden = data.progress.base && data.progress.base.garden;
         const showCarrier = visible && buildingKey !== "hiddenSpring" && !!(garden && garden.arrangementOfManaOrdersUnlocked);
         view.updateVal(`${buildingKey}AllowCarriersMana_row`, showCarrier ? "" : "none", "style.display");
@@ -2832,7 +2830,6 @@ let view = {
             }
         };
         view.updateVal("marketCreditText", intToStringRound(market.credit || 0));
-        view.updateVal("marketCarryAmountText", resortData.getKitsuneCarryCapacity());
         view.updateMarketProgressDisplays();
         setChk("marketAllowStone_chk", market.allowStone);
         setChk("marketAllowWood_chk", market.allowWood);
@@ -2919,6 +2916,9 @@ let view = {
                 view.updateVal(`marketTrade_${tk}_prog_fill`, `${pct}%`, "style.width");
             }
         }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_market");
+        }
     },
     updateBasePanelNoodleBar: function(t) {
         const bar = data.progress.base.noodleBar;
@@ -2932,7 +2932,6 @@ let view = {
         view.updateVal("noodleBarHotWaterText", `Hot Water: ${round1Fixed(noodleWater)}/${noodleCap}`);
         view.updateVal("noodleBarHotWaterFill", noodleCap > 0 ? `${Math.max(0, Math.min(100, (noodleWater / noodleCap) * 100))}%` : "0%", "style.width");
         view.syncAllowCarriersWaterCheckbox("noodleBar", engine.isNoodleBarBuilt());
-        view.updateVal("noodleBarEatRestBonusText", engine.getNoodleEatRestBonus());
         view.updateVal("noodleBarGuestsEatingText", engine.countGuestsEatingNoodles(), "textContent", "floor");
         const shown = Math.min(100, Math.max(0, bar.tipProgress || 0));
         view.updateVal("noodleTipProgressText", round1Fixed(shown));
@@ -2989,12 +2988,18 @@ let view = {
             }
         }
         t.refreshOrderedPurchasables("noodleBar", resortData.buildings.noodleBar.upgradesOrder, { hideMaxed: t.hideMaxed });
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_noodleBar");
+        }
     },
     updateBasePanelMageTower: function(t) {
         const orb = data.progress.base.mage_tower;
         this.updateResortWorkerControls("mage_tower", engine.getOrbExpGainPerSecond() > 0 || engine.getOkami().assignedBuildingKey === "mage_tower");
         view.updateOrbProgressDisplays();
         t.refreshOrderedPurchasables("mage_tower", resortData.buildings.mage_tower.upgradesOrder, { hideMaxed: t.hideMaxed });
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_mage_tower");
+        }
     },
     updateBambooForestInfo: function() {
         const bf = data.progress.base.bambooForest;
@@ -3048,6 +3053,9 @@ let view = {
                 view.updateVal(fillId, cell.color || "#4a9a4a", "style.backgroundColor");
                 view.updateVal(fillId, `${fillPct}%`, "style.height");
             }
+        }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_bambooForest");
         }
     },
     updateSpiritSlotAppearance: function(slotId, spirit, selectedSpiritId) {
@@ -3498,18 +3506,8 @@ let view = {
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
-        view.updateVal("spiritInfoTrainingNote", atTraining ? "" : "none", "style.display");
-        if (atTraining && engine.getSpiritTrainingCardEffects) {
-            const trainFx = engine.getSpiritTrainingCardEffects();
-            view.updateVal("spiritTrainingMinManaText", roundNearestDecimals(trainFx.cost, 2));
-            view.updateVal("spiritTrainingCostText", roundNearestDecimals(trainFx.cost, 2));
-            view.updateVal("spiritTrainingDurationText", roundNearestDecimals(trainFx.durationMs / 1000, 2));
-            view.updateVal("spiritTrainingExpText", roundNearestDecimals(trainFx.exp, 2));
-            view.updateVal("spiritTrainingGainText", roundNearestDecimals(trainFx.training, 2));
-        }
         view.updateVal("spiritInfoExp", round2(spirit.exp || 0));
         view.updateVal("spiritInfoExpReq", round2(spirit.expToLevel || 15));
-        view.updateVal("spiritInfoExpNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? "(x1.8/lvl)" : "", "textContent");
         view.updateVal("spiritInfoEarthExtras", kind === "earth" ? "" : "none", "style.display");
         view.updateVal("spiritInfoWaterExtras", kind === "water" ? "" : "none", "style.display");
         view.updateVal("spiritInfoFireExtras", kind === "fire" ? "" : "none", "style.display");
@@ -3652,35 +3650,27 @@ let view = {
                     view.updateVal("spiritInfoFireLauncherStats", "");
                 }
                 view.updateVal("spiritInfoFireNote", def
-                    ? `Powering ${def.name} (+${round2(regenRate)} embers/s, +${launcherExpPerSec} exp/s). Exp/s assumes always firing, per droplet hit.`
-                    : "Assigned to fire launcher.");
+                    ? `Powering ${def.name} (+${round2(regenRate)} embers/s, +${launcherExpPerSec} exp/s).`
+                    : `+${launcherExpPerSec} exp/s`);
                 view.updateVal("spiritInfoTaskText", `charging embers (${round1Fixed(embers)}/${maxEmbers}) · +${launcherExpPerSec} exp/s`);
                 const pct = Math.max(0, Math.min(100, (embers / maxEmbers) * 100));
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
                 const batchSize = engine.getForgeSmeltBatch(spirit);
-                const forgeLevel = engine.getLargerForgeBought();
                 const forgeExpPerSec = round2(engine.getAtelierForgeExpPerSec(spirit));
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
-                const effPower = round2(engine.getEffectiveSpiritPower(spirit) || 1);
-                const forgeNote = forgeLevel > 0
-                    ? `Smelting ceil(√effective power x ${round2(1 + 0.5 * forgeLevel)}) = ${batchSize} ore into bars every 60s (effective power ${effPower}). +50% per Larger Forge, rounded up. Exp = bars x 3.`
-                    : `Smelting floor(√effective power) = ${batchSize} ore into bars every 60s (effective power ${effPower}). Exp = bars x 3.`;
-                view.updateVal("spiritInfoFireNote", forgeNote);
+                view.updateVal("spiritInfoFireNote", `Smelting ${batchSize} ore / 60s, +${forgeExpPerSec} exp/s`);
                 view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s, +${forgeExpPerSec} exp/s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "bonfire") {
                 const excessHeat = engine.getBonfireExcessHeatForExp();
                 const expRate = excessHeat > 0 ? round2(Math.sqrt(excessHeat / 10) / 10) : 0;
-                const heat = (data.progress.base.bonfire && data.progress.base.bonfire.heat) || 0;
-                view.updateVal("spiritInfoFireNote", excessHeat > 0
-                    ? `Warming by the bonfire (+${expRate} exp/s from heat above spirit baseline).`
-                    : (heat > 0 ? "Warming by the bonfire (no excess heat for exp)." : "Warming by the bonfire (no heat yet)."));
+                view.updateVal("spiritInfoFireNote", `+${expRate} exp/s`);
                 view.updateVal("spiritInfoTaskText", excessHeat > 0 ? `gaining exp (+${expRate}/s)` : "waiting for heat");
                 const pct = excessHeat > 0 ? 100 : 0;
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else {
-                view.updateVal("spiritInfoFireNote", "Assign to the Bonfire, Atelier forge, or a fire launcher.");
+                view.updateVal("spiritInfoFireNote", "");
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
             }
         } else if (kind === "plant") {
@@ -3715,6 +3705,9 @@ let view = {
             if (taskEl) {
                 taskEl.classList.remove("muted-text");
             }
+        }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_spirit");
         }
     },
     updateMineInfo: function() {
@@ -3779,6 +3772,9 @@ let view = {
                 fillEl.className = className;
             }
             viewData.mineBlockRenderCache[i] = { height: heightStr, className: className };
+        }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("resortInfo_mine");
         }
     },
     // includeTip=true: refresh count + tip list (hover / RAF while open).
@@ -3861,6 +3857,9 @@ let view = {
             t.refreshOrderedPurchasables("hiddenSpring", resortData.buildings.hiddenSpring.upgradesOrder, hsOpts);
             view.updateBuildingManaRow("hiddenSpring");
             view.updateCollectStoneButton();
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_hiddenSpring");
+            }
         } else if (selected === "spirit") {
             this.updateSpiritInfo();
         } else if (selected === "fireLauncher") {
@@ -3889,7 +3888,6 @@ let view = {
             const bowl = engine.isToriiDrinkingBowlUnlocked();
             const toriiWaterCap = engine.getToriiWaterCapacity();
             view.updateVal("toriiWater_row", bowl ? "" : "none", "style.display");
-            view.updateVal("toriiWaterReq_row", bowl ? "" : "none", "style.display");
             view.syncAllowCarriersWaterCheckbox("torii", bowl);
             if (bowl) {
                 const toriiWater = torii.water || 0;
@@ -3911,6 +3909,9 @@ let view = {
             });
             tTorii.refreshOrderedPurchasables("torii", resortData.buildings.torii.upgradesOrder, toriiUpgOpts);
             view.updateBuildingManaRow("torii");
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_torii");
+            }
         } else if (selected === "inn") {
             const inn = base.inn;
             engine.syncInnRoomCounts();
@@ -3929,9 +3930,7 @@ let view = {
             const onsen = engine.isInnOnsenConverted();
             view.updateVal("innHotWater_row", onsen ? "" : "none", "style.display");
             view.syncAllowCarriersWaterCheckbox("inn", onsen);
-            view.updateVal("innOnsenTempReq_row", onsen ? "" : "none", "style.display");
             view.updateVal("innOnsenSoak_row", onsen ? "" : "none", "style.display");
-            view.updateVal("innOnsenPondExplain_row", onsen && engine.isPondBuiltFromFoxDen() ? "" : "none", "style.display");
             if (onsen) {
                 const hot = inn.hotWater || 0;
                 const hotCap = engine.getInnHotWaterCapacity();
@@ -3957,6 +3956,9 @@ let view = {
                 }
             }
             tInn.refreshOrderedPurchasables("inn", resortData.buildings.inn.upgradesOrder, { hideMaxed: tInn.hideMaxed });
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_inn");
+            }
         } else if (selected === "laundry") {
             this.updateResortWorkerControls("laundry", false);
         } else if (selected === "path") {
@@ -4040,6 +4042,9 @@ let view = {
             }
             const tPile = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             tPile.refreshOrderedPurchasables("stonePile", resortData.buildings.stonePile.upgradesOrder, { hideMaxed: tPile.hideMaxed });
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_stonePile");
+            }
         } else if (selected === "bambooForest") {
             this.updateBambooForestInfo();
             this.updateResortWorkerControls("bambooForest", (engine.getBambooCutWorkerRate() || 0) > 0);
@@ -4118,6 +4123,9 @@ let view = {
             if (engine.cisternWorkersRevealed()) {
                 this.updateResortWorkerControls("cistern", engine.cisternHasAssignedCarriers());
             }
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_cistern");
+            }
         } else if (selected === "pond") {
             const pond = base.pond || {};
             view.updateVal("pondInfoWater", `${round2(pond.waterVolume || 0)}L`);
@@ -4126,13 +4134,18 @@ let view = {
             view.updateVal("pondWishingWellRate", wellRate > 0 ? `+${wellRate} L/s | ${drainText}` : drainText);
             const pondWater = pond.waterVolume || 0;
             const pondExp = pondWater > 0 ? round2(Math.sqrt(pondWater) / 50) : 0;
-            view.updateVal("pondWaterSpiritExp", pondWater > 0 ? `√(water)/50 = ${pondExp}/s` : `√(water)/50 = 0/s`);
+            const showPondExp = createView.hasAnyWaterSpirit();
+            view.updateVal("pondWaterSpiritExp_row", showPondExp ? "" : "none", "style.display");
+            view.updateVal("pondWaterSpiritExp", `${pondExp}/s`);
             view.updateVal("pondSendWater_row", "none", "style.display");
             if (viewData.cached.base_pond_pipes_to_forest_row) {
                 view.updateVal("base_pond_pipes_to_forest_row", "none", "style.display");
             }
             const tPond = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             tPond.refreshOrderedPurchasables("pond", resortData.buildings.pond.upgradesOrder, { hideMaxed: tPond.hideMaxed });
+            if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_pond");
+            }
         } else if (selected === "mine") {
             this.updateMineInfo();
             const tMine = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);

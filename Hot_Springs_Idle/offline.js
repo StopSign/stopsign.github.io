@@ -616,15 +616,13 @@ let offline = {
         const zones = map.zones || [];
         let totalEnemies = 0;
         let weighted = 0;
-        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
-            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
         const tier = data.battle.mapTier || 0;
         for (let i = 0; i < zones.length; i++) {
             const n = Math.max(0, zones[i].totalEnemies || 0);
             if (n <= 0) {
                 continue;
             }
-            const p = Math.min(1, mapData.getZoneShardDropChance(map, i, tier) + cardAdd);
+            const p = Math.min(1, mapData.getZoneShardDropChance(map, i, tier));
             weighted += p * n;
             totalEnemies += n;
         }

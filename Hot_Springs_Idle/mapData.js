@@ -293,7 +293,8 @@ mapData.getZoneShardDropChance = function(mapDef, zoneIndex, mapTier) {
 };
 
 /**
- * Shard drop amount for a map, including Collect Shards and map-star multipliers.
+ * Shard drop amount for a map: base x Collect Shards x map stars x shrine cards.
+ * Card copies add their percents, then apply once as (1 + total). +200% is x3.
  * Callers should gate visibility/drops on Collect Shards unlock separately.
  */
 mapData.getMapShardDropAmount = function(mapDef) {
@@ -304,5 +305,7 @@ mapData.getMapShardDropAmount = function(mapDef) {
     const starCount = (typeof engine !== "undefined" && engine.countAchievedStars)
         ? engine.countAchievedStars()
         : 0;
-    return base * amountMult * Math.pow(1.1, starCount);
+    const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+        ? (shrineCards.getAggregatedEffects().shardDropAmountAdd || 0) : 0;
+    return base * amountMult * Math.pow(1.1, starCount) * (1 + cardAdd);
 };

@@ -1139,6 +1139,21 @@ button {
     color: #cdd6f4;
 }
 
+@keyframes info-button-unread-flash {
+    0%, 100% {
+        color: #89b4fa;
+        border-color: var(--border-color);
+    }
+    50% {
+        color: #ff8c1a;
+        border-color: #ff8c1a;
+    }
+}
+
+.info-button.info-button-unread {
+    animation: info-button-unread-flash 3s ease-in-out infinite;
+}
+
 .info-button-panel {
     display: none;
     position: absolute;
@@ -4194,16 +4209,31 @@ button {
     background: #222b42;
 }
 
+#inscriptionRows {
+    display: grid;
+    grid-template-columns: 90px 140px max-content max-content max-content;
+    column-gap: 8px;
+}
+
 .inscription-row {
     position: relative;
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: auto auto;
+    grid-column: 1 / -1;
+    align-items: center;
     margin: 0 0 10px;
 }
 
 .inscription-row-cols {
-    display: grid;
-    grid-template-columns: 90px 140px auto auto;
-    gap: 8px;
-    align-items: center;
+    display: contents;
+}
+
+.inscription-value,
+.inscription-bought,
+.inscription-output {
+    white-space: nowrap;
+    justify-self: start;
 }
 
 .inscription-assign {
@@ -4222,6 +4252,7 @@ button {
 }
 
 .inscription-detail {
+    grid-column: 1 / -1;
     font-size: 12px;
     margin-top: 2px;
 }
@@ -4236,6 +4267,10 @@ button {
     right: 0;
     top: 0;
     bottom: 0;
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    width: auto;
+    height: auto;
     z-index: 2;
     display: flex;
     align-items: center;
@@ -4249,18 +4284,15 @@ button {
     right: 0;
     top: 0;
     bottom: 0;
-    background: grey;
-    opacity: 0.5;
+    background: black;
+    opacity: 0.7;
 }
 
 .inscription-lock-text {
     position: relative;
     z-index: 1;
     color: #ef4444;
-}
-
-.inscription-output {
-    white-space: nowrap;
+    font-weight: bold;
 }
 
 button[id^="inscriptionAssign_"]:disabled,

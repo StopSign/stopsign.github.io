@@ -17,15 +17,15 @@ let data = {};
 let language = "english";
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-let isLoadingEnabled = true; //SET FOR COMMIT
-// let isLoadingEnabled = false;
+// let isLoadingEnabled = true; //SET FOR COMMIT
+let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-let isDebug = false; //SET FOR COMMIT
-// let isDebug = true;
+// let isDebug = false; //SET FOR COMMIT
+let isDebug = true;
 let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
@@ -57,7 +57,7 @@ function debug() {
     
     // debugResearchAllSkills()
     // debugSetAllSkillTalent(100)
-    debugGrantMaxShrineCards()
+    // debugGrantMaxShrineCards()
 }
 
 function debugShowPaths() {
@@ -636,6 +636,7 @@ let initials = {
                 disableCompactLayout: false,
                 autoChoosePackCards: false
             },
+            infoButtonSeen: {},
             currentMapKey: mapData.defaultStartingMapKey(),
             selectedTravelMapKey: mapData.defaultStartingMapKey(),
             selectedTravelSubTab: "maps",

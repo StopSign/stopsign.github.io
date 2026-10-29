@@ -801,10 +801,7 @@ let engine = {
                 : mapData.getZoneLastSpawnTimeMs(z);
             let shardDropChance = 0;
             if (engine.isShardLootUnlocked()) {
-                const baseChance = mapData.getZoneShardDropChance(map, i, data.battle.mapTier || 0);
-                const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
-                    ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
-                shardDropChance = Math.min(1, baseChance + cardAdd);
+                shardDropChance = Math.min(1, mapData.getZoneShardDropChance(map, i, data.battle.mapTier || 0));
             }
             zones.push({
                 index: i,
@@ -1362,10 +1359,7 @@ let engine = {
         if (!map.zones[zi]) {
             return null;
         }
-        const baseChance = mapData.getZoneShardDropChance(map, zi, data.battle.mapTier || 0);
-        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
-            ? (shrineCards.getAggregatedEffects().shardDropChanceAdd || 0) : 0;
-        const p = Math.min(1, baseChance + cardAdd);
+        const p = Math.min(1, mapData.getZoneShardDropChance(map, zi, data.battle.mapTier || 0));
         if (Math.random() >= p) {
             return null;
         }
@@ -13230,13 +13224,13 @@ let engine = {
         return lib.researchChoices;
     },
     onScrollArchivesResearchTaskComplete: function(lib) {
-        lib.researchesToChoose = lib.researchesToChoose + 1;
         lib.researchTaskProgress = 0;
+        const before = lib.researchesToChoose || 0;
+        engine.migrateInscriptionResearchGrant(lib);
         engine.syncScrollArchivesResearchCost(lib);
-        if (lib.researchesToChoose > 0 && !lib.researchChoices.length) {
-            engine.rollScrollArchivesResearchChoices();
+        if ((lib.researchesToChoose || 0) > before) {
+            events.markNewBaseContent("scrollArchives");
         }
-        events.markNewBaseContent("scrollArchives");
     },
     completeScrollArchivesResearchChoice: function() {
         const lib = data.progress.base.scrollArchives;
@@ -13253,18 +13247,10 @@ let engine = {
         }
         return true;
     },
-    INSCRIPTION_ROWS: [
-        { key: "strokes", name: "Strokes", coins: 1, beads: 5, mana: 10, progressStart: 20, rateNum: 1, rateDen: 1, product: "Scribings", target: "scribings" },
-        { key: "characters", name: "Characters", coins: 5, beads: 15, mana: 20, progressStart: 200, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
-        { key: "words", name: "Words", coins: 20, beads: 40, mana: 35, progressStart: 500, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
-        { key: "phrases", name: "Phrases", coins: 50, beads: 100, mana: 60, progressStart: 1000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
-        { key: "clauses", name: "Clauses", coins: 100, beads: 250, mana: 90, progressStart: 2500, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
-        { key: "sentences", name: "Sentences", coins: 300, beads: 1000, mana: 150, progressStart: 10000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
-        { key: "paragraphs", name: "Paragraphs", coins: 1000, beads: 2500, mana: 250, progressStart: 20000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
-        { key: "scrolls", name: "Scrolls", coins: 3000, beads: 10000, mana: 400, progressStart: 30000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
-        { key: "codices", name: "Codices", coins: 10000, beads: 25000, mana: 1000, progressStart: 50000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
-        { key: "archives", name: "Archives", coins: 100000, beads: 250000, mana: 3000, progressStart: 100000, rateNum: 1, rateDen: 10000, product: "Codices", target: "codices" }
-    ],
+    get INSCRIPTION_ROWS() {
+        const building = resortData.buildings && resortData.buildings.scrollArchives;
+        return (building && building.inscriptionRows) || [];
+    },
     inscriptionIndex: function(key) {
         const defs = engine.INSCRIPTION_ROWS;
         for (let i = 0; i < defs.length; i++) {
@@ -13276,6 +13262,18 @@ let engine = {
     },
     inscriptionRate: function(def) {
         return def.rateNum / def.rateDen;
+    },
+    syncInscriptionRequirement: function(row, def) {
+        const base = def.progressStart;
+        if (row.progressBase === base && row.required > 0) {
+            return;
+        }
+        const nextRequired = base * Math.pow(1.1, row.bought || 0);
+        if (row.required > 0) {
+            row.progress = (row.progress || 0) * (nextRequired / row.required);
+        }
+        row.required = nextRequired;
+        row.progressBase = base;
     },
     ensureInscriptionState: function() {
         const lib = data.progress.base && data.progress.base.scrollArchives;
@@ -13294,7 +13292,8 @@ let engine = {
                     actual: 0,
                     bought: 0,
                     progress: 0,
-                    required: defs[i].progressStart
+                    required: defs[i].progressStart,
+                    progressBase: defs[i].progressStart
                 };
             } else {
                 const row = lib.inscriptions[key];
@@ -13307,9 +13306,7 @@ let engine = {
                 if (row.progress === undefined || row.progress === null) {
                     row.progress = 0;
                 }
-                if (!(row.required > 0)) {
-                    row.required = defs[i].progressStart;
-                }
+                engine.syncInscriptionRequirement(row, defs[i]);
             }
         }
         if (lib.scribings === undefined || lib.scribings === null) {
@@ -13423,14 +13420,16 @@ let engine = {
             actual: lib.inscriptions[defs[keep].key].actual,
             bought: lib.inscriptions[defs[keep].key].bought,
             progress: lib.inscriptions[defs[keep].key].progress,
-            required: lib.inscriptions[defs[keep].key].required
+            required: lib.inscriptions[defs[keep].key].required,
+            progressBase: lib.inscriptions[defs[keep].key].progressBase
         } : null;
         for (let i = 0; i < defs.length; i++) {
             lib.inscriptions[defs[i].key] = {
                 actual: 0,
                 bought: 0,
                 progress: 0,
-                required: defs[i].progressStart
+                required: defs[i].progressStart,
+                progressBase: defs[i].progressStart
             };
         }
         if (kept) {
@@ -13438,7 +13437,8 @@ let engine = {
                 actual: kept.actual,
                 bought: kept.bought,
                 progress: kept.progress,
-                required: kept.required
+                required: kept.required,
+                progressBase: kept.progressBase
             };
             lib.inscriptionUnlockedThrough = keep;
             if ((kept.bought || 0) >= 10 && keep + 1 < defs.length) {

@@ -29,20 +29,87 @@ let createView = {
      * Adds a ? info button to the top-right of the element with the given id.
      * Click opens a panel with htmlText; the next click anywhere closes it.
      * Optional x sets the CSS right offset in px (default 4).
-     */
-    /**
-     * Click opens a panel with htmlText; the next click anywhere closes it.
-     * Optional x sets the CSS right offset in px (default 4).
      * If htmlText is a function, it is called whenever the panel opens and when
      * createView.refreshInfoButtonPanel(id) runs while open.
+     * contentKeys is a string, an array, or a function returning those. Each key
+     * currently returned is unread until the panel is open. Newly returned keys
+     * flash the button again. Changing numbers inside existing text does not.
      */
-    createInfoButton: function(id, htmlText, x) {
+    normalizeInfoContentKeys: function(contentKeys) {
+        let keys = contentKeys;
+        if (typeof keys === "function") {
+            keys = keys();
+        }
+        if (typeof keys === "string") {
+            keys = [keys];
+        }
+        if (!Array.isArray(keys) || keys.length === 0) {
+            return ["base"];
+        }
+        return keys;
+    },
+    ensureInfoButtonSeenStore: function() {
+        if (typeof data === "undefined" || !data.progress) {
+            return {};
+        }
+        if (!data.progress.infoButtonSeen || typeof data.progress.infoButtonSeen !== "object" || Array.isArray(data.progress.infoButtonSeen)) {
+            data.progress.infoButtonSeen = {};
+        }
+        return data.progress.infoButtonSeen;
+    },
+    getInfoButtonWrap: function(el) {
+        if (!el) {
+            return null;
+        }
+        for (let i = 0; i < el.children.length; i++) {
+            const child = el.children[i];
+            if (child.classList && child.classList.contains("info-button-wrap")) {
+                return child;
+            }
+        }
+        return null;
+    },
+    acknowledgeInfoButton: function(wrap) {
+        if (!wrap || !wrap.dataset.infoButtonFor) {
+            return;
+        }
+        const id = wrap.dataset.infoButtonFor;
+        const keys = wrap._infoResolveKeys ? wrap._infoResolveKeys() : ["base"];
+        const store = createView.ensureInfoButtonSeenStore();
+        if (!store[id] || typeof store[id] !== "object" || Array.isArray(store[id])) {
+            store[id] = {};
+        }
+        for (let i = 0; i < keys.length; i++) {
+            store[id][keys[i]] = true;
+        }
+    },
+    applyInfoButtonUnread: function(wrap) {
+        if (!wrap) {
+            return;
+        }
+        const id = wrap.dataset.infoButtonFor;
+        const keys = wrap._infoResolveKeys ? wrap._infoResolveKeys() : ["base"];
+        const seenRoot = createView.ensureInfoButtonSeenStore();
+        const seen = (seenRoot[id] && typeof seenRoot[id] === "object") ? seenRoot[id] : {};
+        let unread = false;
+        for (let i = 0; i < keys.length; i++) {
+            if (!seen[keys[i]]) {
+                unread = true;
+                break;
+            }
+        }
+        const btn = wrap.querySelector(".info-button");
+        if (btn) {
+            btn.classList.toggle("info-button-unread", unread);
+        }
+    },
+    createInfoButton: function(id, htmlText, x, contentKeys) {
         const el = document.getElementById(id);
         if (!el) {
             return;
         }
-        const existing = el.querySelector(".info-button-wrap");
-        if (existing && existing.parentNode === el) {
+        const existing = createView.getInfoButtonWrap(el);
+        if (existing) {
             existing.remove();
         }
         const computedPos = window.getComputedStyle(el).position;
@@ -56,6 +123,7 @@ let createView = {
         wrap.dataset.infoButtonFor = id;
         const btn = document.createElement("button");
         btn.type = "button";
+        btn.id = "infoButton_" + id;
         btn.className = "info-button";
         btn.textContent = "?";
         btn.setAttribute("aria-label", "Info");
@@ -64,8 +132,12 @@ let createView = {
         const resolveHtml = function() {
             return typeof htmlText === "function" ? htmlText() : htmlText;
         };
+        const resolveKeys = function() {
+            return createView.normalizeInfoContentKeys(contentKeys);
+        };
         panel.innerHTML = resolveHtml();
         wrap._infoResolveHtml = resolveHtml;
+        wrap._infoResolveKeys = resolveKeys;
         wrap._infoPanel = panel;
         const closePanel = function() {
             wrap.classList.remove("info-button-open");
@@ -78,11 +150,15 @@ let createView = {
             e.preventDefault();
             e.stopPropagation();
             if (wrap.classList.contains("info-button-open")) {
+                createView.acknowledgeInfoButton(wrap);
                 closePanel();
+                createView.applyInfoButtonUnread(wrap);
                 return;
             }
             panel.innerHTML = resolveHtml();
             wrap.classList.add("info-button-open");
+            createView.acknowledgeInfoButton(wrap);
+            createView.applyInfoButtonUnread(wrap);
             // Next click anywhere closes; defer so this click does not.
             setTimeout(function() {
                 document.addEventListener("click", onDocClick);
@@ -91,43 +167,54 @@ let createView = {
         wrap.appendChild(btn);
         wrap.appendChild(panel);
         el.appendChild(wrap);
+        createView.applyInfoButtonUnread(wrap);
     },
     refreshInfoButtonPanel: function(id) {
         const el = document.getElementById(id);
-        if (!el) {
+        const wrap = createView.getInfoButtonWrap(el);
+        if (!wrap) {
             return;
         }
-        const wrap = el.querySelector(".info-button-wrap");
-        if (!wrap || !wrap.classList.contains("info-button-open") || !wrap._infoResolveHtml || !wrap._infoPanel) {
-            return;
+        if (wrap.classList.contains("info-button-open") && wrap._infoResolveHtml && wrap._infoPanel) {
+            wrap._infoPanel.innerHTML = wrap._infoResolveHtml();
+            createView.acknowledgeInfoButton(wrap);
         }
-        wrap._infoPanel.innerHTML = wrap._infoResolveHtml();
-    },
-    getScrollArchivesInfoHtml: function() {
-        const stars = (typeof engine !== "undefined" && engine.countAchievedMapStarsByType)
-            ? engine.countAchievedMapStarsByType()
-            : { bronze: 0, silver: 0, gold: 0 };
-        const bronzeMult = (typeof engine !== "undefined" && engine.getScrollArchivesBronzeResearchCostMult)
-            ? engine.getScrollArchivesBronzeResearchCostMult() : 1;
-        const silverMult = (typeof engine !== "undefined" && engine.getScrollArchivesSilverResearchSpeedMult)
-            ? engine.getScrollArchivesSilverResearchSpeedMult() : 1;
-        const goldMult = (typeof engine !== "undefined" && engine.getScrollArchivesGoldResearchGainMult)
-            ? engine.getScrollArchivesGoldResearchGainMult() : 1;
-        const bronzeStar = `<span class="skill-star-btn skill-star-bronze skill-star-filled">★</span>`;
-        const silverStar = `<span class="skill-star-btn skill-star-silver skill-star-filled">★</span>`;
-        const goldStar = `<span class="skill-star-btn skill-star-gold skill-star-filled">★</span>`;
-        return "<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices - select one and weave it with Finish Research to unlock that skill.</p>"
-            + `<p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>`
-            + `<p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>`
-            + `<p>Each ${goldStar} increases research gain by 10% (does not raise cost). Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>`;
+        createView.applyInfoButtonUnread(wrap);
     },
     createInfoButtons: function() {
         createView.createInfoButton(
-            "baseBuildingInfoScroll",
+            "resortInfo_scrollArchives",
             function() {
-                return createView.getScrollArchivesInfoHtml();
+                const stars = engine.countAchievedMapStarsByType();
+                const bronzeMult = engine.getScrollArchivesBronzeResearchCostMult();
+                const silverMult = engine.getScrollArchivesSilverResearchSpeedMult();
+                const goldMult = engine.getScrollArchivesGoldResearchGainMult();
+                const bronzeStar = `<span class="star-bronze">★</span>`;
+                const silverStar = `<span class="star-silver">★</span>`;
+                const goldStar = `<span class="star-gold">★</span>`;
+                return `<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices - select one and weave it with Finish Research to unlock that skill.</p>
+                    <p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>
+                    <p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>
+                    <p>Each ${goldStar} increases research gain by 10% (does not raise cost). Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>`;
             },
             56
+        );
+        createView.createInfoButton(
+            "resortInfo_bambooForest",
+            function() {
+                const pondBuilt = engine.isPondBuiltFromFoxDen();
+                const marketBuilt = engine.isMarketBuilt();
+                return `<p>Harvest bamboo for construction wood.</p>
+                    <p>10 Chips become 1 Wood.</p>
+                    <p>Gain Chop Power per assigned Kitsune or Okami.</p>
+                    <p>One bamboo segment takes 2 minutes to fully grow. Bamboo grows when not being harvested.</p>
+                    ${pondBuilt ? "<p>Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</p>" : ""}
+                    ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}`;
+            },
+            56,
+            function() {
+                return ["base", engine.isPondBuiltFromFoxDen() ? "water" : "", engine.isMarketBuilt() ? "fertilizer" : ""].filter(Boolean);
+            }
         );
         createView.createInfoButton(
             "tabPane_skills",
@@ -144,6 +231,397 @@ let createView = {
             + "<p><strong>Max Aud recover:</strong> Whenever max Aud increases, recover an equal amount of current Audacity (+max and +current)."
             + "<p><strong>Ego Damage order:</strong> ((Base slap + card Base Ego Damage) x Dense Clones + Flat Damage) x Brutality x damage multipliers</p>"
             + "<p><strong>Damage reduction order:</strong> (1) Clout absorbs raw incoming damage, (2) flat reduction, (3) multiplier reductions from skills, buffs, and class.</p>"
+        );
+        createView.createBuildingInfoButtons();
+    },
+    hasAnyWaterSpirit: function() {
+        const spirits = (data.progress.base && data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.spirits) || [];
+        for (let i = 0; i < spirits.length; i++) {
+            if (spirits[i].kind === "water") {
+                return true;
+            }
+        }
+        return false;
+    },
+    spiritTrainingInfoHtml: function() {
+        if (!engine.isSpiritTrainingSpotBought() || !engine.getSpiritTrainingCardEffects) {
+            return "";
+        }
+        const trainFx = engine.getSpiritTrainingCardEffects();
+        const cost = roundNearestDecimals(trainFx.cost, 2);
+        const duration = roundNearestDecimals(trainFx.durationMs / 1000, 2);
+        const exp = roundNearestDecimals(trainFx.exp, 2);
+        const training = roundNearestDecimals(trainFx.training, 2);
+        return `<p>At the Spirit Training Spot, a spirit trains when the Hidden Spring has at least ${cost} mana. Training lasts ${duration}s, then spends ${cost} Hidden Spring mana to grant ${exp} exp and +${training} training. Training can rise above Spirit Power. Effects use Spirit Power plus Spirit Training, up to an equal amount of Spirit Training.</p>`;
+    },
+    createBuildingInfoButtons: function() {
+        createView.createInfoButton(
+            "resortInfo_stonePile",
+            function() {
+                let html = "<p>Stores stone gathered for the resort.</p>";
+                const pile = data.progress.base && data.progress.base.stonePile;
+                if (pile && pile.stoneDuplicatorUnlocked && engine.getStoneDuplicatorBatch) {
+                    const batch = engine.getStoneDuplicatorBatch();
+                    const intervalSec = roundNearestDecimals(engine.getStoneDuplicatorIntervalMs() / 1000, 2);
+                    const stoneText = batch.stone === 1 ? "1 unduplicated stone" : `${batch.stone} unduplicated stone`;
+                    html += `<p>Every ${intervalSec} seconds, the duplicator spends ${batch.mana} mana and ${stoneText}, and adds ${batch.stone * 2} duplicated stone. If stone or mana is short, that cycle does nothing. Fill Mana sends the Okami to move global mana into this pile's reservoir.</p>`;
+                }
+                return html;
+            },
+            56,
+            function() {
+                const pile = data.progress.base && data.progress.base.stonePile;
+                const keys = ["base"];
+                if (pile && pile.stoneDuplicatorUnlocked) {
+                    keys.push("duplicator");
+                    if (engine.getStoneDuplicatorBatch && engine.getStoneDuplicatorBatch().stone >= 10) {
+                        keys.push("batch10");
+                    }
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_foxDen",
+            "<p>Plan buildings here and assign kitsune to carry materials to them. Resources are sent in queue order. Hover the Fox Den for queue order.</p>",
+            56
+        );
+        createView.createInfoButton(
+            "resortInfo_pond",
+            function() {
+                let html = "<p>The Pond receives extra water when the Cistern is full and overflows. Empty Half and Dump incoming water also send Cistern water here. Each second it moves 0.1% of its stored water into the Bamboo Forest. Bamboo grows twice as fast while that water lasts, and each chip regrown spends 1L.</p>";
+                if (createView.hasAnyWaterSpirit()) {
+                    html += "<p>Water spirits assigned to the Pond gain exp each second equal to the square root of stored water, divided by 50. The Water spirit exp line is that rate.</p>";
+                    html += "<p>That exp raises their level. A guest's Watch Water Spirits step at the Tatami Inn lasts a number of seconds equal to the total level of water spirits assigned to the Pond. During those seconds the guest keeps gaining restfulness at the inn rate. This is visit time, not extra rooms or extra guests.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (createView.hasAnyWaterSpirit()) {
+                    keys.push("waterExp");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_bonfire",
+            function() {
+                const bf = data.progress.base && data.progress.base.bonfire;
+                const hs = data.progress.base && data.progress.base.hiddenSpring;
+                let html = "<p>Stare at the fire and contemplate how to protect what's yours.</p>";
+                if (bf && bf.denseClonesUnlocked) {
+                    html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is half the Orb level, if that cost is affordable.</p>";
+                }
+                if (bf && bf.tendTheFlameUnlocked) {
+                    html += "<p>Fire tending: assigned carriers skip wood and coal trips once heat reaches the number beside Only bring wood or coal while heat is below.</p>";
+                }
+                if (bf && bf.tendTheFlameUnlocked && hs && (hs.fireSpiritsBought || 0) >= 1) {
+                    html += "<p>Fire spirits at the bonfire gain √(excess heat / 10) / 10 exp per second. Excess heat is bonfire heat minus the power of the fire spirits assigned there.</p>";
+                }
+                if (engine.isMarketBuilt()) {
+                    html += "<p>Carriers bring coal from the Market before wood. Each coal gives 5 times the heat of wood.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const bf = data.progress.base && data.progress.base.bonfire;
+                const hs = data.progress.base && data.progress.base.hiddenSpring;
+                const keys = ["base"];
+                if (bf && bf.denseClonesUnlocked) {
+                    keys.push("density");
+                }
+                if (bf && bf.tendTheFlameUnlocked) {
+                    keys.push("fireTending");
+                }
+                if (bf && bf.tendTheFlameUnlocked && hs && (hs.fireSpiritsBought || 0) >= 1) {
+                    keys.push("fireSpirit");
+                }
+                if (engine.isMarketBuilt()) {
+                    keys.push("coal");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_noodleBar",
+            function() {
+                const bonus = engine.getNoodleEatRestBonus();
+                let html = "<p>Guests stop here to eat before they rest. Their talk fills the tip bar.</p>";
+                html += `<p>A guest eats for 10 seconds if the bar has at least 100L of water and 1 dried noodle. Carriers only deliver water of at least 65C. Eating spends 100L and 1 dried noodle, and grants +${bonus} restfulness per second.</p>`;
+                html += "<p>More guests at the inn, and more of them eating here, raise tip progress.</p>";
+                if (engine.getNoodleTipSkillPool().length >= 5) {
+                    html += "<p>Five researched skills are offered. Choose one. When tip progress completes, that skill gains 1 tip, and each tip adds 1% skill exp (additive).</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (engine.getNoodleTipSkillPool().length >= 5) {
+                    keys.push("tips");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_torii",
+            function() {
+                const torii = data.progress.base && data.progress.base.torii;
+                let html = "<p>Invites visitors to the resort. They walk to the Inn when a room is free.</p>";
+                if (torii && torii.enticingLightsUnlocked) {
+                    html += "<p>Enticing Lights spend 10 mana per second and make visitors arrive every 30 seconds instead of 60, while the gate is not full. Fill Mana sends the Okami to move global mana into this reservoir.</p>";
+                }
+                if (engine.isToriiDrinkingBowlUnlocked()) {
+                    html += "<p>A paired arrival needs 50L of water of at least 26C. If the gate can hold two visitors, two arrive and 50L is spent.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const torii = data.progress.base && data.progress.base.torii;
+                const keys = ["base"];
+                if (torii && torii.enticingLightsUnlocked) {
+                    keys.push("enticingLights");
+                }
+                if (engine.isToriiDrinkingBowlUnlocked()) {
+                    keys.push("drinkingBowl");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_mage_tower",
+            function() {
+                let html = "<p>Exp each second starts at the total level of all spirits. Each assigned kitsune, and the Okami, adds 20%. The Exp gain line is that rate.</p>";
+                html += "<p>Mana per second starts at the Orb's level. Bonfire heat and Spin Currents multiply that rate. While the Okami is assigned here, her inspiration bonus also multiplies mana generation, and does not multiply the worker exp bonus.</p>";
+                const walls = engine.getOrbBuildWallsBought();
+                const stairs = engine.getOrbBuildStairsBought();
+                if (walls > 0) {
+                    html += `<p>Each Build Walls purchase adds +10% Orb exp. ${walls} bought is +${walls * 10}%.</p>`;
+                }
+                if (stairs > 0) {
+                    html += `<p>Each Build Stairs purchase adds +20% Orb exp. ${stairs} bought is +${stairs * 20}%.</p>`;
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (engine.getOrbBuildWallsBought() > 0) {
+                    keys.push("walls");
+                }
+                if (engine.getOrbBuildStairsBought() > 0) {
+                    keys.push("stairs");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_inn",
+            function() {
+                let html = "<p>Guest steps and their durations are listed on the Guest tab.</p>";
+                if (engine.isInnGentleLightsUnlocked()) {
+                    const bonus = engine.getInnGentleLightsRestfulnessBonus();
+                    html += `<p>Gentle Lights spend 5 mana per second for each occupied room and grant +${bonus} restfulness per second while mana lasts. Fill Mana sends the Okami to move global mana into this reservoir.</p>`;
+                }
+                if (engine.isInnOnsenConverted()) {
+                    html += "<p>A soak needs 50L of water of at least 40C.</p>";
+                }
+                if (engine.isMarketBuilt()) {
+                    html += "<p>A hot bath uses one soap and doubles that soak's Star Bead bonus from 30% to 60%. A hot bath uses one towel and grants +100 restfulness.</p>";
+                }
+                const inn = data.progress.base && data.progress.base.inn;
+                if (inn && inn.pondPathBuilt) {
+                    html += "<p>A pond visit lasts a number of seconds equal to the total level of water spirits assigned to the Pond. Guests keep gaining restfulness at the inn rate during that time.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const inn = data.progress.base && data.progress.base.inn;
+                const keys = ["base"];
+                if (engine.isInnGentleLightsUnlocked()) {
+                    keys.push("gentleLights");
+                }
+                if (engine.isInnOnsenConverted()) {
+                    keys.push("onsen");
+                }
+                if (engine.isMarketBuilt()) {
+                    keys.push("marketGoods");
+                }
+                if (inn && inn.pondPathBuilt) {
+                    keys.push("pondPath");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_market",
+            function() {
+                const carry = resortData.getKitsuneCarryCapacity();
+                return "<p>Assigned kitsune haul the allowed goods here and sell them for Credit. Credit is spent only at the Market. Each Credit gained is 1 Market exp.</p>"
+                    + `<p>Haulers carry ${carry} per trip, alternate between the checked resources, and only leave when that full amount is available.</p>`
+                    + "<p>Traders buy the resources below on their own. The Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time. Traders rotate between checked trades. Unchecking a trade in progress pauses it, the Credit stays spent, and that trader moves to the next checked trade.</p>";
+            },
+            56,
+            function() {
+                return ["base", "haulers", "traders"];
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_shrine",
+            "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second.</p>",
+            56
+        );
+        createView.createInfoButton(
+            "resortInfo_hiddenSpring",
+            function() {
+                let html = "<p>A quiet spring above the resort. Spirits are summoned here and sent out to their work sites.</p>";
+                html += "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. This trip uses the Okami, and it pauses her current path job.</p>";
+                if (engine.isBuildingManaUnlocked("hiddenSpring")) {
+                    html += "<p>Send Mana Clone costs 2000 mana plus the mana deposited, up to this spring's remaining capacity. It uses the Okami the same way.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (engine.isBuildingManaUnlocked("hiddenSpring")) {
+                    keys.push("manaClone");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_cistern",
+            function() {
+                const garden = data.progress.base && data.progress.base.garden;
+                let html = "<p>Water spirits at the Hidden Spring send droplets down the path. A droplet adds its water to the Cistern and mixes its heat into the stored temperature. Heat above 100C becomes essence instead of temperature. Water that does not fit goes to the Pond.</p>";
+                if (garden && garden.arrangementOfThirstUnlocked) {
+                    html += "<p>Dump incoming water sends arriving water to the Pond instead of the Cistern.</p>";
+                }
+                if (garden && garden.arrangementOfHotWaterUnlocked) {
+                    html += "<p>Replace with hotter water, when the Cistern is full, makes room for a hotter droplet by sending stored water to the Pond.</p>";
+                }
+                if (engine.cisternWorkersRevealed()) {
+                    html += "<p>Assigned kitsune, and the Okami while she is here, carry water to a building that still has room and is allowing carriers. They leave only when the Cistern is hot enough for that stop: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. A trip takes up to the Water carry amount. They prefer a stop that can hold a full load. Water that does not fit on delivery is returned to the Cistern.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const garden = data.progress.base && data.progress.base.garden;
+                const keys = ["base"];
+                if (garden && garden.arrangementOfThirstUnlocked) {
+                    keys.push("dump");
+                }
+                if (garden && garden.arrangementOfHotWaterUnlocked) {
+                    keys.push("hotter");
+                }
+                if (engine.cisternWorkersRevealed()) {
+                    keys.push("carriers");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_mine",
+            function() {
+                let html = "<p>Each depth doubles the dirt, stone, and ore from a cleared block, and multiplies block health by 1.9. The depth row's /10 is how many grids you have cleared here. The next depth unlocks at 10.</p>";
+                html += "<p>Earth spirits dig with their effective spirit power. Mineshaft Beams add 20% dig power each, which is the bonus on the Spirit power line.</p>";
+                html += "<p>A grid is 25 blocks. Depth 0 has 1 stone, and each 2 depth adds 1 stone, up to 5. Ore starts at depth 3, and each 5 depth adds 1 ore, up to 5. The rest is dirt.</p>";
+                html += "<p>Digging does not grant exp. When the grid is clear, assigned earth spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and split among them as exp. The play line shows that amount.</p>";
+                if (engine.getPlayPitBought() > 0) {
+                    html += "<p>Play Pit increases the dirt spent on each play cycle.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (engine.getPlayPitBought() > 0) {
+                    keys.push("playPit");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "resortInfo_spirit",
+            function() {
+                const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+                const kind = spirit ? (spirit.kind || "earth") : "";
+                let html = "<p>Exp to the next level is multiplied by 1.8.</p>";
+                if (kind === "earth") {
+                    html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants dirt, stone, or ore. Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
+                    html += "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) stone or ore, plus 20% per Pebble Pay, rounded up. Stone arrives at the Stone Pile. Ore arrives at the Atelier.</p>";
+                } else if (kind === "water") {
+                    html += "<p>At the Hidden Spring, a water spirit forms a droplet and sends it down the path. The delivered volume is granted as exp. The water joins the Cistern, and heat above 100C becomes essence.</p>";
+                    html += "<p>At the Pond, a water spirit gains √(stored water) / 50 exp per second while the pond has water. Those levels set the Tatami Inn's Watch Water Spirits step, in seconds, equal to the total level of water spirits assigned there.</p>";
+                } else if (kind === "fire") {
+                    html += "<p>At the Bonfire, a fire spirit gains √(excess heat / 10) / 10 exp per second. Excess heat is bonfire heat minus the power of fire spirits assigned there.</p>";
+                    html += "<p>At the Atelier, every 60 seconds a fire spirit smelts floor(√effective power) ore into bars. After Larger Forge, the batch is ceil(√effective power × (1 + 0.5 per Larger Forge)). Exp equals bars smelted times 3.</p>";
+                    html += "<p>On a fire launcher, a fire spirit restores embers from effective spirit power and fires when a droplet is in range. Exp per hit equals heat per strike divided by 5.</p>";
+                } else if (kind === "plant") {
+                    html += "<p>At the Bamboo Forest, a plant spirit adds its effective spirit power to that stalk's base chips, and gains 1 exp each time a chip regrows in that column.</p>";
+                }
+                html += createView.spiritTrainingInfoHtml();
+                return html;
+            },
+            100,
+            function() {
+                const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+                if (!spirit) {
+                    return ["none"];
+                }
+                const keys = [spirit.kind || "earth"];
+                if (engine.isSpiritTrainingSpotBought()) {
+                    keys.push("training");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "tabPane_leveling",
+            function() {
+                let html = "<p>Killing an intruder grants character exp. After Growth Blessing, that exp fills this level bar. The same exp also stores 1% for the Okami, and she receives it when the clone run ends. Soul's character-exp bonus applies before that split, so it raises both. The Stats tab has the full formulas for Audacity, damage, and the other combat stats.</p>";
+                html += "<p>Brutality is +10% damage per point, and damage is rounded up. Confidence is +10% max Audacity, +10% healing, and +5% Clout gain per point. Charisma makes enemies move 5% faster per point, grants +5% coins per point, grants +5% Clout gain per point, and leaves 95% of the remaining time until a wave and 95% of the spacing inside a wave. Soul is +3% skill exp and +10% character exp per point, both additive. Your class adds its Bru, Con, and Cha on every level by itself. The number beside the class name is that per-level grant.</p>";
+                if (typeof bonfire !== "undefined" && bonfire.isPlannedGrowthUnlocked()) {
+                    html += "<p>The attribute buttons append the next unplanned level, up to 10 levels past the highest level this clone line has reached. On a level-up, a planned level spends its point immediately. An unplanned level leaves the point unassigned. Edits wait for the next clone. X removes a planned range, and later levels shift down to fill the gap. Clear Plan removes the whole plan.</p>";
+                }
+                return html;
+            },
+            4,
+            function() {
+                const keys = ["base"];
+                if (typeof bonfire !== "undefined" && bonfire.isPlannedGrowthUnlocked()) {
+                    keys.push("plan");
+                }
+                return keys;
+            }
+        );
+        createView.createInfoButton(
+            "tabPane_travel",
+            function() {
+                let html = "<p>A map unlocks when the previous map has a bronze star. The first map is available immediately. A challenge map also requires its listed class.</p>";
+                html += "<p>Clearing a map's enemies through one full cycle earns the next star, then the clone continues at higher difficulty. Bronze is x4 enemy strength and x2 coins and exp. Silver is x16 enemy strength and x4 coins and exp, compared with the first cycle. Gold completes the map.</p>";
+                html += "<p>Stars can be assigned to skills. Each star on a skill multiplies that skill's exp by x1.5, and they stack. At the Scroll Archives, each bronze star multiplies research cost by 0.9, each silver star multiplies inscribe speed by 1.1, and each gold star multiplies research gain by 1.1.</p>";
+                if (engine.isShardLootUnlocked()) {
+                    html += "<p>After Collect Shards is researched, each kill can drop shards. The chance pool for the current star cycle is 100% on bronze, 200% on silver, and 300% on gold. That pool is split across the map's waves by their difficulty, then divided by the number of enemies in the wave, and a single kill cannot exceed 100%. The Shard Drop Amount on a map is its base amount, times x1.3 for each Collect Shards level after the first, times x1.1 for every star you have earned. Shards spend themselves on the next skill slot, and that cost rises by x1.5 each slot.</p>";
+                }
+                html += "<p>The first time you earn a star on a map, you rescue kitsune there: 1 for bronze, 2 for silver, and 3 for gold, up to 6 on that map. They join your kitsune total. Earning a star you have already earned, including after Fade into Legend, does not rescue more.</p>";
+                return html;
+            },
+            4,
+            function() {
+                const keys = ["base"];
+                if (engine.isShardLootUnlocked()) {
+                    keys.push("shards");
+                }
+                return keys;
+            }
         );
     },
     waveInfoZoneSlotCount: 12,
@@ -334,7 +812,7 @@ let createView = {
         };
         const htmlBonfirePanel = function() {
             return `
-                <div id="bonfireCloneSettings_row" class="base-row muted-text" style="display:none">Current settings: <span id="bonfireCloneSettings_map"></span> · Density <span id="bonfireCloneSettings_density">0</span></div>
+                <div id="bonfireCloneSettings_row" class="base-row" style="display:none">Current settings: <span id="bonfireCloneSettings_map"></span> · Density <span id="bonfireCloneSettings_density">0</span></div>
                 <button type="button" id="base_bonfire_clone_btn" class="tab-button bonfire-clone-btn" onclick="events.startBonfireClone()"><span id="base_bonfire_clone_prefix">Create a clone for</span> <span id="base_bonfire_mana_cost">0 mana</span></button>
                 <div id="bonfireApplyLiveSettings_row" class="base-row" style="display:none"><label><input type="checkbox" id="bonfireApplyLiveSettings_chk" onchange="events.toggleBonfireApplyLiveSettings(this.checked)"> Apply setting changes to the next clone</label></div>
                 <div id="bonfireDenseClones_row" class="base-row" style="display:none">
@@ -347,7 +825,6 @@ let createView = {
                         <button type="button" id="bonfireDenseClones_inc_ten" class="tab-button" onclick="events.adjustCloneDensity('ten_inc')">++</button>
                         <button type="button" id="bonfireDenseClones_inc_all" class="tab-button" onclick="events.adjustCloneDensity('all_inc')">>></button>
                     </div>
-                    <div class="muted-text">Each density adds 500 base mana cost and +10% base Aud and ego damage. Max is half the Orb level, if affordable.</div>
                 </div>
                 <div id="bonfireAutoRetry_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireAutoRetry_chk" onchange="events.toggleBonfireAutoRetry(this.checked)"> Retry after the clone disperses</label>
@@ -358,13 +835,11 @@ let createView = {
                 <div id="bonfireFireTending_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireFireTending_chk" checked onchange="events.toggleBonfireFireTending(this.checked)"> Only bring wood or coal while heat is below</label>
                     <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="55" onchange="events.setBonfireFireTendingCap(this.value)">
-                    <span class="muted-text">Assigned carriers skip trips when heat is at or above this value.</span>
                 </div>
                 <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power (base + training): <span id="bonfireFireSpiritPower">0</span></div>
-                <div id="bonfireFireSpiritHeat_row" class="base-row muted-text" style="display:none"></div>
                 <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Wood carry</span>: <span id="bonfireWoodCarry"></span> per trip</div>
                 <div id="bonfireHeatPerFuel_row" class="base-row" style="display:none">1 wood gives <span id="bonfireHeatPerWood"></span> heat<span id="bonfireHeatPerCoalPart" style="display:none"> | 1 coal gives <span id="bonfireHeatPerCoal"></span> heat</span></div>
-                <div id="bonfireCoal_row" class="base-row" style="display:none">Coal: <span id="bonfireCoalText">0</span> <span class="muted-text">Carriers bring coal from the Market before wood. Each coal gives 5x the heat of wood.</span></div>
+                <div id="bonfireCoal_row" class="base-row" style="display:none">Coal: <span id="bonfireCoalText">0</span></div>
                 ${resortUpgradeRowsHtml("bonfire")}
             `;
         };
@@ -410,7 +885,6 @@ let createView = {
         };
         const htmlShrinePanel = function() {
             return `
-                <div class="base-row muted-text">Karma/s = (total talent levels x star score x total spirit levels x Okami level x Okami tails) / 10,000,000. Star score is bronze + 2xsilver + 4xgold. Okami gains a tail every 10 levels.<br>Each shrine level grants +0.1 divinity/s.</div>
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
@@ -504,11 +978,12 @@ let createView = {
                                     <div class="labeled-progress-text labeled-progress-text--small"><span id="inscriptionProg_${def.key}"></span><span class="labeled-progress-sep"> / </span><span id="inscriptionProgNeed_${def.key}"></span></div>
                                 </div>
                             </div>
-                            <div class="inscription-value"><span id="inscriptionActual_${def.key}"></span> (<span id="inscriptionBought_${def.key}"></span>)</div>
+                            <div class="inscription-value"><span id="inscriptionActual_${def.key}"></span></div>
+                            <div class="inscription-bought">(<span id="inscriptionBought_${def.key}"></span>)</div>
                             <div class="inscription-output"><span id="inscriptionOutput_${def.key}"></span></div>
                         </div>
                         <div class="inscription-detail muted-text"><span id="inscriptionRate_${def.key}" class="inscription-rate-label"></span>Requires <span id="inscriptionReq_${def.key}"></span> Inscription. Costs <span id="inscriptionCoins_${def.key}"></span> ${coinIcon}, <span id="inscriptionBeads_${def.key}"></span> ${beadIcon}, <span id="inscriptionMana_${def.key}"></span> ${manaIcon} per inscription.</div>
-                        <div id="inscriptionLock_${def.key}" class="inscription-lock" style="display:none"><div class="inscription-lock-shade"></div><div class="inscription-lock-text">Requires 10 ${prevName} bought</div></div>
+                        <div id="inscriptionLock_${def.key}" class="inscription-lock" style="display:none"><div class="inscription-lock-shade"></div><div class="inscription-lock-text">Requires 10 ${prevName} Inscribed</div></div>
                     </div>`;
             }
             return h;
@@ -524,7 +999,7 @@ let createView = {
                     <div id="scribingsProgressWrap" class="skills-shard-slot-progress-wrap">
                         <div class="skills-shard-slot-progress-track labeled-progress-track">
                             <div id="scribingsProgressFill" class="skills-shard-slot-progress-fill"></div>
-                            <div class="labeled-progress-text"><span id="scribingsAmountText"></span><span class="labeled-progress-sep"> / </span><span id="scribingsRequiredText"></span><span class="labeled-progress-sep"> Scribings</span></div>
+                            <div class="labeled-progress-text"><span id="scribingsAmountText"></span><span class="labeled-progress-sep"> / </span><span id="scribingsRequiredText"></span><span class="labeled-progress-sep"> Scribings | ETA: </span><span id="scribingsEtaText"></span></div>
                         </div>
                     </div>
                     <div id="inscriptionRows">${inscriptionRowsHtml()}</div>
@@ -587,7 +1062,6 @@ let createView = {
         const htmlMarketPanel = function() {
             const credit = resortData.resourceIconHtml("credit");
             return `
-                <div class="base-row muted-text">Assigned Kitsune haul goods here and sell them for Credit. Credit is only spent at the Market. Each Credit gained is 1 Market exp.</div>
                 <div class="base-row">${credit} Credit: <span id="marketCreditText"></span></div>
                 <div id="marketExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="marketExpFill" class="prog-fill prog-fill-market-exp"></div>
@@ -600,11 +1074,9 @@ let createView = {
                 <div class="base-row">Allow resources:
                     ${htmlMarketHaulToggles()}
                 </div>
-                <div class="base-row muted-text">Haulers carry <span id="marketCarryAmountText"></span> per trip, alternate between the allowed resources, and only leave when the full amount is available.</div>
                 ${resortUpgradeRowsHtml("market")}
                 <div class="base-upgrade-divider"></div>
                 <div class="base-info-title">Market Resources</div>
-                <div class="base-row muted-text">Traders buy these on their own; the Okami cannot buy them. Trade time is fixed and is not shortened by spirit strands. Each extra Trader divides the time. Traders rotate between selected trades. Unchecking a trade in progress pauses it (credit stays spent) and the trader moves to the next checked trade.</div>
                 <div class="base-worker-assign-row">
                     <button id="base_market_traders_unassign_all_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'all_dec')"><<</button>
                     <button id="base_market_traders_unassign_ten_btn" class="tab-button" onclick="events.adjustWorkers('market_traders', 'ten_dec')">--</button>
@@ -656,11 +1128,10 @@ let createView = {
                 <div id="resortInfo_empty" class="resort-info-section resort-info-visible"></div>
                 <div id="resortInfo_hiddenSpring" class="resort-info-section">
                     <div class="base-info-title">Hidden Spring</div>
-                    <div class="base-row muted-text">A quiet spring above the resort where spirits gather.</div>
                     <div id="hiddenSpringCollectStone_row" class="base-row">
                         <button type="button" id="hiddenSpringCollectStone_btn" class="tab-button" onclick="events.startCollectStone()">Collect 4 Stone</button>
                     </div>
-                    ${buildingManaRowHtml("hiddenSpring", "Send Mana Clone costs 2000 mana plus the amount that will be deposited (up to Hidden Spring's remaining capacity). This takes concentration from the Okami.")}
+                    ${buildingManaRowHtml("hiddenSpring")}
                     ${resortUpgradeRowsHtml("hiddenSpring")}
                 </div>
                 <div id="resortInfo_spirit" class="resort-info-section">
@@ -672,13 +1143,11 @@ let createView = {
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
                     <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span></div>
-                    <div id="spiritInfoTrainingNote" class="base-row muted-text" style="display:none">Assigned to the Spirit Training Spot. When Hidden Spring has at least <span id="spiritTrainingMinManaText">500</span> mana, trains for <span id="spiritTrainingDurationText">60</span>s, then spends <span id="spiritTrainingCostText">500</span> Hidden Spring mana to gain <span id="spiritTrainingExpText">60</span> exp and +<span id="spiritTrainingGainText">0.1</span> training. Training can rise above Spirit Power. Effects use Spirit Power plus Spirit Training, up to an equal amount of Spirit Training.</div>
-                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpNote" class="muted-text">(x1.8/lvl)</span></div>
+                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
-                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore <span class="muted-text">floor(√effective spirit power), +20% per Pebble Pay, rounded up</span></div>
+                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore</div>
                         <div id="spiritInfoPebbleEtas" class="base-row" style="display:none"></div>
-                        <div class="base-row muted-text">The Earth Spirit can be assigned to the Mine to get Exp and valuable resources, or it can be assigned to the Hidden Spring to create pebbles along the path and send the resources to the resort.</div>
                         <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
                         <div id="spiritInfoAutoReturnMineRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoAutoReturnMine_chk" checked onchange="events.toggleSpiritAutoReturnToMine(this.checked)"> Return to the Mine when there is no stone or ore to send as pebbles</label></div>
                     </div>
@@ -701,7 +1170,6 @@ let createView = {
                     <div id="spiritInfoPlantExtras" style="display:none">
                         <div class="base-row">Bamboo column: <span id="spiritInfoPlantColumn"></span></div>
                         <div class="base-row" id="spiritInfoPlantChipsBonus"></div>
-                        <div class="base-row muted-text">Plant spirits gain 1 exp each time a chip regrows in their assigned bamboo column. They add their effective spirit power (base + training) to the base chips of the bamboo.</div>
                     </div>
                     <div id="spiritInfoTaskWrap">
                         <div id="spiritInfoTaskText" class="base-row base-gap-top"></div>
@@ -710,11 +1178,10 @@ let createView = {
                 </div>
                 <div id="resortInfo_torii" class="resort-info-section">
                     <div class="base-info-title">Zenko Torii Gate</div>
-                    <div class="base-row muted-text">Invites visitors the resort. They move to the Inn if possible.</div>
                     <div class="base-row">Visitors at the gate: <span id="toriiVisitorsWaiting"></span>/<span id="toriiVisitorsMax"></span></div>
                     <div class="base-row">Next visitor: <span id="toriiNextVisitor"></span><span id="toriiAvgVisitorArrival" class="muted-text"></span></div>
                     <div id="toriiNextVisitorProgressWrap" class="base-mini-progress torii-next-visitor-progress" style="display:none"><div id="toriiNextVisitorProgressFill" class="base-mini-progress-fill"></div></div>
-                    ${buildingManaRowHtml("torii", "Enticing Lights use 10 mana/s to make visitors arrive every 30 seconds instead of 60 while the gate is not full. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
+                    ${buildingManaRowHtml("torii")}
                     <div id="toriiWater_row" class="base-row" style="display:none">
                         <div class="prog-track game-progress-track water-prog-track">
                             <div id="toriiWaterFill" class="prog-fill prog-fill-water"></div>
@@ -722,12 +1189,11 @@ let createView = {
                         </div>
                     </div>
                     <div id="toriiAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="toriiAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('torii', this.checked)"> Allow carriers to bring water</label></div>
-                    <div id="toriiWaterReq_row" class="base-row muted-text" style="display:none">Requires 50L of water of at least 26C. When a visitor arrives and the gate can hold two, two visitors arrive and 50L is spent.</div>
                     ${resortUpgradeRowsHtml("torii")}
                 </div>
                 <div id="resortInfo_inn" class="resort-info-section">
                     <div id="innInfoTitle" class="base-info-title">Tatami Inn</div>
-                    ${buildingManaRowHtml("inn", "Gentle Lights use 5 mana/s per occupied room and grant +2 restfulness/s while mana is available. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
+                    ${buildingManaRowHtml("inn")}
                     <div class="base-row">
                         <div>Rooms available: <span id="innRoomsAvailable"></span></div>
                         <div>Rooms occupied: <span id="innRoomsOccupied"></span></div>
@@ -740,12 +1206,9 @@ let createView = {
                         </div>
                     </div>
                     <div id="innAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="innAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('inn', this.checked)"> Allow carriers to bring water</label></div>
-                    <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span> <span class="muted-text">A hot bath uses one soap and doubles the Star Bead bonus from that soak (30% becomes 60%).</span></div>
-                    <div id="innTowels_row" class="base-row" style="display:none">Towels: <span id="innTowelsText">0</span> <span class="muted-text">A hot bath uses one towel and grants +100 restfulness.</span></div>
-                    <div id="innOnsenTempReq_row" class="base-row muted-text" style="display:none">Requires 50L of water of at least 40C</div>
+                    <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span></div>
+                    <div id="innTowels_row" class="base-row" style="display:none">Towels: <span id="innTowelsText">0</span></div>
                     <div id="innOnsenSoak_row" class="base-row muted-text" style="display:none">Soaking lasts 5s and adds +0.5 restfulness/s, and spends 50L.</div>
-                    <div id="innOnsenPondExplain_row" class="base-row muted-text" style="display:none">Pond visit lasts a number of seconds equal to the total level of water spirits assigned to the Pond; guests keep gaining restfulness at the inn rate during that time.</div>
-                    <div class="base-row muted-text">Check the Guest tab for the itinerary.</div>
                     <div id="innGuestsVisitPond_row" class="base-row" style="display:none"><label><input type="checkbox" id="innGuestsVisitPond_chk" checked onchange="events.toggleInnGuestsVisitPond(this.checked)"> Allow guests to visit the pond</label></div>
                     ${resortUpgradeRowsHtml("inn")}
                     <div class="resort-info-grid">
@@ -753,7 +1216,6 @@ let createView = {
                 </div>
                 <div id="resortInfo_noodleBar" class="resort-info-section">
                     <div class="base-info-title">Noodle Bar</div>
-                    <div class="base-row muted-text">Guests stop here to eat before they rest. Their talk fills the tip bar.</div>
                     <div class="base-row">Dried Noodles: <span id="noodleBarNoodlesText">0</span></div>
                     <div id="noodleBarHotWater_row" class="base-row">
                         <div class="prog-track game-progress-track water-prog-track">
@@ -762,22 +1224,18 @@ let createView = {
                         </div>
                     </div>
                     <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
-                    <div id="noodleBarWaterReq_row" class="base-row muted-text">Requires 100L of 65C</div>
-                    <div id="noodleBarEatExplain_row" class="base-row muted-text">If water is there, a guest will eat noodles for 10s, gaining +<span id="noodleBarEatRestBonusText">10</span>/s restfulness.</div>
                     <div id="noodleBarGuestsEating_row" class="base-row">Guests Eating: <span id="noodleBarGuestsEatingText">0</span></div>
                     <div id="noodleTipProgressWrap" class="prog-track orb-exp-prog-track">
                         <div id="noodleTipProgressFill" class="prog-fill prog-fill-noodle-tip"></div>
                         <div class="game-progress-bar-label">Tip Progress: <span id="noodleTipProgressText">0</span>/100%</div>
                     </div>
-                    <div id="noodleTipRateExplain_row" class="base-row muted-text">The more guests there are, and the more eating at the noodle bar, the more they will talk, giving higher tip progress %.</div>
-                    <div id="noodleTipLast_row" class="base-row muted-text"></div>
+                    <div id="noodleTipLast_row" class="base-row"></div>
                     <div class="base-info-title">Tip System</div>
                     <div id="noodleTipLocked_row" class="base-row muted-text">Tips require at least 5 skills researched</div>
                     <div id="noodleTipControls" style="display:none">
-                        <div id="noodleTipSystemExplain_row" class="base-row muted-text">Randomly select 5 skills for listening to tips, and when Tip Progress is complete, the selected skill gets 1 tip, increasing its skill exp by 1% per tip (additive).</div>
                         <button type="button" id="noodleTopicBtn" class="tab-button" onclick="events.changeNoodleConversationTopics()">Change Conversation Topics for 0 coins</button>
                         ${htmlNoodleTipRows()}
-                        <div id="noodleTipSelectHint" class="base-row muted-text" style="display:none">Select which skill to apply the tip to</div>
+                        <div id="noodleTipSelectHint" class="base-row" style="display:none">Select which skill to apply the tip to</div>
                     </div>
                     ${resortUpgradeRowsHtml("noodleBar")}
                 </div>
@@ -795,8 +1253,7 @@ let createView = {
                 </div>
                 <div id="resortInfo_stonePile" class="resort-info-section">
                     <div class="base-info-title">Stone Pile</div>
-                    <div class="base-row muted-text">Holds stone.</div>
-                    ${buildingManaRowHtml("stonePile", "Every 10 seconds, uses 100 mana to turn one unduplicated stone into two duplicated stone. Fill Mana weaves Okami to transfer global mana into this reservoir.")}
+                    ${buildingManaRowHtml("stonePile")}
                     <div id="stonePileDupeProgressWrap" class="base-mini-progress stone-pile-dupe-progress" style="display:none"><div id="stonePileDupeProgressFill" class="base-mini-progress-fill"></div></div>
                     <div id="stonePileDupeIntervalText" class="base-row muted-text" style="display:none">every 10s</div>
                     <div class="base-row">${resortData.resourceIconHtml("stone")} Stone: <span id="stonePileInfoValue"></span></div>
@@ -823,7 +1280,6 @@ let createView = {
                 </div>
                 <div id="resortInfo_mage_tower" class="resort-info-section">
                     <div class="base-info-title">The Orb</div>
-                    <div class="base-row muted-text">Gains exp each second equal to the total levels of all spirits. Each assigned Kitsune (and Okami) increases Orb exp gain by 20%. Mana gain per second equals Orb level; Bonfire heat and Spin Currents multiply that rate. When Okami is assigned here, her inspiration bonus also multiplies mana generation (but not the worker exp bonus).</div>
                     <div class="base-row">Mana generation: <span id="orbManaRateText"></span>/s</div>
                     <div class="base-row">Base Mana: <span id="orbBaseManaText"></span> <span id="orbBaseManaCloneBonusText" class="muted-text"></span></div>
                     <div class="base-row">Exp gain: <span id="orbExpRateText"></span>/s from spirit levels · ETA: <span id="orbExpEtaText"></span></div>
@@ -835,7 +1291,6 @@ let createView = {
                 </div>
                 <div id="resortInfo_bonfire" class="resort-info-section">
                     <div class="base-info-title">Bonfire</div>
-                    <div class="base-row muted-text">Stare at the fire and contemplate how to protect what's yours.</div>
                     ${htmlBonfirePanel()}
                 </div>
                 <div id="resortInfo_shrine" class="resort-info-section">
@@ -848,12 +1303,11 @@ let createView = {
                 </div>
                 <div id="resortInfo_bambooForest" class="resort-info-section">
                     <div class="base-info-title">Bamboo Forest</div>
-                    <div class="base-row muted-text">Harvest bamboo for construction wood.</div>
-                    <div class="base-row">Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 Chips become 1 Wood -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
-                    <div class="base-row">Chop Power: <span id="bambooChopPower"></span> <span class="muted-text">Gain Chop Power per assigned Kitsune or Okami</span></div>
-                    <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span> <span class="muted-text">Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</span></div>
-                    <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span> <span class="muted-text">Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</span></div>
-                    <div class="base-row muted-text">Select which stalk to cut. One bamboo segment takes 2 minutes to fully grow. Bamboo grows when not being harvested.</div>
+                    <div class="base-row">Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
+                    <div class="base-row">Chop Power: <span id="bambooChopPower"></span></div>
+                    <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span></div>
+                    <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span></div>
+                    <div class="base-row muted-text">Select which stalk to cut.</div>
                     <div id="bambooStalkGrid" class="bamboo-stalk-grid"></div>
                     <div id="bambooCutRow" class="bamboo-harvest-row"></div>
                     <div id="bambooStatusRow" class="bamboo-status-row"></div>
@@ -864,7 +1318,6 @@ let createView = {
                 </div>
                 <div id="resortInfo_foxDen" class="resort-info-section">
                     <div class="base-info-title">Fox Den</div>
-                    <div class="base-row muted-text">Plan buildings and send kitsune to deliver materials. Buildings are prioritized over upgrades.</div>
                     <div id="foxDenManaOrders_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenManaOrders_chk" onchange="events.toggleFoxDenManaOrders(this.checked)"> Arrangement of Mana Orders - deliver mana from the Orb when no other gather/build orders remain</label></div>
                     <div id="foxDenAutoClearRocks_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoClearRocks_chk" onchange="events.toggleFoxDenAutoClearPathRocks(this.checked)"> Assigned Okami will automatically clear the next Rocks</label></div>
                     <div id="foxDenAutoAddRailings_row" class="base-row" style="display:none"><label><input type="checkbox" id="foxDenAutoAddRailings_chk" onchange="events.toggleFoxDenAutoAddPathRailings(this.checked)"> Assigned Okami will automatically add Railings on the next path that needs it</label> <span id="foxDenAutoAddRailings_wait" class="muted-text"></span></div>
@@ -876,7 +1329,6 @@ let createView = {
                 </div>
                 <div id="resortInfo_cistern" class="resort-info-section">
                     <div class="base-info-title">Cistern</div>
-                    <div class="base-row muted-text">Collects water from droplets.</div>
                     <div class="base-row">Stored water: <span id="cisternInfoWater"></span></div>
                     <div class="base-row">Temperature: <span id="cisternInfoTemperature"></span></div>
                     <div class="base-row">Capacity: <span id="cisternInfoCapacity"></span></div>
@@ -890,9 +1342,8 @@ let createView = {
                 </div>
                 <div id="resortInfo_pond" class="resort-info-section">
                     <div class="base-info-title">Pond</div>
-                    <div class="base-row muted-text">Overflow basin for extra water.</div>
                     <div class="base-row">Water: <span id="pondInfoWater"></span> <span id="pondWishingWellRate" class="muted-text"></span></div>
-                    <div class="base-row">Water spirit exp: <span id="pondWaterSpiritExp"></span></div>
+                    <div id="pondWaterSpiritExp_row" class="base-row" style="display:none">Water spirit exp: <span id="pondWaterSpiritExp"></span></div>
                     <div id="pondSendWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="pondSendWater_chk" checked onchange="events.togglePondSendWaterToForest(this.checked)"> Send water to bamboo forest</label></div>
                     ${resortUpgradeRowsHtml("pond")}
                 </div>
@@ -929,12 +1380,6 @@ let createView = {
                         <span id="mineStatusText" class="mine-status-inline muted-text"></span>
                     </div>
                     <div class="mine-depth-row"><button id="mineDepthLeftBtn" class="tab-button" onclick="events.changeMineDepth(-1)">←</button><span>Depth <span id="mineDepthText"></span> | <span id="mineDepthClears"></span>/10 <span id="mineDepthReady" class="mine-depth-ready" style="display:none">Ready</span></span><button id="mineDepthRightBtn" class="tab-button" onclick="events.changeMineDepth(1)">→</button></div>
-                    <div class="base-row muted-text">
-                    Each depth level increases rewards by x2, difficulty by x1.9.<br>
-                    Earth Spirits mine faster equal to their Spirit Power.<br>
-                    When a Mine Grid is finished, Earth Spirits play in the dirt, taking the total spirit level of dirt and splitting the exp gain among the assigned earth spirits.<br>
-                    There is 1 more stone per 2 depth, up to 5 stone. Ore is found at depth 3, and 1 more ore is found per 5 depth, up to 5 ore.
-                    </div>
                     <div class="mine-info-body">
                         <div class="mine-grid-row">
                             <div id="mineGrid" class="mine-grid"></div>
@@ -1039,8 +1484,8 @@ let createView = {
                 }
                 gridH += `</div>`;
                 cutH += `<button type="button" id="bambooCutBtn_${si}" class="tab-button bamboo-cut-btn" onclick="events.toggleBambooCut(${si})">Cut</button>`;
-                statusH += `<div id="bambooStatus_${si}" class="bamboo-status-text muted-text"></div>`;
-                baseWoodH += `<div class="bamboo-base-wood-col"><span class="muted-text">Base Chips</span> <span id="bambooBaseWood_${si}"></span></div>`;
+                statusH += `<div id="bambooStatus_${si}" class="bamboo-status-text"></div>`;
+                baseWoodH += `<div class="bamboo-base-wood-col"><span>Base Chips</span> <span id="bambooBaseWood_${si}"></span></div>`;
             }
             bambooStalkGrid.innerHTML = gridH;
             bambooCutRow.innerHTML = cutH;
@@ -1549,28 +1994,28 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingNote", "spiritTrainingMinManaText", "spiritTrainingDurationText", "spiritTrainingCostText", "spiritTrainingExpText", "spiritTrainingGainText", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpNote",
+            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoExp", "spiritInfoExpReq",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
             "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
             "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
-            "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp", "pondSendWater_row",
+            "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp_row", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
-            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "toriiWaterReq_row", "okamiInspirationHint",
+            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10", "bonusSpeedLabel", "bonusSpeedRemaining", "bonusSpeed_x2",
             "offlineProcessingOverlay", "offlineProcessingLabel", "offlineProcessingFill", "offlineProcessingEta", "offlineProcessingSummary", "offlineProcessingDismiss",
-            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenTempReq_row", "innOnsenSoak_row", "innOnsenPondExplain_row", "innMapLabelText", "innGuestsVisitPond_row",
-            "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap", "innManaExplain_row",
+            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenSoak_row", "innMapLabelText", "innGuestsVisitPond_row",
+            "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap",
             "innAllowCarriersMana_row", "innAllowCarriersMana_chk",
-            "toriiManaRow", "toriiFillMana_btn", "toriiManaProgressWrap", "toriiManaFill", "toriiManaAmount", "toriiManaCap", "toriiManaExplain_row",
+            "toriiManaRow", "toriiFillMana_btn", "toriiManaProgressWrap", "toriiManaFill", "toriiManaAmount", "toriiManaCap",
             "toriiAllowCarriersMana_row", "toriiAllowCarriersMana_chk",
-            "stonePileManaRow", "stonePileFillMana_btn", "stonePileManaProgressWrap", "stonePileManaFill", "stonePileManaAmount", "stonePileManaCap", "stonePileManaExplain_row",
+            "stonePileManaRow", "stonePileFillMana_btn", "stonePileManaProgressWrap", "stonePileManaFill", "stonePileManaAmount", "stonePileManaCap",
             "stonePileAllowCarriersMana_row", "stonePileAllowCarriersMana_chk",
             "hiddenSpringCollectStone_row", "hiddenSpringCollectStone_btn",
-            "hiddenSpringManaRow", "hiddenSpringFillMana_btn", "hiddenSpringManaProgressWrap", "hiddenSpringManaFill", "hiddenSpringManaAmount", "hiddenSpringManaCap", "hiddenSpringManaExplain_row",
+            "hiddenSpringManaRow", "hiddenSpringFillMana_btn", "hiddenSpringManaProgressWrap", "hiddenSpringManaFill", "hiddenSpringManaAmount", "hiddenSpringManaCap",
             "hiddenSpringAllowCarriersMana_row", "hiddenSpringAllowCarriersMana_chk",
             "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileDupeIntervalText", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
             "foxDenManaOrders_row", "foxDenManaOrders_chk",
@@ -1593,7 +2038,7 @@ let createView = {
             "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill", "mapShrineProgressWrap", "mapShrineProgressFill",
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
-            "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketCarryAmountText", "marketTradeStatus_row",
+            "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row",
             "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
@@ -1635,14 +2080,14 @@ let createView = {
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
             "bonfireAutoRetry_row", "bonfireAutoRetry_chk",
             "bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk",
-            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireFireSpiritHeat_row", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalText",
+            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalText",
             "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
             "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
             "base_bonfire_planned_row", "base_bonfire_planned_btn", "base_bonfire_planned_extra",
             "base_bonfire_assign_one_btn", "base_bonfire_assign_ten_btn", "base_bonfire_assign_all_btn", "base_bonfire_unassign_one_btn", "base_bonfire_unassign_ten_btn", "base_bonfire_unassign_all_btn", "base_bonfire_workers_label", "base_bonfire_worker_prod_text", "base_bonfire_worker_prod_wrap", "base_bonfire_worker_prog_fill", "base_bonfire_assign_okami_btn",
             "scrollArchivesSubTab_find", "scrollArchivesSubTab_research", "scrollArchivesFindPane", "scrollArchivesResearchPane",
-            "scrollArchivesStarEffects_row", "scribingsProgressWrap", "scribingsProgressFill", "scribingsAmountText", "scribingsRequiredText",
+            "scrollArchivesStarEffects_row", "scribingsProgressWrap", "scribingsProgressFill", "scribingsAmountText", "scribingsRequiredText", "scribingsEtaText",
             "scrollArchivesChoicesWrap",
             "base_scrollArchives_row_finish_research", "base_scrollArchives_extra_finish_research", "base_scrollArchives_finish_research_btn",
             "base_garden_empty",
@@ -1677,10 +2122,10 @@ let createView = {
             );
         }
         createView.queueCache(
-            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk", "noodleBarWaterReq_row", "noodleBarEatExplain_row", "noodleBarEatRestBonusText",
+            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk",
             "noodleBarGuestsEating_row", "noodleBarGuestsEatingText",
-            "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipRateExplain_row", "noodleTipLast_row",
-            "noodleTipLocked_row", "noodleTipControls", "noodleTipSystemExplain_row", "noodleTopicBtn", "noodleTipSelectHint"
+            "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipLast_row",
+            "noodleTipLocked_row", "noodleTipControls", "noodleTopicBtn", "noodleTipSelectHint"
         );
         for (let nti = 0; nti < 5; nti++) {
             createView.queueCache(

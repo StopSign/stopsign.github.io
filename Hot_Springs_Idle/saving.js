@@ -1,10 +1,23 @@
 //contains non-specific saving/loading functions
 
 let saving = {
+    // Set before replacing localStorage and reloading. pagehide/beforeunload call save(),
+    // which would otherwise write the in-memory game back over the stored save.
+    holdSave: false,
+    save: function() {
+        if (saving.holdSave) return;
+        data.lastVisit = Date.now();
+        let sdata = structuredClone(data);
+        window.localStorage[saveName] = JSON.stringify(sdata);
+    },
+    commitStoredSaveAndReload: function() {
+        saving.holdSave = true;
+        location.reload();
+    },
     clearSave: function() {
         console.log("Clearing save")
         window.localStorage[saveName] = "";
-        location.reload();
+        saving.commitStoredSaveAndReload();
     },
     load: async function() {
         initialize.initializeData();
@@ -40,11 +53,6 @@ let saving = {
         }
 
         onLoad.afterLoad()
-    },
-    save: function() {
-        data.lastVisit = Date.now();
-        let sdata = structuredClone(data);
-        window.localStorage[saveName] = JSON.stringify(sdata);
     },
     /** Download current game data as encode64 save (place in battleLoops/ for loadStaticSaveFile). */
     saveToFile: function() {
@@ -91,7 +99,7 @@ let saving = {
                 alert("Could not store that save.");
                 return;
             }
-            location.reload();
+            saving.commitStoredSaveAndReload();
         };
         reader.readAsText(file);
     },
@@ -153,7 +161,7 @@ let saving = {
             return;
         }
         window.localStorage[saveName] = document.getElementById("exportImportSave").value;
-        location.reload();
+        saving.commitStoredSaveAndReload();
     },
     importSaveFile: function(name) {
         const input = document.getElementById("importSaveFileInput");
@@ -172,10 +180,10 @@ let saving = {
             const content = e.target.result.trim();
             if (!content) {
                 saving.clearSave();
-            } else {
-                window.localStorage[saveName] = content;
+                return;
             }
-            location.reload();
+            window.localStorage[saveName] = content;
+            saving.commitStoredSaveAndReload();
         };
         reader.readAsText(file);
     },
@@ -191,10 +199,10 @@ let saving = {
             const text = fflate.strFromU8(decompressed);
             if (!content) {
                 saving.clearSave();
-            } else {
-                window.localStorage[saveName] = text;
+                return;
             }
-            location.reload();
+            window.localStorage[saveName] = text;
+            saving.commitStoredSaveAndReload();
         };
         reader.readAsArrayBuffer(file);
     }
