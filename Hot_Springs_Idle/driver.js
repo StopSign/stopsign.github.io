@@ -173,6 +173,9 @@ let driver = {
     },
     secondPassed: function() {
         data.currentGameState.secondsPassed++;
+        if (typeof engine.tryAutobuyUpgrades === "function") {
+            engine.tryAutobuyUpgrades();
+        }
 
         if (typeof engine.updateManaPerSecond === "function") {
             engine.updateManaPerSecond();

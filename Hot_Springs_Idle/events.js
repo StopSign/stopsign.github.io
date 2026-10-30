@@ -32,8 +32,11 @@ let events = {
         engine.checkLossCondition();
     },
     skillsTabUnlocked: function() {
-        const th = data.progress.base && data.progress.base.foxDen;
-        return !!(th && th.unlocks && th.unlocks.scrollArchives);
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib || typeof onLoad === "undefined" || !onLoad.countUnlockedSkills) {
+            return false;
+        }
+        return onLoad.countUnlockedSkills(lib.unlockedSkills) > 0;
     },
     guestsTabUnlocked: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -320,7 +323,7 @@ let events = {
             return;
         }
         const index = engine.inscriptionIndex(key);
-        if (index < 0 || index > (lib.inscriptionUnlockedThrough || 0)) {
+        if (index < 0 || index > engine.getInscriptionRowLimit() || index > (lib.inscriptionUnlockedThrough || 0)) {
             return;
         }
         lib.selectedInscription = key;
@@ -1418,6 +1421,9 @@ let events = {
         if (buildingKey === "cistern" && !engine.cisternWorkersRevealed()) {
             return;
         }
+        if (buildingKey === "hiddenSpring" && !engine.isArrangementOfSelfSufficiencyUnlocked()) {
+            return;
+        }
         const okami = engine.getOkami();
         if (okami.assignedBuildingKey === buildingKey) {
             okami.assignedBuildingKey = "";
@@ -1435,6 +1441,12 @@ let events = {
             }
             if (buildingKey === "market") {
                 engine.syncMarketCarriersToWorkforce();
+            }
+            if (buildingKey === "hiddenSpring") {
+                okami.repeatCollectStone = false;
+                if (okami.lastAssignedBuildingKey === "hiddenSpring") {
+                    okami.lastAssignedBuildingKey = "";
+                }
             }
             return;
         }
@@ -1459,6 +1471,9 @@ let events = {
             okami.assignedBuildingKey = "";
             engine.syncMarketCarriersToWorkforce();
         }
+        if (prevAssign === "hiddenSpring" && buildingKey !== "hiddenSpring") {
+            okami.repeatCollectStone = false;
+        }
         if (engine.isOkamiWeaving()) {
             engine.pauseAnyActiveWeaving();
         }
@@ -1482,6 +1497,47 @@ let events = {
         if (buildingKey === "market") {
             engine.syncMarketCarriersToWorkforce();
         }
+        if (buildingKey === "hiddenSpring") {
+            okami.repeatCollectStone = true;
+            engine.startCollectStone();
+        }
+    },
+    toggleLibrarySkillLock: function() {
+        const skillKey = data.progress.selectedLibrarySkillKey;
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!skillKey || !lib || !skills._byKey[skillKey]) {
+            return;
+        }
+        if (!lib.lockedSkillKeys) {
+            lib.lockedSkillKeys = [];
+        }
+        const idx = lib.lockedSkillKeys.indexOf(skillKey);
+        if (idx >= 0) {
+            lib.lockedSkillKeys.splice(idx, 1);
+        } else if (lib.lockedSkillKeys.length < engine.getSkillEchoesBought()) {
+            lib.lockedSkillKeys.push(skillKey);
+        }
+        view.updateLibrarySkillInfoPanel();
+        view.updateSkillsListVisibility("library");
+    },
+    toggleMineAutoDepth: function(checked) {
+        const mine = data.progress.base && data.progress.base.mine;
+        if (mine) {
+            mine.autoIncreaseDepth = !!checked;
+        }
+    },
+    toggleHiddenSpringAutoRefill: function(checked) {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        if (hs) {
+            hs.autoRefillMana = !!checked;
+        }
+    },
+    toggleUpgradeAutobuy: function(scopeKey, upgradeKey, checked) {
+        const up = engine.getUpgradeDef(scopeKey, upgradeKey);
+        if (!up || typeof up.setAutobuyChecked !== "function") {
+            return;
+        }
+        up.setAutobuyChecked(!!checked);
     },
     goToOkamiAssignment: function(e) {
         if (e && typeof e.stopPropagation === "function") {

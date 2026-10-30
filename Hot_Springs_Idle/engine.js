@@ -370,6 +370,12 @@ let engine = {
         const lib = data.progress.base && data.progress.base.scrollArchives;
         if (lib) {
             lib.unlockedSkills = {};
+            const lockedKeys = lib.lockedSkillKeys || [];
+            for (let li = 0; li < lockedKeys.length; li++) {
+                if (skills._byKey[lockedKeys[li]]) {
+                    lib.unlockedSkills[lockedKeys[li]] = true;
+                }
+            }
             lib.researchTaskProgress = 0;
             lib.researchChoices = [];
             lib.selectedResearchChoice = "";
@@ -398,6 +404,12 @@ let engine = {
         engine.cancelOrbPrestigeWeaves();
         if (data.progress.mana) {
             data.progress.mana.capacityBonus = 0;
+            const manaFlat = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
+                ? (shrineCards.getAggregatedEffects().prestigeStartingManaCapacityFlat || 0)
+                : 0;
+            if (manaFlat > 0) {
+                data.progress.mana.capacityBonus += manaFlat;
+            }
             data.progress.mana.amount = engine.getManaCapacity();
         }
 
@@ -410,6 +422,7 @@ let engine = {
             spirit.expToLevel = 15;
             spirit.spiritPower = engine.getSpiritPowerForLevel(1);
         }
+        engine.resetBambooForestForPrestige();
 
         const shrine = data.progress.base && data.progress.base.shrine;
         if (shrine) {
@@ -1198,7 +1211,10 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().intruderCoinAdd || 0) : 0;
         const utilityPct = (typeof skills.columnReward === "function") ? (skills.columnReward("utility").value || 0) : 0;
         // Extortion and intruder-coin cards multiply. Charisma is +5% per point with itself, then multiplies that product. Utility column is a percent on the same product.
-        return greedMult * (1 + cardAdd) * (1 + 0.05 * engine.getCharismaPoints()) * (1 + utilityPct / 100);
+        const shrine = data.progress.base && data.progress.base.shrine;
+        const neighborBought = (shrine && shrine.richerNeighborsBought) || 0;
+        const neighborMult = neighborBought > 0 ? Math.pow(1.1, neighborBought) : 1;
+        return greedMult * (1 + cardAdd) * (1 + 0.05 * engine.getCharismaPoints()) * (1 + utilityPct / 100) * neighborMult;
     },
     /**
      * Weighted coin-award events during a run, so offline can step coin rates.
@@ -4749,6 +4765,14 @@ let engine = {
         const garden = data.progress.base && data.progress.base.garden;
         return !!(garden && garden.arrangementOfHeatTargetingUnlocked);
     },
+    isArrangementOfSpelunkingUnlocked: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        return !!(garden && garden.arrangementOfSpelunkingUnlocked);
+    },
+    isArrangementOfSelfSufficiencyUnlocked: function() {
+        const garden = data.progress.base && data.progress.base.garden;
+        return !!(garden && garden.arrangementOfSelfSufficiencyUnlocked);
+    },
     isArrangementOfRhythmicDropletsUnlocked: function() {
         const garden = data.progress.base && data.progress.base.garden;
         return !!(garden && garden.arrangementOfRhythmicDropletsUnlocked);
@@ -5776,6 +5800,86 @@ let engine = {
     },
     assembleFireSpiritFromPurchase: function() {
         return engine.assembleSpiritFromPurchase("fire");
+    },
+    findExtraSpiritPlacementSlot: function(kind) {
+        if (kind === "plant") {
+            const stalkCount = resortData.bambooForestConfig.stalkCount || 4;
+            for (let si = 0; si < stalkCount; si++) {
+                if (!engine.getSpiritAtLocation("bambooForest", si, "plant")) {
+                    return { location: "bambooForest", slot: si };
+                }
+            }
+            return null;
+        }
+        if (kind === "fire") {
+            const existing = engine.findSpiritPlacementSlot("fire");
+            if (existing) {
+                return existing;
+            }
+            const defs = engine.getFireLauncherPlatformDefs();
+            for (let i = 0; i < defs.length; i++) {
+                const platformKey = defs[i].key;
+                if (!engine.isFireLauncherPlatformBuilt(platformKey)) {
+                    continue;
+                }
+                const location = engine.getFireLauncherLocationKey(platformKey);
+                if (!engine.getSpiritAtLocation(location, 0, "fire")) {
+                    return { location: location, slot: 0 };
+                }
+            }
+            return null;
+        }
+        return engine.findSpiritPlacementSlot(kind);
+    },
+    assembleExtraSpirit: function(kind) {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        if (!hs || !kind) {
+            return false;
+        }
+        const placement = engine.findExtraSpiritPlacementSlot(kind);
+        if (!placement) {
+            return false;
+        }
+        if (!hs.spirits) {
+            hs.spirits = [];
+        }
+        if (!hs.spiritIdCounter) {
+            hs.spiritIdCounter = 1;
+        }
+        let kindCount = 0;
+        for (let i = 0; i < hs.spirits.length; i++) {
+            if (hs.spirits[i].kind === kind) {
+                kindCount++;
+            }
+        }
+        const spirit = {
+            id: hs.spiritIdCounter++,
+            kind: kind,
+            colorIndex: kindCount % 8,
+            level: 1,
+            exp: 0,
+            expToLevel: 15,
+            spiritPower: 1,
+            training: 0,
+            trainingTimerMs: 0,
+            location: placement.location,
+            slot: placement.slot
+        };
+        if (kind === "earth") {
+            spirit.pebbleCooldownMs = 5000;
+            spirit.autoReturnToMine = true;
+            if (data.progress.base.mapRevealed) {
+                data.progress.base.mapRevealed.mine = true;
+            }
+        } else if (kind === "water") {
+            if (placement.location === "hiddenSpring") {
+                spirit.dropletCooldownMs = 5000;
+            }
+        } else if (kind === "fire") {
+            spirit.forgeTimerMs = 0;
+        }
+        hs.spirits.push(spirit);
+        return true;
     },
     assemblePlantSpiritFromPurchase: function() {
         const hs = data.progress.base && data.progress.base.hiddenSpring;
@@ -7370,6 +7474,7 @@ let engine = {
         engine.getOkami().pausedCollectStoneJob = snap;
     },
     beginCollectStoneWait: function(job) {
+        engine.refillHiddenSpringManaFromCollectStone();
         const totalMs = engine.getCollectStoneDurationMs();
         job.phase = "collecting";
         job.collectRemainMs = totalMs;
@@ -7431,12 +7536,38 @@ let engine = {
         };
         return true;
     },
+    refillHiddenSpringManaFromCollectStone: function() {
+        if (!engine.isArrangementOfSelfSufficiencyUnlocked()) {
+            return;
+        }
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        if (!hs || !hs.autoRefillMana) {
+            return;
+        }
+        const cap = engine.getBuildingManaCapacity("hiddenSpring");
+        const current = hs.mana || 0;
+        const deficit = Math.max(0, cap - current);
+        if (deficit <= 0 || !data.progress.mana) {
+            return;
+        }
+        const take = Math.min(deficit, data.progress.mana.amount || 0);
+        if (take <= 0) {
+            return;
+        }
+        data.progress.mana.amount = Math.max(0, (data.progress.mana.amount || 0) - take);
+        hs.mana = Math.min(cap, current + take);
+    },
     completeCollectStone: function() {
         const pile = data.progress.base.stonePile;
         pile.stone = (pile.stone || 0) + engine.getCollectStoneAmount();
         const okami = engine.getOkami();
         okami.pathJob = null;
         okami.pausedCollectStoneJob = null;
+        if (okami.repeatCollectStone && engine.isArrangementOfSelfSufficiencyUnlocked()) {
+            okami.assignedBuildingKey = "hiddenSpring";
+            engine.startCollectStone();
+            return;
+        }
         if (okami.assignedBuildingKey === "hiddenSpring") {
             okami.assignedBuildingKey = "";
         }
@@ -8390,7 +8521,7 @@ let engine = {
             upgradeKey: upgradeKey,
             required: Object.assign({}, split.gather),
             delivered: resortData.emptyGatherDelivered(),
-            weaveCost: { coins: 0, starBeads: 0, mana: 0, credit: 0, divinity: 0 },
+            weaveCost: { coins: 0, starBeads: 0, mana: 0, credit: 0, divinity: 0, essence: 0 },
             weaveCostPaid: hasWeaveCost,
             paused: false,
             status: "gathering"
@@ -8409,6 +8540,67 @@ let engine = {
             engine.tryAutoWeaveOnGatherReady(jobKey);
         }
         return true;
+    },
+    tryAutobuyUpgrades: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (!rh || !rh.upgradeGatherJobs) {
+            return;
+        }
+        const buildings = resortData.buildings;
+        if (!buildings) {
+            return;
+        }
+        const scopeKeys = Object.keys(buildings);
+        let weaverTaken = !!(engine.getWeavingState().active);
+        for (let si = 0; si < scopeKeys.length; si++) {
+            const scopeKey = scopeKeys[si];
+            const cfg = buildings[scopeKey];
+            if (!cfg || !cfg.upgrades || !cfg.upgradesOrder) {
+                continue;
+            }
+            for (let ui = 0; ui < cfg.upgradesOrder.length; ui++) {
+                const upgradeKey = cfg.upgradesOrder[ui];
+                const up = cfg.upgrades[upgradeKey];
+                if (!up || !up.autobuy) {
+                    continue;
+                }
+                if (typeof up.autobuyVisible === "function" && !up.autobuyVisible()) {
+                    continue;
+                }
+                if (typeof up.isAutobuyChecked !== "function" || !up.isAutobuyChecked()) {
+                    continue;
+                }
+                const active = engine.getWeavingState().active;
+                if (active && active.scopeKey === scopeKey && active.upgradeKey === upgradeKey) {
+                    continue;
+                }
+                if (engine.getPausedWeavingEntry(scopeKey, upgradeKey)) {
+                    continue;
+                }
+                let job = engine.getUpgradeGatherJob(scopeKey, upgradeKey);
+                if (!job) {
+                    if (up.canBuy && !up.canBuy()) {
+                        continue;
+                    }
+                    const cost = resortData.resolveCost(up, scopeKey);
+                    if (!resortData.canAffordCost(cost)) {
+                        continue;
+                    }
+                    if (!engine.enqueueUpgradeGather(scopeKey, upgradeKey)) {
+                        continue;
+                    }
+                    job = engine.getUpgradeGatherJob(scopeKey, upgradeKey);
+                    if (engine.getWeavingState().active) {
+                        weaverTaken = true;
+                    }
+                }
+                if (job && job.status === "ready" && !weaverTaken) {
+                    if (engine.startUpgradeWeave(scopeKey, upgradeKey)) {
+                        weaverTaken = true;
+                    }
+                }
+            }
+        }
     },
     pauseUpgradeGather: function(scopeKey, upgradeKey) {
         const rh = data.progress.base.foxDen;
@@ -10983,6 +11175,26 @@ let engine = {
             stalk.cells[ri].growthRemainMs = 0;
         }
     },
+    resetBambooForestForPrestige: function() {
+        const bf = data.progress.base && data.progress.base.bambooForest;
+        if (!bf || !bf.stalks) {
+            return;
+        }
+        for (let si = 0; si < bf.stalks.length; si++) {
+            const stalk = bf.stalks[si];
+            if (!stalk || !stalk.cells) {
+                continue;
+            }
+            stalk.baseWood = engine.getBambooStalkComputedBaseChips(si);
+            for (let ri = 0; ri < stalk.cells.length; ri++) {
+                const cell = stalk.cells[ri];
+                cell.lumber = 0;
+                cell.growthRemainMs = 0;
+                cell.color = engine.randomBambooCellColor();
+            }
+            engine.refreshBambooStalkCapacities(stalk);
+        }
+    },
     completeBambooStalkHarvest: function(bf, stalkIndex) {
         const stalk = bf.stalks[stalkIndex];
         stalk.baseWood = engine.getBambooStalkComputedBaseChips(stalkIndex);
@@ -11493,6 +11705,7 @@ let engine = {
     },
     updateMine: function(tickMs) {
         const mine = data.progress.base.mine;
+        engine.tryAutoIncreaseMineDepth();
         const power = engine.getMineSpiritPower();
         if (power <= 0) {
             return;
@@ -11558,6 +11771,20 @@ let engine = {
         mine.blocks = engine.createMineBlocksForDepth(target);
         mine.playTimerMs = 0;
         return true;
+    },
+    tryAutoIncreaseMineDepth: function() {
+        const mine = data.progress.base && data.progress.base.mine;
+        if (!mine || !mine.autoIncreaseDepth) {
+            return;
+        }
+        const depth = mine.currentDepth || 0;
+        if ((mine.clearsByDepth[depth] || 0) < 10) {
+            return;
+        }
+        if (mine.readyConsumedByDepth && mine.readyConsumedByDepth[depth]) {
+            return;
+        }
+        engine.changeMineDepth(1);
     },
     checkMineDepthReadyNotify: function(depth) {
         const mine = data.progress.base && data.progress.base.mine;
@@ -12429,12 +12656,99 @@ let engine = {
             engine.grantShrinePack("epic");
         }
     },
+    getLegendsWritten: function() {
+        return Math.max(0, Math.floor((data.progress && data.progress.legendsWritten) || 0));
+    },
+    getShrineUpgradeBought: function(field) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        return (shrine && shrine[field]) || 0;
+    },
+    getShardEchoesBought: function() {
+        return engine.getShrineUpgradeBought("shardEchoesBought");
+    },
+    getArtAppreciationBought: function() {
+        return engine.getShrineUpgradeBought("artAppreciationBought");
+    },
+    getLanguageEchoesBought: function() {
+        return engine.getShrineUpgradeBought("languageEchoesBought");
+    },
+    getSkillEchoesBought: function() {
+        return engine.getShrineUpgradeBought("skillEchoesBought");
+    },
+    getCollectShardsMax: function() {
+        return 5 + engine.getShardEchoesBought();
+    },
+    getLanguageEchoesMax: function() {
+        return Math.min(10, engine.getLegendsWritten());
+    },
+    collectShardsPurchaseInProgress: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh && rh.upgradeGatherJobs && engine.getUpgradeGatherJob("scrollArchives", "collectShards")) {
+            return true;
+        }
+        if (!data.progress.weaving) {
+            return false;
+        }
+        const weaving = engine.getWeavingState();
+        const active = weaving.active;
+        if (active && active.scopeKey === "scrollArchives" && active.upgradeKey === "collectShards") {
+            return true;
+        }
+        return !!engine.getPausedWeavingEntry("scrollArchives", "collectShards");
+    },
+    cancelCollectShardsInProgress: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (rh && rh.upgradeGatherJobs && rh.jobQueue) {
+            const jobKey = engine.getUpgradeGatherJobKey("scrollArchives", "collectShards");
+            if (rh.upgradeGatherJobs[jobKey]) {
+                engine.removeUpgradeGatherJob("scrollArchives", "collectShards");
+            }
+        }
+        if (!data.progress.weaving) {
+            return;
+        }
+        const weaving = engine.getWeavingState();
+        const key = engine.getWeavingJobKey("scrollArchives", "collectShards");
+        if (weaving.active && weaving.active.scopeKey === "scrollArchives" && weaving.active.upgradeKey === "collectShards") {
+            weaving.active = null;
+        }
+        if (weaving.paused && weaving.paused[key]) {
+            delete weaving.paused[key];
+        }
+    },
+    refundCollectShardsAboveCap: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib) {
+            return;
+        }
+        const max = engine.getCollectShardsMax();
+        const refundIndex = function(n) {
+            const mult = Math.pow(2, n);
+            data.progress.coins = (data.progress.coins || 0) + 800 * mult;
+            data.progress.starBeads = (data.progress.starBeads || 0) + 1000 * mult;
+        };
+        const level = lib.collectShardsLevel || 0;
+        if (engine.collectShardsPurchaseInProgress() && level >= max) {
+            refundIndex(level);
+            engine.cancelCollectShardsInProgress();
+        }
+        const current = lib.collectShardsLevel || 0;
+        if (current > max) {
+            for (let n = max; n < current; n++) {
+                refundIndex(n);
+            }
+            lib.collectShardsLevel = max;
+        }
+    },
+    getShrineDivinityMultiplier: function() {
+        return engine.getLegendsWritten() >= 1 ? 2 : 1;
+    },
     getShrineDivinityRate: function() {
         if (!engine.isShrineBuilt()) {
             return 0;
         }
         const shrine = data.progress.base && data.progress.base.shrine;
-        return ((shrine && shrine.level) || 0) * 0.1;
+        return ((shrine && shrine.level) || 0) * 0.1 * engine.getShrineDivinityMultiplier();
     },
     applyShrineLevelUps: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
@@ -13281,6 +13595,17 @@ let engine = {
         }
         return -1;
     },
+    getInscriptionRowLimit: function() {
+        const defs = engine.INSCRIPTION_ROWS;
+        let clausesIndex = 0;
+        for (let i = 0; i < defs.length; i++) {
+            if (defs[i].key === "clauses") {
+                clausesIndex = i;
+                break;
+            }
+        }
+        return Math.min(clausesIndex, Math.max(0, defs.length - 1));
+    },
     inscriptionRate: function(def) {
         return def.rateNum / def.rateDen;
     },
@@ -13379,10 +13704,14 @@ let engine = {
     },
     refreshInscriptionUnlock: function(lib) {
         const defs = engine.INSCRIPTION_ROWS;
+        const maxIndex = engine.getInscriptionRowLimit();
         let through = Math.max(0, lib.inscriptionUnlockedThrough || 0);
-        while (through + 1 < defs.length) {
+        if (through > maxIndex) {
+            through = maxIndex;
+        }
+        while (through < maxIndex && through + 1 < defs.length) {
             const prev = lib.inscriptions[defs[through].key];
-            if ((prev.bought || 0) >= 10) {
+            if (prev && (prev.bought || 0) >= 10) {
                 through++;
             } else {
                 break;
@@ -13429,21 +13758,16 @@ let engine = {
         }
         engine.ensureInscriptionState();
         const defs = engine.INSCRIPTION_ROWS;
-        let keep = -1;
-        for (let i = 0; i < defs.length; i++) {
+        const keepN = Math.max(0, Math.min(defs.length, engine.getLanguageEchoesBought()));
+        const kept = [];
+        for (let i = 0; i < keepN; i++) {
             const row = lib.inscriptions[defs[i].key];
-            if ((row.actual || 0) >= 1) {
-                keep = i;
-            }
+            kept.push({
+                bought: row.bought || 0,
+                progress: row.progress || 0,
+                required: row.required > 0 ? row.required : defs[i].progressStart
+            });
         }
-        const kept = keep >= 0 ? {
-            key: defs[keep].key,
-            actual: lib.inscriptions[defs[keep].key].actual,
-            bought: lib.inscriptions[defs[keep].key].bought,
-            progress: lib.inscriptions[defs[keep].key].progress,
-            required: lib.inscriptions[defs[keep].key].required,
-            progressBase: lib.inscriptions[defs[keep].key].progressBase
-        } : null;
         for (let i = 0; i < defs.length; i++) {
             lib.inscriptions[defs[i].key] = {
                 actual: 0,
@@ -13453,28 +13777,28 @@ let engine = {
                 progressBase: defs[i].progressStart
             };
         }
-        if (kept) {
-            lib.inscriptions[kept.key] = {
-                actual: kept.actual,
-                bought: kept.bought,
-                progress: kept.progress,
-                required: kept.required,
-                progressBase: kept.progressBase
+        for (let i = 0; i < kept.length; i++) {
+            const snap = kept[i];
+            const def = defs[i];
+            lib.inscriptions[def.key] = {
+                actual: snap.bought,
+                bought: snap.bought,
+                progress: snap.progress,
+                required: snap.required,
+                progressBase: def.progressStart
             };
-            lib.inscriptionUnlockedThrough = keep;
-            if ((kept.bought || 0) >= 10 && keep + 1 < defs.length) {
-                lib.inscriptionUnlockedThrough = keep + 1;
-            }
-            lib.selectedInscription = kept.key;
-        } else {
-            lib.inscriptionUnlockedThrough = 0;
-            lib.selectedInscription = "strokes";
         }
+        lib.inscriptionUnlockedThrough = 0;
+        lib.selectedInscription = "strokes";
         lib.scribings = 0;
         lib.scribingsRequired = 300;
         lib.scribingsCompleted = 0;
         lib.inscriptionSecondMs = 0;
         engine.refreshInscriptionUnlock(lib);
+        const selectedIndex = engine.inscriptionIndex(lib.selectedInscription);
+        if (selectedIndex < 0 || selectedIndex > (lib.inscriptionUnlockedThrough || 0)) {
+            lib.selectedInscription = "strokes";
+        }
     },
     applyInscriptionFrame: function(lib, elapsedMs) {
         const sec = (elapsedMs || 0) / 1000;
@@ -13537,7 +13861,8 @@ let engine = {
         let term = engine.inscriptionRate(defs[0]) * M;
         const first = lib.inscriptions[defs[0].key];
         let gain = ((first && first.actual) || 0) * term;
-        for (let k = 1; k < defs.length; k++) {
+        const rowCount = Math.min(defs.length, engine.getInscriptionRowLimit() + 1);
+        for (let k = 1; k < rowCount; k++) {
             const stepsLeft = M - k;
             if (stepsLeft <= 0) {
                 break;
@@ -13558,7 +13883,8 @@ let engine = {
         }
         const defs = engine.INSCRIPTION_ROWS;
         let producing = false;
-        for (let i = 0; i < defs.length; i++) {
+        const rowCount = Math.min(defs.length, engine.getInscriptionRowLimit() + 1);
+        for (let i = 0; i < rowCount; i++) {
             const row = lib.inscriptions[defs[i].key];
             if (row && row.actual > 0) {
                 producing = true;
@@ -13591,12 +13917,13 @@ let engine = {
     },
     runInscriptionProduction: function(lib) {
         const defs = engine.INSCRIPTION_ROWS;
+        const rowCount = Math.min(defs.length, engine.getInscriptionRowLimit() + 1);
         const snap = [];
-        for (let i = 0; i < defs.length; i++) {
+        for (let i = 0; i < rowCount; i++) {
             snap.push(lib.inscriptions[defs[i].key].actual || 0);
         }
         lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]);
-        for (let i = 1; i < defs.length; i++) {
+        for (let i = 1; i < rowCount; i++) {
             const above = lib.inscriptions[defs[i - 1].key];
             above.actual = (above.actual || 0) + snap[i] * engine.inscriptionRate(defs[i]);
         }

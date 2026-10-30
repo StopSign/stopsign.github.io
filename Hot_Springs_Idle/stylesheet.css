@@ -1622,6 +1622,17 @@ button {
     align-items: center;
 }
 
+#libSkillInfo_lockBtn {
+    margin-left: auto;
+}
+
+.skill-lock-icon {
+    width: 14px;
+    height: 14px;
+    margin-left: 4px;
+    flex-shrink: 0;
+}
+
 .skills-total-talent-level {
     font-size: 12px;
     font-weight: 600;
@@ -2200,6 +2211,15 @@ button {
     height: 100%;
     box-sizing: border-box;
     overflow: hidden;
+}
+
+#gameVersionLabel {
+    position: absolute;
+    left: 8px;
+    bottom: 4px;
+    z-index: 40;
+    margin: 0;
+    pointer-events: none;
 }
 
 #tabPane_base .pane-title {
@@ -4177,6 +4197,18 @@ button {
 }
 .base-upgrade-name {
     font-weight: 600;
+}
+.base-upgrade-name--autobuy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.upgrade-autobuy-label {
+    font-weight: 500;
+    font-size: 12px;
+    margin-left: auto;
+    white-space: nowrap;
 }
 .base-upgrade-actions {
     display: flex;

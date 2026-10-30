@@ -1037,6 +1037,7 @@ let view = {
             view.updateVal(`mapActionCurrent_${map.key}`, onThisMap ? "" : "none", "style.display");
             view.updateVal(`mapDifficulty_${map.key}`, `x${round2(map.baseDifficulty || 1)}`);
             view.updateVal(`mapWaves_${map.key}`, (map.zones || []).length, "textContent", 1);
+            view.updateVal(`mapTotalUnits_${map.key}`, mapData.getMapTotalEnemies(map), "textContent", 1);
             view.updateVal(`mapShardDrop_${map.key}`, intToString(mapData.getMapShardDropAmount(map), 2));
             const workersFound = (data.progress.mapWorkersFound && data.progress.mapWorkersFound[map.key]) || 0;
             const workersMax = 6;
@@ -1118,6 +1119,17 @@ let view = {
                         show = !hideMx;
                     }
                     view.updateVal(rowEl, show ? "" : "none", "style.display");
+                }
+                if (u.autobuy) {
+                    const autoRowId = `base_${buildingSegment}_autobuy_${slug}_row`;
+                    const showAuto = typeof u.autobuyVisible === "function" && u.autobuyVisible();
+                    view.updateVal(autoRowId, showAuto ? "" : "none", "style.display");
+                    if (showAuto && typeof u.isAutobuyChecked === "function") {
+                        const autoChk = viewData.cached[`base_${buildingSegment}_autobuy_${slug}_chk`];
+                        if (autoChk) {
+                            autoChk.checked = !!u.isAutobuyChecked();
+                        }
+                    }
                 }
                 view.updateVal(extraEl, resortData.insertResourceIcons(resortData.getUpgradeExtraText(u, buildingSegment) || ""), "innerHTML");
                 if (typeof u.description === "function") {
@@ -1563,10 +1575,15 @@ let view = {
             view.updateScribingsEta();
         }
         const defs = engine.INSCRIPTION_ROWS;
+        const rowLimit = engine.getInscriptionRowLimit();
         const unlockedThrough = lib.inscriptionUnlockedThrough || 0;
         const selected = lib.selectedInscription || "strokes";
         for (let i = 0; i < defs.length; i++) {
             const def = defs[i];
+            if (i > rowLimit) {
+                view.updateVal(`inscriptionRow_${def.key}`, "none", "style.display");
+                continue;
+            }
             const row = lib.inscriptions[def.key];
             const assignable = i <= unlockedThrough;
             const preview = i === unlockedThrough + 1;
@@ -2430,6 +2447,7 @@ let view = {
         view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent", 1);
         view.updateVal("shrineExpFill", `${pct}%`, "style.width");
         view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
+        view.updateVal("shrineDivinityMultText", engine.getShrineDivinityMultiplier());
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
         view.updateVal("shrineMapDisplay", `Lvl ${level}`, "textContent");
         view.updateVal("mapShrineProgressWrap", "", "style.display");
@@ -3738,6 +3756,14 @@ let view = {
         view.updateVal("mineDepthReady", showReady ? "" : "none", "style.display");
         view.updateVal("mineDepthLeftBtn", depth > 0 ? "" : "none", "style.display");
         view.updateVal("mineDepthRightBtn", clears >= 10 ? "" : "none", "style.display");
+        const spelunking = engine.isArrangementOfSpelunkingUnlocked();
+        view.updateVal("mineAutoDepth_row", spelunking ? "" : "none", "style.display");
+        if (spelunking) {
+            const depthChk = viewData.cached.mineAutoDepth_chk;
+            if (depthChk) {
+                depthChk.checked = !!mine.autoIncreaseDepth;
+            }
+        }
         const cleared = engine.isMineCleared();
         view.updateVal("mineStatusText", cleared ? "Playing in the Dirt" : "Mining...");
         view.updateVal("mineDirtText", mine.resources.dirt, "textContent", 2);
@@ -3874,6 +3900,21 @@ let view = {
             t.refreshOrderedPurchasables("hiddenSpring", resortData.buildings.hiddenSpring.upgradesOrder, hsOpts);
             view.updateBuildingManaRow("hiddenSpring");
             view.updateCollectStoneButton();
+            const selfSufficient = engine.isArrangementOfSelfSufficiencyUnlocked();
+            view.updateVal("hiddenSpringAssignOkami_btn", selfSufficient ? "" : "none", "style.display");
+            if (selfSufficient) {
+                const okamiHere = !!engine.getOkami().repeatCollectStone;
+                view.updateVal("hiddenSpringAssignOkami_btn", okamiHere ? "Unassign Okami" : "Assign Okami");
+                view.updateVal("hiddenSpringAssignOkami_btn", okamiHere, "classList.toggle", "assign-okami-btn-active");
+            }
+            view.updateVal("hiddenSpringAutoRefill_row", selfSufficient ? "" : "none", "style.display");
+            if (selfSufficient) {
+                const refillChk = viewData.cached.hiddenSpringAutoRefill_chk;
+                const hsState = base.hiddenSpring;
+                if (refillChk && hsState) {
+                    refillChk.checked = !!hsState.autoRefillMana;
+                }
+            }
             if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
                 createView.refreshInfoButtonPanel("resortInfo_hiddenSpring");
             }
@@ -4995,6 +5036,7 @@ let view = {
             view.updateVal(`skill_${k}_class_tag`, (def && def.category === "class") ? "" : "none", "style.display");
             view.updateVal(`skill_${k}_equipped_badge`, skills.isSkillEquipped(k) ? "" : "none", "style.display");
         }
+        view.syncSkillLockIcons();
         view.updateVal("skillsLibraryResearchedTitle", `Researched Skills - Showing: ${orderedVisible.length}`);
         view.applySkillListSortRadiosOnly();
         const emptyEl = viewData.cached.skillsListEmpty;
@@ -5204,6 +5246,22 @@ let view = {
         view.updateVal("libSkillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("libSkillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
         view.updateVal("libSkillInfo_unequipBtn", skills.isSkillEquipped(skillKey) ? "" : "none", "style.display");
+        const echoesBought = engine.getSkillEchoesBought();
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        const lockedKeys = (lib && lib.lockedSkillKeys) || [];
+        const isLocked = lockedKeys.indexOf(skillKey) >= 0;
+        view.updateVal("libSkillInfo_lockBtn", echoesBought >= 1 ? "" : "none", "style.display");
+        view.updateVal("libSkillInfo_lockBtn", isLocked ? "Unlock" : "Lock");
+        view.updateVal("libSkillInfo_lockBtn", !isLocked && lockedKeys.length >= echoesBought, "disabled");
+        view.syncSkillLockIcons();
+    },
+    syncSkillLockIcons: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        const lockedKeys = (lib && lib.lockedSkillKeys) || [];
+        for (let i = 0; i < skills.keysInOrder.length; i++) {
+            const key = skills.keysInOrder[i];
+            view.updateVal(`skill_${key}_lock`, lockedKeys.indexOf(key) >= 0 ? "" : "none", "style.display");
+        }
     },
     updateSkillSubTabs: function() {
         const tab = data.progress.selectedSkillsTab || "equipped";
@@ -5391,7 +5449,8 @@ let view = {
             return String(shrineCards.legendEffectText(n))
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+                .replace(/>/g, "&gt;")
+                .replace(/\n/g, "<br>");
         };
         view.updateVal("legendRequirementText", `Write Legend ${nextNumber}: ${req} stars`);
         view.updateVal("legendStarWarning", stars >= req ? "none" : "", "style.display");

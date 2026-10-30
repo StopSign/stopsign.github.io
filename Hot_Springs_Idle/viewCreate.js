@@ -363,7 +363,10 @@ let createView = {
                 const hs = data.progress.base && data.progress.base.hiddenSpring;
                 let html = "<p>Stare at the fire and contemplate how to protect what's yours.</p>";
                 if (bf && bf.denseClonesUnlocked) {
-                    html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is a quarter of the Orb level, if that cost is affordable.</p>";
+                    const densityPhrase = (typeof engine.getLegendsWritten === "function" && engine.getLegendsWritten() >= 1)
+                        ? "half the Orb level"
+                        : "a quarter of the Orb level";
+                    html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is " + densityPhrase + ", if that cost is affordable.</p>";
                 }
                 if (bf && bf.tendTheFlameUnlocked) {
                     html += "<p>Fire tending: assigned carriers skip wood and coal trips once heat reaches the number beside Only bring wood or coal while heat is below.</p>";
@@ -708,7 +711,7 @@ let createView = {
                     </div>
                     <div class="travel-map-meta">
                         <div>Difficulty: <span id="mapDifficulty_${m.key}"></span></div>
-                        <div># Waves: <span id="mapWaves_${m.key}"></span></div>
+                        <div># Waves: <span id="mapWaves_${m.key}"></span>, total Units: <span id="mapTotalUnits_${m.key}"></span></div>
                         <div>Shard Drop Amount: <span id="mapShardDrop_${m.key}"></span></div>
                         <div>Kitsune Rescued: <span id="mapWorkers_${m.key}"></span></div>
                     </div>
@@ -840,7 +843,14 @@ let createView = {
                 const extraId = resortData.idExtra(scopeKey, slug);
                 const descId = `base_${scopeKey}_desc_${slug}`;
                 const descText = typeof ud.description === "function" ? ud.description() : (ud.description || "");
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${ud.name || ""}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
+                let nameHtml = ud.name || "";
+                if (ud.autobuy) {
+                    const autoRowId = `base_${scopeKey}_autobuy_${slug}_row`;
+                    const autoChkId = `base_${scopeKey}_autobuy_${slug}_chk`;
+                    nameHtml = `<span class="base-upgrade-name-label">${ud.name || ""}</span><label id="${autoRowId}" class="upgrade-autobuy-label" style="display:none"><input type="checkbox" id="${autoChkId}" onchange="events.toggleUpgradeAutobuy('${scopeKey}','${pk}', this.checked)"> Autobuy</label>`;
+                }
+                const nameClass = ud.autobuy ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
+                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="${nameClass}">${nameHtml}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
             }
             return h;
         };
@@ -931,7 +941,7 @@ let createView = {
         };
         const htmlShrinePanel = function() {
             return `
-                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s</div>
+                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span></div>
@@ -988,7 +998,7 @@ let createView = {
                     <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
                     <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 </div>
-                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills, skill talent, research progress, the Orb's level and base mana, Expand Orb, Spin Currents, spirit levels, shrine level, mine depth, and mine dirt. The mana cost below is spent, then mana fills to its new maximum. Divinity is not reset, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if the next Legend exists and you have enough stars.</div>
+                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills except ones locked by Skill Echoes, skill talent, research progress, inscription rows except those kept by Language Echoes, the Orb's level and base mana, Expand Orb, Spin Currents, spirit levels, shrine level, mine depth, mine dirt, and bamboo growth. The mana cost below is spent, then mana fills to its new maximum. Divinity is not reset, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if the next Legend exists and you have enough stars.<br>You may want to build up some coins before resetting.</div>
                 <div id="legendRequirementText" class="base-row"></div>
                 <div id="legendStarWarning" class="shrine-move-pack-error" style="display:none">Not enough stars to reach the next milestone. Are you sure?</div>
                 <div id="legendWipWarning" class="shrine-move-pack-error" style="display:none">The next Legend does not exist yet (WIP). Legend will not increase.</div>
@@ -1009,6 +1019,9 @@ let createView = {
         };
         const inscriptionRowsHtml = function() {
             const defs = (typeof engine !== "undefined" && engine.INSCRIPTION_ROWS) || [];
+            const rowLimit = (typeof engine !== "undefined" && engine.getInscriptionRowLimit)
+                ? engine.getInscriptionRowLimit()
+                : defs.length - 1;
             const coinIcon = resortData.resourceIconHtml("coins");
             const beadIcon = resortData.resourceIconHtml("starBeads");
             const manaIcon = resortData.resourceIconHtml("mana");
@@ -1016,8 +1029,9 @@ let createView = {
             for (let i = 0; i < defs.length; i++) {
                 const def = defs[i];
                 const prevName = i > 0 ? defs[i - 1].name : "";
+                const hidden = i > rowLimit ? ` style="display:none"` : "";
                 h += `
-                    <div id="inscriptionRow_${def.key}" class="inscription-row">
+                    <div id="inscriptionRow_${def.key}" class="inscription-row"${hidden}>
                         <div class="inscription-row-cols">
                             <button type="button" id="inscriptionAssign_${def.key}" class="tab-button inscription-assign" onclick="events.selectInscription('${def.key}')">${def.name}</button>
                             <div class="inscription-progress">
@@ -1179,6 +1193,8 @@ let createView = {
                     <div id="hiddenSpringCollectStone_row" class="base-row">
                         <button type="button" id="hiddenSpringCollectStone_btn" class="tab-button" onclick="events.startCollectStone()">Collect 4 Stone</button>
                     </div>
+                    <button type="button" id="hiddenSpringAssignOkami_btn" class="tab-button assign-okami-btn" style="display:none" onclick="events.assignOkami('hiddenSpring')">Assign Okami</button>
+                    <div id="hiddenSpringAutoRefill_row" class="base-row" style="display:none"><label><input type="checkbox" id="hiddenSpringAutoRefill_chk" onchange="events.toggleHiddenSpringAutoRefill(this.checked)"> Auto-refill mana when collecting stone</label></div>
                     ${buildingManaRowHtml("hiddenSpring")}
                     ${resortUpgradeRowsHtml("hiddenSpring")}
                 </div>
@@ -1431,6 +1447,7 @@ let createView = {
                         <span id="mineStatusText" class="mine-status-inline muted-text"></span>
                     </div>
                     <div class="mine-depth-row"><button id="mineDepthLeftBtn" class="tab-button" onclick="events.changeMineDepth(-1)">←</button><span>Depth <span id="mineDepthText"></span> | <span id="mineDepthClears"></span>/10 <span id="mineDepthReady" class="mine-depth-ready" style="display:none">Ready</span></span><button id="mineDepthRightBtn" class="tab-button" onclick="events.changeMineDepth(1)">→</button></div>
+                    <div id="mineAutoDepth_row" class="base-row" style="display:none"><label><input type="checkbox" id="mineAutoDepth_chk" onchange="events.toggleMineAutoDepth(this.checked)"> Auto-increase depth when ready</label></div>
                     <div class="mine-info-body">
                         <div class="mine-grid-row">
                             <div id="mineGrid" class="mine-grid"></div>
@@ -1747,6 +1764,7 @@ let createView = {
                 <div class="skills-equip-row">
                     <button type="button" id="libSkillInfo_equipBtn" class="tab-button" onclick="events.equipSelectedLibrarySkill()">Equip</button>
                     <button type="button" id="libSkillInfo_unequipBtn" class="tab-button" style="display:none" onclick="events.unequipSelectedLibrarySkill()">Unequip</button>
+                    <button type="button" id="libSkillInfo_lockBtn" class="tab-button" style="display:none" onclick="events.toggleLibrarySkillLock()">Lock</button>
                 </div>
             </aside>`;
 
@@ -1775,6 +1793,7 @@ let createView = {
                         <div class="skill-library-row-tags">
                             <span id="skill_${key}_class_tag" class="skill-class-tag" style="${isClass ? "" : "display:none"}">Class</span>
                             <span id="skill_${key}_equipped_badge" class="skill-equipped-badge" style="display:none">Equipped</span>
+                            <img id="skill_${key}_lock" class="skill-lock-icon" src="img/lock.svg" alt="" draggable="false" style="display:none">
                         </div>
                     </div>
                 </div>`;
@@ -1836,7 +1855,7 @@ let createView = {
             "skillInfo_unequipBtn",
             "skillInfoPanelLibrary", "libSkillInfo_title", "libSkillInfo_grouping", "libSkillInfo_reward", "libSkillInfo_trigger",
             "libSkillInfo_base_exp", "libSkillInfo_talent_text", "libSkillInfo_talent_fill", "libSkillInfo_tips_row", "libSkillInfo_tips_text",
-            "libSkillInfo_equipError", "libSkillInfo_equipBtn", "libSkillInfo_unequipBtn",
+            "libSkillInfo_equipError", "libSkillInfo_equipBtn", "libSkillInfo_unequipBtn", "libSkillInfo_lockBtn",
             "combatStarsInventory", "combatStarsCounts", "skillsTotalTalentLevelWrap", "skillsTotalTalentLevel",
             "skillSubTab_equipped", "skillSubTab_library",
             "skillLoadoutSlots", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4",
@@ -1874,7 +1893,7 @@ let createView = {
             const key = skills.keysInOrder[i];
             createView.queueCache(
                 `skill_wrap_${key}`, `skill_${key}_name`, `skill_${key}_talent_only`, `skill_${key}_slot_cat`,
-                `skill_${key}_class_tag`, `skill_${key}_equipped_badge`
+                `skill_${key}_class_tag`, `skill_${key}_equipped_badge`, `skill_${key}_lock`
             );
         }
         events.bindSkillInfoDismiss();
@@ -2065,7 +2084,7 @@ let createView = {
             "toriiAllowCarriersMana_row", "toriiAllowCarriersMana_chk",
             "stonePileManaRow", "stonePileFillMana_btn", "stonePileManaProgressWrap", "stonePileManaFill", "stonePileManaAmount", "stonePileManaCap",
             "stonePileAllowCarriersMana_row", "stonePileAllowCarriersMana_chk",
-            "hiddenSpringCollectStone_row", "hiddenSpringCollectStone_btn",
+            "hiddenSpringCollectStone_row", "hiddenSpringCollectStone_btn", "hiddenSpringAssignOkami_btn", "hiddenSpringAutoRefill_row", "hiddenSpringAutoRefill_chk",
             "hiddenSpringManaRow", "hiddenSpringFillMana_btn", "hiddenSpringManaProgressWrap", "hiddenSpringManaFill", "hiddenSpringManaAmount", "hiddenSpringManaCap",
             "hiddenSpringAllowCarriersMana_row", "hiddenSpringAllowCarriersMana_chk",
             "stonePileDupeProgressWrap", "stonePileDupeProgressFill", "stonePileDupeIntervalText", "stonePileDupedStone_row", "stonePileDupedStoneValue", "stonePileAllowUnduplicated_row", "stonePileAllowUnduplicated_chk",
@@ -2099,7 +2118,7 @@ let createView = {
             "fireLauncherUpgrades_pathMid", "fireLauncherUpgrades_pathLower", "fireLauncherUpgrades_bendTop",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",
             "fireLauncherTarget_coldest", "fireLauncherTarget_hottest", "fireLauncherTarget_coldest_label", "fireLauncherTarget_hottest_label",
-            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",
+            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAutoDepth_row", "mineAutoDepth_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",
             "base_torii_assign_one_btn", "base_torii_assign_ten_btn", "base_torii_assign_all_btn", "base_torii_unassign_one_btn", "base_torii_unassign_ten_btn", "base_torii_unassign_all_btn", "base_torii_workers_label", "base_torii_worker_prod_text", "base_torii_worker_prod_wrap", "base_torii_worker_prog_fill",
             "base_laundry_assign_one_btn", "base_laundry_assign_ten_btn", "base_laundry_assign_all_btn", "base_laundry_unassign_one_btn", "base_laundry_unassign_ten_btn", "base_laundry_unassign_all_btn", "base_laundry_workers_label", "base_laundry_worker_prod_text", "base_laundry_worker_prod_wrap", "base_laundry_worker_prog_fill",
             "base_resource_strip", "base_res_stone",
@@ -2111,7 +2130,7 @@ let createView = {
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
             "legendResetExplain", "legendRequirementText", "legendStarWarning", "legendWipWarning", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
-            "shrineKarmaRateText", "shrineDivinityRateText",
+            "shrineKarmaRateText", "shrineDivinityMultText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
             "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackAutoChoose", "prestigePackAutoChoose_chk", "prestigePackSummary", "prestigeFinishBtn",
@@ -2154,7 +2173,7 @@ let createView = {
         for (let mi = 0; mi < maps.length; mi++) {
             const m = maps[mi];
             const mk = m.key;
-            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapShardDrop_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
+            createView.queueCache(`travel_card_${mk}`, `travelRadio_${mk}`, `mapActionCurrent_${mk}`, `mapDifficulty_${mk}`, `mapWaves_${mk}`, `mapTotalUnits_${mk}`, `mapShardDrop_${mk}`, `mapStar_${mk}_bronze`, `mapStar_${mk}_silver`, `mapStar_${mk}_gold`, `mapWorkers_${mk}`);
         }
         for (let gi = 0; gi < 10; gi++) {
             createView.queueCache(`base_inn_guest_wrap_${gi}`, `base_inn_guest_name_${gi}`, `base_inn_guest_chat_${gi}`, `base_inn_guest_fill_${gi}`);
@@ -2303,6 +2322,12 @@ let createView = {
                     resortData.idBtn(rbk, rslug),
                     `base_${rbk}_desc_${rslug}`
                 );
+                if (rud.autobuy) {
+                    createView.queueCache(
+                        `base_${rbk}_autobuy_${rslug}_row`,
+                        `base_${rbk}_autobuy_${rslug}_chk`
+                    );
+                }
             }
         }
         for (let bi = 0; bi < 25; bi++) {

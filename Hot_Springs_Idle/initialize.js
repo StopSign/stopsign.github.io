@@ -24,8 +24,8 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
 let showPathDebug = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
@@ -379,7 +379,8 @@ let initials = {
                 readyConsumedByDepth: {},
                 readyNotifySeenByDepth: {},
                 pebblePayBought: 0,
-                playPitBought: 0
+                playPitBought: 0,
+                autoIncreaseDepth: false
             },
             scrollArchives: pb("scrollArchives"),
             inn: Object.assign(pb("inn"), {
@@ -451,7 +452,8 @@ let initials = {
                 spirits: [],
                 pebbleGlobalCooldownMs: 0,
                 dropletGlobalCooldownMs: 0,
-                equalDropletSpacing: false
+                equalDropletSpacing: false,
+                autoRefillMana: false
             },
             stonePile: {
                 stone: 0,
@@ -943,7 +945,8 @@ let initialize = {
             spirits: [],
             pebbleGlobalCooldownMs: 0,
             dropletGlobalCooldownMs: 0,
-            equalDropletSpacing: false
+            equalDropletSpacing: false,
+            autoRefillMana: false
         };
         if (!base.hiddenSpring) {
             base.hiddenSpring = JSON.parse(JSON.stringify(def));
@@ -1071,7 +1074,8 @@ let initialize = {
             pausedPathJobs: {},
             pausedManaCloneJob: null,
             pausedCollectStoneJob: null,
-            resumePathAfterWeaveSegmentIndex: null
+            resumePathAfterWeaveSegmentIndex: null,
+            repeatCollectStone: false
         };
         if (!data.progress.okami) {
             data.progress.okami = JSON.parse(JSON.stringify(def));
@@ -1332,6 +1336,9 @@ let initialize = {
         if (typeof shrineCards !== "undefined" && shrineCards.invalidateAggregatedEffects) {
             shrineCards.invalidateAggregatedEffects();
         }
+        if (typeof shrineCards !== "undefined" && shrineCards.syncExtraKitsuneBonus) {
+            shrineCards.syncExtraKitsuneBonus();
+        }
         if (data.progress.hasMovedToNewMountain === undefined || data.progress.hasMovedToNewMountain === null) {
             data.progress.hasMovedToNewMountain = false;
         }
@@ -1432,6 +1439,9 @@ let initialize = {
             } else if (jobs[oldKey]) {
                 delete jobs[oldKey];
             }
+        }
+        if (typeof engine.refundCollectShardsAboveCap === "function") {
+            engine.refundCollectShardsAboveCap();
         }
     },
     initializeCistern: function() {
@@ -1539,6 +1549,9 @@ let initialize = {
         }
         if (mine.prioritizeOre === undefined) {
             mine.prioritizeOre = false;
+        }
+        if (mine.autoIncreaseDepth === undefined || mine.autoIncreaseDepth === null) {
+            mine.autoIncreaseDepth = false;
         }
         if (!mine.readyConsumedByDepth) {
             mine.readyConsumedByDepth = {};

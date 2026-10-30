@@ -259,6 +259,9 @@ var resortData = {
         if (key === "divinity") {
             return (data.progress.divinity && data.progress.divinity.amount) || 0;
         }
+        if (key === "essence") {
+            return (base.cistern && base.cistern.essence) || 0;
+        }
         return 0;
     },
     /** Coins never cover a Credit cost. */
@@ -298,6 +301,7 @@ var resortData = {
         if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
         if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
         if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
+        if ((c.essence || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.essence, "essence", "essence"));
         return parts;
     },
 
@@ -398,7 +402,8 @@ var resortData = {
                 starBeads: c.starBeads || 0,
                 mana: c.mana || 0,
                 credit: c.credit || 0,
-                divinity: c.divinity || 0
+                divinity: c.divinity || 0,
+                essence: c.essence || 0
             }
         };
     },
@@ -406,7 +411,7 @@ var resortData = {
     hasWeaveCost: function(weaveCost) {
         const w = weaveCost || {};
         return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0
-            || (w.credit || 0) > 0 || (w.divinity || 0) > 0;
+            || (w.credit || 0) > 0 || (w.divinity || 0) > 0 || (w.essence || 0) > 0;
     },
 
     hasGatherCost: function(gatherCost) {
@@ -567,6 +572,7 @@ var resortData = {
         if ((c.starBeads || 0) > (data.progress.starBeads || 0)) return false;
         if ((c.mana || 0) > ((data.progress.mana && data.progress.mana.amount) || 0)) return false;
         if ((c.divinity || 0) > ((data.progress.divinity && data.progress.divinity.amount) || 0)) return false;
+        if ((c.essence || 0) > ((base.cistern && base.cistern.essence) || 0)) return false;
         if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) return false;
         if ((c.stone || 0) > engine.getTotalStone()) return false;
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) return false;
@@ -596,6 +602,9 @@ var resortData = {
         }
         if ((c.divinity || 0) > 0 && data.progress.divinity) {
             data.progress.divinity.amount = Math.max(0, (data.progress.divinity.amount || 0) - (c.divinity || 0));
+        }
+        if ((c.essence || 0) > 0 && base.cistern) {
+            base.cistern.essence = Math.max(0, (base.cistern.essence || 0) - (c.essence || 0));
         }
         if ((c.wood || 0) > 0 && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - (c.wood || 0));
@@ -636,7 +645,7 @@ var resortData = {
     workerAssignmentSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "scrollArchives", "bonfire", "cistern", "mage_tower", "market"],
 
     /** Sites where Okami can be assigned (replaces manual action buttons). */
-    okamiAssignableSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "scrollArchives", "bonfire", "cistern", "mage_tower", "market"],
+    okamiAssignableSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "scrollArchives", "bonfire", "cistern", "mage_tower", "market", "hiddenSpring"],
 
     defaultWeavingTime: 5,
     defaultWeavingTimeIncrease: 1,
@@ -1479,9 +1488,13 @@ var resortData = {
                 assignedWorkers: 0,
                 waterCarriers: [],
                 carrierIdCounter: 1,
-                wishingWellBought: 0
+                wishingWellBought: 0,
+                growPlantSpiritBought: 0,
+                condenseWaterSpiritBought: 0,
+                raiseEarthSpiritBought: 0,
+                spinFireSpiritBought: 0
             },
-            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell"],
+            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell", "growPlantSpirit", "condenseWaterSpirit", "raiseEarthSpirit", "spinFireSpirit"],
             upgrades: {
                 increaseCapacity: {
                     key: "increase_capacity",
@@ -1685,6 +1698,100 @@ var resortData = {
                         const rate = engine.getWishingWellCoinRate();
                         const nextAdd = bought <= 0 ? 0.1 : 1;
                         return `Coins: +${rate.toFixed(1)}/s. Next: +${nextAdd}/s`;
+                    }
+                },
+                growPlantSpirit: {
+                    key: "grow_plant_spirit",
+                    name: "Grow Plant Spirit",
+                    description: "Summon one plant spirit.",
+                    cost: { essence: 100000 },
+                    weavingTime: 5000,
+                    canBuy: function() {
+                        return (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
+                    },
+                    onBuy: function() {
+                        if (engine.assembleExtraSpirit("plant")) {
+                            data.progress.base.cistern.growPlantSpiritBought = 1;
+                        }
+                    },
+                    maxPurchases: 1,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.growPlantSpiritBought || 0) >= 1;
+                    },
+                    soldOutButtonLabel: "Grown",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
+                    }
+                },
+                condenseWaterSpirit: {
+                    key: "condense_water_spirit",
+                    name: "Condense Water Spirit",
+                    description: "Summon one water spirit.",
+                    cost: { essence: 100000 },
+                    weavingTime: 5000,
+                    canBuy: function() {
+                        return (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
+                    },
+                    onBuy: function() {
+                        if (engine.assembleExtraSpirit("water")) {
+                            data.progress.base.cistern.condenseWaterSpiritBought = 1;
+                        }
+                    },
+                    maxPurchases: 1,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.condenseWaterSpiritBought || 0) >= 1;
+                    },
+                    soldOutButtonLabel: "Condensed",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
+                    }
+                },
+                raiseEarthSpirit: {
+                    key: "raise_earth_spirit",
+                    name: "Raise Earth Spirit",
+                    description: "Summon one earth spirit.",
+                    cost: { essence: 100000 },
+                    weavingTime: 5000,
+                    canBuy: function() {
+                        return (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
+                    },
+                    onBuy: function() {
+                        if (engine.assembleExtraSpirit("earth")) {
+                            data.progress.base.cistern.raiseEarthSpiritBought = 1;
+                        }
+                    },
+                    maxPurchases: 1,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.raiseEarthSpiritBought || 0) >= 1;
+                    },
+                    soldOutButtonLabel: "Raised",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
+                    }
+                },
+                spinFireSpirit: {
+                    key: "spin_fire_spirit",
+                    name: "Spin Fire Spirit",
+                    description: "Summon one fire spirit.",
+                    cost: { essence: 100000 },
+                    weavingTime: 5000,
+                    canBuy: function() {
+                        return (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
+                    },
+                    onBuy: function() {
+                        if (engine.assembleExtraSpirit("fire")) {
+                            data.progress.base.cistern.spinFireSpiritBought = 1;
+                        }
+                    },
+                    maxPurchases: 1,
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.cistern.spinFireSpiritBought || 0) >= 1;
+                    },
+                    soldOutButtonLabel: "Spun",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1
+                            && engine.getFireLauncherBuiltCount() >= 1
+                            && (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
                     }
                 }
             }
@@ -2403,7 +2510,8 @@ var resortData = {
                 finishWeaveCostQueue: [],
                 researchChoices: [],
                 selectedResearchChoice: "",
-                collectShardsLevel: 0
+                collectShardsLevel: 0,
+                lockedSkillKeys: []
             },
             upgradesOrder: ["finishResearch", "collectShards"],
             upgrades: {
@@ -2439,10 +2547,14 @@ var resortData = {
                         return data.progress.base.scrollArchives.collectShardsLevel || 0;
                     },
                     canBuy: function() {
-                        return !!(data.progress && data.progress.showBattle);
+                        const level = data.progress.base.scrollArchives.collectShardsLevel || 0;
+                        return !!(data.progress && data.progress.showBattle) && level < engine.getCollectShardsMax();
                     },
                     onBuy: function() {
                         data.progress.base.scrollArchives.collectShardsLevel = (data.progress.base.scrollArchives.collectShardsLevel || 0) + 1;
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getCollectShardsMax();
                     },
                     extraInfo: function() {
                         const lv = data.progress.base.scrollArchives.collectShardsLevel || 0;
@@ -2994,6 +3106,10 @@ var resortData = {
                 arrangementOfRailingSafetyUnlocked: false,
                 arrangementOfStepBuildingUnlocked: false,
                 arrangementOfLanternPlacingUnlocked: false,
+                arrangementOfSpelunkingUnlocked: false,
+                arrangementOfSelfSufficiencyUnlocked: false,
+                arrangementOfOrbGrowthUnlocked: false,
+                arrangementOfManaCurrentsUnlocked: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
                 autoWeaveIncludePausedWeaves: false
@@ -3005,7 +3121,8 @@ var resortData = {
                 "arrangementOfTargetPriority", "arrangementOfManaOrders", "arrangementOfDoubledStone", "arrangementOfRailingSafety",
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
-                "arrangementOfPaperMoney", "arrangementOfHeatTargeting"],
+                "arrangementOfPaperMoney", "arrangementOfHeatTargeting",
+                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3680,6 +3797,114 @@ var resortData = {
                         return !!(g && g.arrangementOfLanternPlacingUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfSpelunking: {
+                    key: "arrangement_of_spelunking",
+                    name: "Arrangement of Spelunking",
+                    description: "Reveal a Mine checkbox. When checked, depth increases automatically once the floor is ready.",
+                    cost: { stone: 10000 },
+                    weavingTime: 4000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 1 && !(g && g.arrangementOfSpelunkingUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfSpelunkingUnlocked = true;
+                        const mine = data.progress.base.mine;
+                        if (mine) {
+                            mine.autoIncreaseDepth = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 1 && !(g && g.arrangementOfSpelunkingUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfSpelunkingUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfSelfSufficiency: {
+                    key: "arrangement_of_self_sufficiency",
+                    name: "Arrangement of Self-Sufficiency",
+                    description: "Assign the Okami to the Hidden Spring to collect stone on repeat, and refill its mana on arrival.",
+                    cost: { stone: 10000 },
+                    weavingTime: 4000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 2 && !(g && g.arrangementOfSelfSufficiencyUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfSelfSufficiencyUnlocked = true;
+                        const hs = data.progress.base.hiddenSpring;
+                        if (hs) {
+                            hs.autoRefillMana = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 2 && !(g && g.arrangementOfSelfSufficiencyUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfSelfSufficiencyUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfOrbGrowth: {
+                    key: "arrangement_of_orb_growth",
+                    name: "Arrangement of Orb Growth",
+                    description: "Reveal an Autobuy checkbox on Expand Orb.",
+                    cost: { stone: 10000 },
+                    weavingTime: 4000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 3 && !(g && g.arrangementOfOrbGrowthUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfOrbGrowthUnlocked = true;
+                        const orb = data.progress.base.mage_tower;
+                        if (orb) {
+                            orb.expandOrbAutobuy = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 3 && !(g && g.arrangementOfOrbGrowthUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfOrbGrowthUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfManaCurrents: {
+                    key: "arrangement_of_mana_currents",
+                    name: "Arrangement of Mana Currents",
+                    description: "Reveal an Autobuy checkbox on Spin Currents.",
+                    cost: { stone: 10000 },
+                    weavingTime: 4000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 4 && !(g && g.arrangementOfManaCurrentsUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfManaCurrentsUnlocked = true;
+                        const orb = data.progress.base.mage_tower;
+                        if (orb) {
+                            orb.spinCurrentsAutobuy = true;
+                        }
+                    },
+                    rowVisible: function() {
+                        const g = data.progress.base.garden;
+                        return engine.getArtAppreciationBought() >= 4 && !(g && g.arrangementOfManaCurrentsUnlocked);
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfManaCurrentsUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
                 }
             },
             emptyPlaceholderId: "base_garden_empty",
@@ -3901,7 +4126,7 @@ var resortData = {
                 mysticalGloves: {
                     key: "mystical_gloves",
                     name: "Mystical Gloves",
-                    description: "Silk gloves that quicken a clone's hands. Each pair reduces created clones' slap cooldown by 100ms.",
+                    description: "Silk gloves that quicken a clone's hands. Each pair reduces created clones' slap cooldown by 100ms. Max buyable increases by 1 per Market Level.",
                     getCost: function() {
                         const n = engine.getMarketMysticalGlovesBought();
                         return { credit: Math.round(10000 * Math.pow(10, n)) };
@@ -4119,7 +4344,7 @@ var resortData = {
                 literacyLessons: {
                     key: "literacy_lessons",
                     name: "Literacy Lessons",
-                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2.",
+                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
                         const n = engine.getLiteracyLessonsBought();
                         return { credit: Math.round(40000 * Math.pow(1.5, n)) };
@@ -4208,7 +4433,7 @@ var resortData = {
                 lostScrolls: {
                     key: "lost_scrolls",
                     name: "Lost Scrolls",
-                    description: "A scroll that was never catalogued. Each purchase adds one research choice and does not raise the price of the next paid research.",
+                    description: "A scroll that was never catalogued. Each purchase adds one research choice and does not raise the price of the next paid research. Max buyable increases by 1 per Market Level.",
                     getCost: function() {
                         const n = engine.getLostScrollsBought();
                         return { credit: Math.round(100000 * Math.pow(3, n)) };
@@ -4575,7 +4800,9 @@ var resortData = {
                 increaseInnManaCapacityBought: 0,
                 increaseGateManaCapacityBought: 0,
                 increaseStonePileManaCapacityBought: 0,
-                assignedWorkers: 0
+                assignedWorkers: 0,
+                expandOrbAutobuy: false,
+                spinCurrentsAutobuy: false
             },
             upgradesOrder: ["expandOrb", "spinCurrents", "buildWalls", "buildStairs", "buildFloor", "increaseInnManaCapacity", "increaseGateManaCapacity", "increaseStonePileManaCapacity"],
             upgrades: {
@@ -4607,6 +4834,21 @@ var resortData = {
                     rowVisible: function() {
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.expandOrbBought) || 0;
                         return n > 0 || engine.hasManaCapacityForCost(this.getCost());
+                    },
+                    autobuy: true,
+                    autobuyVisible: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfOrbGrowthUnlocked);
+                    },
+                    isAutobuyChecked: function() {
+                        const orb = data.progress.base.mage_tower;
+                        return !!(orb && orb.expandOrbAutobuy);
+                    },
+                    setAutobuyChecked: function(on) {
+                        const orb = data.progress.base.mage_tower;
+                        if (orb) {
+                            orb.expandOrbAutobuy = !!on;
+                        }
                     }
                 },
                 spinCurrents: {
@@ -4637,6 +4879,21 @@ var resortData = {
                     rowVisible: function() {
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.spinCurrentsBought) || 0;
                         return n > 0 || engine.hasManaCapacityForCost(this.getCost());
+                    },
+                    autobuy: true,
+                    autobuyVisible: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfManaCurrentsUnlocked);
+                    },
+                    isAutobuyChecked: function() {
+                        const orb = data.progress.base.mage_tower;
+                        return !!(orb && orb.spinCurrentsAutobuy);
+                    },
+                    setAutobuyChecked: function(on) {
+                        const orb = data.progress.base.mage_tower;
+                        if (orb) {
+                            orb.spinCurrentsAutobuy = !!on;
+                        }
                     }
                 },
                 buildWalls: {
@@ -4920,9 +5177,14 @@ var resortData = {
                     maxManaReq: 200000,
                     divinityAmountReq: 30000,
                     totalGoldStarsReq: 1
-                }
+                },
+                shardEchoesBought: 0,
+                artAppreciationBought: 0,
+                richerNeighborsBought: 0,
+                languageEchoesBought: 0,
+                skillEchoesBought: 0
             },
-            upgradesOrder: ["spareSandals"],
+            upgradesOrder: ["spareSandals", "shardEchoes", "artAppreciation", "richerNeighbors", "languageEchoes", "skillEchoes"],
             upgrades: {
                 spareSandals: {
                     key: "sandal",
@@ -4949,6 +5211,168 @@ var resortData = {
                         return !!data.progress.base.atelier.sandalBuilt;
                     },
                     soldOutButtonLabel: "Built"
+                },
+                shardEchoes: {
+                    key: "shard_echoes",
+                    name: "Shard Echoes",
+                    description: "+1 maximum buyable Collect Shards research per written Legend",
+                    weavingTime: 4000,
+                    weavingTimeIncreaseAdd: 2000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getShardEchoesBought();
+                    },
+                    getCost: function() {
+                        const bought = engine.getShardEchoesBought();
+                        return { divinity: 5000 + 5000 * bought };
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getLegendsWritten();
+                    },
+                    canBuy: function() {
+                        return engine.getShardEchoesBought() < engine.getLegendsWritten();
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.shardEchoesBought = (shrine.shardEchoesBought || 0) + 1;
+                    },
+                    lockedLabel: function() {
+                        if (engine.getShardEchoesBought() >= engine.getLegendsWritten()) {
+                            return "Write another Legend";
+                        }
+                        return "";
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1;
+                    }
+                },
+                artAppreciation: {
+                    key: "art_appreciation",
+                    name: "Art Appreciation",
+                    description: "Each level unlocks a new Rock Garden Arrangement to buy",
+                    weavingTime: 3000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getArtAppreciationBought();
+                    },
+                    getCost: function() {
+                        return { divinity: 10000 };
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.getArtAppreciationBought() < 4;
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.artAppreciationBought = (shrine.artAppreciationBought || 0) + 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getArtAppreciationBought() >= 4;
+                    },
+                    soldOutButtonLabel: "Max appreciation",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1;
+                    }
+                },
+                richerNeighbors: {
+                    key: "richer_neighbors",
+                    name: "Richer Neighbors",
+                    description: "Each level multiplies coins from intruders by x1.1.",
+                    weavingTime: 4000,
+                    weavingTimeIncreaseAdd: 2000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getShrineUpgradeBought("richerNeighborsBought");
+                    },
+                    getCost: function() {
+                        const bought = engine.getShrineUpgradeBought("richerNeighborsBought");
+                        return { divinity: Math.round(15000 * Math.pow(1.3, bought)) };
+                    },
+                    canBuy: function() {
+                        return true;
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.richerNeighborsBought = (shrine.richerNeighborsBought || 0) + 1;
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1;
+                    },
+                    extraInfo: function() {
+                        const n = engine.getShrineUpgradeBought("richerNeighborsBought");
+                        return `Coin multiplier: x${round2(Math.pow(1.1, n))}`;
+                    }
+                },
+                languageEchoes: {
+                    key: "language_echoes",
+                    name: "Language Echoes",
+                    description: "Each level preserves one more inscription row when writing a Legend, starting with Strokes.",
+                    weavingTime: 4000,
+                    weavingTimeIncreaseAdd: 2000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getLanguageEchoesBought();
+                    },
+                    getCost: function() {
+                        const bought = engine.getLanguageEchoesBought();
+                        return { divinity: 30000 + 10000 * bought };
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getLanguageEchoesMax();
+                    },
+                    canBuy: function() {
+                        return engine.getLanguageEchoesBought() < engine.getLanguageEchoesMax();
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.languageEchoesBought = (shrine.languageEchoesBought || 0) + 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getLanguageEchoesBought() >= 10;
+                    },
+                    soldOutButtonLabel: "Max echoes",
+                    lockedLabel: function() {
+                        const bought = engine.getLanguageEchoesBought();
+                        if (bought >= 10) {
+                            return "";
+                        }
+                        if (bought >= engine.getLanguageEchoesMax()) {
+                            return "Write another Legend";
+                        }
+                        return "";
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1;
+                    }
+                },
+                skillEchoes: {
+                    key: "skill_echoes",
+                    name: "Skill Echoes",
+                    description: "Lock +1 skill to survive starting a new Legend, keeping it as a free, unlocked research",
+                    weavingTime: 4000,
+                    weavingTimeIncreaseAdd: 2000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getSkillEchoesBought();
+                    },
+                    getCost: function() {
+                        const bought = engine.getSkillEchoesBought();
+                        return { divinity: 30000 + 10000 * bought };
+                    },
+                    getMaxPurchases: function() {
+                        return engine.getLegendsWritten();
+                    },
+                    canBuy: function() {
+                        return engine.getSkillEchoesBought() < engine.getLegendsWritten();
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.skillEchoesBought = (shrine.skillEchoesBought || 0) + 1;
+                    },
+                    lockedLabel: function() {
+                        if (engine.getSkillEchoesBought() >= engine.getLegendsWritten()) {
+                            return "Write another Legend";
+                        }
+                        return "";
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 1;
+                    }
                 }
             }
         }

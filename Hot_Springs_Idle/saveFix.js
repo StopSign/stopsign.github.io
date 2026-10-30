@@ -8,7 +8,7 @@
 // Then bump CODE_SAVE_VERSION to N+1 so the next save stamps past N.
 // Prefer saveVersion gates over permanent progress flags for new fixups.
 
-const CODE_SAVE_VERSION = 3;
+const CODE_SAVE_VERSION = 4;
 
 let saveFix = {
     STAR_TYPES: ["bronze", "silver", "gold"],
@@ -33,6 +33,9 @@ let saveFix = {
         }
         if (loadedSaveVersion < 3) {
             saveFix.migrateEquippedStatSkillsOffCounters();
+        }
+        if (loadedSaveVersion < 4) {
+            saveFix.refundRemovedPrestigeCards();
         }
         engine.ensureShardProgress();
         engine.processShardSkillSlotUnlocks();
@@ -389,6 +392,34 @@ let saveFix = {
             }
             actual++;
         }
+    },
+
+    /**
+     * spiritTrainingSpotAvailable and startingCoins no longer exist.
+     * Saves that owned them get one pack of that card's rarity, once.
+     */
+    refundRemovedPrestigeCards: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (!shrine || !shrine.cards) {
+            return;
+        }
+        const cards = shrine.cards;
+        const training = cards.spiritTrainingSpotAvailable;
+        if (training && (training.epic || 0) > 0 && typeof engine !== "undefined" && engine.grantShrinePack) {
+            engine.grantShrinePack("epic");
+        }
+        delete cards.spiritTrainingSpotAvailable;
+
+        const coins = cards.startingCoins;
+        if (coins && typeof engine !== "undefined" && engine.grantShrinePack) {
+            if ((coins.rare || 0) > 0) {
+                engine.grantShrinePack("rare");
+            }
+            if ((coins.epic || 0) > 0) {
+                engine.grantShrinePack("epic");
+            }
+        }
+        delete cards.startingCoins;
     },
 
     /** Rescues used to update the map counter without adding workers. Raise the pool to match. */

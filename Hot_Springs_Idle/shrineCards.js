@@ -801,23 +801,6 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         }
     },
     {
-        key: "spiritTrainingSpotAvailable",
-        name: "Spirit Training Spot Available",
-        class: "none",
-        category: "unique",
-        rarity: { epic: 1 },
-        getEffect: function(rarity) {
-            if (rarity === "epic") return { spiritTrainingSpotAvailable: 1 };
-            return {};
-        },
-        effectText: function(rarity) {
-            return "After prestige: Spirit Training Spot bought, Hidden Spring starts at full mana capacity";
-        },
-        totalBonusText: function(totalEffect) {
-            return "After prestige: Spirit Training Spot bought, Hidden Spring starts at full mana capacity";
-        }
-    },
-    {
         key: "roadWork",
         name: "Road Work",
         class: "none",
@@ -879,41 +862,22 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         }
     },
     {
-        key: "startingCoins",
-        name: "Starting Coins",
-        class: "none",
-        category: "buff",
-        rarity: { rare: 2, epic: 1 },
-        getEffect: function(rarity) {
-            if (rarity === "rare") return { prestigeStartingCoinsFlat: 60 };
-            if (rarity === "epic") return { prestigeStartingCoinsFlat: 160 };
-            return {};
-        },
-        effectText: function(rarity) {
-            const e = this.getEffect(rarity);
-            return "Starting Coins After Prestige: +" + (e.prestigeStartingCoinsFlat || 0);
-        },
-        totalBonusText: function(totalEffect) {
-            return "Starting Coins After Prestige: +" + (totalEffect.prestigeStartingCoinsFlat || 0);
-        }
-    },
-    {
         key: "startingKitsune",
-        name: "Starting Kitsune",
+        name: "Extra Kitsune",
         class: "none",
         category: "buff",
         rarity: { rare: 4, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { prestigeStartingKitsuneFlat: 1 };
-            if (rarity === "epic") return { prestigeStartingKitsuneFlat: 2 };
+            if (rarity === "rare") return { extraKitsuneFlat: 1 };
+            if (rarity === "epic") return { extraKitsuneFlat: 2 };
             return {};
         },
         effectText: function(rarity) {
             const e = this.getEffect(rarity);
-            return "Starting Kitsune After Prestige: +" + (e.prestigeStartingKitsuneFlat || 0);
+            return "Extra Kitsune: +" + (e.extraKitsuneFlat || 0);
         },
         totalBonusText: function(totalEffect) {
-            return "Starting Kitsune After Prestige: +" + (totalEffect.prestigeStartingKitsuneFlat || 0);
+            return "Extra Kitsune: +" + (totalEffect.extraKitsuneFlat || 0);
         }
     },
     {
@@ -1123,7 +1087,30 @@ var shrineCards = {
                 initialize.calcPlayerStats(false);
             }
         }
+        if (key === "startingKitsune") {
+            shrineCards.syncExtraKitsuneBonus();
+        }
         return true;
+    },
+
+    /**
+     * Extra Kitsune is granted once per owned card. Later loads and prestige do not add it again.
+     */
+    syncExtraKitsuneBonus: function() {
+        const progress = data.progress;
+        if (!progress) {
+            return;
+        }
+        const want = (shrineCards.getTotalEffect("startingKitsune").extraKitsuneFlat) || 0;
+        const applied = progress.extraKitsuneApplied || 0;
+        const delta = want - applied;
+        if (delta > 0) {
+            if (!progress.kitsune) {
+                progress.kitsune = { total: 2 };
+            }
+            progress.kitsune.total = (progress.kitsune.total || 0) + delta;
+        }
+        progress.extraKitsuneApplied = want;
     },
 
     debugGrant: function(key, rarity, n) {
@@ -1156,8 +1143,13 @@ var shrineCards = {
         return odds.common + "% Common / " + odds.rare + "% Rare / " + odds.epic + "% Epic";
     },
     legendManaCost: 100000,
-    /** Legend N is index N - 1. Each entry is { text, apply }. Empty until effects are designed. */
-    legendEffects: [],
+    /** Legend N is index N - 1. Each entry is { text, apply }. Effects read legendsWritten at use time. */
+    legendEffects: [
+        {
+            text: "Add 5 upgrades to Shrine that cost Divinity.\nx2 divinity/s\nIncrease max density to be the Orb Level/2\nAdd 4 upgrades to Cistern that let you buy more spirits for Essence",
+            apply: function() {}
+        }
+    ],
     legendStarRequirement: function(legendsWritten) {
         return 8 + 2 * Math.max(0, Math.floor(legendsWritten || 0));
     },
@@ -1432,18 +1424,7 @@ var shrineCards = {
             return;
         }
 
-        const coinFlat = card.prestigeStartingCoinsFlat || 0;
-        if (coinFlat > 0) {
-            progress.coins = (progress.coins || 0) + coinFlat;
-        }
-
-        const kitsuneFlat = card.prestigeStartingKitsuneFlat || 0;
-        if (kitsuneFlat > 0) {
-            if (!progress.kitsune) {
-                progress.kitsune = { total: 2 };
-            }
-            progress.kitsune.total = (progress.kitsune.total || 0) + kitsuneFlat;
-        }
+        shrineCards.syncExtraKitsuneBonus();
 
         const manaFlat = card.prestigeStartingManaCapacityFlat || 0;
         if (manaFlat > 0) {
@@ -1465,16 +1446,6 @@ var shrineCards = {
             }
             if (typeof engine !== "undefined" && engine.syncScrollArchivesResearchCost) {
                 engine.syncScrollArchivesResearchCost(archives);
-            }
-        }
-
-        if ((card.spiritTrainingSpotAvailable || 0) > 0) {
-            const hs = progress.base && progress.base.hiddenSpring;
-            if (hs) {
-                hs.spiritTrainingSpotBought = true;
-                hs.mana = (typeof engine !== "undefined" && engine.getBuildingManaCapacity)
-                    ? engine.getBuildingManaCapacity("hiddenSpring")
-                    : (hs.manaCapacity || 40000);
             }
         }
 

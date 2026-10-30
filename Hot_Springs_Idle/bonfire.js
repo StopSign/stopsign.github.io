@@ -98,7 +98,8 @@ var bonfire = {
             return 0;
         }
         const orb = data.progress.base && data.progress.base.mage_tower;
-        const orbLevelCap = Math.floor(((orb && orb.level) || 0) / 4);
+        const divisor = (typeof engine.getLegendsWritten === "function" && engine.getLegendsWritten() >= 1) ? 2 : 4;
+        const orbLevelCap = Math.floor(((orb && orb.level) || 0) / divisor);
         const cap = engine.getManaCapacity();
         let n = 0;
         while (n < orbLevelCap && bonfire.getCloneManaCostFromSnapshot(n + 1) < cap) {
