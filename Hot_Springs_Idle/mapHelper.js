@@ -74,6 +74,11 @@ let mapHelper = {
             mapHelper.workingMap.baseDifficulty = isFinite(n) && n > 0 ? n : 1;
             mapHelper.refresh({ rebuildTable: false });
         });
+        document.getElementById("mhCoinDropAmount").addEventListener("input", function() {
+            const n = parseFloat(this.value);
+            mapHelper.workingMap.coinDropAmount = isFinite(n) && n >= 0 ? n : 0;
+            mapHelper.refresh({ rebuildTable: false });
+        });
         document.getElementById("mhSeed").addEventListener("input", function() {
             const n = parseInt(this.value, 10);
             mapHelper.workingMap.seed = isFinite(n) ? n : 0;
@@ -183,7 +188,7 @@ let mapHelper = {
     },
 
     newBlankMap: function() {
-        const zone = mapData.createZone(5, "scoundrel", 0, 200, 1, 1, 5);
+        const zone = mapData.createZone(5, "scoundrel", 0, 200, 1, 1);
         mapHelper.workingMap = mapData.createMap({
             version: 0,
             key: "map_new",
@@ -192,6 +197,7 @@ let mapHelper = {
             seed: 1,
             baseDifficulty: 1,
             zones: [zone],
+            coinDropAmount: 25,
             shardDropAmount: 1
         });
         document.getElementById("mhMapSelect").value = "";
@@ -206,6 +212,7 @@ let mapHelper = {
         document.getElementById("mhMapKey").value = m.key || "";
         document.getElementById("mhDescription").value = m.description || "";
         document.getElementById("mhBaseDifficulty").value = m.baseDifficulty !== undefined ? m.baseDifficulty : 1;
+        document.getElementById("mhCoinDropAmount").value = m.coinDropAmount !== undefined ? m.coinDropAmount : 0;
         document.getElementById("mhSeed").value = m.seed !== undefined ? m.seed : 0;
     },
 
@@ -241,9 +248,6 @@ let mapHelper = {
         } else if (field === "audDamageTradeRatio") {
             const n = parseFloat(el.value);
             z.audDamageTradeRatio = isFinite(n) && n >= 0.01 ? n : 1;
-        } else if (field === "coinsPerIntruder") {
-            const n = parseFloat(el.value);
-            z.coinsPerIntruder = isFinite(n) && n >= 0 ? n : 0;
         }
         mapHelper.refresh({ rebuildTable: false });
     },
@@ -284,7 +288,7 @@ let mapHelper = {
             const last = mapHelper.analyze().waves[zones.length - 1];
             startMs = Math.round((last.lastMs || last.startMs) + 5000);
         }
-        zones.push(mapData.createZone(5, "scoundrel", startMs, 200, 1, 1, 5));
+        zones.push(mapData.createZone(5, "scoundrel", startMs, 200, 1, 1));
         mapHelper.renameWaves();
         mapHelper.refresh();
     },
@@ -371,7 +375,6 @@ let mapHelper = {
                 totalEnemies: z.totalEnemies,
                 difficulty: z.difficulty,
                 trade: z.audDamageTradeRatio,
-                coins: z.coinsPerIntruder,
                 exp: cr.expBasePerIntruder
             });
             for (let ri = 0; ri < rows.length; ri++) {
@@ -506,7 +509,6 @@ let mapHelper = {
             html += `<td><input type="number" min="0" step="1" data-field="distanceBetweenUnits" value="${mapHelper.esc(z.distanceBetweenUnits)}"></td>`;
             html += `<td><input type="number" min="0.01" step="0.1" data-field="difficulty" value="${mapHelper.esc(z.difficulty)}"></td>`;
             html += `<td><input type="number" min="0.01" step="0.05" data-field="audDamageTradeRatio" value="${mapHelper.esc(z.audDamageTradeRatio)}"></td>`;
-            html += `<td><input type="number" min="0" step="1" data-field="coinsPerIntruder" value="${mapHelper.esc(z.coinsPerIntruder)}"></td>`;
             html += `<td class="mh-computed" data-col="aud">${w.aud}</td>`;
             html += `<td class="mh-computed" data-col="dmg">${w.dmg}</td>`;
             html += `<td class="mh-computed" data-col="gap">${mapHelper.fmtNum(w.intervalMs / 1000, 2)}</td>`;
@@ -523,7 +525,7 @@ let mapHelper = {
             html += `</td></tr>`;
         }
         if (!analysis.waves.length) {
-            html = `<tr><td colspan="17" class="muted-text">No waves. Add one to start.</td></tr>`;
+            html = `<tr><td colspan="16" class="muted-text">No waves. Add one to start.</td></tr>`;
         }
         body.innerHTML = html;
     },
@@ -821,6 +823,8 @@ let mapHelper = {
             }
         }
         lines.push("    ],");
+        const coinAmt = m.coinDropAmount !== undefined ? m.coinDropAmount : 0;
+        lines.push("    coinDropAmount: " + mapHelper.fmtExportNum(coinAmt) + ",");
         const dropAmt = m.shardDropAmount !== undefined ? m.shardDropAmount : 1;
         lines.push("    shardDropAmount: " + mapHelper.fmtExportNum(dropAmt));
         lines.push("})");
@@ -834,8 +838,7 @@ let mapHelper = {
             mapHelper.fmtExportNum(Math.round(z.startTimeMs || 0)),
             mapHelper.fmtExportNum(z.distanceBetweenUnits || 0),
             mapHelper.fmtExportNum(z.difficulty !== undefined ? z.difficulty : 1),
-            mapHelper.fmtExportNum(z.audDamageTradeRatio !== undefined ? z.audDamageTradeRatio : 1),
-            mapHelper.fmtExportNum(z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1)
+            mapHelper.fmtExportNum(z.audDamageTradeRatio !== undefined ? z.audDamageTradeRatio : 1)
         ];
         return `mapData.createZone(${args.join(", ")})`;
     },

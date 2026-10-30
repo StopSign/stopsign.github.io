@@ -90,7 +90,7 @@ let onLoad = {
             data.progress.selectedLibrarySkillKey = "";
         }
         const cardsSubTab = data.progress.selectedCardsSubTab;
-        if (cardsSubTab !== "get" && cardsSubTab !== "prestige" && cardsSubTab !== "bonuses") {
+        if (cardsSubTab !== "get" && cardsSubTab !== "bonuses") {
             data.progress.selectedCardsSubTab = "get";
         }
         if (data.progress.selectedScrollArchivesSubTab !== "find" && data.progress.selectedScrollArchivesSubTab !== "research") {

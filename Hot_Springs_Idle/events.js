@@ -96,7 +96,7 @@ let events = {
             if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
                 const optIx = preTabs.indexOf("options");
                 if (optIx >= 0) {
-                    preTabs.splice(optIx, 0, "cardBonuses");
+                    preTabs.splice(optIx, 0, "cardBonuses", "prestige");
                 }
             }
             return preTabs;
@@ -116,7 +116,7 @@ let events = {
         if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
             const optIx = tabs.indexOf("options");
             if (optIx >= 0) {
-                tabs.splice(optIx, 0, "cardBonuses");
+                tabs.splice(optIx, 0, "cardBonuses", "prestige");
             }
         }
         return tabs;
@@ -332,7 +332,7 @@ let events = {
         }
     },
     switchCardsSubTab: function(tabKey) {
-        const t = (tabKey === "prestige" || tabKey === "bonuses") ? tabKey : "get";
+        const t = tabKey === "bonuses" ? tabKey : "get";
         data.progress.selectedCardsSubTab = t;
         if (typeof view !== "undefined" && view.updateCardBonusesTab) {
             view.updateCardBonusesTab();
@@ -2178,10 +2178,10 @@ let events = {
             chk.disabled = false;
         }
         const checked = !!(chk && chk.checked);
-        const cost = shrineCards.legendDivinityCost || 20000;
-        const afford = typeof resortData !== "undefined" && resortData.canAffordCost({ divinity: cost });
+        const cost = shrineCards.legendManaCost || 100000;
+        const afford = typeof resortData !== "undefined" && resortData.canAffordCost({ mana: cost });
         if (btn) {
-            const amountHtml = resortData.formatCostAmountHtml(cost, "divinity", "divinity");
+            const amountHtml = resortData.formatCostAmountHtml(cost, "mana", "mana");
             const label = `Fade into Legend (Combat Prestige) for [${amountHtml}]`;
             view.updateVal("shrineMoveMountainBtn", label, "innerHTML");
             view.updateVal("shrineMoveMountainBtn", !checked || !afford, "disabled");
@@ -2196,8 +2196,8 @@ let events = {
         if (!chk || !chk.checked) {
             return;
         }
-        const cost = shrineCards.legendDivinityCost || 20000;
-        if (!resortData.canAffordCost({ divinity: cost })) {
+        const cost = shrineCards.legendManaCost || 100000;
+        if (!resortData.canAffordCost({ mana: cost })) {
             return;
         }
         engine.performCombatPrestige();
@@ -2216,11 +2216,12 @@ let events = {
         }
         resortData.deductCost(cost);
         engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
+        const odds = shrineCards.buyCardOdds || { common: 100, rare: 0, epic: 0 };
         const roll = engine.nextSeededFloat(shrine, "packSeed") * 100;
         let rarity = "epic";
-        if (roll < 94) {
+        if (roll < (odds.common || 0)) {
             rarity = "common";
-        } else if (roll < 99) {
+        } else if (roll < (odds.common || 0) + (odds.rare || 0)) {
             rarity = "rare";
         }
         engine.grantShrinePack(rarity);
@@ -2450,7 +2451,7 @@ let events = {
         const researchSeed = oldArchives && typeof oldArchives.researchSeed === "number" ? oldArchives.researchSeed : null;
         const packSeed = shrine && typeof shrine.packSeed === "number" ? shrine.packSeed : null;
         const talentAdd = skills.unlockedTalentLevelTotal();
-        const oldCap = (progress.divinity && progress.divinity.capacity) || 100000;
+        const oldCap = (progress.divinity && typeof progress.divinity.capacity === "number") ? progress.divinity.capacity : 50000;
         const newCap = oldCap + talentAdd;
         const prevOptions = progress.options || {};
         const hideMaxed = prevOptions.hideMaxedUpgrades;

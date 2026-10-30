@@ -1,5 +1,5 @@
 let mapData = {
-    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio, coinsPerIntruder) {
+    createZone: function(totalEnemies, intruderType, startTimeMs, distanceBetweenUnits, difficulty, audDamageTradeRatio) {
         const safeEnemies = Math.max(1, totalEnemies || 1);
         const safeDistanceBetweenUnits = Math.max(0, distanceBetweenUnits || 0);
         return {
@@ -10,7 +10,6 @@ let mapData = {
             distanceBetweenUnits: safeDistanceBetweenUnits,
             lengthMs: Math.max(0, safeDistanceBetweenUnits * Math.max(0, safeEnemies - 1)),
             intruderType: intruderType || "scoundrel",
-            coinsPerIntruder: coinsPerIntruder !== undefined ? Math.max(0, coinsPerIntruder) : 1,
             audDamageTradeRatio: audDamageTradeRatio !== undefined ? Math.max(0.01, audDamageTradeRatio) : 1
         };
     },
@@ -22,6 +21,9 @@ let mapData = {
             z.name = `Wave ${i + 1}`;
             totalDurationMs = Math.max(totalDurationMs, z.startTimeMs);
         }
+        const coinDropAmount = config.coinDropAmount !== undefined
+            ? Math.max(0, config.coinDropAmount)
+            : 0;
         const shardDropAmount = config.shardDropAmount !== undefined
             ? Math.max(0, config.shardDropAmount)
             : 1;
@@ -34,6 +36,7 @@ let mapData = {
             requiredClassKey: config.requiredClassKey || "",
             unlocksAfterMapKey: config.unlocksAfterMapKey || "",
             zones: zones,
+            coinDropAmount: coinDropAmount,
             shardDropAmount: shardDropAmount,
             totalDurationMs: totalDurationMs,
             version: config.version
@@ -87,8 +90,8 @@ let mapData = {
         const N = ratio * totalDifficulty;
         const rawAud = gameData.battle.intruderBaseAud * Math.pow(N, 1.3) * trade;
         const rawDamage = gameData.battle.intruderAttackDamage * Math.pow(N, 1.2) / trade;
-        const coinsPerIntruderBase = Math.max(0, z.coinsPerIntruder !== undefined ? z.coinsPerIntruder : 1);
-        const perIntruderGain = Math.ceil(coinsPerIntruderBase * coinsMult);
+        const baseCoins = mapData.getZoneBaseCoinsPerIntruder(mapDefinition, zoneIndex);
+        const perIntruderGain = baseCoins * coinsMult;
         const expBasePerIntruder = Math.max(0, (mapDefinition.baseDifficulty || 1) * ratio * expMult);
         return {
             rawAud,

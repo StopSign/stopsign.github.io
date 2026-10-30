@@ -34,6 +34,8 @@ let saveFix = {
         if (loadedSaveVersion < 3) {
             saveFix.migrateEquippedStatSkillsOffCounters();
         }
+        engine.ensureShardProgress();
+        engine.processShardSkillSlotUnlocks();
     },
 
     /**
@@ -96,9 +98,7 @@ let saveFix = {
         }
 
         data.progress.shards = pooled;
-        if (!data.progress.nextSkillSlotShardCost || data.progress.nextSkillSlotShardCost < 1) {
-            data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
-        }
+        engine.syncNextSkillSlotShardCost();
         engine.processShardSkillSlotUnlocks();
 
         if (data.progress.skillListSort === "shards") {

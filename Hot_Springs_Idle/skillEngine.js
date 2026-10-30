@@ -289,33 +289,50 @@ let skillEngine = {
         return hindsight * hogMult + 0.10 * engine.getCloneSoulLevel();
     },
     getValidationAudFromKills: function() {
-        if (!skills.isSkillUnlocked("validation")) {
+        if (!data.battle || !skills.isSkillEquipped("validation")) {
             return 0;
         }
-        const eff = skills.getSkillEffect("validation");
-        const per = eff.audPerKill || 1;
-        const cap = eff.audCap || 0;
-        return Math.min((data.battle.enemiesKilled || 0) * per, cap);
+        skillEngine.ensureValidationAudEarned();
+        const cap = skills.getSkillEffect("validation").audCap || 0;
+        return Math.min(data.battle.validationAudEarned || 0, cap);
     },
-    /** True when the latest kill raised Validation's max-Aud contribution (still under the per-level cap). */
-    didValidationMaxAudIncreaseOnLastKill: function() {
-        if (!skills.isSkillUnlocked("validation")) {
-            return false;
+    /** Old clones stored no counter. Keep Audacity they already received, then only new kills fill new cap room. */
+    ensureValidationAudEarned: function() {
+        if (!data.battle) {
+            return;
+        }
+        if (data.battle.validationAudEarned !== undefined && data.battle.validationAudEarned !== null) {
+            return;
         }
         const eff = skills.getSkillEffect("validation");
-        const per = eff.audPerKill || 1;
+        const per = eff.audPerKill || 0;
         const cap = eff.audCap || 0;
         const kills = data.battle.enemiesKilled || 0;
-        if (kills <= 0 || cap <= 0 || per <= 0) {
-            return false;
-        }
-        return Math.min(kills * per, cap) > Math.min((kills - 1) * per, cap);
+        data.battle.validationAudEarned = Math.min(kills * per, cap);
     },
-    getValidationCurrentAudOnMaxIncrease: function() {
-        if (!skills.isSkillUnlocked("validation")) {
+    /**
+     * One removal grants +audPerKill max Aud only while earned is under the current cap.
+     * Raising the cap does not apply earlier removals. Returns this kill's additional heal
+     * (skill level), or 0 when the cap did not gain max Aud.
+     */
+    applyValidationKillProgress: function() {
+        if (!data.battle || !skills.isSkillEquipped("validation")) {
             return 0;
         }
-        return skills.getSkillEffect("validation").currentAudOnMaxIncrease || 0;
+        skillEngine.ensureValidationAudEarned();
+        const eff = skills.getSkillEffect("validation");
+        const per = eff.audPerKill || 0;
+        const cap = eff.audCap || 0;
+        const earned = data.battle.validationAudEarned || 0;
+        if (!(per > 0) || earned >= cap) {
+            return 0;
+        }
+        const gain = Math.min(per, cap - earned);
+        if (!(gain > 0)) {
+            return 0;
+        }
+        data.battle.validationAudEarned = earned + gain;
+        return eff.currentAudOnMaxIncrease || 0;
     },
     /** Flat coin bonus from Nickel and Dime and More Coin Drop, excluding %/mult and zone base. */
     getKillCoinsFlatBonus: function() {

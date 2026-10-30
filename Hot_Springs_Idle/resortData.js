@@ -1248,7 +1248,7 @@ var resortData = {
                     key: "lingering_density",
                     name: "Lingering Density",
                     description: "When a clone disperses, base mana gained is 10 plus its density level.",
-                    cost: { mana: 3000, coins: 500 },
+                    cost: { mana: 3000, coins: 1000 },
                     weavingTime: 120,
                     canBuy: function() {
                         const b = data.progress.base.bonfire;
@@ -1274,7 +1274,7 @@ var resortData = {
                     key: "bond_growth",
                     name: "Bond Growth",
                     description: "When a clone disperses, base mana capacity gained gets +10% per 10 seconds the clone was alive. Applies to (10 + density).",
-                    cost: { mana: 40000, coins: 5000 },
+                    cost: { mana: 40000, starBeads: 40000 },
                     weavingTime: 360,
                     canBuy: function() {
                         const b = data.progress.base.bonfire;
@@ -1551,8 +1551,10 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Max reinforced",
                     rowVisible: function() {
+                        const n = data.progress.base.cistern.reinforceToriiCapacityBought || 0;
                         return engine.isToriiDrinkingBowlUnlocked()
-                            && (data.progress.base.cistern.reinforceToriiCapacityBought || 0) < 4;
+                            && n < 4
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
                     },
                     extraInfo: function() {
                         return "Next: +700L";
@@ -1590,8 +1592,10 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Max reinforced",
                     rowVisible: function() {
+                        const n = data.progress.base.cistern.reinforceOnsenCapacityBought || 0;
                         return engine.isInnOnsenConverted()
-                            && (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) < 4;
+                            && n < 4
+                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
                     },
                     extraInfo: function() {
                         return "Next: +1000L";
@@ -1985,8 +1989,8 @@ var resortData = {
                     key: "spirit_training_spot",
                     name: "Create Spirit Training Spot",
                     description: "Reveal a spirit slot for any spirit, allowing it to train using Hidden Spring mana for a permanent spirit power bonus.",
-                    cost: { mana: 12000, starBeads: 20000, coins: 8000 },
-                    weavingTime: 240,
+                    cost: { mana: 30000, starBeads: 20000, coins: 10000 },
+                    weavingTime: 480,
                     weavingTimeIncrease: 1,
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
@@ -2427,7 +2431,7 @@ var resortData = {
                     getCost: function() {
                         const n = data.progress.base.scrollArchives.collectShardsLevel || 0;
                         const mult = Math.pow(2, n);
-                        return { coins: 400 * mult, starBeads: 2000 * mult };
+                        return { coins: 800 * mult, starBeads: 1000 * mult };
                     },
                     weavingTime: 120,
                     weavingTimeIncreaseAdd: 120,
@@ -2453,16 +2457,16 @@ var resortData = {
                 }
             },
             inscriptionRows: [
-                { key: "strokes", name: "Strokes", coins: 1, beads: 5, mana: 10, progressStart: 50, rateNum: 1, rateDen: 1, product: "Scribings", target: "scribings" },
-                { key: "characters", name: "Characters", coins: 3, beads: 10, mana: 15, progressStart: 300, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
-                { key: "words", name: "Words", coins: 5, beads: 15, mana: 20, progressStart: 1000, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
-                { key: "phrases", name: "Phrases", coins: 10, beads: 50, mana: 30, progressStart: 5000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
-                { key: "clauses", name: "Clauses", coins: 25, beads: 100, mana: 40, progressStart: 20000, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
-                { key: "sentences", name: "Sentences", coins: 50, beads: 200, mana: 55, progressStart: 50000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
-                { key: "paragraphs", name: "Paragraphs", coins: 150, beads: 500, mana: 75, progressStart: 100000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
-                { key: "scrolls", name: "Scrolls", coins: 500, beads: 1000, mana: 100, progressStart: 300000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
-                { key: "codices", name: "Codices", coins: 1000, beads: 2000, mana: 125, progressStart: 1000000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
-                { key: "archives", name: "Archives", coins: 3000, beads: 4000, mana: 200, progressStart: 3000000, rateNum: 1, rateDen: 10000, product: "Codices", target: "codices" }
+                { key: "strokes", name: "Strokes", coins: 1, beads: 3, mana: 10, progressStart: 100, rateNum: 1, rateDen: 1, product: "Scribings", target: "scribings" },
+                { key: "characters", name: "Characters", coins: 3, beads: 5, mana: 15, progressStart: 300, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
+                { key: "words", name: "Words", coins: 5, beads: 10, mana: 20, progressStart: 800, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
+                { key: "phrases", name: "Phrases", coins: 8, beads: 15, mana: 25, progressStart: 3000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
+                { key: "clauses", name: "Clauses", coins: 12, beads: 30, mana: 35, progressStart: 8000, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
+                { key: "sentences", name: "Sentences", coins: 50, beads: 200, mana: 45, progressStart: 50000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
+                { key: "paragraphs", name: "Paragraphs", coins: 150, beads: 500, mana: 60, progressStart: 100000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
+                { key: "scrolls", name: "Scrolls", coins: 500, beads: 1000, mana: 75, progressStart: 300000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
+                { key: "codices", name: "Codices", coins: 1000, beads: 2000, mana: 90, progressStart: 1000000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
+                { key: "archives", name: "Archives", coins: 3000, beads: 4000, mana: 125, progressStart: 3000000, rateNum: 1, rateDen: 10000, product: "Codices", target: "codices" }
             ]
         },
 
@@ -3439,7 +3443,7 @@ var resortData = {
                 arrangementOfViscosity: {
                     key: "arrangement_of_viscosity",
                     name: "Arrangement of Viscosity",
-                    description: "Unlocks a Cistern checkbox to let water spirits use path speed bonuses (Add Lanterns).",
+                    description: "Unlocks a Cistern checkbox to let water spirits choose to not use path speed bonuses.",
                     cost: { stone: 300 },
                     weavingTime: 240,
                     canBuy: function() {
@@ -4071,7 +4075,7 @@ var resortData = {
                 improveStoneDuplicator: {
                     key: "improve_stone_duplicator",
                     name: "Improve Stone Duplicator",
-                    description: "The duplicator works in batches. Every 10 seconds, 10 stone and 500 mana become 20 duplicated stone. It skips a tick when fewer than 10 stone are stored.",
+                    description: "The duplicator works in batches. Every 10 seconds, 10 stone and 500 mana become 20 duplicated stone.",
                     cost: { credit: 30000 },
                     weavingTime: 600,
                     canBuy: function() {
@@ -4100,7 +4104,7 @@ var resortData = {
                     name: "Exchange Credit",
                     description: "The Okami turns 1000 coins into 1000 Credit and 1000 Market exp.",
                     directWeave: true,
-                    weavingTime: 40,
+                    weavingTime: 80,
                     cost: {},
                     canBuy: function() {
                         return engine.canStartExchangeCredit();
@@ -4115,7 +4119,7 @@ var resortData = {
                 literacyLessons: {
                     key: "literacy_lessons",
                     name: "Literacy Lessons",
-                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2. Coins, star beads, and mana spent stay the same.",
+                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2.",
                     getCost: function() {
                         const n = engine.getLiteracyLessonsBought();
                         return { credit: Math.round(40000 * Math.pow(1.5, n)) };

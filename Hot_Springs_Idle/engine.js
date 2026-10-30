@@ -282,26 +282,43 @@ let engine = {
         }
         engine.syncScrollArchivesResearchCost();
     },
-    performCombatPrestige: function() {
-        const cost = (typeof shrineCards !== "undefined" && shrineCards.legendDivinityCost) || 20000;
-        if (typeof resortData === "undefined" || !resortData.canAffordCost({ divinity: cost })) {
-            return false;
-        }
+    getCombatPrestigeMaxDivinityGain: function() {
         const talentTotal = (typeof skills !== "undefined" && skills.unlockedTalentLevelTotal)
             ? skills.unlockedTalentLevelTotal()
             : 0;
+        return Math.floor(Math.pow(Math.max(0, talentTotal), 1.2));
+    },
+    cancelOrbPrestigeWeaves: function() {
+        const weaving = engine.getWeavingState();
+        const upgradeKeys = ["expandOrb", "spinCurrents"];
+        const active = weaving.active;
+        if (active && active.scopeKey === "mage_tower" && upgradeKeys.indexOf(active.upgradeKey) >= 0) {
+            weaving.active = null;
+            engine.restoreOkamiAfterWeaveOrPath();
+        }
+        if (weaving.paused) {
+            for (let i = 0; i < upgradeKeys.length; i++) {
+                delete weaving.paused[engine.getWeavingJobKey("mage_tower", upgradeKeys[i])];
+            }
+        }
+    },
+    performCombatPrestige: function() {
+        const cost = (typeof shrineCards !== "undefined" && shrineCards.legendManaCost) || 100000;
+        if (typeof resortData === "undefined" || !resortData.canAffordCost({ mana: cost })) {
+            return false;
+        }
+        resortData.deductCost({ mana: cost });
         const starTotal = engine.getTotalEarnedStarsCount();
         engine.endCloneRun("dead", { skipManaBonus: true, skipRetry: true });
         if (!data.progress.divinity) {
             data.progress.divinity = { amount: 0, capacity: 0 };
         }
-        data.progress.divinity.capacity = (data.progress.divinity.capacity || 0) + Math.pow(Math.max(0, talentTotal), 1.2);
+        data.progress.divinity.capacity = (data.progress.divinity.capacity || 0) + engine.getCombatPrestigeMaxDivinityGain();
         const written = Math.max(0, Math.floor(data.progress.legendsWritten || 0));
         const req = shrineCards.legendStarRequirement(written);
-        if (starTotal >= req) {
+        if (starTotal >= req && shrineCards.hasNextLegend(written)) {
             data.progress.legendsWritten = written + 1;
         }
-        resortData.deductCost({ divinity: cost });
         engine.applyCombatPrestigeResets();
         if (typeof shrineCards !== "undefined" && shrineCards.applyFinishedLegends) {
             shrineCards.applyFinishedLegends();
@@ -344,8 +361,8 @@ let engine = {
             }
         }
         data.progress.shards = 0;
-        data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
         data.progress.skillSlotUnlockIndex = 0;
+        engine.syncNextSkillSlotShardCost();
         data.progress.skillEquip = skills.getDefaultSkillEquip();
         data.progress.selectedEquippedSkillKey = "";
         data.progress.selectedLibrarySkillKey = "";
@@ -375,7 +392,10 @@ let engine = {
             orb.level = orbDef.level || 0;
             orb.exp = orbDef.exp || 0;
             orb.expToLevel = orbDef.expToLevel || 200;
+            orb.expandOrbBought = 0;
+            orb.spinCurrentsBought = 0;
         }
+        engine.cancelOrbPrestigeWeaves();
         if (data.progress.mana) {
             data.progress.mana.capacityBonus = 0;
             data.progress.mana.amount = engine.getManaCapacity();
@@ -1121,22 +1141,13 @@ let engine = {
         }
         const overkillDamage = (opts && opts.overkillDamage) || 0;
         skills.fireTrigger("onKillLogOverkill", { overkillDamage: overkillDamage });
-        // Validation: +audPerKill max Aud per kill (via calcPlayerStats). When that max rises, additionally
-        // heal equal to Validation level. Equal recover already grants that max-rise amount, so pass the
-        // rest as extraCurrentOnMaxRise (not boosted by Narcissism).
-        let validationExtraCurrent = 0;
-        if (skillEngine.didValidationMaxAudIncreaseOnLastKill()) {
-            const curGain = skillEngine.getValidationCurrentAudOnMaxIncrease();
-            const eff = skills.getSkillEffect("validation");
-            const per = eff.audPerKill || 1;
-            const cap = eff.audCap || 0;
-            const kills = data.battle.enemiesKilled || 0;
-            const valRise = Math.min(kills * per, cap) - Math.min((kills - 1) * per, cap);
-            if (curGain > valRise) {
-                validationExtraCurrent = curGain - valRise;
-            }
+        // Validation fills its cap only on removals after that cap exists. Equal recover
+        // covers the +5 max. The additional heal is the skill level (Confidence, not Narcissism).
+        const validationHeal = skillEngine.applyValidationKillProgress();
+        initialize.calcPlayerStats(false);
+        if (validationHeal > 0) {
+            engine.grantPlayerCurrentAudGain(validationHeal * engine.getConfidenceMultiplier(), "validation");
         }
-        initialize.calcPlayerStats(false, { extraCurrentOnMaxRise: validationExtraCurrent, healSource: "validation" });
         if (data.battle.state === "running") {
             engine.updateCurrentZoneInfo();
         }
@@ -1268,7 +1279,22 @@ let engine = {
         return gain;
     },
     SKILL_SLOT_UNLOCK_CYCLE: ["any", "offense", "defense", "utility"],
-    DEFAULT_NEXT_SKILL_SLOT_SHARD_COST: 50,
+    DEFAULT_NEXT_SKILL_SLOT_SHARD_COST: 30,
+    SKILL_SLOT_SHARD_COST_GROWTH: 1.5,
+
+    /** Next slot cost from the base and how many extra slots are already unlocked. */
+    getNextSkillSlotShardCost: function(unlockIndex) {
+        const idx = Math.max(0, unlockIndex || 0);
+        return engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST * Math.pow(engine.SKILL_SLOT_SHARD_COST_GROWTH, idx);
+    },
+
+    syncNextSkillSlotShardCost: function() {
+        if (!data.progress) {
+            return;
+        }
+        const idx = data.progress.skillSlotUnlockIndex || 0;
+        data.progress.nextSkillSlotShardCost = engine.getNextSkillSlotShardCost(idx);
+    },
 
     ensureShardProgress: function() {
         if (!data.progress) {
@@ -1277,13 +1303,10 @@ let engine = {
         if (data.progress.shards === undefined || data.progress.shards === null) {
             data.progress.shards = 0;
         }
-        if (data.progress.nextSkillSlotShardCost === undefined || data.progress.nextSkillSlotShardCost === null
-            || data.progress.nextSkillSlotShardCost < 1) {
-            data.progress.nextSkillSlotShardCost = engine.DEFAULT_NEXT_SKILL_SLOT_SHARD_COST;
-        }
         if (data.progress.skillSlotUnlockIndex === undefined || data.progress.skillSlotUnlockIndex === null) {
             data.progress.skillSlotUnlockIndex = 0;
         }
+        engine.syncNextSkillSlotShardCost();
     },
 
     /** Collect Shards level → amount multiplier (0 if locked). L1 = x1, L2 = x1.3, … */
@@ -1327,9 +1350,9 @@ let engine = {
         let unlockedAny = false;
         while ((data.progress.shards || 0) >= data.progress.nextSkillSlotShardCost) {
             data.progress.shards -= data.progress.nextSkillSlotShardCost;
-            data.progress.nextSkillSlotShardCost *= 1.5;
             const col = cycle[data.progress.skillSlotUnlockIndex % cycle.length];
             data.progress.skillSlotUnlockIndex++;
+            engine.syncNextSkillSlotShardCost();
             const eq = data.progress.skillEquip;
             if (!eq.slots[col]) {
                 eq.slots[col] = [];
@@ -1648,6 +1671,7 @@ let engine = {
         const coins = engine.coinsAwardFromIntruderGain(stored) * 0.5;
         if (coins > 0) {
             engine.grantBattleCoins(coins);
+            engine.noteSkillExtraCoins("outrage", stored * engine.intruderCoinMultiplier() * 0.5);
             engine.noteSkillExtraCoins("nickelAndDime", engine.nickelExtraCoins(0.5));
             engine.noteSkillExtraCoins("cardCoinDrop", engine.cardCoinDropExtra(0.5));
         }
@@ -3308,7 +3332,7 @@ let engine = {
         return 5;
     },
     getInnAddRoomBaseMaxPurchases: function() {
-        return 1;
+        return 2;
     },
     getInnFurnitureMaxPurchases: function() {
         const inn = data.progress.base.inn;
@@ -4127,9 +4151,6 @@ let engine = {
         return cap;
     },
     emptyHalfCistern: function() {
-        if (!engine.isPondBuiltFromFoxDen()) {
-            return false;
-        }
         const cistern = data.progress.base && data.progress.base.cistern;
         if (!cistern) {
             return false;
@@ -12161,7 +12182,7 @@ let engine = {
             return (req === 10 || req === 12) ? "common" : "rare";
         }
         if (id === "orbLevel") {
-            return req === 35 ? "common" : "rare";
+            return "rare";
         }
         if (id === "divinityAmount") {
             if (req === 30000) {
@@ -12445,7 +12466,7 @@ let engine = {
         if (!divinity) {
             return;
         }
-        const cap = divinity.capacity || 100000;
+        const cap = (divinity.capacity === undefined || divinity.capacity === null) ? 50000 : divinity.capacity;
         const rate = engine.getShrineDivinityRate();
         divinity.amount = Math.min(cap, (divinity.amount || 0) + rate);
     },
@@ -13507,6 +13528,67 @@ let engine = {
         }
         engine.refreshInscriptionUnlock(lib);
     },
+    scribingsGainedAfterTicks: function(lib, ticks) {
+        const defs = engine.INSCRIPTION_ROWS;
+        const M = Math.floor(ticks);
+        if (!lib || !lib.inscriptions || !defs.length || M <= 0) {
+            return 0;
+        }
+        let term = engine.inscriptionRate(defs[0]) * M;
+        const first = lib.inscriptions[defs[0].key];
+        let gain = ((first && first.actual) || 0) * term;
+        for (let k = 1; k < defs.length; k++) {
+            const stepsLeft = M - k;
+            if (stepsLeft <= 0) {
+                break;
+            }
+            term *= engine.inscriptionRate(defs[k]) * stepsLeft / (k + 1);
+            const row = lib.inscriptions[defs[k].key];
+            gain += ((row && row.actual) || 0) * term;
+        }
+        return gain;
+    },
+    getScribingsChainEtaSeconds: function(lib) {
+        if (!lib || !lib.inscriptions) {
+            return null;
+        }
+        const remain = (lib.scribingsRequired || 0) - (lib.scribings || 0);
+        if (!(remain > 0)) {
+            return null;
+        }
+        const defs = engine.INSCRIPTION_ROWS;
+        let producing = false;
+        for (let i = 0; i < defs.length; i++) {
+            const row = lib.inscriptions[defs[i].key];
+            if (row && row.actual > 0) {
+                producing = true;
+                break;
+            }
+        }
+        if (!producing) {
+            return null;
+        }
+        const cap = 1e15;
+        let hi = 1;
+        while (hi < cap && engine.scribingsGainedAfterTicks(lib, hi) < remain) {
+            const next = hi * 2;
+            hi = next > cap ? cap : next;
+        }
+        if (engine.scribingsGainedAfterTicks(lib, hi) < remain) {
+            return null;
+        }
+        let lo = 0;
+        while (lo + 1 < hi) {
+            const mid = Math.floor(lo + (hi - lo) / 2);
+            if (engine.scribingsGainedAfterTicks(lib, mid) >= remain) {
+                hi = mid;
+            } else {
+                lo = mid;
+            }
+        }
+        const untilNextTick = Math.max(0, 1000 - (lib.inscriptionSecondMs || 0)) / 1000;
+        return untilNextTick + Math.max(0, hi - 1);
+    },
     runInscriptionProduction: function(lib) {
         const defs = engine.INSCRIPTION_ROWS;
         const snap = [];
@@ -13521,7 +13603,7 @@ let engine = {
         let sGuard = 0;
         while ((lib.scribings || 0) >= lib.scribingsRequired && lib.scribingsRequired > 0 && sGuard < 10000) {
             lib.scribings -= lib.scribingsRequired;
-            lib.scribingsRequired *= 2;
+            lib.scribingsRequired *= 3;
             lib.scribingsCompleted = (lib.scribingsCompleted || 0) + 1;
             engine.onScrollArchivesResearchTaskComplete(lib);
             sGuard++;

@@ -18,7 +18,7 @@
                 <h1>Map Data Helper</h1>
                 <a class="tab-button mh-back" href="index.html">Back to game</a>
             </div>
-            <p class="muted-text mh-lede">Edit waves, check audacity/damage/spacing and spawn overlap, then copy a <code>createMap</code> block into <code>mapData.js</code>. Coins are map-design totals (no skills). Waves spawn as a column at start time; distance is travel stagger at 50 px/s.</p>
+            <p class="muted-text mh-lede">Edit waves, check audacity/damage/spacing and spawn overlap, then copy a <code>createMap</code> block into <code>mapData.js</code>. Coin total is the bronze-cycle pool: split across waves by difficulty, then across each wave's intruders, with each intruder's base rounded up. Silver pays x2 and gold pays x4. Coins shown here exclude skills. Waves spawn as a column at start time; distance is travel stagger at 50 px/s.</p>
         </header>
 
         <section class="mh-toolbar">
@@ -42,6 +42,7 @@
                 <label class="mh-field">Name <input type="text" id="mhMapName"></label>
                 <label class="mh-field">Key <input type="text" id="mhMapKey"></label>
                 <label class="mh-field">Base difficulty <input type="number" id="mhBaseDifficulty" min="0.01" step="0.1"></label>
+                <label class="mh-field">Coin total <input type="number" id="mhCoinDropAmount" min="0" step="1"></label>
                 <label class="mh-field">Seed <input type="number" id="mhSeed" step="1"></label>
             </div>
             <label class="mh-field mh-field-wide">Description <input type="text" id="mhDescription"></label>
@@ -64,7 +65,6 @@
                             <th>Distance (px)</th>
                             <th>Difficulty</th>
                             <th>Aud/Dmg trade</th>
-                            <th>Coins</th>
                             <th>Aud</th>
                             <th>Dmg</th>
                             <th>Gap (s)</th>

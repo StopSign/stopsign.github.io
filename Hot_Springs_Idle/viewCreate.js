@@ -103,6 +103,32 @@ let createView = {
             btn.classList.toggle("info-button-unread", unread);
         }
     },
+    positionInfoButtonPanel: function(wrap) {
+        const btn = wrap && wrap.querySelector(".info-button");
+        const panel = wrap && wrap._infoPanel;
+        if (!btn || !panel) {
+            return;
+        }
+        const rect = btn.getBoundingClientRect();
+        const gap = 4;
+        const margin = 8;
+        const width = panel.offsetWidth || Math.min(480, window.innerWidth - 16);
+        const height = panel.offsetHeight || 0;
+        let left = rect.right - width;
+        if (left < margin) {
+            left = margin;
+        }
+        const maxLeft = window.innerWidth - width - margin;
+        if (left > maxLeft) {
+            left = Math.max(margin, maxLeft);
+        }
+        let top = rect.bottom + gap;
+        if (height > 0 && top + height > window.innerHeight - margin) {
+            top = Math.max(margin, window.innerHeight - margin - height);
+        }
+        panel.style.left = left + "px";
+        panel.style.top = top + "px";
+    },
     createInfoButton: function(id, htmlText, x, contentKeys) {
         const el = document.getElementById(id);
         if (!el) {
@@ -110,6 +136,12 @@ let createView = {
         }
         const existing = createView.getInfoButtonWrap(el);
         if (existing) {
+            if (existing._infoClose) {
+                existing._infoClose();
+            }
+            if (existing._infoPanel && existing._infoPanel.parentNode) {
+                existing._infoPanel.remove();
+            }
             existing.remove();
         }
         const computedPos = window.getComputedStyle(el).position;
@@ -139,13 +171,20 @@ let createView = {
         wrap._infoResolveHtml = resolveHtml;
         wrap._infoResolveKeys = resolveKeys;
         wrap._infoPanel = panel;
-        const closePanel = function() {
-            wrap.classList.remove("info-button-open");
-            document.removeEventListener("click", onDocClick);
-        };
         const onDocClick = function() {
             closePanel();
         };
+        const onScroll = function() {
+            createView.positionInfoButtonPanel(wrap);
+        };
+        const closePanel = function() {
+            wrap.classList.remove("info-button-open");
+            panel.classList.remove("info-button-open");
+            window.removeEventListener("scroll", onScroll, true);
+            window.removeEventListener("resize", onScroll);
+            document.removeEventListener("click", onDocClick);
+        };
+        wrap._infoClose = closePanel;
         btn.addEventListener("click", function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -156,9 +195,14 @@ let createView = {
                 return;
             }
             panel.innerHTML = resolveHtml();
+            document.body.appendChild(panel);
+            panel.classList.add("info-button-open");
             wrap.classList.add("info-button-open");
+            createView.positionInfoButtonPanel(wrap);
             createView.acknowledgeInfoButton(wrap);
             createView.applyInfoButtonUnread(wrap);
+            window.addEventListener("scroll", onScroll, true);
+            window.addEventListener("resize", onScroll);
             // Next click anywhere closes; defer so this click does not.
             setTimeout(function() {
                 document.addEventListener("click", onDocClick);
@@ -177,6 +221,7 @@ let createView = {
         }
         if (wrap.classList.contains("info-button-open") && wrap._infoResolveHtml && wrap._infoPanel) {
             wrap._infoPanel.innerHTML = wrap._infoResolveHtml();
+            createView.positionInfoButtonPanel(wrap);
             createView.acknowledgeInfoButton(wrap);
         }
         createView.applyInfoButtonUnread(wrap);
@@ -195,9 +240,14 @@ let createView = {
                 return `<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices - select one and weave it with Finish Research to unlock that skill.</p>
                     <p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>
                     <p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>
-                    <p>Each ${goldStar} increases research gain by 10% (does not raise cost). Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>`;
+                    <p>Each ${goldStar} increases research gain by 10%. Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>
+                    <p>Assigned kitsune, and the Okami while she is here, inscribe one row at a time. Click a row to put their inscription power on it. They fill that row's bar and spend its coin, star bead, and mana cost. Finishing the bar adds 1 to that row's count, and to the number in parentheses. The next bar on that row asks for 10% more.</p>
+                    <p>Each row creates the one above it. Every second, a row adds its count times the rate shown on that row to the count above it. That added amount does not increase the number in parentheses. Strokes fill the Scribings bar. A lower row stays locked until the row above it has 10 in parentheses.</p>`;
             },
-            56
+            56,
+            function() {
+                return ["base", "inscription"];
+            }
         );
         createView.createInfoButton(
             "resortInfo_bambooForest",
@@ -219,11 +269,11 @@ let createView = {
         createView.createInfoButton(
             "tabPane_skills",
             "<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</p>"
-            + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot. The Equipped and Library slot columns stay in sync.</p>"
-            + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap (same column, or typed ↔ Any when the skill fits). Dragging from the Library list onto a compatible slot equips that skill there. If the slot already has a skill, that skill is unequipped. If the dragged skill is already equipped, it moves to the new slot and keeps its level and stars. Invalid drops do nothing.</p>"
+            + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot.</p>"
+            + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap, if the swap is valid.</p>"
             + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
             + "<p><strong>Unequip:</strong> Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept.</p>"
-            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Click the selected button again to deselect; none is selected by default. Save stores the current skills and stars. Load replaces the board with that slot. Loading an empty slot clears the equipped skills. While a saved slot is selected, skills and stars that Load would remove are marked red. Clear empties the selected slot and does not change your current skills or stars. Skills in the loadout keep their level even if their slot changes. Equipped skills that are not in the loadout reset. If there are fewer slots or stars than the loadout needs, as many as possible are applied.</p>"
+            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Save stores the current skills and stars. Load replaces the board with that slot. While a saved slot is selected, skills and stars that Load would remove are marked red. Clear empties the selected slot and does not change your current skills or stars.</p>"
         );
         createView.createInfoButton(
             "tabPane_stats",
@@ -283,7 +333,8 @@ let createView = {
         );
         createView.createInfoButton(
             "resortInfo_foxDen",
-            "<p>Plan buildings here and assign kitsune to carry materials to them. Resources are sent in queue order. Hover the Fox Den for queue order.</p>",
+            "<p>Plan buildings here and assign kitsune to carry materials to them. Resources are sent in queue order. Hover the Fox Den for queue order.</p>" +
+            "<p>Click an upgrade that is requesting resources to pause it. The Fox Den has a limited number of queue slots, but they only apply to unpaused queued upgrades. Resuming a paused upgrade will put it at the front of the queue.</p>",
             56
         );
         createView.createInfoButton(
@@ -312,7 +363,7 @@ let createView = {
                 const hs = data.progress.base && data.progress.base.hiddenSpring;
                 let html = "<p>Stare at the fire and contemplate how to protect what's yours.</p>";
                 if (bf && bf.denseClonesUnlocked) {
-                    html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is half the Orb level, if that cost is affordable.</p>";
+                    html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is a quarter of the Orb level, if that cost is affordable.</p>";
                 }
                 if (bf && bf.tendTheFlameUnlocked) {
                     html += "<p>Fire tending: assigned carriers skip wood and coal trips once heat reaches the number beside Only bring wood or coal while heat is below.</p>";
@@ -350,7 +401,7 @@ let createView = {
             function() {
                 const bonus = engine.getNoodleEatRestBonus();
                 let html = "<p>Guests stop here to eat before they rest. Their talk fills the tip bar.</p>";
-                html += `<p>A guest eats for 10 seconds if the bar has at least 100L of water and 1 dried noodle. Carriers only deliver water of at least 65C. Eating spends 100L and 1 dried noodle, and grants +${bonus} restfulness per second.</p>`;
+                html += `<p>A guest eats for 10 seconds when the bar has enough hot water and 1 dried noodle. Eating spends that water and 1 dried noodle, and grants +${bonus} restfulness per second.</p>`;
                 html += "<p>More guests at the inn, and more of them eating here, raise tip progress.</p>";
                 if (engine.getNoodleTipSkillPool().length >= 5) {
                     html += "<p>Five researched skills are offered. Choose one. When tip progress completes, that skill gains 1 tip, and each tip adds 1% skill exp (additive).</p>";
@@ -375,7 +426,7 @@ let createView = {
                     html += "<p>Enticing Lights spend 10 mana per second and make visitors arrive every 30 seconds instead of 60, while the gate is not full. Fill Mana sends the Okami to move global mana into this reservoir.</p>";
                 }
                 if (engine.isToriiDrinkingBowlUnlocked()) {
-                    html += "<p>A paired arrival needs 50L of water of at least 26C. If the gate can hold two visitors, two arrive and 50L is spent.</p>";
+                    html += "<p>If the gate can hold two visitors, two arrive and the required water is spent.</p>";
                 }
                 return html;
             },
@@ -427,9 +478,6 @@ let createView = {
                     const bonus = engine.getInnGentleLightsRestfulnessBonus();
                     html += `<p>Gentle Lights spend 5 mana per second for each occupied room and grant +${bonus} restfulness per second while mana lasts. Fill Mana sends the Okami to move global mana into this reservoir.</p>`;
                 }
-                if (engine.isInnOnsenConverted()) {
-                    html += "<p>A soak needs 50L of water of at least 40C.</p>";
-                }
                 if (engine.isMarketBuilt()) {
                     html += "<p>A hot bath uses one soap and doubles that soak's Star Bead bonus from 30% to 60%. A hot bath uses one towel and grants +100 restfulness.</p>";
                 }
@@ -445,9 +493,6 @@ let createView = {
                 const keys = ["base"];
                 if (engine.isInnGentleLightsUnlocked()) {
                     keys.push("gentleLights");
-                }
-                if (engine.isInnOnsenConverted()) {
-                    keys.push("onsen");
                 }
                 if (engine.isMarketBuilt()) {
                     keys.push("marketGoods");
@@ -605,13 +650,14 @@ let createView = {
         createView.createInfoButton(
             "tabPane_travel",
             function() {
-                let html = "<p>A map unlocks when the previous map has a bronze star. The first map is available immediately. A challenge map also requires its listed class.</p>";
-                html += "<p>Clearing a map's enemies through one full cycle earns the next star, then the clone continues at higher difficulty. Bronze is x4 enemy strength and x2 coins and exp. Silver is x16 enemy strength and x4 coins and exp, compared with the first cycle. Gold completes the map.</p>";
-                html += "<p>Stars can be assigned to skills. Each star on a skill multiplies that skill's exp by x1.5, and they stack. At the Scroll Archives, each bronze star multiplies research cost by 0.9, each silver star multiplies inscribe speed by 1.1, and each gold star multiplies research gain by 1.1.</p>";
+                let html = "<p>A map unlocks when the previous map has a bronze star.</p>";
+                html += "<p>Clearing a map's enemies through one full cycle earns the next star, then the clone continues at higher difficulty. After each star within the map, the enemies spawn over again in the same pattern, but x4 stronger each time, giving x2 coins and exp.Bronze is x4 enemy strength and x2 coins and exp.</p>";
+                html += "<p>A map's coin total is split across its waves by difficulty, then across the intruders in that wave. Each intruder's base coins round up. Silver pays twice that base, and gold pays twice again.</p>";
+                html += "<p>Stars can be assigned to in the Skills tab to grant them more exp gain. Each star also makes Inscribing in the Scroll Archives better, and makes x1.1 more shards drop in all maps.</p>";
                 if (engine.isShardLootUnlocked()) {
-                    html += "<p>After Collect Shards is researched, each kill can drop shards. The chance pool for the current star cycle is 100% on bronze, 200% on silver, and 300% on gold. That pool is split across the map's waves by their difficulty, then divided by the number of enemies in the wave, and a single kill cannot exceed 100%. The Shard Drop Amount on a map is its base amount, times x1.3 for each Collect Shards level after the first, times x1.1 for every star you have earned. Shards spend themselves on the next skill slot, and that cost rises by x1.5 each slot.</p>";
+                    html += "<p>Each kill can drop shards. The chance pool for the current star cycle is 100% on bronze, 200% on silver, and 300% on gold. That pool is split across the map's waves by their difficulty and wave enemy count. The Shard Drop Amount increases per map, and can be increased through upgrades. Shards spend themselves on the next skill slot.</p>";
                 }
-                html += "<p>The first time you earn a star on a map, you rescue kitsune there: 1 for bronze, 2 for silver, and 3 for gold, up to 6 on that map. They join your kitsune total. Earning a star you have already earned, including after Fade into Legend, does not rescue more.</p>";
+                html += "<p>The first time you earn a star on a map, you rescue kitsune there: 1 for bronze, 2 for silver, and 3 for gold, up to 6 on that map. They join your kitsune total.</p>";
                 return html;
             },
             4,
@@ -916,7 +962,7 @@ let createView = {
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
                         ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
                         ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
-                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", commonImg)}
+                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
                         ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
                         ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
                         ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
@@ -942,13 +988,15 @@ let createView = {
                     <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
                     <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 </div>
-                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills, skill talent, research progress, the Orb's level and base mana, spirit levels, shrine level, mine depth, and mine dirt. Mana fills to its new maximum. Divinity is not reset, except for the cost below, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if you have enough stars.</div>
+                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills, skill talent, research progress, the Orb's level and base mana, Expand Orb, Spin Currents, spirit levels, shrine level, mine depth, and mine dirt. The mana cost below is spent, then mana fills to its new maximum. Divinity is not reset, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if the next Legend exists and you have enough stars.</div>
                 <div id="legendRequirementText" class="base-row"></div>
                 <div id="legendStarWarning" class="shrine-move-pack-error" style="display:none">Not enough stars to reach the next milestone. Are you sure?</div>
+                <div id="legendWipWarning" class="shrine-move-pack-error" style="display:none">The next Legend does not exist yet (WIP). Legend will not increase.</div>
                 <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
                     <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
                     <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.reduceFame()" disabled>Fade into Legend (Combat Prestige)</button>
                 </div>
+                <div id="legendMaxDivinityGain" class="base-row">Max Divinity to gain: <span id="legendMaxDivinityGainValue">0</span> <span class="muted-text">(Total Talent Levels^1.2)</span></div>
                 <div id="legendList" class="legend-list"></div>
             `;
         };
@@ -1187,6 +1235,7 @@ let createView = {
                             <div id="toriiWaterFill" class="prog-fill prog-fill-water"></div>
                             <div id="toriiWaterText" class="game-progress-bar-label">Hot Water: 0/200</div>
                         </div>
+                        <div id="toriiWaterRequire" class="muted-text">Requires 50L of 26C</div>
                     </div>
                     <div id="toriiAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="toriiAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('torii', this.checked)"> Allow carriers to bring water</label></div>
                     ${resortUpgradeRowsHtml("torii")}
@@ -1204,6 +1253,7 @@ let createView = {
                             <div id="innHotWaterFill" class="prog-fill prog-fill-water"></div>
                             <div id="innHotWaterText" class="game-progress-bar-label">Hot Water: 0/500</div>
                         </div>
+                        <div id="innHotWaterRequire" class="muted-text">Requires 50L of 40C</div>
                     </div>
                     <div id="innAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="innAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('inn', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="innSoap_row" class="base-row" style="display:none">Soap: <span id="innSoapText">0</span></div>
@@ -1222,6 +1272,7 @@ let createView = {
                             <div id="noodleBarHotWaterFill" class="prog-fill prog-fill-water"></div>
                             <div id="noodleBarHotWaterText" class="game-progress-bar-label">Hot Water: 0/1000</div>
                         </div>
+                        <div id="noodleBarHotWaterRequire" class="muted-text">Requires 100L of 65C</div>
                     </div>
                     <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="noodleBarGuestsEating_row" class="base-row">Guests Eating: <span id="noodleBarGuestsEatingText">0</span></div>
@@ -1337,7 +1388,7 @@ let createView = {
                     <div id="cisternReplaceHotWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternReplaceHotWater_chk" onchange="events.toggleCisternReplaceWithHotterWater(this.checked)"> Replace with hotter water</label></div>
                     <div id="cisternRefuseWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternRefuseWater_chk" onchange="events.toggleCisternRefuseIncomingWater(this.checked)"> Dump incoming water to the Pond</label></div>
                     <div id="cisternViscosity_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternViscosity_chk" checked onchange="events.toggleCisternWaterSpiritsUsePathSpeed(this.checked)"> Water spirits use path speed bonuses</label></div>
-                    <div class="base-row"><button id="cisternEmptyHalf_btn" class="tab-button" style="display:none" onclick="events.emptyHalfCistern()">Empty Half to Pond</button></div>
+                    <div class="base-row"><button id="cisternEmptyHalf_btn" class="tab-button" onclick="events.emptyHalfCistern()">Empty Half to Pond</button></div>
                     ${resortUpgradeRowsHtml("cistern")}
                 </div>
                 <div id="resortInfo_pond" class="resort-info-section">
@@ -1949,7 +2000,7 @@ let createView = {
         battlefield.style.height = `${innerH + 2}px`;
     },
     showCurrentTab: function() {
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "options"];
         const tabs = events.mainMenuTabOrder();
         const requestedTab = data.battle.currentTab || "base";
         const tab = tabs.indexOf(requestedTab) >= 0 ? requestedTab : "base";
@@ -1978,8 +2029,8 @@ let createView = {
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
-            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
-            "cardsSubTab_get", "cardsSubTab_prestige", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_prestige", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineOpenPacksBtn", "shrineClassDebugBlock",
+            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
+            "cardsSubTab_get", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineBuyCardOdds", "shrineOpenPacksBtn", "shrineClassDebugBlock",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
@@ -2004,10 +2055,10 @@ let createView = {
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp_row", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
-            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "okamiInspirationHint",
+            "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiWaterRequire", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "okamiInspirationHint",
             "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10", "bonusSpeedLabel", "bonusSpeedRemaining", "bonusSpeed_x2",
             "offlineProcessingOverlay", "offlineProcessingLabel", "offlineProcessingFill", "offlineProcessingEta", "offlineProcessingSummary", "offlineProcessingDismiss",
-            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenSoak_row", "innMapLabelText", "innGuestsVisitPond_row",
+            "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innHotWaterRequire", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenSoak_row", "innMapLabelText", "innGuestsVisitPond_row",
             "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap",
             "innAllowCarriersMana_row", "innAllowCarriersMana_chk",
             "toriiManaRow", "toriiFillMana_btn", "toriiManaProgressWrap", "toriiManaFill", "toriiManaAmount", "toriiManaCap",
@@ -2059,7 +2110,7 @@ let createView = {
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
-            "legendResetExplain", "legendRequirementText", "legendStarWarning", "legendList",
+            "legendResetExplain", "legendRequirementText", "legendStarWarning", "legendWipWarning", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
             "shrineKarmaRateText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
@@ -2094,7 +2145,7 @@ let createView = {
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
-            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "travelVentingSurplus_row", "travelVentingSurplus_chk", "skillsList", "historyList",
+            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "skillsList", "historyList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
@@ -2122,7 +2173,7 @@ let createView = {
             );
         }
         createView.queueCache(
-            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk",
+            "noodleBarNoodlesText", "noodleBarHotWater_row", "noodleBarHotWaterFill", "noodleBarHotWaterText", "noodleBarHotWaterRequire", "noodleBarAllowCarriersWater_row", "noodleBarAllowCarriersWater_chk",
             "noodleBarGuestsEating_row", "noodleBarGuestsEatingText",
             "noodleTipProgressWrap", "noodleTipProgressFill", "noodleTipProgressText", "noodleTipLast_row",
             "noodleTipLocked_row", "noodleTipControls", "noodleTopicBtn", "noodleTipSelectHint"
@@ -2444,7 +2495,7 @@ let createView = {
     ensureTabNotifyBadges: function() {
         const tabLabels = {
             base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
-            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Cards", options: "Options"
+            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Cards", prestige: "Prestige", options: "Options"
         };
         for (const tabKey in tabLabels) {
             const btnId = "tabButton_" + tabKey;

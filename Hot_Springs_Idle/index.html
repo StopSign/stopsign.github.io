@@ -62,7 +62,7 @@
         <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
             <div class="prog-track game-progress-track divinity-progress-track">
                 <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
-                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">100000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
+                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
             </div>
         </div>
     </div>
@@ -81,6 +81,7 @@
             <button id="tabButton_travel" class="tab-button" onclick="events.switchTab('travel')">Travel</button>
             <button id="tabButton_history" class="tab-button" onclick="events.switchTab('history')">History</button>
             <button id="tabButton_cardBonuses" class="tab-button" onclick="events.switchTab('cardBonuses')" style="display:none">Cards</button>
+            <button id="tabButton_prestige" class="tab-button" onclick="events.switchTab('prestige')" style="display:none">Prestige</button>
             <button id="tabButton_options" class="tab-button" onclick="events.switchTab('options')">Options</button>
         </div>
         <div id="menuContent">
@@ -355,7 +356,6 @@
                     <button type="button" id="travelBonfireLaunchBtn" class="tab-button" onclick="events.startTravelWithBonfireSettings()">Travel with Bonfire settings for <span id="travelBonfireManaCost">0 mana</span></button>
                     <button type="button" id="travelGoBonfireBtn" class="tab-button" onclick="events.goToBonfire()">Go to Bonfire</button>
                 </div>
-                <div id="travelVentingSurplus_row" class="base-row" style="display:none"><label><input type="checkbox" id="travelVentingSurplus_chk" checked onchange="events.toggleVentingSurplus(this.checked)"> Start When Full Mana</label></div>
                 <div class="travel-subtabs-row">
                     <button type="button" id="travelSubTab_maps" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('maps')">Maps</button>
                     <button type="button" id="travelSubTab_challenges" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('challenges')">Challenges</button>
@@ -372,26 +372,26 @@
                 <div class="pane-title">Cards</div>
                 <div class="row-buttons row-buttons-wrap">
                     <button type="button" id="cardsSubTab_get" class="tab-button" onclick="events.switchCardsSubTab('get')">Get Cards</button>
-                    <button type="button" id="cardsSubTab_prestige" class="tab-button" onclick="events.switchCardsSubTab('prestige')">Fade into Legend (Combat Prestige)</button>
                     <button type="button" id="cardsSubTab_bonuses" class="tab-button" onclick="events.switchCardsSubTab('bonuses')">Card Bonuses</button>
                 </div>
                 <div id="cardsPane_get">
                     <div class="base-scrollArchives-row base-upgrade-row">
                         <div class="base-upgrade-text">
                             <div class="base-upgrade-name">Buy Card</div>
-                            <div class="muted-text base-skill-short">94% Common / 5% Rare / 1% Epic</div>
+                            <div id="shrineBuyCardOdds" class="muted-text base-skill-short">100% Common / 0% Rare / 0% Epic</div>
                         </div>
                         <button type="button" id="shrineBuyCardBtn" class="tab-button" onclick="events.buyShrineCard()" disabled>Buy for</button>
                     </div>
                     <div id="cardsPacksMount"></div>
                 </div>
-                <div id="cardsPane_prestige" style="display:none">
-                    <div id="cardsPrestigeMount"></div>
-                </div>
                 <div id="cardsPane_bonuses" style="display:none">
                     <div id="cardBonusesEmpty" class="muted-text">No cards received yet.</div>
                     <div id="cardBonusesList" class="card-bonuses-list"></div>
                 </div>
+            </div>
+            <div id="tabPane_prestige" class="tab-pane" style="display:none">
+                <div class="pane-title">Fade into Legend (Combat Prestige)</div>
+                <div id="cardsPrestigeMount"></div>
             </div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>

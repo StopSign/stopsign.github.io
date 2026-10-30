@@ -9,10 +9,11 @@ mapData.getDefaultMaps = function() {
             seed: 5557,
             baseDifficulty: 1,
             zones: [
-                mapData.createZone(6, "scoundrel", 0, 325, 1, 1.6, 6),
-                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5, 9),
-                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1, 12),
+                mapData.createZone(6, "scoundrel", 0, 325, 1, 1.6),
+                mapData.createZone(5, "scoundrel", 33000, 250, 1.5, 1.5),
+                mapData.createZone(5, "scoundrel", 60000, 250, 2, 1),
             ],
+            coinDropAmount: 200,
             shardDropAmount: 1
         }),
         mapData.createMap({
@@ -24,12 +25,13 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 1.4,
             unlocksAfterMapKey: "map_1",
             zones: [
-                mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1, 8),
-                mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25, 9),
-                mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1, 10),
-                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25, 13),
-                mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1, 15),
+                mapData.createZone(5, "scoundrel", 0, 120, 0.8, 1),
+                mapData.createZone(6, "scoundrel", 13000, 120, 1, 1.25),
+                mapData.createZone(7, "scoundrel", 34000, 200, 1.2, 1),
+                mapData.createZone(4, "scoundrel", 40000, 320, 1.5, 1.25),
+                mapData.createZone(4, "scoundrel", 65000, 50, 1.8, 1),
             ],
+            coinDropAmount: 350,
             shardDropAmount: 2
         }),
         mapData.createMap({
@@ -41,12 +43,13 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 1.8,
             unlocksAfterMapKey: "map_2",
             zones: [
-                mapData.createZone(4, "scoundrel", 0, 300, 1, 1, 14),
-                mapData.createZone(4, "lecher", 500, 550, 1, 1.25, 16),
-                mapData.createZone(4, "scoundrel", 21000, 250, 1.5, 1.25, 20),
-                mapData.createZone(5, "lecher", 38000, 400, 1.6, 0.75, 24),
-                mapData.createZone(7, "scoundrel", 40000, 270, 2, 1, 22),
+                mapData.createZone(4, "scoundrel", 0, 300, 1, 1),
+                mapData.createZone(4, "lecher", 500, 550, 1, 1.25),
+                mapData.createZone(4, "scoundrel", 21000, 250, 1.5, 1.25),
+                mapData.createZone(5, "lecher", 38000, 400, 1.6, 0.75),
+                mapData.createZone(7, "scoundrel", 40000, 270, 2, 1),
             ],
+            coinDropAmount: 600,
             shardDropAmount: 3
         }),
         mapData.createMap({
@@ -58,13 +61,14 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 2.5,
             unlocksAfterMapKey: "map_3",
             zones: [
-                mapData.createZone(6, "lecher", 0, 150, 1, 1, 20),
-                mapData.createZone(2, "scoundrel", 2000, 600, 1.4, 1.25, 25),
-                mapData.createZone(6, "lecher", 22000, 225, 1.4, 1, 30),
-                mapData.createZone(3, "scoundrel", 24000, 500, 1.6, 1.25, 35),
-                mapData.createZone(6, "lecher", 52000, 200, 1.8, 1.25, 40),
-                mapData.createZone(2, "scoundrel", 56000, 400, 2, 1, 40),
+                mapData.createZone(2, "scoundrel", 0, 800, 1.2, 1.25),
+                mapData.createZone(4, "lecher", 1000, 200, 1, 1.25),
+                mapData.createZone(5, "lecher", 22000, 225, 1.4, 1),
+                mapData.createZone(3, "scoundrel", 24000, 500, 1.6, 1.25),
+                mapData.createZone(6, "lecher", 52000, 250, 1.8, 1.25),
+                mapData.createZone(2, "scoundrel", 56000, 400, 2, 1),
             ],
+            coinDropAmount: 1000,
             shardDropAmount: 5
         }),
         mapData.createMap({
@@ -76,15 +80,16 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 4,
             unlocksAfterMapKey: "map_4",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 400, 1.4, 2, 50),
-                mapData.createZone(1, "lecher", 1000, 200, 1.4, 1, 50),
-                mapData.createZone(2, "scoundrel", 24000, 300, 1.8, 2, 70),
-                mapData.createZone(1, "lecher", 25000, 200, 1.8, 1, 70),
-                mapData.createZone(2, "scoundrel", 36000, 300, 2.2, 2, 90),
-                mapData.createZone(1, "lecher", 37000, 200, 2.2, 1, 90),
-                mapData.createZone(2, "scoundrel", 48000, 300, 2.6, 2, 110),
-                mapData.createZone(1, "lecher", 49000, 200, 2.6, 1, 110),
+                mapData.createZone(3, "scoundrel", 0, 400, 1.4, 2),
+                mapData.createZone(1, "lecher", 1000, 200, 1.4, 1),
+                mapData.createZone(2, "scoundrel", 24000, 300, 1.8, 2),
+                mapData.createZone(1, "lecher", 25000, 200, 1.8, 1),
+                mapData.createZone(2, "scoundrel", 36000, 300, 2.2, 2),
+                mapData.createZone(1, "lecher", 37000, 200, 2.2, 1),
+                mapData.createZone(2, "scoundrel", 48000, 300, 2.6, 2),
+                mapData.createZone(1, "lecher", 49000, 200, 2.6, 1),
             ],
+            coinDropAmount: 1750,
             shardDropAmount: 8
         }),
         mapData.createMap({
@@ -96,12 +101,13 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 4.5,
             unlocksAfterMapKey: "map_5",
             zones: [
-                mapData.createZone(5, "scoundrel", 0, 100, 1, 1, 30),
-                mapData.createZone(6, "scoundrel", 12000, 100, 1.3, 1, 36),
-                mapData.createZone(7, "scoundrel", 24000, 100, 1.6, 0.75, 42),
-                mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25, 46),
-                mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1, 54),
+                mapData.createZone(5, "scoundrel", 0, 100, 1, 1),
+                mapData.createZone(6, "scoundrel", 12000, 100, 1.3, 1),
+                mapData.createZone(7, "scoundrel", 24000, 100, 1.6, 0.75),
+                mapData.createZone(4, "scoundrel", 42000, 75, 2, 1.25),
+                mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1),
             ],
+            coinDropAmount: 3000,
             shardDropAmount: 13
         }),
         mapData.createMap({
@@ -113,15 +119,16 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 6,
             unlocksAfterMapKey: "map_6",
             zones: [
-                mapData.createZone(4, "scoundrel", 0, 150, 1, 1, 40),
-                mapData.createZone(2, "lecher", 2000, 300, 1, 1, 40),
-                mapData.createZone(5, "scoundrel", 22000, 125, 1.3, 1, 55),
-                mapData.createZone(1, "lecher", 23000, 50, 1.3, 1, 55),
-                mapData.createZone(4, "scoundrel", 42000, 150, 1.6, 1, 70),
-                mapData.createZone(3, "lecher", 44000, 150, 1.6, 1, 70),
-                mapData.createZone(4, "scoundrel", 60000, 150, 2, 1, 85),
-                mapData.createZone(2, "lecher", 62000, 300, 2, 1, 85),
+                mapData.createZone(4, "scoundrel", 0, 150, 1, 1),
+                mapData.createZone(2, "lecher", 2000, 300, 1, 1),
+                mapData.createZone(5, "scoundrel", 22000, 125, 1.3, 1),
+                mapData.createZone(1, "lecher", 23000, 50, 1.3, 1),
+                mapData.createZone(4, "scoundrel", 42000, 150, 1.6, 1),
+                mapData.createZone(3, "lecher", 44000, 150, 1.6, 1),
+                mapData.createZone(4, "scoundrel", 60000, 150, 2, 1),
+                mapData.createZone(2, "lecher", 62000, 300, 2, 1),
             ],
+            coinDropAmount: 5000,
             shardDropAmount: 20
         }),
         mapData.createMap({
@@ -133,12 +140,13 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 7.5,
             unlocksAfterMapKey: "map_7",
             zones: [
-                mapData.createZone(4, "lecher", 0, 200, 1, 1, 45),
-                mapData.createZone(5, "lecher", 10000, 200, 1.3, 1, 60),
-                mapData.createZone(6, "lecher", 20000, 200, 1.6, 1, 75),
-                mapData.createZone(5, "lecher", 34000, 200, 1.9, 1, 90),
-                mapData.createZone(6, "lecher", 48000, 200, 2.2, 1, 105),
+                mapData.createZone(4, "lecher", 0, 200, 1, 1),
+                mapData.createZone(5, "lecher", 10000, 200, 1.3, 1),
+                mapData.createZone(6, "lecher", 20000, 200, 1.6, 1),
+                mapData.createZone(5, "lecher", 34000, 200, 1.9, 1),
+                mapData.createZone(6, "lecher", 48000, 200, 2.2, 1),
             ],
+            coinDropAmount: 8000,
             shardDropAmount: 30
         }),
         mapData.createMap({
@@ -150,14 +158,15 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 10,
             unlocksAfterMapKey: "map_8",
             zones: [
-                mapData.createZone(4, "scoundrel", 0, 175, 1, 1.25, 60),
-                mapData.createZone(2, "lecher", 5000, 100, 1.3, 0.75, 75),
-                mapData.createZone(4, "scoundrel", 16000, 250, 1.5, 1, 90),
-                mapData.createZone(5, "scoundrel", 30000, 300, 1.6, 1, 105),
-                mapData.createZone(2, "lecher", 34000, 200, 1.8, 0.75, 120),
-                mapData.createZone(5, "scoundrel", 60000, 150, 2, 1, 135),
-                mapData.createZone(1, "lecher", 62000, 200, 2, 0.75, 150),
+                mapData.createZone(4, "scoundrel", 0, 175, 1, 1.25),
+                mapData.createZone(2, "lecher", 5000, 100, 1.3, 0.75),
+                mapData.createZone(4, "scoundrel", 16000, 250, 1.5, 1),
+                mapData.createZone(5, "scoundrel", 30000, 300, 1.6, 1),
+                mapData.createZone(2, "lecher", 34000, 200, 1.8, 0.75),
+                mapData.createZone(5, "scoundrel", 60000, 150, 2, 1),
+                mapData.createZone(1, "lecher", 62000, 200, 2, 0.75),
             ],
+            coinDropAmount: 13000,
             shardDropAmount: 50
         }),
         mapData.createMap({
@@ -169,12 +178,13 @@ mapData.getDefaultMaps = function() {
             baseDifficulty: 15,
             unlocksAfterMapKey: "map_9",
             zones: [
-                mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5, 140),
-                mapData.createZone(3, "lecher", 12000, 100, 1.3, 1.25, 160),
-                mapData.createZone(3, "scoundrel", 24000, 100, 1.6, 1.5, 180),
-                mapData.createZone(3, "lecher", 36000, 100, 1.8, 1.25, 200),
-                mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5, 220),
+                mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5),
+                mapData.createZone(3, "lecher", 12000, 100, 1.3, 1.25),
+                mapData.createZone(3, "scoundrel", 24000, 100, 1.6, 1.5),
+                mapData.createZone(3, "lecher", 36000, 100, 1.8, 1.25),
+                mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5),
             ],
+            coinDropAmount: 2700,
             shardDropAmount: 80
         })
 
@@ -187,9 +197,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 1.4,
         //     requiredClassKey: "condescend",
         //     zones: [
-        //         mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, 22, { key: "aboveItAll", gain: 1, chance: 0.006, cap: 24 }),
-        //         mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, 30, { key: "toughness_condescend", gain: 1, chance: 0.005, cap: 28 }),
-        //         mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, 40, { key: "second_wind", gain: 1, chance: 0.004, cap: 30 })
+        //         mapData.createZone(28, "scoundrel", 0, 780, 0.9, 1, { key: "aboveItAll", gain: 1, chance: 0.006, cap: 24 }),
+        //         mapData.createZone(34, "scoundrel", 9000, 845, 1.0, 1, { key: "toughness_condescend", gain: 1, chance: 0.005, cap: 28 }),
+        //         mapData.createZone(40, "scoundrel", 20000, 910, 1.1, 1, { key: "second_wind", gain: 1, chance: 0.004, cap: 30 })
         //     ]
         // }),
         // mapData.createMap({
@@ -199,9 +209,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 1.45,
         //     requiredClassKey: "scold",
         //     zones: [
-        //         mapData.createZone(16, "lecher", 0, 780, 1.0, 1, 22),
-        //         mapData.createZone(22, "lecher", 10000, 845, 1.1, 1, 32),
-        //         mapData.createZone(28, "lecher", 21000, 910, 1.2, 1, 44)
+        //         mapData.createZone(16, "lecher", 0, 780, 1.0, 1),
+        //         mapData.createZone(22, "lecher", 10000, 845, 1.1, 1),
+        //         mapData.createZone(28, "lecher", 21000, 910, 1.2, 1)
         //     ]
         // }),
         // mapData.createMap({
@@ -211,9 +221,9 @@ mapData.getDefaultMaps = function() {
         //     baseDifficulty: 2.1,
         //     requiredClassKey: "mock",
         //     zones: [
-        //         mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1, 26),
-        //         mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1, 36),
-        //         mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1, 52)
+        //         mapData.createZone(4, "scoundrel", 0, 780, 2.2, 1),
+        //         mapData.createZone(5, "scoundrel", 10000, 910, 2.4, 1),
+        //         mapData.createZone(6, "scoundrel", 23000, 975, 2.7, 1)
         //     ]
         // })
     ];
@@ -271,6 +281,30 @@ mapData.getMapZoneDifficultySum = function(mapDef) {
         sum += Math.max(0, zones[i].difficulty || 0);
     }
     return Math.max(0, sum);
+};
+
+/**
+ * Base coins for one intruder in a zone, before the star-cycle coin multiplier.
+ * coinDropAmount x (zoneDifficulty / sumDifficulties) / enemyCount, rounded up.
+ * Silver multiplies that base by 2, and gold multiplies it by 2 again (x4).
+ */
+mapData.getZoneBaseCoinsPerIntruder = function(mapDef, zoneIndex) {
+    if (!mapDef || !mapDef.zones || zoneIndex < 0 || zoneIndex >= mapDef.zones.length) {
+        return 0;
+    }
+    const z = mapDef.zones[zoneIndex];
+    const sumDiff = mapData.getMapZoneDifficultySum(mapDef);
+    if (sumDiff <= 0) {
+        return 0;
+    }
+    const enemies = Math.max(1, z.totalEnemies || 1);
+    const total = Math.max(0, mapDef.coinDropAmount !== undefined ? mapDef.coinDropAmount : 0);
+    const waveShare = Math.max(0, z.difficulty || 0) / sumDiff;
+    const raw = total * waveShare / enemies;
+    if (!(raw > 0)) {
+        return 0;
+    }
+    return Math.ceil(raw - 1e-9);
 };
 
 /**

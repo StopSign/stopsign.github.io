@@ -17,8 +17,8 @@ let data = {};
 let language = "english";
 let globalVisible = false; //SET FOR COMMIT
 // let globalVisible = true;
-// let isLoadingEnabled = true; //SET FOR COMMIT
-let isLoadingEnabled = false;
+let isLoadingEnabled = true; //SET FOR COMMIT
+// let isLoadingEnabled = false;
 let loadStaticSaveFile = false; //SET FOR COMMIT
 // let loadStaticSaveFile = true;
 let isSteam = false; //SET FOR COMMIT
@@ -596,8 +596,9 @@ let initials = {
             },
             divinity: {
                 amount: 0,
-                capacity: 100000
+                capacity: 50000
             },
+            divinityCapReduced50k: true,
             essenceMade: 0,
             manaCapacityBonusPerCombatStart: resortData.manaCapacityBonusPerCloneDispersal,
             stars: {
@@ -616,7 +617,7 @@ let initials = {
             selectedEquippedSkillKey: "",
             selectedLibrarySkillKey: "",
             shards: 0,
-            nextSkillSlotShardCost: 50,
+            nextSkillSlotShardCost: engine.getNextSkillSlotShardCost(0),
             skillSlotUnlockIndex: 0,
             skillEquip: {
                 slots: {
@@ -684,6 +685,7 @@ let initials = {
             runStartCoins: 0,
             historyLogged: false,
             enemiesKilled: 0,
+            validationAudEarned: 0,
             runCoinsFromKills: 0,
             completionBonusCoins: 0,
             pendingOkamiExp: 0,
@@ -1400,6 +1402,13 @@ let initialize = {
         if (data.progress.divinity.capacity === undefined || data.progress.divinity.capacity === null || data.progress.divinity.capacity === 10000) {
             data.progress.divinity.capacity = 100000;
         }
+        if (!data.progress.divinityCapReduced50k) {
+            data.progress.divinity.capacity = Math.max(0, (data.progress.divinity.capacity || 0) - 50000);
+            data.progress.divinityCapReduced50k = true;
+        }
+        if ((data.progress.divinity.amount || 0) > data.progress.divinity.capacity) {
+            data.progress.divinity.amount = data.progress.divinity.capacity;
+        }
         if (typeof engine !== "undefined" && engine.ensureSavedSeed) {
             engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
         }
@@ -1835,7 +1844,8 @@ let initialize = {
                 }
                 skills.fireTrigger("onMaxAudIncrease");
             }
-            // Additional recovers (Validation, Cornered Ego, Shameless) - not boosted by Narcissism.
+            // Additional recovers (Cornered Ego, Shameless) - not boosted by Narcissism.
+            // Validation's per-kill heal is granted after this, in onIntruderKilled.
             // Flat extra heals are multiplied by Confidence. Equal recover is not.
             const extraRequested = (maxRise > 0 && opts && opts.extraCurrentOnMaxRise > 0)
                 ? opts.extraCurrentOnMaxRise * engine.getConfidenceMultiplier() : 0;

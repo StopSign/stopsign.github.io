@@ -56,8 +56,8 @@ const SKILL_TRIGGER_TYPES = {
         }
     },
     notFullAudPerSecond: {
-        initialExpToLevel: 10,
-        initialTalentToLevel: 10,
+        initialExpToLevel: 15,
+        initialTalentToLevel: 20,
         triggerText: "Trigger: 1 skill exp per second while Audacity is not full.",
         periodMs: 1000,
         ready: function() { return !engine.isPlayerAtMaxAud(); },
@@ -363,7 +363,7 @@ const SKILL_DEFINITION_ROWS = [
         effectUiSummary: function(sk, e) {
             const b = e.baseAudBonus || 0;
             const r = e.audRecoverBonus || 0;
-            return `Current: +${b} max Aud; additionally recover ${r} Audacity when leveling`;
+            return `Current: +${b} max Aud; additionally heal ${r} Audacity when leveling`;
         }
     },
     {
@@ -385,7 +385,7 @@ const SKILL_DEFINITION_ROWS = [
         effectUiSummary: function(sk, e) {
             const b = e.audInnerBonus || 0;
             const r = e.audRecoverBonus || 0;
-            return `Current: +${b} max Aud (includes +20 base); additionally recover ${r} Audacity when leveling`;
+            return `Current: +${b} max Aud (includes +20 base); additionally heal ${r} Audacity when leveling`;
         }
     },
     {
@@ -632,19 +632,17 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: '"The deepest principle in human nature is the craving to be appreciated." - William James',
         shortDescription: "Gain max Audacity per kill. Additionally heal equal to the skill level.",
         rewardText: function(sk) {
-            return `Reward: +5 max Audacity per intruder removal, up to 15 per skill level. When this occurs, additionally heal equal to 3 x skill level.`;
+            return `Reward: +5 max Audacity per intruder removal, up to 15 per skill level. Removals while already at that cap do nothing. When a removal raises this max Audacity, also heal equal to the 2 x skill level.`;
         },
         getEffect: function(sk) {
             const lv = sk.level || 0;
-            return { audPerKill: 5, audCap: lv * 15, currentAudOnMaxIncrease: lv * 3 };
+            return { audPerKill: 5, audCap: lv * 15, currentAudOnMaxIncrease: lv * 2 };
         },
         effectUiSummary: function(sk, e) {
             const cap = e.audCap || 0;
-            const per = e.audPerKill || 5;
-            const kills = (data.battle && data.battle.enemiesKilled) || 0;
-            const n = Math.min(kills * per, cap);
+            const earned = Math.min((data.battle && data.battle.validationAudEarned) || 0, cap);
             const curGain = e.currentAudOnMaxIncrease || 0;
-            return `Current: +${n} max Aud from kills (cap ${cap}). Additionally recover +${curGain} Audacity when max increases from a kill`;
+            return `Current: +${earned} max Aud from kills (cap ${cap}). Additionally heal +${curGain} Audacity when a kill raises that max`;
         }
     },
     {
@@ -2172,6 +2170,9 @@ let skills = {
         skill.exp = 0;
         skill.expToLevel = def && def.initialExpToLevel !== undefined ? def.initialExpToLevel : 5;
         skill.triggerCount = 0;
+        if (skill.key === "validation" && data.battle) {
+            data.battle.validationAudEarned = 0;
+        }
     },
 
     /** Place skill into an empty slot. Fails if occupied, already equipped, or incompatible. */

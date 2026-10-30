@@ -1149,12 +1149,21 @@ var shrineCards = {
         epic: "rgba(188, 7, 237, 0.5)"
     },
 
-    buyPackDivinityCost: 20000,
-    legendDivinityCost: 20000,
+    buyPackDivinityCost: 30000,
+    buyCardOdds: { common: 100, rare: 0, epic: 0 },
+    buyCardOddsText: function() {
+        const odds = shrineCards.buyCardOdds || { common: 100, rare: 0, epic: 0 };
+        return odds.common + "% Common / " + odds.rare + "% Rare / " + odds.epic + "% Epic";
+    },
+    legendManaCost: 100000,
     /** Legend N is index N - 1. Each entry is { text, apply }. Empty until effects are designed. */
     legendEffects: [],
     legendStarRequirement: function(legendsWritten) {
-        return 15 + 3 * Math.max(0, Math.floor(legendsWritten || 0));
+        return 8 + 2 * Math.max(0, Math.floor(legendsWritten || 0));
+    },
+    hasNextLegend: function(legendsWritten) {
+        const idx = Math.max(0, Math.floor(legendsWritten || 0));
+        return !!shrineCards.legendEffects[idx];
     },
     legendEffectText: function(legendNumber) {
         const def = shrineCards.legendEffects[Math.floor(legendNumber || 0) - 1];

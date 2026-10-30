@@ -100,6 +100,7 @@ let view = {
         if (!events._buyableTooltipOpen) {
             view.updateBuyableUpgradesOverlay(false);
         }
+        view.updateScribingsEta();
     },
     updateEtaText: function(id, remain, rate) {
         if (rate > 0 && remain > 0) {
@@ -268,7 +269,7 @@ let view = {
             } else {
                 view.updateVal("deathSummary", `Time ${round1Fixed(runClock)}s | Level ${data.battle.levelState.level} | Kills ${data.battle.enemiesKilled} | Coins ${intToStringRound(killCoins)}${shardsTxt}${retryTxt}`, "innerHTML");
             }
-            view.updateVal("deathManaBonus", `+${manaBonus} base mana capacity`);
+            view.updateVal("deathManaBonus", `+${round1(manaBonus)} base mana capacity`);
             const runSettings = data.battle.cloneRunSettings;
             if (bonfire.isApplyLiveSettingsToNextClone()) {
                 const livePlan = bonfire.getCreateClonePlan();
@@ -404,6 +405,8 @@ let view = {
             view.updateGuestsTab();
         } else if (activeTab === "cardBonuses") {
             view.updateCardBonusesTab();
+        } else if (activeTab === "prestige") {
+            view.updatePrestigeTab();
         } else if (activeTab === "options") {
             view.updateOptionsTab();
         }
@@ -933,6 +936,9 @@ let view = {
             if (key === "cardCoinDrop") {
                 return "Card Coin Drop";
             }
+            if (key === "outrage") {
+                return "Outrage";
+            }
             const sk = data.progress.skills && data.progress.skills[key];
             return (sk && sk.name) || key;
         };
@@ -988,15 +994,6 @@ let view = {
         const hasClassForTravel = ["condescend", "scold", "mock", "shun"].indexOf(clsMenu) >= 0;
         const selectedTravel = data.progress.selectedTravelMapKey || data.progress.currentMapKey;
         view.updateCloneCostDisplays();
-        const bfTravel = data.progress.base && data.progress.base.bonfire;
-        const ventingUnlocked = !!(bfTravel && bfTravel.startWithFullManaUnlocked);
-        view.updateVal("travelVentingSurplus_row", ventingUnlocked ? "" : "none", "style.display");
-        if (ventingUnlocked) {
-            const ventChk = viewData.cached.travelVentingSurplus_chk;
-            if (ventChk) {
-                ventChk.checked = bfTravel.startWithFullManaEnabled !== false;
-            }
-        }
         let travelSub = data.progress.selectedTravelSubTab || "maps";
         if (!hasClassForTravel && travelSub === "challenges") {
             travelSub = "maps";
@@ -1019,6 +1016,9 @@ let view = {
         for (let i = 0; i < mapDefs.length; i++) {
             const map = mapDefs[i];
             const authored = authoredByKey[map.key] || map;
+            if (authored.coinDropAmount !== undefined) {
+                map.coinDropAmount = authored.coinDropAmount;
+            }
             if (authored.shardDropAmount !== undefined) {
                 map.shardDropAmount = authored.shardDropAmount;
             }
@@ -1525,6 +1525,23 @@ let view = {
         view.updateVal("innRestfulnessPerSecond", engine.getInnRestfulnessPerSecond());
     },
 
+    updateScribingsEta: function() {
+        if (!viewData.cached.scribingsEtaText || typeof engine.getScribingsChainEtaSeconds !== "function") {
+            return;
+        }
+        const lib = engine.ensureInscriptionState();
+        viewData.scribingsEtaPrimed = true;
+        if (!lib) {
+            view.updateVal("scribingsEtaText", "-");
+            return;
+        }
+        const seconds = engine.getScribingsChainEtaSeconds(lib);
+        if (seconds === null) {
+            view.updateVal("scribingsEtaText", "-");
+        } else {
+            view.updateVal("scribingsEtaText", seconds, "textContent", "time");
+        }
+    },
     updateScrollArchivesInscriptions: function() {
         const lib = engine.ensureInscriptionState();
         if (!lib) {
@@ -1539,12 +1556,12 @@ let view = {
         const scribingsNeed = lib.scribingsRequired || 300;
         const scribingsHave = lib.scribings || 0;
         const scribingsPct = scribingsNeed > 0 ? Math.max(0, Math.min(100, (scribingsHave / scribingsNeed) * 100)) : 0;
-        const strokes = lib.inscriptions && lib.inscriptions.strokes;
-        const scribingsPerSecond = ((strokes && strokes.actual) || 0) * engine.inscriptionRate(engine.INSCRIPTION_ROWS[0]);
-        view.updateVal("scribingsAmountText", scribingsHave, "textContent", 3);
-        view.updateVal("scribingsRequiredText", scribingsNeed, "textContent", 3);
-        view.updateEtaText("scribingsEtaText", Math.max(0, scribingsNeed - scribingsHave), scribingsPerSecond);
+        view.updateVal("scribingsAmountText", scribingsHave, "textContent", 1);
+        view.updateVal("scribingsRequiredText", scribingsNeed, "textContent", 1);
         view.updateVal("scribingsProgressFill", `${scribingsPct}%`, "style.width");
+        if (!viewData.scribingsEtaPrimed) {
+            view.updateScribingsEta();
+        }
         const defs = engine.INSCRIPTION_ROWS;
         const unlockedThrough = lib.inscriptionUnlockedThrough || 0;
         const selected = lib.selectedInscription || "strokes";
@@ -2193,8 +2210,8 @@ let view = {
         if (!unlocked) {
             return;
         }
-        const divinity = data.progress.divinity || { amount: 0, capacity: 100000 };
-        const cap = divinity.capacity || 100000;
+        const divinity = data.progress.divinity || { amount: 0, capacity: 50000 };
+        const cap = (divinity.capacity === undefined || divinity.capacity === null) ? 50000 : divinity.capacity;
         const amount = Math.floor(divinity.amount || 0);
         const rate = engine.getShrineDivinityRate();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
@@ -2366,7 +2383,7 @@ let view = {
                 : `Exchanging, finished in ${time}`;
             view.updateVal(btnId, label);
         } else {
-            view.updateVal(btnId, "Exchange 1000 coins for 1000 credits in 40 threads to weave.");
+            view.updateVal(btnId, "Exchange 1000 coins for 1000 credits in 80 threads to weave.");
         }
         if (btnNode) {
             const weaving = !!weaveUi;
@@ -3728,7 +3745,7 @@ let view = {
         const oreMined = !!(data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.oreMined);
         view.updateVal("mineOreRow", oreMined ? "" : "none", "style.display");
         if (oreMined) {
-            view.updateVal("mineOreText", round2(mine.resources.ore || 0));
+            view.updateVal("mineOreText", (mine.resources.ore || 0), "textContent", 2);
         }
         view.updateVal("minePrioritizeOreRow", "none", "style.display");
         view.updateVal("mineAssignedLevelText", engine.getMineSpiritLevelTotal());
@@ -4115,9 +4132,7 @@ let view = {
                     visChk.checked = cistern.waterSpiritsUsePathSpeed !== false;
                 }
             }
-            const pondBuilt = engine.isPondBuiltFromFoxDen();
-            view.updateVal("cisternEmptyHalf_btn", pondBuilt ? "" : "none", "style.display");
-            view.updateVal("cisternEmptyHalf_btn", !pondBuilt || (cistern.waterVolume || 0) <= 0, "disabled");
+            view.updateVal("cisternEmptyHalf_btn", (cistern.waterVolume || 0) <= 0, "disabled");
             const tCistern = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             tCistern.refreshOrderedPurchasables("cistern", resortData.buildings.cistern.upgradesOrder, { hideMaxed: tCistern.hideMaxed });
             if (engine.cisternWorkersRevealed()) {
@@ -4695,7 +4710,7 @@ let view = {
     updateSkillsShardSlotProgress: function() {
         engine.ensureShardProgress();
         const unlocked = engine.isShardLootUnlocked();
-        const cost = data.progress.nextSkillSlotShardCost || 50;
+        const cost = data.progress.nextSkillSlotShardCost;
         const have = data.progress.shards || 0;
         if (!unlocked) {
             view.updateVal("skillsShardSlotProgressLabel", "Research Collect Shards to unlock");
@@ -5313,19 +5328,20 @@ let view = {
     },
     updateCardsSubTabs: function() {
         let tab = data.progress.selectedCardsSubTab || "get";
-        if (tab !== "get" && tab !== "prestige" && tab !== "bonuses") {
+        if (tab !== "get" && tab !== "bonuses") {
             tab = "get";
         }
         data.progress.selectedCardsSubTab = tab;
         view.updateVal("cardsSubTab_get", tab === "get" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
-        view.updateVal("cardsSubTab_prestige", tab === "prestige" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("cardsSubTab_bonuses", tab === "bonuses" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("cardsPane_get", tab === "get" ? "" : "none", "style.display");
-        view.updateVal("cardsPane_prestige", tab === "prestige" ? "" : "none", "style.display");
         view.updateVal("cardsPane_bonuses", tab === "bonuses" ? "" : "none", "style.display");
     },
     updateBuyCardButton: function() {
-        const cost = { divinity: (typeof shrineCards !== "undefined" && shrineCards.buyPackDivinityCost) || 20000 };
+        if (typeof shrineCards !== "undefined" && shrineCards.buyCardOddsText) {
+            view.updateVal("shrineBuyCardOdds", shrineCards.buyCardOddsText());
+        }
+        const cost = { divinity: (typeof shrineCards !== "undefined" && shrineCards.buyPackDivinityCost) || 30000 };
         const label = resortData.buyForFromCost(cost);
         const afford = resortData.canAffordCost(cost);
         view.updateVal("shrineBuyCardBtn", label, "innerHTML");
@@ -5369,7 +5385,8 @@ let view = {
         const nextNumber = written + 1;
         const req = shrineCards.legendStarRequirement(written);
         const stars = engine.getTotalEarnedStarsCount();
-        const ready = stars >= req;
+        const hasNext = shrineCards.hasNextLegend(written);
+        const ready = stars >= req && hasNext;
         const legendText = function(n) {
             return String(shrineCards.legendEffectText(n))
                 .replace(/&/g, "&amp;")
@@ -5377,7 +5394,12 @@ let view = {
                 .replace(/>/g, "&gt;");
         };
         view.updateVal("legendRequirementText", `Write Legend ${nextNumber}: ${req} stars`);
-        view.updateVal("legendStarWarning", ready ? "none" : "", "style.display");
+        view.updateVal("legendStarWarning", stars >= req ? "none" : "", "style.display");
+        view.updateVal("legendWipWarning", hasNext ? "none" : "", "style.display");
+        const gain = (typeof engine.getCombatPrestigeMaxDivinityGain === "function")
+            ? engine.getCombatPrestigeMaxDivinityGain()
+            : 0;
+        view.updateVal("legendMaxDivinityGainValue", gain, "textContent", "floor");
         const parts = [];
         parts.push(`<div class="legend-card ${ready ? "legend-card--ready" : "legend-card--short"}"><div class="legend-card-title">Legend ${nextNumber}</div><div class="legend-card-text">${legendText(nextNumber)}</div></div>`);
         for (let n = written; n >= 1; n--) {
@@ -5406,7 +5428,6 @@ let view = {
         view.updateCardsSubTabs();
         view.updateBuyCardButton();
         view.updateOpenPacksButton();
-        view.updateShrineClassControls();
         view.updateShrinePackDisplays();
         const list = viewData.cached.cardBonusesList || document.getElementById("cardBonusesList");
         const emptyEl = viewData.cached.cardBonusesEmpty || document.getElementById("cardBonusesEmpty");
@@ -5472,9 +5493,12 @@ let view = {
             list.innerHTML = html;
         }
     },
+    updatePrestigeTab: function() {
+        view.updateShrineClassControls();
+    },
     updateTabButtons: function(activeTab) {
         const tabs = events.mainMenuTabOrder();
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "options"];
         const notify = data.progress.baseContentNotify;
         for (let i = 0; i < allTabs.length; i++) {
             const tabKey = allTabs[i];
