@@ -8674,7 +8674,7 @@ let engine = {
         if (!up) {
             return null;
         }
-        if (typeof up.upgradeSoldOut === "function" && up.upgradeSoldOut()) {
+        if (resortData.isUpgradeSoldOut(up)) {
             return { label: up.soldOutButtonLabel || "Bought", disabled: true, mode: "soldOut" };
         }
         /* lockedLabel shows an unmet requirement on the button instead of hiding the row. */
@@ -8776,10 +8776,10 @@ let engine = {
                 if (!up || up.directWeave || upgradeKey === "fillMana") {
                     continue;
                 }
-                if (typeof up.rowVisible === "function" && !up.rowVisible()) {
+                if (!resortData.isUpgradeRowVisible(up)) {
                     continue;
                 }
-                if (typeof up.upgradeSoldOut === "function" && up.upgradeSoldOut()) {
+                if (resortData.isUpgradeSoldOut(up)) {
                     continue;
                 }
                 if (typeof up.canBuy === "function" && !up.canBuy()) {

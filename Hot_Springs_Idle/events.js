@@ -156,7 +156,7 @@ let events = {
                 if (!u) {
                     continue;
                 }
-                const visible = typeof u.rowVisible === "function" ? u.rowVisible() : true;
+                const visible = resortData.isUpgradeRowVisible(u);
                 if (visible) {
                     seen[scopeKey + ":" + pk] = true;
                 }
@@ -209,8 +209,8 @@ let events = {
                 if (!u) {
                     continue;
                 }
-                const visible = typeof u.rowVisible === "function" ? u.rowVisible() : true;
-                const soldOut = typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut();
+                const visible = resortData.isUpgradeRowVisible(u);
+                const soldOut = resortData.isUpgradeSoldOut(u);
                 const seenKey = scopeKey + ":" + pk;
                 if (visible && !soldOut && !seen[seenKey]) {
                     const notifyKey = scopeKey === "scrollArchives" ? "scrollArchives" : scopeKey;

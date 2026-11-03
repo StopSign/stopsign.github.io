@@ -1091,7 +1091,7 @@ let view = {
                     return soldOutOrBuyLabel(u, segmentForCost);
                 },
                 buttonDisabled: function(pk, u) {
-                    return typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut();
+                    return resortData.isUpgradeSoldOut(u);
                 }
             };
         };
@@ -1112,14 +1112,11 @@ let view = {
                 const rowEl = resortData.idRow(buildingSegment, slug);
                 const btnEl = resortData.idBtn(buildingSegment, slug);
                 const extraEl = resortData.idExtra(buildingSegment, slug);
-                if (typeof u.rowVisible === "function") {
-                    let show = u.rowVisible(hideMx);
-                    if (buildingSegment !== "path"
-                        && typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut()) {
-                        show = !hideMx;
-                    }
-                    view.updateVal(rowEl, show ? "" : "none", "style.display");
+                let show = resortData.isUpgradeRowVisible(u, hideMx);
+                if (resortData.isUpgradeSoldOut(u)) {
+                    show = !hideMx;
                 }
+                view.updateVal(rowEl, show ? "" : "none", "style.display");
                 if (u.autobuy) {
                     const autoRowId = `base_${buildingSegment}_autobuy_${slug}_row`;
                     const showAuto = typeof u.autobuyVisible === "function" && u.autobuyVisible();
@@ -3888,7 +3885,7 @@ let view = {
             const t = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             const hsOpts = Object.assign({}, t.soldOutUpgradeRowOpts(t.hideMaxed, "hiddenSpring"), {
                 buttonDisabled: function(pk, u) {
-                    if (typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut()) {
+                    if (resortData.isUpgradeSoldOut(u)) {
                         return true;
                     }
                     if (typeof u.canBuy === "function") {
@@ -3956,7 +3953,7 @@ let view = {
             const tTorii = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             const toriiUpgOpts = Object.assign({}, tTorii.soldOutUpgradeRowOpts(tTorii.hideMaxed, "torii"), {
                 buttonDisabled: function(pk, u) {
-                    if (typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut()) {
+                    if (resortData.isUpgradeSoldOut(u)) {
                         return true;
                     }
                     if (typeof u.canBuy === "function") {
@@ -4035,15 +4032,15 @@ let view = {
             view.updateVal("pathSegmentStateText", stateText);
             const showNextPathBtn = !!(seg && seg.state !== "Large Rocks" && pathIdx > 0);
             view.updateVal("base_path_select_next_row", showNextPathBtn ? "" : "none", "style.display");
-            const t = view._basePanelPurchasingTools(base, null, false);
-            const pathOpts = Object.assign({}, t.soldOutUpgradeRowOpts(false, "path"), {
+            const t = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
+            const pathOpts = Object.assign({}, t.soldOutUpgradeRowOpts(t.hideMaxed, "path"), {
                 buyButtonText: function(pk, u) {
                     const weaveUi = pathIdx !== undefined && pathIdx !== null
                         ? engine.getPathUpgradeWeaveUi(pathIdx, pk) : null;
                     if (weaveUi) {
                         return weaveUi.label;
                     }
-                    if (typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut()) {
+                    if (resortData.isUpgradeSoldOut(u)) {
                         return u.soldOutButtonLabel || "Cleared";
                     }
                     if (pk === "removeRocks") {
@@ -4057,7 +4054,7 @@ let view = {
                     if (weaveUi) {
                         return weaveUi.disabled;
                     }
-                    if (typeof u.upgradeSoldOut === "function" && u.upgradeSoldOut()) {
+                    if (resortData.isUpgradeSoldOut(u)) {
                         return true;
                     }
                     if (typeof u.canBuy === "function") {
@@ -4131,7 +4128,7 @@ let view = {
         } else if (selected === "shrine") {
             this.updateBasePanelShrine();
         } else if (selected === "scrollArchives") {
-            const t = view._basePanelPurchasingTools(base, null, false);
+            const t = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             this.updateBasePanelScrollArchives(base, t);
         } else if (selected === "cistern") {
             const cistern = base.cistern || {};

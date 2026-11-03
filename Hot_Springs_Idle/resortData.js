@@ -509,12 +509,79 @@ var resortData = {
         return null;
     },
 
+    upgradeHasPurchaseCounter: function(upgradeDef) {
+        return !!(upgradeDef && (
+            typeof upgradeDef.getPurchaseCount === "function"
+            || typeof upgradeDef.getWeavingPurchaseIndex === "function"
+        ));
+    },
+
+    /** Resolved cost, with getCost run against the upgrade so `this` matches a method call. */
+    upgradeCost: function(upgradeDef) {
+        if (!upgradeDef) {
+            return null;
+        }
+        if (typeof upgradeDef.getCost === "function") {
+            return upgradeDef.getCost.call(upgradeDef);
+        }
+        if (upgradeDef.cost !== undefined) {
+            return upgradeDef.cost;
+        }
+        return null;
+    },
+
+    /**
+     * Bought out. A custom upgradeSoldOut wins. Otherwise a declared max plus a purchase
+     * counter means count >= max. One-shot flags and hard caps keep their own function.
+     */
+    isUpgradeSoldOut: function(upgradeDef) {
+        if (!upgradeDef) {
+            return false;
+        }
+        if (typeof upgradeDef.upgradeSoldOut === "function") {
+            return !!upgradeDef.upgradeSoldOut.call(upgradeDef);
+        }
+        if (!resortData.upgradeHasPurchaseCounter(upgradeDef)) {
+            return false;
+        }
+        const max = resortData.getUpgradeMaxPurchases(upgradeDef);
+        if (max === null || max === undefined) {
+            return false;
+        }
+        return resortData.getUpgradePurchaseCount(upgradeDef) >= max;
+    },
+
+    /**
+     * Row visibility. Custom rowVisible is used when the row must show before canBuy.
+     * Otherwise canBuy is the row. A first mana purchase also needs reservoir room.
+     * Torii Fill Mana has no rowVisible and stays shown; the other Fill Mana rows return false.
+     */
+    isUpgradeRowVisible: function(upgradeDef, hideMaxed) {
+        if (!upgradeDef) {
+            return false;
+        }
+        let show;
+        if (typeof upgradeDef.rowVisible === "function") {
+            show = !!upgradeDef.rowVisible.call(upgradeDef, hideMaxed);
+        } else if (upgradeDef.key === "fill_mana") {
+            show = true;
+        } else if (typeof upgradeDef.canBuy === "function") {
+            show = !!upgradeDef.canBuy.call(upgradeDef);
+        } else {
+            show = true;
+        }
+        if (show && resortData.getUpgradePurchaseCount(upgradeDef) <= 0) {
+            const cost = resortData.upgradeCost(upgradeDef);
+            if (cost && cost.mana > 0 && !engine.hasManaCapacityForCost(cost)) {
+                show = false;
+            }
+        }
+        return show;
+    },
+
     getUpgradeMaxPurchaseExtra: function(upgradeDef) {
         const max = resortData.getUpgradeMaxPurchases(upgradeDef);
         if (max === null || max <= 1) {
-            return "";
-        }
-        if (typeof upgradeDef.upgradeSoldOut === "function" && upgradeDef.upgradeSoldOut()) {
             return "";
         }
         const bought = resortData.getUpgradePurchaseCount(upgradeDef);
@@ -522,7 +589,7 @@ var resortData = {
     },
 
     getUpgradeButtonLabel: function(upgradeDef, scopeKey) {
-        if (typeof upgradeDef.upgradeSoldOut === "function" && upgradeDef.upgradeSoldOut()) {
+        if (resortData.isUpgradeSoldOut(upgradeDef)) {
             return upgradeDef.soldOutButtonLabel || "Bought";
         }
         const costGetter = typeof upgradeDef.getCost === "function"
@@ -694,9 +761,6 @@ var resortData = {
                             return false;
                         }
                         const job = engine.getOkamiPathJob();
-                        if (job && job.segmentIndex !== idx) {
-                            return false;
-                        }
                         if (job && job.segmentIndex === idx && !job.paused) {
                             return false;
                         }
@@ -704,11 +768,8 @@ var resortData = {
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
-                        if (idx === undefined || idx === null) {
-                            return true;
-                        }
-                        const seg = engine.getPathSegmentData(idx);
-                        return !seg || seg.state !== "Large Rocks";
+                        const seg = idx === undefined || idx === null ? null : engine.getPathSegmentData(idx);
+                        return !!(seg && seg.state !== "Large Rocks");
                     },
                     soldOutButtonLabel: "Cleared",
                     onBuy: function() {
@@ -768,11 +829,8 @@ var resortData = {
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
-                        if (idx === undefined || idx === null) {
-                            return true;
-                        }
-                        const seg = engine.getPathSegmentData(idx);
-                        return !seg || seg.state !== "Clear" || !!seg.hasRailing;
+                        const seg = idx === undefined || idx === null ? null : engine.getPathSegmentData(idx);
+                        return !!(seg && seg.hasRailing);
                     },
                     soldOutButtonLabel: "Railing added",
                     onBuy: function() {
@@ -832,11 +890,8 @@ var resortData = {
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
-                        if (idx === undefined || idx === null) {
-                            return true;
-                        }
-                        const seg = engine.getPathSegmentData(idx);
-                        return !seg || seg.state !== "Clear" || !seg.hasRailing || !!seg.hasStairs;
+                        const seg = idx === undefined || idx === null ? null : engine.getPathSegmentData(idx);
+                        return !!(seg && seg.hasStairs);
                     },
                     soldOutButtonLabel: "Stairs added",
                     onBuy: function() {
@@ -896,11 +951,8 @@ var resortData = {
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
-                        if (idx === undefined || idx === null) {
-                            return true;
-                        }
-                        const seg = engine.getPathSegmentData(idx);
-                        return !seg || seg.state !== "Clear" || !seg.hasStairs || !!seg.hasLanterns;
+                        const seg = idx === undefined || idx === null ? null : engine.getPathSegmentData(idx);
+                        return !!(seg && seg.hasLanterns);
                     },
                     soldOutButtonLabel: "Lanterns added",
                     onBuy: function() {
@@ -954,15 +1006,10 @@ var resortData = {
                         const bought = data.progress.base.torii.callForAllyBought || 0;
                         return { coins: 5 * Math.pow(2, bought) };
                     },
-                    rowVisible: function() {
+                    canBuy: function() {
                         const rh = data.progress.base.foxDen;
                         const torii = data.progress.base.torii;
                         return !!(rh && rh.unlocks && rh.unlocks.torii) && (torii.callForAllyBought || 0) < 8;
-                    },
-                    canBuy: function() {
-                        const torii = data.progress.base.torii;
-                        const bought = torii.callForAllyBought || 0;
-                        return bought < 8;
                     },
                     onBuy: function() {
                         data.progress.base.torii.callForAllyBought = (data.progress.base.torii.callForAllyBought || 0) + 1;
@@ -972,9 +1019,6 @@ var resortData = {
                         data.progress.kitsune.total = (data.progress.kitsune.total || 0) + 1;
                     },
                     maxPurchases: 8,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.torii.callForAllyBought || 0) >= 8;
-                    },
                     soldOutButtonLabel: "Max calls"
                 },
                 growPlantSpirit: {
@@ -991,28 +1035,17 @@ var resortData = {
                         return { starBeads: 50 * Math.pow(10, bought) };
                     },
                     canBuy: function() {
-                        const torii = data.progress.base.torii;
-                        const max = resortData.bambooForestConfig.plantSpiritMax || 4;
-                        const bought = torii.plantSpiritsBought || 0;
-                        return bought < max;
-                    },
-                    onBuy: function() {
-                        engine.assemblePlantSpiritFromPurchase();
-                    },
-                    rowVisible: function() {
                         const rh = data.progress.base.foxDen;
                         const torii = data.progress.base.torii;
                         const max = resortData.bambooForestConfig.plantSpiritMax || 4;
                         return !!(rh && rh.unlocks && rh.unlocks.inn)
                             && (torii.plantSpiritsBought || 0) < max;
                     },
+                    onBuy: function() {
+                        engine.assemblePlantSpiritFromPurchase();
+                    },
                     getMaxPurchases: function() {
                         return resortData.bambooForestConfig.plantSpiritMax || 4;
-                    },
-                    upgradeSoldOut: function() {
-                        const torii = data.progress.base.torii;
-                        const max = resortData.bambooForestConfig.plantSpiritMax || 4;
-                        return (torii.plantSpiritsBought || 0) >= max;
                     },
                     soldOutButtonLabel: "Max spirits"
                 },
@@ -1030,23 +1063,15 @@ var resortData = {
                         return data.progress.base.torii.queuePostsBought || 0;
                     },
                     maxPurchases: 3,
-                    rowVisible: function() {
-                        const torii = data.progress.base.torii;
-                        return !!(torii && torii.enticingLightsUnlocked) && (torii.queuePostsBought || 0) < 3;
-                    },
                     canBuy: function() {
                         const torii = data.progress.base.torii;
                         const bought = torii.queuePostsBought || 0;
-                        return bought < 3;
+                        return !!(torii && torii.enticingLightsUnlocked) && bought < 3;
                     },
                     onBuy: function() {
                         const torii = data.progress.base.torii;
                         torii.queuePostsBought = (torii.queuePostsBought || 0) + 1;
                         torii.maxVisitors = (torii.maxVisitors || 2) + 1;
-                    },
-                    upgradeSoldOut: function() {
-                        const torii = data.progress.base.torii;
-                        return (torii.queuePostsBought || 0) >= 3;
                     },
                     soldOutButtonLabel: "Max posts"
                 },
@@ -1065,12 +1090,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.torii.enticingLightsUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const torii = data.progress.base.torii;
-                        const rh = data.progress.base.foxDen;
-                        return !!(rh && rh.unlocks && rh.unlocks.mage_tower && torii && !torii.enticingLightsUnlocked)
-                            && engine.hasManaCapacityForCost(this.getCost());
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.torii && data.progress.base.torii.enticingLightsUnlocked);
@@ -1102,9 +1121,6 @@ var resortData = {
                         const n = (data.progress.base.torii && data.progress.base.torii.shinyServiceBought) || 0;
                         return `Torii workers: +${n * 25}%`;
                     },
-                    rowVisible: function() {
-                        return engine.isPondBuiltFromFoxDen();
-                    },
                     upgradeSoldOut: function() {
                         return ((data.progress.base.torii && data.progress.base.torii.shinyServiceBought) || 0) >= 4;
                     },
@@ -1122,9 +1138,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.torii.drinkingBowlUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        return engine.isCisternBuiltFromFoxDen();
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.torii && data.progress.base.torii.drinkingBowlUnlocked);
@@ -1192,10 +1205,6 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.tendTheFlameUnlocked
-                            && engine.hasManaCapacityForCost(this.cost);
-                    },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.tendTheFlameUnlocked;
                     },
@@ -1221,9 +1230,6 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.autoRetryUnlocked;
-                    },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.autoRetryUnlocked;
                     },
@@ -1243,10 +1249,6 @@ var resortData = {
                     },
                     extraInfo: function() {
                         return "";
-                    },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.denseClonesUnlocked
-                            && engine.hasManaCapacityForCost(this.cost);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.denseClonesUnlocked;
@@ -1269,11 +1271,6 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function() {
-                        const b = data.progress.base.bonfire;
-                        return !!(b && b.denseClonesUnlocked && !b.lingeringDensityUnlocked)
-                            && engine.hasManaCapacityForCost(this.cost);
-                    },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.lingeringDensityUnlocked;
                     },
@@ -1295,11 +1292,6 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function() {
-                        const b = data.progress.base.bonfire;
-                        return !!(b && b.lingeringDensityUnlocked && !b.bondGrowthUnlocked)
-                            && engine.hasManaCapacityForCost(this.cost);
-                    },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.bondGrowthUnlocked;
                     },
@@ -1320,9 +1312,6 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.growthBlessingUnlocked;
-                    },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.growthBlessingUnlocked;
                     },
@@ -1342,9 +1331,6 @@ var resortData = {
                     },
                     extraInfo: function() {
                         return "";
-                    },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.plannedGrowthBlessingUnlocked;
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.plannedGrowthBlessingUnlocked;
@@ -1376,14 +1362,7 @@ var resortData = {
                         engine.createStokeFireSpirit();
                     },
                     maxPurchases: 2,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.bonfire.stokeFireSpiritBought || 0) >= 2;
-                    },
                     soldOutButtonLabel: "Max stoked",
-                    rowVisible: function() {
-                        const bf = data.progress.base.bonfire;
-                        return engine.isAtelierForgeBuilt() && (bf.stokeFireSpiritBought || 0) < 2;
-                    }
                 },
                 startWithFullMana: {
                     key: "start_with_full_mana",
@@ -1399,10 +1378,6 @@ var resortData = {
                         b.startWithFullManaUnlocked = true;
                         b.startWithFullManaEnabled = true;
                         engine.tryStartWhenFullMana();
-                    },
-                    rowVisible: function() {
-                        return !data.progress.base.bonfire.startWithFullManaUnlocked
-                            && engine.hasManaCapacityForCost(this.cost);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.bonfire.startWithFullManaUnlocked;
@@ -1463,11 +1438,6 @@ var resortData = {
                         const pct = Math.round((engine.getBambooInfuseSoilMultiplier() - 1) * 100);
                         return `Total chips: +${pct}% (x${round2(engine.getBambooInfuseSoilMultiplier())}). Next: +${nextAdd}%`;
                     },
-                    rowVisible: function() {
-                        const n = data.progress.base.bambooForest.infuseSoilBought || 0;
-                        return engine.isManaUnlocked()
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    }
                 }
             }
         },
@@ -1517,13 +1487,7 @@ var resortData = {
                         data.progress.base.cistern.capacityBought = (data.progress.base.cistern.capacityBought || 0) + 1;
                     },
                     maxPurchases: 99,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.cistern.capacityBought || 0) >= 99;
-                    },
                     soldOutButtonLabel: "Max capacity",
-                    rowVisible: function() {
-                        return engine.isInnOnsenConverted() && (data.progress.base.cistern.capacityBought || 0) < 99;
-                    },
                     extraInfo: function() {
                         const bought = data.progress.base.cistern.capacityBought || 0;
                         const nextN = bought + 1;
@@ -1559,16 +1523,7 @@ var resortData = {
                             (data.progress.base.cistern.reinforceToriiCapacityBought || 0) + 1;
                     },
                     maxPurchases: 4,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.cistern.reinforceToriiCapacityBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max reinforced",
-                    rowVisible: function() {
-                        const n = data.progress.base.cistern.reinforceToriiCapacityBought || 0;
-                        return engine.isToriiDrinkingBowlUnlocked()
-                            && n < 4
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
                     extraInfo: function() {
                         return "Next: +700L";
                     }
@@ -1600,16 +1555,7 @@ var resortData = {
                             (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) + 1;
                     },
                     maxPurchases: 4,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max reinforced",
-                    rowVisible: function() {
-                        const n = data.progress.base.cistern.reinforceOnsenCapacityBought || 0;
-                        return engine.isInnOnsenConverted()
-                            && n < 4
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
                     extraInfo: function() {
                         return "Next: +1000L";
                     }
@@ -1641,14 +1587,7 @@ var resortData = {
                             (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) + 1;
                     },
                     maxPurchases: 4,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max reinforced",
-                    rowVisible: function() {
-                        return engine.isNoodleBarBuilt()
-                            && (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) < 4;
-                    },
                     extraInfo: function() {
                         return "Next: +1500L";
                     }
@@ -1681,18 +1620,7 @@ var resortData = {
                         engine.assembleWaterSpiritFromWishingWell();
                     },
                     maxPurchases: 2,
-                    upgradeSoldOut: function() {
-                        return ((data.progress.base.cistern && data.progress.base.cistern.wishingWellBought) || 0) >= 2;
-                    },
                     soldOutButtonLabel: "Well built",
-                    rowVisible: function() {
-                        const cistern = data.progress.base.cistern;
-                        const bought = (cistern && cistern.wishingWellBought) || 0;
-                        if (!engine.isCisternBuiltFromFoxDen() || bought >= 2) {
-                            return false;
-                        }
-                        return !!engine.findWaterSpiritPlacementSlot();
-                    },
                     extraInfo: function() {
                         const bought = (data.progress.base.cistern.wishingWellBought || 0);
                         const rate = engine.getWishingWellCoinRate();
@@ -1707,7 +1635,8 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1
+                            && (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("plant")) {
@@ -1719,9 +1648,6 @@ var resortData = {
                         return (data.progress.base.cistern.growPlantSpiritBought || 0) >= 1;
                     },
                     soldOutButtonLabel: "Grown",
-                    rowVisible: function() {
-                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
-                    }
                 },
                 condenseWaterSpirit: {
                     key: "condense_water_spirit",
@@ -1730,7 +1656,8 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1
+                            && (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("water")) {
@@ -1742,9 +1669,6 @@ var resortData = {
                         return (data.progress.base.cistern.condenseWaterSpiritBought || 0) >= 1;
                     },
                     soldOutButtonLabel: "Condensed",
-                    rowVisible: function() {
-                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
-                    }
                 },
                 raiseEarthSpirit: {
                     key: "raise_earth_spirit",
@@ -1753,7 +1677,8 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1
+                            && (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("earth")) {
@@ -1765,9 +1690,6 @@ var resortData = {
                         return (data.progress.base.cistern.raiseEarthSpiritBought || 0) >= 1;
                     },
                     soldOutButtonLabel: "Raised",
-                    rowVisible: function() {
-                        return engine.getLegendsWritten() >= 1 && (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
-                    }
                 },
                 spinFireSpirit: {
                     key: "spin_fire_spirit",
@@ -1776,7 +1698,9 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1
+                            && engine.getFireLauncherBuiltCount() >= 1
+                            && (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("fire")) {
@@ -1788,11 +1712,6 @@ var resortData = {
                         return (data.progress.base.cistern.spinFireSpiritBought || 0) >= 1;
                     },
                     soldOutButtonLabel: "Spun",
-                    rowVisible: function() {
-                        return engine.getLegendsWritten() >= 1
-                            && engine.getFireLauncherBuiltCount() >= 1
-                            && (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
-                    }
                 }
             }
         },
@@ -1836,15 +1755,7 @@ var resortData = {
                     getMaxPurchases: function() {
                         return 2;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.pond.wishingWellBought || 0) >= 2;
-                    },
                     soldOutButtonLabel: "Pump built",
-                    rowVisible: function() {
-                        const pond = data.progress.base.pond;
-                        const bought = pond.wishingWellBought || 0;
-                        return engine.isPondBuiltFromFoxDen() && bought < 2;
-                    }
                 }
             }
         },
@@ -1877,14 +1788,6 @@ var resortData = {
                     getMaxPurchases: function() {
                         return engine.getHiddenSpringSpiritSlotMax();
                     },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.earthSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax();
-                    },
-                    upgradeSoldOut: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.earthSpiritsBought || 0) >= engine.getHiddenSpringSpiritSlotMax();
-                    },
                     soldOutButtonLabel: "Max assembled"
                 },
                 expandPebbleCapacity: {
@@ -1912,19 +1815,11 @@ var resortData = {
                     getMaxPurchases: function() {
                         return 2;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.hiddenSpring.pebbleCapacityBought || 0) >= 2;
-                    },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
                         const max = engine.getEarthSpiritPebbleMax();
                         return `Pebble capacity: ${max}`;
                     },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.earthSpiritsBought || 0) > 0
-                            && (hs.pebbleCapacityBought || 0) < 2;
-                    }
                 },
                 learnTheBestStones: {
                     key: "learn_the_best_stones",
@@ -1941,10 +1836,6 @@ var resortData = {
                     },
                     extraInfo: function() {
                         return "Collect 4 + total earth spirit level";
-                    },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.earthSpiritsBought || 0) >= 1 && !hs.learnTheBestStonesUnlocked);
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.learnTheBestStonesUnlocked);
@@ -1978,17 +1869,6 @@ var resortData = {
                     getMaxPurchases: function() {
                         return engine.getHiddenSpringSpiritSlotMax();
                     },
-                    rowVisible: function() {
-                        if (!engine.isCisternBuiltFromFoxDen()) {
-                            return false;
-                        }
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.waterSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax();
-                    },
-                    upgradeSoldOut: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.waterSpiritsBought || 0) >= engine.getHiddenSpringSpiritSlotMax();
-                    },
                     soldOutButtonLabel: "Max gathered"
                 },
                 carryingCapacity: {
@@ -2016,19 +1896,11 @@ var resortData = {
                     getMaxPurchases: function() {
                         return 4;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.hiddenSpring.carryingCapacityBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
                         const mult = engine.getWaterDropletCapacityMultiplier();
                         return `Droplet capacity: x${mult}`;
                     },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.waterSpiritsBought || 0) > 0
-                            && (hs.carryingCapacityBought || 0) < 4;
-                    }
                 },
                 bringOreToAtelier: {
                     key: "bring_ore_to_atelier",
@@ -2046,10 +1918,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.hiddenSpring.bringOreToAtelierUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && hs.oreMined && !hs.bringOreToAtelierUnlocked);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.hiddenSpring.bringOreToAtelierUnlocked;
@@ -2081,15 +1949,6 @@ var resortData = {
                     getMaxPurchases: function() {
                         return 4;
                     },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && hs.bringOreToAtelierUnlocked
-                            && (hs.fireSpiritsBought || 0) < 4);
-                    },
-                    upgradeSoldOut: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return (hs.fireSpiritsBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max sparked"
                 },
                 createSpiritTrainingSpot: {
@@ -2106,12 +1965,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.hiddenSpring.spiritTrainingSpotBought = true;
-                    },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(engine.isManaUnlocked() && hs && (hs.fireSpiritsBought || 0) >= 1
-                            && !hs.spiritTrainingSpotBought)
-                            && engine.hasManaCapacityForCost(this.cost);
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.spiritTrainingSpotBought);
@@ -2155,17 +2008,14 @@ var resortData = {
                         return engine.getPebblePayBought();
                     },
                     canBuy: function() {
-                        return engine.getPebblePayBought() < 5;
+                        const hs = data.progress.base.hiddenSpring;
+                        return !!((hs && hs.earthSpiritsBought) >= 2) && engine.getPebblePayBought() < 5;
                     },
                     onBuy: function() {
                         data.progress.base.mine.pebblePayBought = engine.getPebblePayBought() + 1;
                     },
                     extraInfo: function() {
                         return `Pebble stone and ore: +${engine.getPebblePayBought() * 20}%`;
-                    },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2);
                     },
                     upgradeSoldOut: function() {
                         return engine.getPebblePayBought() >= 5;
@@ -2201,11 +2051,6 @@ var resortData = {
                         const pct = Math.round((engine.getPlayPitDirtMultiplier() - 1) * 100);
                         return `Dirt per play: +${pct}% (x${round2(engine.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
                     },
-                    rowVisible: function() {
-                        const n = engine.getPlayPitBought();
-                        return engine.isManaUnlocked()
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    }
                 }
             }
         },
@@ -2261,13 +2106,7 @@ var resortData = {
                     getMaxPurchases: function() {
                         return engine.getInnFurnitureAbsoluteMaxPurchases();
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.inn.furnitureBought || 0) >= engine.getInnFurnitureAbsoluteMaxPurchases();
-                    },
                     soldOutButtonLabel: "Max furniture",
-                    rowVisible: function() {
-                        return (data.progress.base.inn.furnitureBought || 0) < engine.getInnFurnitureAbsoluteMaxPurchases();
-                    }
                 },
                 addDecoration: {
                     key: "add_decoration",
@@ -2289,13 +2128,7 @@ var resortData = {
                         data.progress.base.inn.decorationBought++;
                     },
                     maxPurchases: 4,
-                    upgradeSoldOut: function() {
-                        return data.progress.base.inn.decorationBought >= 4;
-                    },
                     soldOutButtonLabel: "Max decoration",
-                    rowVisible: function() {
-                        return data.progress.base.inn.decorationBought < 4;
-                    }
                 },
                 addRoom: {
                     key: "add_room",
@@ -2311,7 +2144,8 @@ var resortData = {
                         return data.progress.base.inn.addRoomBought || 0;
                     },
                     canBuy: function() {
-                        return (data.progress.base.inn.addRoomBought || 0) < engine.getInnAddRoomMaxPurchases();
+                        return engine.isInnOnsenConverted()
+                            && (data.progress.base.inn.addRoomBought || 0) < engine.getInnAddRoomMaxPurchases();
                     },
                     onBuy: function() {
                         data.progress.base.inn.addRoomBought = (data.progress.base.inn.addRoomBought || 0) + 1;
@@ -2320,14 +2154,7 @@ var resortData = {
                     getMaxPurchases: function() {
                         return engine.getInnAddRoomAbsoluteMaxPurchases();
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.inn.addRoomBought || 0) >= engine.getInnAddRoomAbsoluteMaxPurchases();
-                    },
                     soldOutButtonLabel: "Max rooms",
-                    rowVisible: function() {
-                        return engine.isInnOnsenConverted()
-                            && (data.progress.base.inn.addRoomBought || 0) < engine.getInnAddRoomAbsoluteMaxPurchases();
-                    }
                 },
                 buildPathToPond: {
                     key: "build_path_to_pond",
@@ -2343,10 +2170,6 @@ var resortData = {
                         const inn = data.progress.base.inn;
                         inn.pondPathBuilt = true;
                         inn.guestsVisitPond = true;
-                    },
-                    rowVisible: function() {
-                        const inn = data.progress.base.inn;
-                        return engine.isPondBuiltFromFoxDen() && !(inn && inn.pondPathBuilt);
                     },
                     upgradeSoldOut: function() {
                         const inn = data.progress.base.inn;
@@ -2369,7 +2192,9 @@ var resortData = {
                         return data.progress.base.inn.reinforceJointsBought || 0;
                     },
                     canBuy: function() {
-                        return (data.progress.base.inn.reinforceJointsBought || 0) < engine.getInnReinforceJointsMaxPurchases();
+                        const inn = data.progress.base.inn;
+                        return !!(inn && inn.onsenConverted && engine.isAtelierForgeBuilt())
+                            && (inn.reinforceJointsBought || 0) < engine.getInnReinforceJointsMaxPurchases();
                     },
                     onBuy: function() {
                         data.progress.base.inn.reinforceJointsBought = (data.progress.base.inn.reinforceJointsBought || 0) + 1;
@@ -2377,17 +2202,7 @@ var resortData = {
                     getMaxPurchases: function() {
                         return engine.getInnReinforceJointsMaxPurchases();
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.inn.reinforceJointsBought || 0) >= engine.getInnReinforceJointsMaxPurchases();
-                    },
                     soldOutButtonLabel: "Max reinforced",
-                    rowVisible: function() {
-                        const inn = data.progress.base.inn;
-                        if (!inn || !inn.onsenConverted || !engine.isAtelierForgeBuilt()) {
-                            return false;
-                        }
-                        return (inn.reinforceJointsBought || 0) < engine.getInnReinforceJointsMaxPurchases();
-                    }
                 },
                 convertToOnsen: {
                     key: "convert_to_onsen",
@@ -2402,10 +2217,6 @@ var resortData = {
                     onBuy: function() {
                         const inn = data.progress.base.inn;
                         inn.onsenConverted = true;
-                    },
-                    rowVisible: function() {
-                        const inn = data.progress.base.inn;
-                        return !!(inn && engine.isAtelierForgeBuilt() && !inn.onsenConverted);
                     },
                     upgradeSoldOut: function() {
                         const inn = data.progress.base.inn;
@@ -2428,12 +2239,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.inn.gentleLightsUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const inn = data.progress.base.inn;
-                        const rh = data.progress.base.foxDen;
-                        return !!(rh && rh.unlocks && rh.unlocks.mage_tower && inn && !inn.gentleLightsUnlocked)
-                            && engine.hasManaCapacityForCost(this.getCost());
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.inn && data.progress.base.inn.gentleLightsUnlocked);
@@ -2462,14 +2267,7 @@ var resortData = {
                         inn.shapedLampsBought = (inn.shapedLampsBought || 0) + 1;
                     },
                     maxPurchases: 3,
-                    upgradeSoldOut: function() {
-                        return ((data.progress.base.inn && data.progress.base.inn.shapedLampsBought) || 0) >= 3;
-                    },
                     soldOutButtonLabel: "Max shaped",
-                    rowVisible: function() {
-                        const inn = data.progress.base.inn;
-                        return !!(inn && inn.gentleLightsUnlocked && (inn.shapedLampsBought || 0) < 3);
-                    },
                     extraInfo: function() {
                         return `Gentle Lights: +${engine.getInnGentleLightsRestfulnessBonus()} restfulness/s`;
                     }
@@ -2562,9 +2360,6 @@ var resortData = {
                             return "Unlocks shard drops and skill-slot progress";
                         }
                         return `Shard drop amount: x${round1(Math.pow(1.3, lv - 1))}`;
-                    },
-                    rowVisible: function() {
-                        return !!(data.progress && data.progress.showBattle);
                     }
                 }
             },
@@ -2638,9 +2433,6 @@ var resortData = {
                         const strands = engine.getOkamiSpiritStrands();
                         return `Spirit strands: ${round2(strands)} (x${round2(Math.pow(1.1, n))})`;
                     },
-                    rowVisible: function() {
-                        return true;
-                    }
                 },
                 addForge: {
                     key: "add_forge",
@@ -2659,15 +2451,10 @@ var resortData = {
                     canBuy: function() {
                         const a = data.progress.base.atelier;
                         const hs = data.progress.base.hiddenSpring;
-                        return !!(a && hs && hs.oreMined && !a.forgeBuilt);
+                        return !!(a && hs && hs.oreMined && hs.bringOreToAtelierUnlocked && !a.forgeBuilt);
                     },
                     onBuy: function() {
                         data.progress.base.atelier.forgeBuilt = true;
-                    },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(a && hs && hs.oreMined && !a.forgeBuilt && data.progress.base.hiddenSpring.bringOreToAtelierUnlocked);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.atelier.forgeBuilt;
@@ -2693,12 +2480,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.atelier.largerForgeBought = engine.getLargerForgeBought() + 1;
-                    },
-                    rowVisible: function() {
-                        return engine.isForgingInstructionsBought();
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getLargerForgeBought() >= 4;
                     },
                     soldOutButtonLabel: "Max forge"
                 },
@@ -2727,14 +2508,7 @@ var resortData = {
                         data.progress.base.fireLaunchers.builtCount = a.fireLaunchersBought;
                     },
                     maxPurchases: 3,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.atelier.fireLaunchersBought || 0) >= 3;
-                    },
                     soldOutButtonLabel: "All built",
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        return !!(engine.isInnOnsenConverted() && a && (a.fireLaunchersBought || 0) < 3);
-                    }
                 },
                 formDirtRoads: {
                     key: "form_dirt_roads",
@@ -2753,13 +2527,6 @@ var resortData = {
                     extraInfo: function() {
                         const cap = engine.getDirtRoadMaxProgress();
                         return `Cap: ${cap} progress (+${round1(cap * 0.5)}% speed). Per delivery: ${engine.getDirtRoadProgressPerDelivery()}`;
-                    },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const rh = data.progress.base.foxDen;
-                        const formed = !!(a && a.formDirtRoadsUnlocked);
-                        return !!(rh && rh.unlocks && rh.unlocks.mage_tower)
-                            && (formed || engine.hasManaCapacityForCost(this.cost));
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.atelier && data.progress.base.atelier.formDirtRoadsUnlocked);
@@ -2787,14 +2554,7 @@ var resortData = {
                         data.progress.base.atelier.organizeOrdersBought = (data.progress.base.atelier.organizeOrdersBought || 0) + 1;
                     },
                     maxPurchases: 3,
-                    upgradeSoldOut: function() {
-                        const n = data.progress.base.atelier.organizeOrdersBought || 0;
-                        return n >= 3;
-                    },
                     soldOutButtonLabel: "Max orders",
-                    rowVisible: function() {
-                        return true;
-                    }
                 },
                 manaStorageCharms: {
                     key: "mana_storage_charms",
@@ -2809,8 +2569,9 @@ var resortData = {
                     weavingTimeIncreaseAdd: 90,
                     maxPurchases: 9,
                     canBuy: function() {
+                        const garden = data.progress.base && data.progress.base.garden;
                         const n = data.progress.base.atelier.manaStorageCharmsBought || 0;
-                        return n < 9;
+                        return !!(garden && garden.arrangementOfManaOrdersUnlocked) && n < 9;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.manaStorageCharmsBought = (data.progress.base.atelier.manaStorageCharmsBought || 0) + 1;
@@ -2818,19 +2579,9 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.manaStorageCharmsBought || 0;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.atelier.manaStorageCharmsBought || 0) >= 9;
-                    },
                     soldOutButtonLabel: "Max charms",
-                    rowVisible: function() {
-                        const garden = data.progress.base && data.progress.base.garden;
-                        const n = data.progress.base.atelier.manaStorageCharmsBought || 0;
-                        return !!(garden && garden.arrangementOfManaOrdersUnlocked && n < 9)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
                     extraInfo: function() {
-                        const n = data.progress.base.atelier.manaStorageCharmsBought || 0;
-                        return `Mana carry: ${resortData.getManaCarryAmount()} (${n}/9)`;
+                        return `Mana carry: ${resortData.getManaCarryAmount()}`;
                     }
                 },
                 makeBaskets: {
@@ -2848,7 +2599,7 @@ var resortData = {
                         return data.progress.base.atelier.basketsBought || 0;
                     },
                     canBuy: function() {
-                        return true;
+                        return engine.isManaUnlocked();
                     },
                     onBuy: function() {
                         data.progress.base.atelier.basketsBought = (data.progress.base.atelier.basketsBought || 0) + 1;
@@ -2858,11 +2609,6 @@ var resortData = {
                         const cap = resortData.getKitsuneCarryCapacity();
                         return `Resource carry: ${cap} per trip (${bought} woven) | Next basket: +${fibonacci(bought)}`;
                     },
-                    rowVisible: function() {
-                        const bought = data.progress.base.atelier.basketsBought || 0;
-                        return engine.isManaUnlocked()
-                            && (bought > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    }
                 },
                 makeBuckets: {
                     key: "make_buckets",
@@ -2880,23 +2626,17 @@ var resortData = {
                         return data.progress.base.atelier.bucketsBought || 0;
                     },
                     canBuy: function() {
-                        return (data.progress.base.atelier.bucketsBought || 0) < 4;
+                        return engine.isInnOnsenConverted()
+                            && (data.progress.base.atelier.bucketsBought || 0) < 4;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.bucketsBought = (data.progress.base.atelier.bucketsBought || 0) + 1;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.atelier.bucketsBought || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max buckets",
                     extraInfo: function() {
-                        const bought = data.progress.base.atelier.bucketsBought || 0;
                         const cap = resortData.getCisternWaterCarryAmount();
-                        return `Cistern water carry: ${cap}L per trip (${bought}/4)`;
+                        return `Cistern water carry: ${cap}L per trip`;
                     },
-                    rowVisible: function() {
-                        return engine.isInnOnsenConverted();
-                    }
                 },
                 betterAxes: {
                     key: "better_axes",
@@ -2917,18 +2657,12 @@ var resortData = {
                     onBuy: function() {
                         data.progress.base.atelier.betterAxesBought = (data.progress.base.atelier.betterAxesBought || 0) + 1;
                     },
-                    maxPurchases: 7,
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.atelier.betterAxesBought || 0) >= 6;
-                    },
+                    maxPurchases: 6,
                     soldOutButtonLabel: "Max axes",
                     extraInfo: function() {
                         const n = data.progress.base.atelier.betterAxesBought || 0;
                         return `+${n} chop power per kitsune`;
                     },
-                    rowVisible: function() {
-                        return true;
-                    }
                 },
                 sharperAxes: {
                     key: "sharper_axes",
@@ -2945,7 +2679,7 @@ var resortData = {
                         return data.progress.base.atelier.sharperAxesBought || 0;
                     },
                     canBuy: function() {
-                        return true;
+                        return engine.isAtelierForgeBuilt();
                     },
                     onBuy: function() {
                         data.progress.base.atelier.sharperAxesBought = (data.progress.base.atelier.sharperAxesBought || 0) + 1;
@@ -2954,9 +2688,6 @@ var resortData = {
                         const n = data.progress.base.atelier.sharperAxesBought || 0;
                         return `+${n * 50}% chop power per kitsune`;
                     },
-                    rowVisible: function() {
-                        return engine.isAtelierForgeBuilt();
-                    }
                 },
                 sprinkleOre: {
                     key: "sprinkle_ore",
@@ -2973,7 +2704,7 @@ var resortData = {
                         return data.progress.base.atelier.sprinkleOreBought || 0;
                     },
                     canBuy: function() {
-                        return true;
+                        return engine.isBringOreToAtelierUnlocked();
                     },
                     onBuy: function() {
                         data.progress.base.atelier.sprinkleOreBought = (data.progress.base.atelier.sprinkleOreBought || 0) + 1;
@@ -2982,9 +2713,6 @@ var resortData = {
                     extraInfo: function() {
                         const n = data.progress.base.atelier.sprinkleOreBought || 0;
                         return `Total chips: x${round2(Math.pow(1.1, n))}`;
-                    },
-                    rowVisible: function() {
-                        return engine.isBringOreToAtelierUnlocked();
                     }
                 },
                 sprinkleOreOnRoads: {
@@ -3002,10 +2730,6 @@ var resortData = {
                     },
                     extraInfo: function() {
                         return "Road progress per delivery: 2";
-                    },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        return !!(a && a.formDirtRoadsUnlocked && engine.isBringOreToAtelierUnlocked());
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.atelier && data.progress.base.atelier.sprinkleOreOnRoadsBought);
@@ -3026,7 +2750,8 @@ var resortData = {
                         return data.progress.base.atelier.improveDirtRoadsBought || 0;
                     },
                     canBuy: function() {
-                        return (data.progress.base.atelier.improveDirtRoadsBought || 0) < 5;
+                        return !!(data.progress.base.atelier && data.progress.base.atelier.sprinkleOreOnRoadsBought)
+                            && (data.progress.base.atelier.improveDirtRoadsBought || 0) < 5;
                     },
                     onBuy: function() {
                         const a = data.progress.base.atelier;
@@ -3034,9 +2759,6 @@ var resortData = {
                     },
                     extraInfo: function() {
                         return `Road cap: ${engine.getDirtRoadMaxProgress()}`;
-                    },
-                    rowVisible: function() {
-                        return !!(data.progress.base.atelier && data.progress.base.atelier.sprinkleOreOnRoadsBought);
                     },
                     upgradeSoldOut: function() {
                         return (data.progress.base.atelier.improveDirtRoadsBought || 0) >= 5;
@@ -3057,17 +2779,15 @@ var resortData = {
                         return engine.getMineshaftBeamsBought();
                     },
                     canBuy: function() {
-                        return engine.getMineshaftBeamsBought() < 5;
+                        const hs = data.progress.base.hiddenSpring;
+                        return !!((hs && hs.earthSpiritsBought) >= 2)
+                            && engine.getMineshaftBeamsBought() < 5;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.mineshaftBeamsBought = engine.getMineshaftBeamsBought() + 1;
                     },
                     extraInfo: function() {
                         return `Mine spirit power: +${engine.getMineshaftBeamsBought() * 20}%`;
-                    },
-                    rowVisible: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2);
                     },
                     upgradeSoldOut: function() {
                         return engine.getMineshaftBeamsBought() >= 5;
@@ -3142,10 +2862,6 @@ var resortData = {
                             bf.autoRotateHarvest = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !(g && g.arrangementOfRotationUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfRotationUnlocked);
@@ -3165,10 +2881,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfRemembranceUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !(g && g.arrangementOfRemembranceUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3195,11 +2907,6 @@ var resortData = {
                             rh.autoClearPathRocks = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !(g && g.arrangementOfPathMakingUnlocked)
-                            && !engine.isMapElementRevealed("hiddenSpring");
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfPathMakingUnlocked);
@@ -3224,10 +2931,6 @@ var resortData = {
                             g.autoWeaveOnGatherComplete = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !(g && g.arrangementOfAppraisalUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfAppraisalUnlocked);
@@ -3248,11 +2951,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfPriorityUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && hs.bringOreToAtelierUnlocked && !(g && g.arrangementOfPriorityUnlocked));
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3283,13 +2981,6 @@ var resortData = {
                             }
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const rh = data.progress.base.foxDen;
-                        const toriiBuilt = !!(rh && rh.unlocks && rh.unlocks.torii);
-                        return toriiBuilt && engine.isInnOnsenConverted()
-                            && !(g && g.arrangementOfWaterOrdersUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfWaterOrdersUnlocked);
@@ -3317,12 +3008,6 @@ var resortData = {
                             }
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.pebbleCapacityBought || 0) >= 1)
-                            && !(g && g.arrangementOfDiggingUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfDiggingUnlocked);
@@ -3347,10 +3032,6 @@ var resortData = {
                             g.autoWeaveCheapestReady = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !!(g && g.arrangementOfAppraisalUnlocked) && !(g && g.arrangementOfReviewUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfReviewUnlocked);
@@ -3371,10 +3052,6 @@ var resortData = {
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfShoppingUnlocked = true;
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !(g && g.arrangementOfShoppingUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfShoppingUnlocked);
@@ -3391,7 +3068,9 @@ var resortData = {
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         const bf = data.progress.base.bonfire;
-                        return !!(bf && bf.tendTheFlameUnlocked) && !(g && g.arrangementOfFireTendingUnlocked);
+                        return engine.isBonfireBuiltFromFoxDen()
+                            && !!(bf && bf.tendTheFlameUnlocked)
+                            && !(g && g.arrangementOfFireTendingUnlocked);
                     },
                     onBuy: function() {
                         const g = data.progress.base.garden;
@@ -3401,13 +3080,6 @@ var resortData = {
                             bf.fireTendingEnabled = true;
                             bf.fireTendingHeatCap = 55;
                         }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const bf = data.progress.base.bonfire;
-                        return engine.isBonfireBuiltFromFoxDen()
-                            && !!(bf && bf.tendTheFlameUnlocked)
-                            && !(g && g.arrangementOfFireTendingUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3428,10 +3100,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfTraderResponsibilityUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.isMarketBuilt() && !(g && g.arrangementOfTraderResponsibilityUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3459,12 +3127,6 @@ var resortData = {
                             market.repeatExchangeWhenReady = false;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.isMarketBuilt()
-                            && engine.getMarketLevel() >= 2
-                            && !(g && g.arrangementOfPaperMoneyUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfPaperMoneyUnlocked);
@@ -3485,12 +3147,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfHotWaterUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const g = data.progress.base.garden;
-                        return (a && (a.fireLaunchersBought || 0) >= 1)
-                            && !(g && g.arrangementOfHotWaterUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3517,12 +3173,6 @@ var resortData = {
                             hs.equalDropletSpacing = false;
                         }
                     },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const g = data.progress.base.garden;
-                        return (a && (a.fireLaunchersBought || 0) >= 1)
-                            && !(g && g.arrangementOfRhythmicDropletsUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfRhythmicDropletsUnlocked);
@@ -3546,10 +3196,6 @@ var resortData = {
                         if (cistern && cistern.refuseIncomingWater === undefined) {
                             cistern.refuseIncomingWater = false;
                         }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.isPondBuiltFromFoxDen() && !(g && g.arrangementOfThirstUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3576,12 +3222,6 @@ var resortData = {
                             cistern.waterSpiritsUsePathSpeed = true;
                         }
                     },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const g = data.progress.base.garden;
-                        return (a && (a.fireLaunchersBought || 0) >= 1)
-                            && !(g && g.arrangementOfViscosityUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfViscosityUnlocked);
@@ -3603,12 +3243,6 @@ var resortData = {
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfTargetPriorityUnlocked = true;
                     },
-                    rowVisible: function() {
-                        const a = data.progress.base.atelier;
-                        const g = data.progress.base.garden;
-                        return (a && (a.fireLaunchersBought || 0) >= 1)
-                            && !(g && g.arrangementOfTargetPriorityUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfTargetPriorityUnlocked);
@@ -3628,11 +3262,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfHeatTargetingUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return !!(g && g.arrangementOfTargetPriorityUnlocked)
-                            && !(g && g.arrangementOfHeatTargetingUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3658,10 +3287,6 @@ var resortData = {
                         }
                         engine.enableCarriersBringManaOnAllBuildings();
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.isManaUnlocked() && engine.hasManaOrderPrerequisite() && !(g && g.arrangementOfManaOrdersUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfManaOrdersUnlocked);
@@ -3682,11 +3307,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfDoubledStoneUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const pile = data.progress.base.stonePile;
-                        return !!(pile && pile.stoneDuplicatorUnlocked) && !(g && g.arrangementOfDoubledStoneUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3713,12 +3333,6 @@ var resortData = {
                         if (rh) {
                             rh.autoAddPathRailings = true;
                         }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.isAtelierBuiltFromFoxDen()
-                            && !(g && g.arrangementOfRailingSafetyUnlocked)
-                            && !engine.allPathSegmentsHaveUpgrade("railing");
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3748,14 +3362,6 @@ var resortData = {
                             rh.autoAddPathStairs = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const railingReady = !!(g && g.arrangementOfRailingSafetyUnlocked)
-                            || engine.allPathSegmentsHaveUpgrade("railing");
-                        return railingReady
-                            && !(g && g.arrangementOfStepBuildingUnlocked)
-                            && !engine.allPathSegmentsHaveUpgrade("stairs");
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfStepBuildingUnlocked);
@@ -3784,14 +3390,6 @@ var resortData = {
                             rh.autoAddPathLanterns = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        const stairsReady = !!(g && g.arrangementOfStepBuildingUnlocked)
-                            || engine.allPathSegmentsHaveUpgrade("stairs");
-                        return stairsReady
-                            && !(g && g.arrangementOfLanternPlacingUnlocked)
-                            && !engine.allPathSegmentsHaveUpgrade("lanterns");
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfLanternPlacingUnlocked);
@@ -3814,10 +3412,6 @@ var resortData = {
                         if (mine) {
                             mine.autoIncreaseDepth = true;
                         }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 1 && !(g && g.arrangementOfSpelunkingUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3842,10 +3436,6 @@ var resortData = {
                             hs.autoRefillMana = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 2 && !(g && g.arrangementOfSelfSufficiencyUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfSelfSufficiencyUnlocked);
@@ -3869,10 +3459,6 @@ var resortData = {
                             orb.expandOrbAutobuy = true;
                         }
                     },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 3 && !(g && g.arrangementOfOrbGrowthUnlocked);
-                    },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfOrbGrowthUnlocked);
@@ -3895,10 +3481,6 @@ var resortData = {
                         if (orb) {
                             orb.spinCurrentsAutobuy = true;
                         }
-                    },
-                    rowVisible: function() {
-                        const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 4 && !(g && g.arrangementOfManaCurrentsUnlocked);
                     },
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
@@ -3931,12 +3513,6 @@ var resortData = {
                     },
                     onBuy: function() {
                         data.progress.base.stonePile.stoneDuplicatorUnlocked = true;
-                    },
-                    rowVisible: function() {
-                        const pile = data.progress.base.stonePile;
-                        const rh = data.progress.base.foxDen;
-                        return !!(rh && rh.unlocks && rh.unlocks.mage_tower && pile && !pile.stoneDuplicatorUnlocked)
-                            && engine.hasManaCapacityForCost(this.getCost());
                     },
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.stonePile && data.progress.base.stonePile.stoneDuplicatorUnlocked);
@@ -4009,12 +3585,6 @@ var resortData = {
                     extraInfo: function() {
                         return `Chance: ${engine.getNoodleCrossTalkBought() * 10}%`;
                     },
-                    rowVisible: function() {
-                        return true;
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getNoodleCrossTalkBought() >= 5;
-                    },
                     soldOutButtonLabel: "Max cross-talk"
                 },
                 comfyStools: {
@@ -4040,9 +3610,6 @@ var resortData = {
                     extraInfo: function() {
                         return `Noodle restfulness: +${engine.getNoodleEatRestBonus()}/s`;
                     },
-                    rowVisible: function() {
-                        return true;
-                    }
                 },
                 trophyDecorations: {
                     key: "trophy_decorations",
@@ -4064,9 +3631,6 @@ var resortData = {
                         const bar = data.progress.base.noodleBar;
                         bar.trophyDecorationsBought = engine.getNoodleTrophyDecorationsBought() + 1;
                     },
-                    rowVisible: function() {
-                        return true;
-                    }
                 }
             }
         },
@@ -4223,8 +3787,8 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function(hideMaxed) {
-                        return !(hideMaxed && engine.isMarketCookingEquipmentBought());
+                    rowVisible: function() {
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         return engine.isMarketCookingEquipmentBought();
@@ -4250,8 +3814,8 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function(hideMaxed) {
-                        return !(hideMaxed && engine.isMarketTradingExperienceBought());
+                    rowVisible: function() {
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         return engine.isMarketTradingExperienceBought();
@@ -4288,9 +3852,6 @@ var resortData = {
                     },
                     rowVisible: function() {
                         return true;
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getMarketBuyAdvertisingBought() >= 20;
                     },
                     soldOutButtonLabel: "Max advertising",
                     lockedLabel: function() {
@@ -4466,9 +4027,6 @@ var resortData = {
                     rowVisible: function() {
                         return engine.getMarketLevel() >= 2;
                     },
-                    upgradeSoldOut: function() {
-                        return engine.getLostScrollsBought() >= engine.getLostScrollsMax();
-                    },
                     soldOutButtonLabel: "Max scrolls",
                     lockedLabel: function() {
                         return engine.getMarketLevel() >= 3 ? "" : "Unlocks at Market level 3";
@@ -4487,9 +4045,8 @@ var resortData = {
                     onBuy: function() {
                         data.progress.base.market.launcherDesignsBought = 1;
                     },
-                    rowVisible: function(hideMaxed) {
-                        return engine.getMarketLevel() >= 2
-                            && !(hideMaxed && engine.isLauncherDesignsBought());
+                    rowVisible: function() {
+                        return engine.getMarketLevel() >= 2;
                     },
                     upgradeSoldOut: function() {
                         return engine.isLauncherDesignsBought();
@@ -4527,12 +4084,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "ironSightsBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought") >= 3;
-                    }
                 },
                 longRangeFirePit: {
                     key: "long_range_fire_pit",
@@ -4556,12 +4107,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "firePitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathMid", "firePitBought") >= 2;
-                    }
                 },
                 longRangeWoodPit: {
                     key: "long_range_wood_pit",
@@ -4585,12 +4130,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "woodPitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought") >= 4;
-                    }
                 }
             }
         },
@@ -4621,12 +4160,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "fireFlingersBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought") >= 3;
-                    }
                 },
                 emberFirePit: {
                     key: "ember_fire_pit",
@@ -4650,12 +4183,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "firePitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathLower", "firePitBought") >= 2;
-                    }
                 },
                 emberWoodPit: {
                     key: "ember_wood_pit",
@@ -4679,12 +4206,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "woodPitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought") >= 4;
-                    }
                 }
             }
         },
@@ -4715,12 +4236,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "hotIronsBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought") >= 3;
-                    }
                 },
                 burstFirePit: {
                     key: "burst_fire_pit",
@@ -4744,12 +4259,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "firePitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("bendTop", "firePitBought") >= 2;
-                    }
                 },
                 burstWoodPit: {
                     key: "burst_wood_pit",
@@ -4773,12 +4282,6 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "woodPitBought");
                     },
-                    rowVisible: function() {
-                        return engine.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought") >= 4;
-                    }
                 }
             }
         },
@@ -4831,10 +4334,6 @@ var resortData = {
                         const mult = Math.pow(1.1, n);
                         return `Capacity multiplier: x${round2(mult)} (${n} purchased)`;
                     },
-                    rowVisible: function() {
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.expandOrbBought) || 0;
-                        return n > 0 || engine.hasManaCapacityForCost(this.getCost());
-                    },
                     autobuy: true,
                     autobuyVisible: function() {
                         const g = data.progress.base.garden;
@@ -4875,10 +4374,6 @@ var resortData = {
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.spinCurrentsBought) || 0;
                         const mult = Math.pow(1.05, n);
                         return `Mana gain multiplier: x${round2(mult)} (${n} purchased)`;
-                    },
-                    rowVisible: function() {
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.spinCurrentsBought) || 0;
-                        return n > 0 || engine.hasManaCapacityForCost(this.getCost());
                     },
                     autobuy: true,
                     autobuyVisible: function() {
@@ -4925,9 +4420,6 @@ var resortData = {
                     extraInfo: function() {
                         return `Exp bonus: +${engine.getOrbBuildWallsBought() * 10}%`;
                     },
-                    rowVisible: function() {
-                        return true;
-                    },
                     upgradeSoldOut: function() {
                         return engine.getOrbBuildWallsBought() >= engine.getOrbBuildWallsMax();
                     },
@@ -4963,16 +4455,9 @@ var resortData = {
                     extraInfo: function() {
                         return `Exp bonus: +${engine.getOrbBuildStairsBought() * 20}%`;
                     },
-                    rowVisible: function() {
-                        const max = engine.getOrbBuildStairsMax();
-                        const bought = engine.getOrbBuildStairsBought();
-                        if (max > 0 && bought >= max) {
-                            return false;
-                        }
-                        return engine.getOrbBuildWallsBought() >= 4;
-                    },
                     upgradeSoldOut: function() {
-                        return false;
+                        const max = engine.getOrbBuildStairsMax();
+                        return max > 0 && engine.getOrbBuildStairsBought() >= max;
                     },
                     soldOutButtonLabel: "Max stairs"
                 },
@@ -5005,16 +4490,9 @@ var resortData = {
                     extraInfo: function() {
                         return `Mana gen and cap: +${engine.getOrbBuildFloorBought() * 10}%`;
                     },
-                    rowVisible: function() {
-                        const max = engine.getOrbBuildFloorMax();
-                        const bought = engine.getOrbBuildFloorBought();
-                        if (max > 0 && bought >= max) {
-                            return false;
-                        }
-                        return engine.getOrbBuildStairsBought() >= 1;
-                    },
                     upgradeSoldOut: function() {
-                        return false;
+                        const max = engine.getOrbBuildFloorMax();
+                        return max > 0 && engine.getOrbBuildFloorBought() >= max;
                     },
                     soldOutButtonLabel: "Max floors"
                 },
@@ -5034,8 +4512,9 @@ var resortData = {
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
+                        const inn = data.progress.base && data.progress.base.inn;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
-                        return n < 4;
+                        return !!(inn && inn.gentleLightsUnlocked) && n < 4;
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5046,20 +4525,10 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
                     },
-                    rowVisible: function() {
-                        const inn = data.progress.base && data.progress.base.inn;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
-                        return !!(inn && inn.gentleLightsUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
-                    upgradeSoldOut: function() {
-                        return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
                         const cap = (data.progress.base.inn && data.progress.base.inn.manaCapacity) || 4000;
-                        return `Inn mana capacity: ${intToStringRound(cap)} (${n}/4)`;
+                        return `Inn mana capacity: ${intToStringRound(cap)}`;
                     }
                 },
                 increaseGateManaCapacity: {
@@ -5078,8 +4547,9 @@ var resortData = {
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
+                        const torii = data.progress.base && data.progress.base.torii;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
-                        return n < 4;
+                        return !!(torii && torii.enticingLightsUnlocked) && n < 4;
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5090,20 +4560,10 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
                     },
-                    rowVisible: function() {
-                        const torii = data.progress.base && data.progress.base.torii;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
-                        return !!(torii && torii.enticingLightsUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
-                    upgradeSoldOut: function() {
-                        return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
                         const cap = (data.progress.base.torii && data.progress.base.torii.manaCapacity) || 4000;
-                        return `Gate mana capacity: ${intToStringRound(cap)} (${n}/4)`;
+                        return `Gate mana capacity: ${intToStringRound(cap)}`;
                     }
                 },
                 increaseStonePileManaCapacity: {
@@ -5122,8 +4582,9 @@ var resortData = {
                     weavingTime: 80,
                     maxPurchases: 4,
                     canBuy: function() {
+                        const pile = data.progress.base && data.progress.base.stonePile;
                         const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
-                        return n < 4;
+                        return !!(pile && pile.stoneDuplicatorUnlocked) && n < 4;
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5134,20 +4595,10 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
                     },
-                    rowVisible: function() {
-                        const pile = data.progress.base && data.progress.base.stonePile;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
-                        return !!(pile && pile.stoneDuplicatorUnlocked)
-                            && (n > 0 || engine.hasManaCapacityForCost(this.getCost()));
-                    },
-                    upgradeSoldOut: function() {
-                        return ((data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0) >= 4;
-                    },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
                         const cap = (data.progress.base.stonePile && data.progress.base.stonePile.manaCapacity) || 4000;
-                        return `Stone Pile mana capacity: ${intToStringRound(cap)} (${n}/4)`;
+                        return `Stone Pile mana capacity: ${intToStringRound(cap)}`;
                     }
                 }
             }
@@ -5194,7 +4645,7 @@ var resortData = {
                     weavingTime: 120,
                     weavingTimeIncrease: 1,
                     canBuy: function() {
-                        return !data.progress.base.atelier.sandalBuilt;
+                        return false;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.sandalBuilt = true;
@@ -5203,9 +4654,8 @@ var resortData = {
                     extraInfo: function() {
                         return "";
                     },
-                    rowVisible: function(hideMaxed) {
+                    rowVisible: function() {
                         return false;
-                        // return !(hideMaxed && data.progress.base.atelier.sandalBuilt);
                     },
                     upgradeSoldOut: function() {
                         return !!data.progress.base.atelier.sandalBuilt;
@@ -5235,6 +4685,10 @@ var resortData = {
                         const shrine = data.progress.base.shrine;
                         shrine.shardEchoesBought = (shrine.shardEchoesBought || 0) + 1;
                     },
+                    // Growing legend cap is a lock, not sold out, so the locked label can show.
+                    upgradeSoldOut: function() {
+                        return false;
+                    },
                     lockedLabel: function() {
                         if (engine.getShardEchoesBought() >= engine.getLegendsWritten()) {
                             return "Write another Legend";
@@ -5263,9 +4717,6 @@ var resortData = {
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.artAppreciationBought = (shrine.artAppreciationBought || 0) + 1;
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getArtAppreciationBought() >= 4;
                     },
                     soldOutButtonLabel: "Max appreciation",
                     rowVisible: function() {
@@ -5363,6 +4814,10 @@ var resortData = {
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.skillEchoesBought = (shrine.skillEchoesBought || 0) + 1;
+                    },
+                    // Growing legend cap is a lock, not sold out, so the locked label can show.
+                    upgradeSoldOut: function() {
+                        return false;
                     },
                     lockedLabel: function() {
                         if (engine.getSkillEchoesBought() >= engine.getLegendsWritten()) {
