@@ -308,6 +308,143 @@ let events = {
         view.updateSkillsTab();
         createView.updateLayoutMeasurements();
     },
+    switchBonfireSubTab: function(tabKey) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        bf.kilnSubTab = tabKey === "kiln" ? "kiln" : "clone";
+        if (typeof view !== "undefined" && view.updateBasePanelBonfire) {
+            view.updateBasePanelBonfire();
+        }
+        if (typeof createView !== "undefined" && createView.updateLayoutMeasurements) {
+            createView.updateLayoutMeasurements();
+        }
+    },
+    setBonfireKilnHeatCap: function(value) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        const trimmed = String(value == null ? "" : value).trim();
+        if (trimmed === "") {
+            bf.kilnHeatCap = null;
+            return;
+        }
+        const n = parseInt(trimmed, 10);
+        bf.kilnHeatCap = isNaN(n) || n < 0 ? null : n;
+    },
+    setBonfirePriorityKeep: function(key, value) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || typeof engine === "undefined") {
+            return;
+        }
+        const row = engine.getBonfirePriorityRow(bf, key);
+        if (!row) {
+            return;
+        }
+        const trimmed = String(value == null ? "" : value).trim();
+        if (trimmed === "") {
+            row.keep = null;
+            return;
+        }
+        const n = parseInt(trimmed, 10);
+        row.keep = isNaN(n) || n < 0 ? null : n;
+    },
+    setBonfireHardwoodStop: function(value) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        const trimmed = String(value == null ? "" : value).trim();
+        if (trimmed === "") {
+            bf.hardwoodStopAt = null;
+            return;
+        }
+        const n = parseInt(trimmed, 10);
+        bf.hardwoodStopAt = isNaN(n) || n < 0 ? null : n;
+    },
+    toggleBonfirePriorityUse: function(key, checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || typeof engine === "undefined") {
+            return;
+        }
+        const row = engine.getBonfirePriorityRow(bf, key);
+        if (row) {
+            row.use = !!checked;
+        }
+    },
+    moveBonfirePriority: function(key, dir) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || typeof engine === "undefined") {
+            return;
+        }
+        const rows = engine.ensureBonfireKilnPriority(bf);
+        let index = -1;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].key === key) {
+                index = i;
+                break;
+            }
+        }
+        const next = index + dir;
+        if (index < 0 || next < 0 || next >= rows.length) {
+            return;
+        }
+        const swap = rows[index];
+        rows[index] = rows[next];
+        rows[next] = swap;
+        if (typeof view !== "undefined" && view.updateBasePanelBonfire) {
+            view.updateBasePanelBonfire();
+        }
+    },
+    bonfirePriorityDragEnd: function() {
+        events._bonfireDragKey = null;
+    },
+    bonfirePriorityDragStart: function(event, key) {
+        events._bonfireDragKey = key;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", key);
+        }
+    },
+    bonfirePriorityDragOver: function(event) {
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = "move";
+        }
+    },
+    bonfirePriorityDrop: function(event, targetKey) {
+        event.preventDefault();
+        const fromKey = events._bonfireDragKey || (event.dataTransfer && event.dataTransfer.getData("text/plain"));
+        events._bonfireDragKey = null;
+        if (!fromKey || fromKey === targetKey) {
+            return;
+        }
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf || typeof engine === "undefined") {
+            return;
+        }
+        const rows = engine.ensureBonfireKilnPriority(bf);
+        let from = -1;
+        let to = -1;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].key === fromKey) {
+                from = i;
+            }
+            if (rows[i].key === targetKey) {
+                to = i;
+            }
+        }
+        if (from < 0 || to < 0) {
+            return;
+        }
+        const row = rows.splice(from, 1)[0];
+        rows.splice(to, 0, row);
+        if (typeof view !== "undefined" && view.updateBasePanelBonfire) {
+            view.updateBasePanelBonfire();
+        }
+    },
     switchScrollArchivesSubTab: function(tabKey) {
         data.progress.selectedScrollArchivesSubTab = tabKey === "research" ? "research" : "find";
         if (typeof view !== "undefined" && view.updateScrollArchivesInscriptions) {
@@ -642,7 +779,7 @@ let events = {
         const selected = data.progress.selectedResortInfoType || data.progress.selectedBaseBuilding || "";
         if (selected === "scrollArchives") {
             const base = data.progress.base;
-            const t = view._basePanelPurchasingTools(base, null, false);
+            const t = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);
             view.updateBasePanelScrollArchives(base, t);
         }
     },
@@ -2234,11 +2371,11 @@ let events = {
             chk.disabled = false;
         }
         const checked = !!(chk && chk.checked);
-        const cost = shrineCards.legendManaCost || 100000;
+        const cost = engine.getLegendManaCost();
         const afford = typeof resortData !== "undefined" && resortData.canAffordCost({ mana: cost });
         if (btn) {
             const amountHtml = resortData.formatCostAmountHtml(cost, "mana", "mana");
-            const label = `Fade into Legend (Combat Prestige) for [${amountHtml}]`;
+            const label = `Fade into Legend (Prestige) for [${amountHtml}]`;
             view.updateVal("shrineMoveMountainBtn", label, "innerHTML");
             view.updateVal("shrineMoveMountainBtn", !checked || !afford, "disabled");
             btn.classList.toggle("upgrade-btn-ready", !!afford);
@@ -2252,7 +2389,7 @@ let events = {
         if (!chk || !chk.checked) {
             return;
         }
-        const cost = shrineCards.legendManaCost || 100000;
+        const cost = engine.getLegendManaCost();
         if (!resortData.canAffordCost({ mana: cost })) {
             return;
         }
@@ -2280,7 +2417,7 @@ let events = {
         } else if (roll < (odds.common || 0) + (odds.rare || 0)) {
             rarity = "rare";
         }
-        engine.grantShrinePack(rarity);
+        engine.grantShrinePack(rarity, "bought");
         saving.save();
         if (typeof view !== "undefined") {
             if (view.updateShrinePackDisplays) {
@@ -2393,6 +2530,7 @@ let events = {
         engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
         session.openPack = {
             rarity: rarity,
+            source: engine.shiftPackSource(rarity),
             cards: shrineCards.rollPackCards(rarity, function() {
                 return engine.nextSeededFloat(shrine, "packSeed");
             })
@@ -2462,6 +2600,7 @@ let events = {
             view.renderPrestigePackPanel();
             return;
         }
+        const packSource = session.openPack.source || "carried";
         for (let i = 0; i < sel.length; i++) {
             const card = session.openPack.cards[sel[i]];
             if (!card) {
@@ -2469,6 +2608,7 @@ let events = {
             }
             shrineCards.grant(card.key, card.rarity, 1);
             session.gained.push({ key: card.key, rarity: card.rarity });
+            engine.notePrestigeChosenCard(packSource, card);
         }
         if (typeof view !== "undefined" && view.updateCardBonusesTab) {
             view.updateCardBonusesTab();
@@ -2675,6 +2815,24 @@ let events = {
     },
     changeMap: function(mapKey) {
         data.progress.selectedTravelMapKey = mapKey;
+    },
+    switchAtelierSubTab: function(which) {
+        if (!engine.isDrophammerUnlocked()) {
+            return;
+        }
+        data.progress.selectedAtelierSubTab = which === "dropHammer" ? "dropHammer" : "atelier";
+        if (typeof view !== "undefined" && view.updateMenuNumbers) {
+            view.updateMenuNumbers();
+        }
+    },
+    switchHistorySubTab: function(which) {
+        data.progress.selectedHistorySubTab = which === "prestige" ? "prestige" : "combat";
+        if (!data.progress.prestigeHistory || !data.progress.prestigeHistory.length) {
+            data.progress.selectedHistorySubTab = "combat";
+        }
+        if (typeof view !== "undefined" && view.updateHistoryTab) {
+            view.updateHistoryTab();
+        }
     },
     switchTravelSubTab: function(which) {
         data.progress.selectedTravelSubTab = which === "challenges" ? "challenges" : "maps";

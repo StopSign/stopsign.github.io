@@ -173,6 +173,13 @@ let driver = {
     },
     secondPassed: function() {
         data.currentGameState.secondsPassed++;
+        if (data.progress) {
+            if (typeof data.progress.secondsThisResort !== "number") {
+                data.progress.secondsThisResort = data.currentGameState.secondsPassed;
+            } else {
+                data.progress.secondsThisResort++;
+            }
+        }
         if (typeof engine.tryAutobuyUpgrades === "function") {
             engine.tryAutobuyUpgrades();
         }

@@ -2184,6 +2184,20 @@ button {
     margin-bottom: 4px;
 }
 
+.history-prestige-entry {
+    margin-bottom: 14px;
+}
+
+.history-prestige-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.history-prestige-line {
+    font-size: 13px;
+    margin: 2px 0;
+}
+
 .history-talent {
     margin: 0;
     font-size: 11px;
@@ -2275,9 +2289,28 @@ button {
     margin-bottom: 10px;
     box-sizing: border-box;
     overflow: hidden;
+    isolation: isolate;
     --path-end-x: 631px;
     --path-end-y: 328px;
     user-select: none;
+}
+
+.pond-forest-stream {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: visible;
+}
+
+.pond-forest-stream-path {
+    fill: none;
+    stroke: #7ec8e3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
 }
 
 .base-building-label {
@@ -2644,6 +2677,81 @@ button {
     transform: none;
 }
 
+.bonfire-map-art-row {
+    display: block;
+    width: 40px;
+    height: 40px;
+}
+
+.bonfire-map-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.bonfire-map-kiln-art {
+    display: none;
+}
+
+.resort-building-bonfire.has-kiln {
+    display: flex;
+    width: 80px;
+    bottom: 63px;
+}
+
+.resort-building-bonfire.has-kiln .bonfire-map-art-row {
+    display: grid;
+    grid-template-columns: 40px 40px;
+    grid-template-rows: 40px;
+    width: 80px;
+    height: 40px;
+}
+
+.resort-building-bonfire.has-kiln .bonfire-map-kiln-art {
+    display: block;
+}
+
+.kiln-priority-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 4px 0;
+}
+
+.kiln-priority-row--off {
+    opacity: 0.5;
+}
+
+.kiln-priority-handle {
+    cursor: grab;
+    padding: 0 4px;
+    user-select: none;
+}
+
+.kiln-priority-move {
+    min-width: 28px;
+    padding: 0 6px;
+}
+
+.kiln-priority-label,
+.kiln-priority-keep {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.kiln-priority-heat {
+    margin-top: 0;
+}
+
+#bonfireCharcoalRequire.kiln-require-unmet {
+    color: #e05555;
+}
+
 .bonfire-clone-btn--unaffordable {
     border: 2px solid #c62828 !important;
 }
@@ -2735,6 +2843,48 @@ button {
 
 #legendResetExplain {
     margin: 0 0 8px;
+}
+
+.legend-reset-desc {
+    margin-bottom: 8px;
+}
+
+.legend-reset-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    align-items: start;
+}
+
+.legend-reset-header {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.legend-reset-header--pros {
+    color: #2ad15f;
+}
+
+.legend-reset-header--cons {
+    color: #ef4444;
+}
+
+.legend-reset-list {
+    margin: 0;
+    padding-left: 1.2em;
+    list-style: disc;
+}
+
+.legend-reset-list li {
+    margin: 0 0 4px;
+}
+
+.legend-current-stars--ready {
+    color: #2ad15f;
+}
+
+.legend-current-stars--short {
+    color: #ef4444;
 }
 
 .legend-list {
@@ -3039,6 +3189,45 @@ button {
     transform: none;
 }
 
+.atelier-map-art-row {
+    display: block;
+    width: 40px;
+    height: 40px;
+}
+
+.atelier-map-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.atelier-map-wheel-art {
+    display: none;
+    transform-origin: center center;
+    transform: scaleX(-1);
+}
+
+.resort-building-atelier.has-drophammer {
+    display: flex;
+    width: 80px;
+    left: 480px;
+}
+
+.resort-building-atelier.has-drophammer .atelier-map-art-row {
+    display: grid;
+    grid-template-columns: 40px 40px;
+    grid-template-rows: 40px;
+    width: 80px;
+    height: 40px;
+}
+
+.resort-building-atelier.has-drophammer .atelier-map-wheel-art {
+    display: block;
+}
+
 .resort-building-scrollArchives {
     left: 393px;
     bottom: 134px;
@@ -3058,8 +3247,8 @@ button {
 }
 
 .resort-building-stone-pile {
-    left: calc(var(--path-end-x) - 13px);
-    top: calc(var(--path-end-y) + 18px);
+    left: 620px;
+    top: 379px;
     transform: translate(-50%, 0);
     bottom: auto;
     right: auto;
@@ -3745,6 +3934,11 @@ button {
     left: 125px;
 }
 
+.resort-map-progress-bonfire-mana {
+    bottom: 25px;
+    left: 586px;
+}
+
 .resort-map-progress-inn-water {
     bottom: 152px;
     left: 125px;
@@ -3793,8 +3987,8 @@ button {
 }
 
 .resort-map-progress-stone-pile-mana {
-    left: calc(var(--path-end-x) - 13px);
-    top: calc(var(--path-end-y) + 92px);
+    left: 621px;
+    top: 452px;
     transform: translate(-50%, 0);
     bottom: auto;
 }

@@ -8,7 +8,7 @@
 // Then bump CODE_SAVE_VERSION to N+1 so the next save stamps past N.
 // Prefer saveVersion gates over permanent progress flags for new fixups.
 
-const CODE_SAVE_VERSION = 4;
+const CODE_SAVE_VERSION = 6;
 
 let saveFix = {
     STAR_TYPES: ["bronze", "silver", "gold"],
@@ -37,8 +37,57 @@ let saveFix = {
         if (loadedSaveVersion < 4) {
             saveFix.refundRemovedPrestigeCards();
         }
+        if (loadedSaveVersion < 5) {
+            saveFix.migrateBalancePenalties();
+        }
+        if (loadedSaveVersion < 6) {
+            saveFix.refundAlacrityResearch();
+        }
         engine.ensureShardProgress();
         engine.processShardSkillSlotUnlocks();
+    },
+
+    /** Alacrity was offered as a Scroll Archives research. Return that point once. */
+    refundAlacrityResearch: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib || !lib.unlockedSkills || !lib.unlockedSkills.alacrity) {
+            return;
+        }
+        lib.researchesToChoose = (lib.researchesToChoose || 0) + 1;
+        const choices = lib.researchChoices || [];
+        let choicesValid = choices.length > 0;
+        for (let ci = 0; ci < choices.length && choicesValid; ci++) {
+            if (!engine.isScrollArchivesSkillViable(choices[ci])) {
+                choicesValid = false;
+            }
+        }
+        if (!choicesValid) {
+            engine.rollScrollArchivesResearchChoices();
+        }
+        if (typeof events !== "undefined" && events.markNewBaseContent) {
+            events.markNewBaseContent("scrollArchives");
+        }
+    },
+
+    /**
+     * Market level exp now scales ×4. Rewrite the next threshold from the current level
+     * and clear the old noodle topic price. New penalties start at zero.
+     */
+    migrateBalancePenalties: function() {
+        const base = data.progress && data.progress.base;
+        const market = base && base.market;
+        if (market) {
+            const lvl = Math.max(0, Math.floor(market.level || 0));
+            market.expToLevel = 30000 * Math.pow(4, lvl);
+            market.demandTaxExtra = 0;
+        }
+        const bar = base && base.noodleBar;
+        if (bar) {
+            bar.topicPresses = 0;
+        }
+        if (data.progress) {
+            data.progress.legendPenaltyExtra = 0;
+        }
     },
 
     /**
@@ -406,17 +455,17 @@ let saveFix = {
         const cards = shrine.cards;
         const training = cards.spiritTrainingSpotAvailable;
         if (training && (training.epic || 0) > 0 && typeof engine !== "undefined" && engine.grantShrinePack) {
-            engine.grantShrinePack("epic");
+            engine.grantShrinePack("epic", "carried");
         }
         delete cards.spiritTrainingSpotAvailable;
 
         const coins = cards.startingCoins;
         if (coins && typeof engine !== "undefined" && engine.grantShrinePack) {
             if ((coins.rare || 0) > 0) {
-                engine.grantShrinePack("rare");
+                engine.grantShrinePack("rare", "carried");
             }
             if ((coins.epic || 0) > 0) {
-                engine.grantShrinePack("epic");
+                engine.grantShrinePack("epic", "carried");
             }
         }
         delete cards.startingCoins;

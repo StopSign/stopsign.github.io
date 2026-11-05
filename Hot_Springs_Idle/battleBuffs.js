@@ -24,7 +24,7 @@ var battleBuffDefs = {
         label: "Outrage",
         img: "img/outrage.svg",
         kind: "counter",
-        description: "When Outrage is 10 or higher, your next slap or sandal spends 10. That attack's cooldown is halved, and when it lands you gain 50% of the coins that intruder would drop. That coin gain counts for other skills that trigger when coins are gained."
+        description: "When Outrage is 10 or higher, your next slap or sandal spends 10. That attack's cooldown is 75% of normal, and when it lands you gain 25% of the coins that intruder would drop. That coin gain counts for other skills that trigger when coins are gained."
     },
     malice: {
         key: "malice",
@@ -158,8 +158,8 @@ var battleBuffs = {
             const cap = battleBuffs.getOutrageCap();
             const ready = counter >= 10;
             bottomRight = intToString(counter, 1);
-            topRight = ready ? "/2" : "";
-            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + The Orb level)<br>${ready ? "Next slap or sandal spends 10: cooldown halved, and that hit pays 50% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
+            topRight = ready ? "75%" : "";
+            tooltipExtra = `Counter: ${round2(counter)}<br>Cap: ${round2(cap)} (10 + The Orb level)<br>${ready ? "Next slap or sandal spends 10: cooldown at 75%, and that hit pays 25% of the target's kill coins." : "At 10 or more, the next slap or sandal spends 10."}`;
         } else if (key === "fakeTears") {
             const counter = entry.counter || 0;
             const whole = battleBuffs.getFakeTearsWhole(counter);

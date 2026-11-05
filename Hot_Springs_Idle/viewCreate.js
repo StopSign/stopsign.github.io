@@ -368,14 +368,21 @@ let createView = {
                         : "a quarter of the Orb level";
                     html += "<p>Each density adds 500 base mana cost and +10% base Aud and ego damage. The maximum is " + densityPhrase + ", if that cost is affordable.</p>";
                 }
-                if (bf && bf.tendTheFlameUnlocked) {
+                if (bf && bf.kilnBuilt) {
+                    html += "<p>The Kiln priority list decides what assigned workers do, from the top. Unchecked rows are skipped. Bring Wood and Bring Hardwood can keep a reserve at the source. Hardwood hauled to the kiln uses the Fox Den carry amount.</p>";
+                    html += "<p>Build Charcoal Pit moves hardwood into the pit. Ten pit wood makes one charcoal when heat is at least 400 and the kiln has at least 100 mana. That spends 100 mana and gives one Ash. Stored charcoal feeds the fire while heat is under the heat box, up to 5 a second, at 50 heat each before the heat card.</p>";
+                } else if (bf && bf.tendTheFlameUnlocked) {
                     html += "<p>Fire tending: assigned carriers skip wood and coal trips once heat reaches the number beside Only bring wood or coal while heat is below.</p>";
                 }
                 if (bf && bf.tendTheFlameUnlocked && hs && (hs.fireSpiritsBought || 0) >= 1) {
                     html += "<p>Fire spirits at the bonfire gain √(excess heat / 10) / 10 exp per second. Excess heat is bonfire heat minus the power of the fire spirits assigned there.</p>";
                 }
                 if (engine.isMarketBuilt()) {
-                    html += "<p>Carriers bring coal from the Market before wood. Each coal gives 5 times the heat of wood.</p>";
+                    if (bf && bf.kilnBuilt) {
+                        html += "<p>Each coal gives 5 times the heat of wood.</p>";
+                    } else {
+                        html += "<p>Carriers bring coal from the Market before wood. Each coal gives 5 times the heat of wood.</p>";
+                    }
                 }
                 return html;
             },
@@ -387,7 +394,9 @@ let createView = {
                 if (bf && bf.denseClonesUnlocked) {
                     keys.push("density");
                 }
-                if (bf && bf.tendTheFlameUnlocked) {
+                if (bf && bf.kilnBuilt) {
+                    keys.push("kiln");
+                } else if (bf && bf.tendTheFlameUnlocked) {
                     keys.push("fireTending");
                 }
                 if (bf && bf.tendTheFlameUnlocked && hs && (hs.fireSpiritsBought || 0) >= 1) {
@@ -528,7 +537,7 @@ let createView = {
             "resortInfo_hiddenSpring",
             function() {
                 let html = "<p>A quiet spring above the resort. Spirits are summoned here and sent out to their work sites.</p>";
-                html += "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. This trip uses the Okami, and it pauses her current path job.</p>";
+                html += "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. Okami Stone Bonus then adds 10% per rare card and 25% per epic card, and that total is rounded up. This trip uses the Okami, and it pauses her current path job.</p>";
                 if (engine.isBuildingManaUnlocked("hiddenSpring")) {
                     html += "<p>Send Mana Clone costs 2000 mana plus the mana deposited, up to this spring's remaining capacity. It uses the Okami the same way.</p>";
                 }
@@ -611,7 +620,7 @@ let createView = {
                 } else if (kind === "fire") {
                     html += "<p>At the Bonfire, a fire spirit gains √(excess heat / 10) / 10 exp per second. Excess heat is bonfire heat minus the power of fire spirits assigned there.</p>";
                     html += "<p>At the Atelier, every 60 seconds a fire spirit smelts floor(√effective power) ore into bars. After Larger Forge, the batch is ceil(√effective power × (1 + 0.5 per Larger Forge)). Exp equals bars smelted times 3.</p>";
-                    html += "<p>On a fire launcher, a fire spirit restores embers from effective spirit power and fires when a droplet is in range. Exp per hit equals heat per strike divided by 5.</p>";
+                    html += "<p>On a fire launcher, a fire spirit restores embers from effective spirit power and fires when a droplet is in range. The Long-Range Launcher grants 0.5 exp per hit. Other launchers grant exp per hit equal to heat per strike divided by 5.</p>";
                 } else if (kind === "plant") {
                     html += "<p>At the Bamboo Forest, a plant spirit adds its effective spirit power to that stalk's base chips, and gains 1 exp each time a chip regrows in that column.</p>";
                 }
@@ -656,7 +665,7 @@ let createView = {
                 let html = "<p>A map unlocks when the previous map has a bronze star.</p>";
                 html += "<p>Clearing a map's enemies through one full cycle earns the next star, then the clone continues at higher difficulty. After each star within the map, the enemies spawn over again in the same pattern, but x4 stronger each time, giving x2 coins and exp.Bronze is x4 enemy strength and x2 coins and exp.</p>";
                 html += "<p>A map's coin total is split across its waves by difficulty, then across the intruders in that wave. Each intruder's base coins round up. Silver pays twice that base, and gold pays twice again.</p>";
-                html += "<p>Stars can be assigned to in the Skills tab to grant them more exp gain. Each star also makes Inscribing in the Scroll Archives better, and makes x1.1 more shards drop in all maps.</p>";
+                html += "<p>Stars can be assigned to in the Skills tab to grant them more exp gain. Each star also makes Inscribing in the Scroll Archives better, and makes x1.2 more shards drop in all maps.</p>";
                 if (engine.isShardLootUnlocked()) {
                     html += "<p>Each kill can drop shards. The chance pool for the current star cycle is 100% on bronze, 200% on silver, and 300% on gold. That pool is split across the map's waves by their difficulty and wave enemy count. The Shard Drop Amount increases per map, and can be increased through upgrades. Shards spend themselves on the next skill slot.</p>";
                 }
@@ -866,8 +875,26 @@ let createView = {
                     <div id="${buildingKey}AllowCarriersMana_row" class="base-row" style="display:none"><label><input type="checkbox" id="${buildingKey}AllowCarriersMana_chk" onchange="events.toggleBuildingAllowCarriersMana('${buildingKey}', this.checked)"> Allow carriers to bring mana</label></div>
                     ${explainText ? `<div id="${buildingKey}ManaExplain_row" class="base-row muted-text" style="display:none">${explainText}</div>` : ""}`;
         };
+        const htmlBonfirePriorityRow = function(key, label, extras) {
+            return `<div id="bonfirePriority_${key}" class="kiln-priority-row" data-priority-key="${key}" ondragover="events.bonfirePriorityDragOver(event)" ondrop="events.bonfirePriorityDrop(event, '${key}')">
+                <span class="kiln-priority-handle" draggable="true" ondragstart="events.bonfirePriorityDragStart(event, '${key}')" ondragend="events.bonfirePriorityDragEnd()" title="Drag to reorder">=</span>
+                <button type="button" class="tab-button kiln-priority-move" onclick="events.moveBonfirePriority('${key}', -1)">^</button>
+                <button type="button" class="tab-button kiln-priority-move" onclick="events.moveBonfirePriority('${key}', 1)">v</button>
+                <label class="kiln-priority-label"><input type="checkbox" id="bonfirePriorityUse_${key}" checked onchange="events.toggleBonfirePriorityUse('${key}', this.checked)"> ${label}</label>
+                <span id="bonfirePriorityHeat_${key}" class="muted-text kiln-priority-heat"></span>
+                ${extras || ""}
+            </div>`;
+        };
+        const htmlBonfireKeepInput = function(key) {
+            return `<label class="kiln-priority-keep">Keep at source: <input type="number" id="bonfireKeep_${key}" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfirePriorityKeep('${key}', this.value)"></label>`;
+        };
         const htmlBonfirePanel = function() {
             return `
+                <div id="bonfireSubTabs" class="row-buttons row-buttons-wrap" style="display:none">
+                    <button type="button" id="bonfireSubTab_clone" class="tab-button" onclick="events.switchBonfireSubTab('clone')">Clone Management</button>
+                    <button type="button" id="bonfireSubTab_kiln" class="tab-button" onclick="events.switchBonfireSubTab('kiln')">Kiln</button>
+                </div>
+                <div id="bonfireClonePane">
                 <div id="bonfireCloneSettings_row" class="base-row" style="display:none">Current settings: <span id="bonfireCloneSettings_map"></span> · Density <span id="bonfireCloneSettings_density">0</span></div>
                 <button type="button" id="base_bonfire_clone_btn" class="tab-button bonfire-clone-btn" onclick="events.startBonfireClone()"><span id="base_bonfire_clone_prefix">Create a clone for</span> <span id="base_bonfire_mana_cost">0 mana</span></button>
                 <div id="bonfireApplyLiveSettings_row" class="base-row" style="display:none"><label><input type="checkbox" id="bonfireApplyLiveSettings_chk" onchange="events.toggleBonfireApplyLiveSettings(this.checked)"> Apply setting changes to the next clone</label></div>
@@ -888,6 +915,22 @@ let createView = {
                 <div id="bonfireStartWithFullMana_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireStartWithFullMana_chk" onchange="events.toggleVentingSurplus(this.checked)"> Start when full Mana</label>
                 </div>
+                </div>
+                <div id="bonfireKilnPane">
+                <div id="bonfireKilnControls" style="display:none">
+                    <div id="bonfireKilnHeat_row" class="base-row">Bring resources when heat is below <input type="number" id="bonfireKilnHeatCap" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireKilnHeatCap(this.value)"></div>
+                    <div id="bonfirePriorityList">
+                        ${htmlBonfirePriorityRow("coal", "Bring Coal")}
+                        ${htmlBonfirePriorityRow("wood", "Bring Wood", htmlBonfireKeepInput("wood"))}
+                        ${htmlBonfirePriorityRow("hardwood", "Bring Hardwood for Charcoal", htmlBonfireKeepInput("hardwood"))}
+                        ${htmlBonfirePriorityRow("charcoalPit", "Build Charcoal Pit")}
+                    </div>
+                    <div id="bonfireKilnHardwood_row" class="base-row">Hardwood: <span id="bonfireKilnHardwood">0</span> <label class="kiln-priority-keep">Stop at: <input type="number" id="bonfireHardwoodStop" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireHardwoodStop(this.value)"></label></div>
+                    <div id="bonfireCharcoalPitProg" class="prog-track game-progress-track" style="display:none"><div id="bonfireCharcoalPitFill" class="prog-fill"></div></div>
+                    <div id="bonfireCharcoalLine" class="base-row">Charcoal Pit Wood: <span id="bonfirePitWood">0</span> | Charcoal produced: <span id="bonfireCharcoalRate">0</span>/s | Charcoal: <span id="bonfireCharcoalStock">0</span></div>
+                    <div id="bonfireCharcoalRequire" class="base-row muted-text">Requires a heat of 400 and 100 mana to burn charcoal</div>
+                    ${buildingManaRowHtml("bonfire")}
+                </div>
                 <div id="bonfireFireTending_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireFireTending_chk" checked onchange="events.toggleBonfireFireTending(this.checked)"> Only bring wood or coal while heat is below</label>
                     <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="55" onchange="events.setBonfireFireTendingCap(this.value)">
@@ -895,8 +938,11 @@ let createView = {
                 <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power (base + training): <span id="bonfireFireSpiritPower">0</span></div>
                 <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Wood carry</span>: <span id="bonfireWoodCarry"></span> per trip</div>
                 <div id="bonfireHeatPerFuel_row" class="base-row" style="display:none">1 wood gives <span id="bonfireHeatPerWood"></span> heat<span id="bonfireHeatPerCoalPart" style="display:none"> | 1 coal gives <span id="bonfireHeatPerCoal"></span> heat</span></div>
-                <div id="bonfireCoal_row" class="base-row" style="display:none">Coal: <span id="bonfireCoalText">0</span></div>
+                <div id="bonfireCoal_row" class="base-row" style="display:none"><span id="bonfireCoalPart">Coal: <span id="bonfireCoalText">0</span></span><span id="bonfireAshSep" style="display:none"> | </span><span id="bonfireAshPart" style="display:none">${resortData.resourceIconHtml("ash")} Ash: <span id="bonfireAshText">0</span></span></div>
+                </div>
+                <div id="bonfireUpgradesPane">
                 ${resortUpgradeRowsHtml("bonfire")}
+                </div>
             `;
         };
         const htmlShrineMilestoneHeading = function(text, split) {
@@ -970,16 +1016,16 @@ let createView = {
                         ${htmlShrineMilestoneHeading("Capped Milestones", false)}
                         ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
+                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
                         ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
                         ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
                         ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
                         ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
                         ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
                         ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
-                        ${htmlShrineMilestoneHeading("One Time Milestones", true)}
-                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
                         ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
                         ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
+                        ${htmlShrineMilestoneHeading("One Time Milestones", true)}
                         ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
@@ -998,14 +1044,38 @@ let createView = {
                     <div id="shrineClassRow" class="shrine-class-row">${classBtns}</div>
                     <div id="shrineClassDemoNote" class="shrine-class-demo-note" style="display:none">Other classes not available in the demo. They will be available in the Steam version (WIP)!</div>
                 </div>
-                <div id="legendResetExplain" class="base-row muted-text">A running battle ends. This resets stars and travel maps back to the first map, shards, skill slots, researched skills except ones locked by Skill Echoes, skill talent, research progress, inscription rows except those kept by Language Echoes, the Orb's level and base mana, Expand Orb, Spin Currents, spirit levels, shrine level, mine depth, mine dirt, and bamboo growth. The mana cost below is spent, then mana fills to its new maximum. Divinity is not reset, and its maximum increases from your talent. Tips, kitsune you already found, spirit training, mine stone, and mine ore stay. Card and market research bonuses stay. A Legend is written only if the next Legend exists and you have enough stars.<br>You may want to build up some coins before resetting.</div>
-                <div id="legendRequirementText" class="base-row"></div>
+                <div id="legendResetExplain" class="base-row">
+                    <div class="legend-reset-desc">Write your Legend, resetting the resort aside from the Shrine and Path, but gaining unique bonuses per Legend Written - if you have enough stars! Requires a mana cost, but the star minimum is not required to do the Prestige.</div>
+                    <div class="legend-reset-cols">
+                        <div class="legend-reset-col">
+                            <div class="legend-reset-header legend-reset-header--pros">Pros</div>
+                            <ul class="legend-reset-list">
+                                <li>Gain unique bonuses from the next Legend, if you have the star minimum</li>
+                                <li>Increased max divinity based on Total Talent Levels</li>
+                                <li>Keep the Shrine, its upgrades and level, and current and max divinity</li>
+                                <li>Keep the Path and its upgrades</li>
+                                <li>Keep Tips on skills</li>
+                                <li>Keep Legend progress and the Legend Penalty</li>
+                                <li>Keep card bonuses and packs</li>
+                            </ul>
+                        </div>
+                        <div class="legend-reset-col">
+                            <div class="legend-reset-header legend-reset-header--cons">Cons</div>
+                            <ul class="legend-reset-list">
+                                <li>Reset the Resort's non-shrine buildings, upgrades, and resources</li>
+                                <li>Reset Skills, Maps, Stars, and Kitsune</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="legendRequirementText" class="base-row"><span id="legendRequirementPrefix"></span><span id="legendCurrentStars"></span></div>
                 <div id="legendStarWarning" class="shrine-move-pack-error" style="display:none">Not enough stars to reach the next milestone. Are you sure?</div>
                 <div id="legendWipWarning" class="shrine-move-pack-error" style="display:none">The next Legend does not exist yet (WIP). Legend will not increase.</div>
                 <div id="shrineMoveMountainRow" class="base-row shrine-move-row">
                     <label class="shrine-move-confirm"><input type="checkbox" id="shrineMoveConfirm_chk" onchange="events.toggleShrineMoveConfirm(this.checked)"> Confirm</label>
-                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.reduceFame()" disabled>Fade into Legend (Combat Prestige)</button>
+                    <button type="button" id="shrineMoveMountainBtn" class="tab-button" onclick="events.reduceFame()" disabled>Fade into Legend (Prestige)</button>
                 </div>
+                <div id="legendPenalty_row" class="base-row"></div>
                 <div id="legendMaxDivinityGain" class="base-row">Max Divinity to gain: <span id="legendMaxDivinityGainValue">0</span> <span class="muted-text">(Total Talent Levels^1.2)</span></div>
                 <div id="legendList" class="legend-list"></div>
             `;
@@ -1150,6 +1220,7 @@ let createView = {
                     <span id="base_market_traders_workers_label" class="base-worker-cap-label muted-text"></span>
                 </div>
                 <div id="marketTradeStatus_row" class="base-row muted-text"></div>
+                <div id="marketDemandTax_row" class="base-row muted-text"></div>
                 ${htmlMarketTradeRows()}
             `;
         };
@@ -1213,7 +1284,7 @@ let createView = {
                         <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore</div>
                         <div id="spiritInfoPebbleEtas" class="base-row" style="display:none"></div>
                         <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
-                        <div id="spiritInfoAutoReturnMineRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoAutoReturnMine_chk" checked onchange="events.toggleSpiritAutoReturnToMine(this.checked)"> Return to the Mine when there is no stone or ore to send as pebbles</label></div>
+                        <div id="spiritInfoAutoReturnMineRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoAutoReturnMine_chk" checked onchange="events.toggleSpiritAutoReturnToMine(this.checked)"> Return to the Mine when there are no resources to send with pebbles</label></div>
                     </div>
                     <div id="spiritInfoWaterExtras" style="display:none">
                         <div class="base-row">Water volume: <span id="spiritInfoWaterVolume"></span></div>
@@ -1288,7 +1359,7 @@ let createView = {
                             <div id="noodleBarHotWaterFill" class="prog-fill prog-fill-water"></div>
                             <div id="noodleBarHotWaterText" class="game-progress-bar-label">Hot Water: 0/1000</div>
                         </div>
-                        <div id="noodleBarHotWaterRequire" class="muted-text">Requires 100L of 65C</div>
+                        <div id="noodleBarHotWaterRequire" class="muted-text">Requires 100L of 65C and 1 Dried Noodles.</div>
                     </div>
                     <div id="noodleBarAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="noodleBarAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('noodleBar', this.checked)"> Allow carriers to bring water</label></div>
                     <div id="noodleBarGuestsEating_row" class="base-row">Guests Eating: <span id="noodleBarGuestsEatingText">0</span></div>
@@ -1338,12 +1409,19 @@ let createView = {
                 </div>
                 <div id="resortInfo_atelier" class="resort-info-section">
                     <div class="base-info-title">Atelier</div>
-                    <div class="base-row muted-text">Upgrades for the different buildings.</div>
-                    <div id="atelierOreBars_row" style="display:none">
-                        <div class="base-row">${resortData.resourceIconHtml("ore")} Ore: <span id="atelierInfoOre"></span></div>
-                        <div class="base-row">${resortData.resourceIconHtml("bars")} Bars: <span id="atelierInfoBars"></span></div>
+                    <div id="atelierSubTabs" class="travel-subtabs-row" style="display:none">
+                        <button type="button" id="atelierSubTab_atelier" class="tab-button travel-subtab-btn" onclick="events.switchAtelierSubTab('atelier')">Atelier</button>
+                        <button type="button" id="atelierSubTab_dropHammer" class="tab-button travel-subtab-btn" onclick="events.switchAtelierSubTab('dropHammer')">Drop Hammer</button>
                     </div>
-                    ${resortUpgradeRowsHtml("atelier")}
+                    <div id="atelierPane_atelier">
+                        <div class="base-row muted-text">Upgrades for the different buildings.</div>
+                        <div id="atelierOreBars_row" style="display:none">
+                            <div class="base-row">${resortData.resourceIconHtml("ore")} Ore: <span id="atelierInfoOre"></span></div>
+                            <div class="base-row">${resortData.resourceIconHtml("bars")} Bars: <span id="atelierInfoBars"></span></div>
+                        </div>
+                        ${resortUpgradeRowsHtml("atelier")}
+                    </div>
+                    <div id="atelierPane_dropHammer" style="display:none"></div>
                 </div>
                 <div id="resortInfo_mage_tower" class="resort-info-section">
                     <div class="base-info-title">The Orb</div>
@@ -1370,7 +1448,7 @@ let createView = {
                 </div>
                 <div id="resortInfo_bambooForest" class="resort-info-section">
                     <div class="base-info-title">Bamboo Forest</div>
-                    <div class="base-row">Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
+                    <div class="base-row">Bamboo Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
                     <div class="base-row">Chop Power: <span id="bambooChopPower"></span></div>
                     <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span></div>
                     <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span></div>
@@ -2058,7 +2136,7 @@ let createView = {
             "bambooForestInfoChips", "bambooForestInfoWood", "bambooForestMapDisplay",
             "base_bambooForest_assign_one_btn", "base_bambooForest_assign_ten_btn", "base_bambooForest_assign_all_btn", "base_bambooForest_unassign_one_btn", "base_bambooForest_unassign_ten_btn", "base_bambooForest_unassign_all_btn", "base_bambooForest_workers_label", "base_bambooForest_worker_prod_text", "base_bambooForest_worker_prod_wrap", "base_bambooForest_worker_prog_fill", "base_bambooForest_assign_okami_btn",
             "base_foxDen_assign_one_btn", "base_foxDen_assign_ten_btn", "base_foxDen_assign_all_btn", "base_foxDen_unassign_one_btn", "base_foxDen_unassign_ten_btn", "base_foxDen_unassign_all_btn", "base_foxDen_workers_label", "base_foxDen_assign_okami_btn",
-            "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "constructionMouseTip", "foxDenQueueTip", "baseResortMap",
+            "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "constructionMouseTip", "foxDenQueueTip", "baseResortMap", "pondForestStream", "pondForestStreamPath",
             "pathSegmentStateText", "base_path_select_next_row", "base_path_select_next_btn", "base_path_remove_rocks_row", "base_path_remove_rocks_btn", "base_path_remove_rocks_extra", "base_path_add_railing_row", "base_path_add_railing_btn", "base_path_add_railing_extra", "base_torii_call_for_ally_row", "base_torii_call_for_ally_btn", "base_torii_call_for_ally_extra", "okamiTravelToken", "okamiPathWeaveToken",
             "baseBuildingInfoClose", "baseBuildingInfoHideToggle", "baseBuildingInfoHeaderBtns",
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
@@ -2094,7 +2172,7 @@ let createView = {
             "foxDenAutoAddStairs_row", "foxDenAutoAddStairs_chk", "foxDenAutoAddStairs_wait",
             "foxDenAutoAddLanterns_row", "foxDenAutoAddLanterns_chk", "foxDenAutoAddLanterns_wait",
             "foxDenCarry_resource", "foxDenCarryMana_row", "foxDenCarry_mana",
-            "mapInnManaProgressWrap", "mapInnManaProgressFill",
+            "mapInnManaProgressWrap", "mapInnManaProgressFill", "bonfireMapDisplay", "mapBonfireManaProgressWrap", "mapBonfireManaProgressFill",
             "mapInnWaterProgressWrap", "mapInnWaterProgressFill",
             "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill",
             "mapNoodleWaterProgressWrap", "mapNoodleWaterProgressFill",
@@ -2104,11 +2182,11 @@ let createView = {
             "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill",
             "guestStarBeadsRange", "guestStarBeadsMin", "guestStarBeadsMax", "guestStarBeadsRangeNote",
             "kitsuneAssignTooltip", "kitsuneAssignTooltipList",
-            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay",
+            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay",
             "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill", "mapShrineProgressWrap", "mapShrineProgressFill",
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
-            "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row",
+            "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row", "marketDemandTax_row",
             "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
@@ -2129,7 +2207,7 @@ let createView = {
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
-            "legendResetExplain", "legendRequirementText", "legendStarWarning", "legendWipWarning", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
+            "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
             "shrineKarmaRateText", "shrineDivinityMultText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
@@ -2150,7 +2228,15 @@ let createView = {
             "bonfireDenseClones_inc_one", "bonfireDenseClones_inc_ten", "bonfireDenseClones_inc_all",
             "bonfireAutoRetry_row", "bonfireAutoRetry_chk",
             "bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk",
-            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalText",
+            "bonfireSubTabs", "bonfireSubTab_clone", "bonfireSubTab_kiln", "bonfireClonePane", "bonfireKilnPane", "bonfireKilnControls", "bonfireUpgradesPane",
+            "bonfireKilnHeatCap", "bonfirePriorityList",
+            "bonfirePriority_coal", "bonfirePriority_wood", "bonfirePriority_hardwood", "bonfirePriority_charcoalPit",
+            "bonfirePriorityUse_coal", "bonfirePriorityUse_wood", "bonfirePriorityUse_hardwood", "bonfirePriorityUse_charcoalPit",
+            "bonfirePriorityHeat_coal", "bonfirePriorityHeat_wood", "bonfirePriorityHeat_hardwood", "bonfirePriorityHeat_charcoalPit",
+            "bonfireKeep_wood", "bonfireKeep_hardwood", "bonfireKilnHardwood", "bonfireHardwoodStop",
+            "bonfireCharcoalPitProg", "bonfireCharcoalPitFill", "bonfireCharcoalLine", "bonfirePitWood", "bonfireCharcoalRate", "bonfireCharcoalStock", "bonfireCharcoalRequire",
+            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalPart", "bonfireCoalText", "bonfireAshSep", "bonfireAshPart", "bonfireAshText",
+            "bonfireManaRow", "bonfireFillMana_btn", "bonfireManaProgressWrap", "bonfireManaFill", "bonfireManaAmount", "bonfireManaCap", "bonfireAllowCarriersMana_row", "bonfireAllowCarriersMana_chk",
             "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
             "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",
             "base_bonfire_dense_clones_row", "base_bonfire_dense_clones_btn", "base_bonfire_dense_clones_extra",
@@ -2165,6 +2251,7 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "skillsList", "historyList",
+            "historySubTabs", "historySubTab_combat", "historySubTab_prestige", "historyPane_combat", "historyPane_prestige", "prestigeHistoryList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"

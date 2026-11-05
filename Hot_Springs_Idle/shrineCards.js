@@ -562,18 +562,18 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         name: "Okami Stone Bonus",
         class: "none",
         category: "buff",
-        rarity: { rare: 3, epic: 1 },
+        rarity: { rare: 5, epic: 2 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { okamiStoneFlat: 1 };
-            if (rarity === "epic") return { okamiStoneFlat: 3 };
+            if (rarity === "rare") return { okamiStoneAdd: 0.10 };
+            if (rarity === "epic") return { okamiStoneAdd: 0.25 };
             return {};
         },
         effectText: function(rarity) {
             const e = this.getEffect(rarity);
-            return "Clear Rocks / Collect Stone: +" + (e.okamiStoneFlat || 0) + " stone";
+            return "Okami Collect Stone from Hidden Spring: +" + Math.round((e.okamiStoneAdd || 0) * 100) + "%";
         },
         totalBonusText: function(totalEffect) {
-            return "Clear Rocks / Collect Stone: +" + (totalEffect.okamiStoneFlat || 0) + " stone";
+            return "Okami Collect Stone from Hidden Spring: +" + Math.round((totalEffect.okamiStoneAdd || 0) * 100) + "%";
         }
     },
     {
@@ -682,10 +682,10 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         },
         effectText: function(rarity) {
             const e = this.getEffect(rarity);
-            return "Bonfire Heat From Wood/Coal: +" + Math.round((e.bonfireHeatAdd || 0) * 100) + "%";
+            return "Bonfire Heat From Burnable Resources: +" + Math.round((e.bonfireHeatAdd || 0) * 100) + "%";
         },
         totalBonusText: function(totalEffect) {
-            return "Bonfire Heat From Wood/Coal: +" + Math.round((totalEffect.bonfireHeatAdd || 0) * 100) + "%";
+            return "Bonfire Heat From Burnable Resources: +" + Math.round((totalEffect.bonfireHeatAdd || 0) * 100) + "%";
         }
     },
     {
@@ -850,7 +850,7 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         category: "buff",
         rarity: { rare: 4 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { marketTradeDurationReduceSec: 5 };
+            if (rarity === "rare") return { marketTradeDurationReduceSec: 10 };
             return {};
         },
         effectText: function(rarity) {
@@ -1079,9 +1079,6 @@ var shrineCards = {
         }
         cards[key][rarity] = (cards[key][rarity] || 0) + amount;
         shrineCards.invalidateAggregatedEffects();
-        if (key === "bambooBaseChips" && typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
-            engine.refreshBambooForestBaseChips();
-        }
         if (key === "baseAudacity" || key === "baseEgoDamage") {
             if (typeof initialize !== "undefined" && initialize.calcPlayerStats) {
                 initialize.calcPlayerStats(false);
@@ -1151,7 +1148,7 @@ var shrineCards = {
         }
     ],
     legendStarRequirement: function(legendsWritten) {
-        return 8 + 2 * Math.max(0, Math.floor(legendsWritten || 0));
+        return 9 + 3 * Math.max(0, Math.floor(legendsWritten || 0));
     },
     hasNextLegend: function(legendsWritten) {
         const idx = Math.max(0, Math.floor(legendsWritten || 0));

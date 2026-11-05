@@ -27,6 +27,8 @@ let isSteam = false; //SET FOR COMMIT
 // let isDebug = false; //SET FOR COMMIT
 let isDebug = true;
 let showPathDebug = false;
+let debugPondStreamMaxWidth = false;
+let showDrophammer = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
 function debug() {
@@ -235,7 +237,7 @@ function debugGrantMarket(credit, level) {
     market.credit = credit !== undefined ? credit : 20000;
     market.level = lvl;
     market.exp = 0;
-    market.expToLevel = 30000 * Math.pow(3, lvl);
+    market.expToLevel = 30000 * Math.pow(4, lvl);
     market.fertilizer = 500;
     market.coal = 500;
     market.soap = 50;
@@ -309,9 +311,6 @@ function debugGrantMaxShrineCards() {
         data.gameSettings.prestigePackOpen = false;
     }
     shrineCards.applyPrestigeStartBonuses();
-    if (typeof engine !== "undefined" && engine.refreshBambooForestBaseChips) {
-        engine.refreshBambooForestBaseChips();
-    }
     const archives = data.progress.base && data.progress.base.scrollArchives;
     if (archives && (archives.researchesToChoose || 0) > 0 && !(archives.researchChoices && archives.researchChoices.length)) {
         if (typeof engine !== "undefined" && engine.rollScrollArchivesResearchChoices) {
@@ -647,6 +646,12 @@ let initials = {
             mapStars: {},
             mapStarsEver: {},
             legendsWritten: 0,
+            legendPenaltyExtra: 0,
+            secondsThisResort: 0,
+            prestigeHistory: [],
+            selectedHistorySubTab: "combat",
+            packSourceQueues: { common: [], rare: [], epic: [] },
+            prestigeRunCards: { milestone: [], bought: [] },
             mapWorkersFound: {},
             currentClassKey: "none",
             pendingClassKey: "",
@@ -816,8 +821,17 @@ let initialize = {
         if (typeof engine.ensureInscriptionState === "function") {
             engine.ensureInscriptionState();
         }
-        if ((lib.researchesToChoose || 0) > 0 && !lib.researchChoices.length) {
-            engine.rollScrollArchivesResearchChoices();
+        if ((lib.researchesToChoose || 0) > 0) {
+            const choices = lib.researchChoices || [];
+            let choicesValid = choices.length > 0;
+            for (let ci = 0; ci < choices.length && choicesValid; ci++) {
+                if (!engine.isScrollArchivesSkillViable(choices[ci])) {
+                    choicesValid = false;
+                }
+            }
+            if (!choicesValid) {
+                engine.rollScrollArchivesResearchChoices();
+            }
         }
     },
     initializeInn: function() {
@@ -1266,6 +1280,9 @@ let initialize = {
         }
         if (bonfireProg.autoRetryEnabled && !bonfireProg.autoRetryUnlocked) {
             bonfireProg.autoRetryUnlocked = true;
+        }
+        if (typeof engine !== "undefined" && engine.ensureBonfireKilnPriority) {
+            engine.ensureBonfireKilnPriority(bonfireProg);
         }
     },
     initializeMageTower: function() {

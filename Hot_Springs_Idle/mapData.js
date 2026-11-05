@@ -50,7 +50,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(7, "scoundrel", 40000, 270, 2, 1),
             ],
             coinDropAmount: 600,
-            shardDropAmount: 3
+            shardDropAmount: 4
         }),
         mapData.createMap({
             version: 0,
@@ -69,7 +69,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(2, "scoundrel", 56000, 400, 2, 1),
             ],
             coinDropAmount: 1000,
-            shardDropAmount: 5
+            shardDropAmount: 8
         }),
         mapData.createMap({
             version: 0,
@@ -90,7 +90,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(1, "lecher", 49000, 200, 2.6, 1),
             ],
             coinDropAmount: 1750,
-            shardDropAmount: 8
+            shardDropAmount: 15
         }),
         mapData.createMap({
             version: 0,
@@ -108,7 +108,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(7, "scoundrel", 50000, 100, 2.2, 1),
             ],
             coinDropAmount: 3000,
-            shardDropAmount: 13
+            shardDropAmount: 30
         }),
         mapData.createMap({
             version: 0,
@@ -116,7 +116,7 @@ mapData.getDefaultMaps = function() {
             name: "The Gawk Squad",
             description: "A gang known for forming small groups and catcalling everyone walking by has found a new target. The Okami will stand in their way.",
             seed: 15003,
-            baseDifficulty: 6,
+            baseDifficulty: 7,
             unlocksAfterMapKey: "map_6",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 150, 1, 1),
@@ -129,7 +129,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(2, "lecher", 62000, 300, 2, 1),
             ],
             coinDropAmount: 5000,
-            shardDropAmount: 20
+            shardDropAmount: 60
         }),
         mapData.createMap({
             version: 0,
@@ -137,7 +137,7 @@ mapData.getDefaultMaps = function() {
             name: "Sketch Artists",
             description: "They don't want to touch, only look; their gazes still make the guests uncomfortable. The Okami will show them the error of their ways.",
             seed: 21888,
-            baseDifficulty: 7.5,
+            baseDifficulty: 10,
             unlocksAfterMapKey: "map_7",
             zones: [
                 mapData.createZone(4, "lecher", 0, 200, 1, 1),
@@ -147,7 +147,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(6, "lecher", 48000, 200, 2.2, 1),
             ],
             coinDropAmount: 8000,
-            shardDropAmount: 30
+            shardDropAmount: 100
         }),
         mapData.createMap({
             version: 0,
@@ -155,7 +155,7 @@ mapData.getDefaultMaps = function() {
             name: "Fedora Tippers",
             description: "They tip their hats when they wink and leer, but the illusion of chivalry does not fool the Okami.",
             seed: 21888,
-            baseDifficulty: 10,
+            baseDifficulty: 15,
             unlocksAfterMapKey: "map_8",
             zones: [
                 mapData.createZone(4, "scoundrel", 0, 175, 1, 1.25),
@@ -167,7 +167,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(1, "lecher", 62000, 200, 2, 0.75),
             ],
             coinDropAmount: 13000,
-            shardDropAmount: 50
+            shardDropAmount: 180
         }),
         mapData.createMap({
             version: 0,
@@ -175,7 +175,7 @@ mapData.getDefaultMaps = function() {
             name: "Catcallers",
             description: "Seeking to whistle at the rumored beauties in the mist, they will take a good beating before giving up.",
             seed: 21888,
-            baseDifficulty: 15,
+            baseDifficulty: 22,
             unlocksAfterMapKey: "map_9",
             zones: [
                 mapData.createZone(3, "scoundrel", 0, 100, 1, 1.5),
@@ -185,7 +185,7 @@ mapData.getDefaultMaps = function() {
                 mapData.createZone(3, "scoundrel", 48000, 100, 2.1, 1.5),
             ],
             coinDropAmount: 2700,
-            shardDropAmount: 80
+            shardDropAmount: 350
         })
 
         //gropers - 1 scoundrel lots of lechers 
@@ -341,5 +341,5 @@ mapData.getMapShardDropAmount = function(mapDef) {
         : 0;
     const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
         ? (shrineCards.getAggregatedEffects().shardDropAmountAdd || 0) : 0;
-    return base * amountMult * Math.pow(1.1, starCount) * (1 + cardAdd);
+    return base * amountMult * Math.pow(1.2, starCount) * (1 + cardAdd);
 };

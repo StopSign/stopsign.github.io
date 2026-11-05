@@ -1022,10 +1022,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Everybody's doing it. That's the whole point.\"",
         shortDescription: "More ego damage % per intruder closer than 200 ft.",
         rewardText: function(sk) {
-            return `Reward: +3% (+2% per skill level) ego damage per intruder closer than 200 ft.`;
+            return `Reward: +2% (+1% per skill level) ego damage per intruder closer than 200 ft.`;
         },
         getEffect: function(sk) {
-            return { damageBonusFractionPerEnemy: 0.03 + (sk.level || 0) * 0.02 };
+            return { damageBonusFractionPerEnemy: 0.02 + (sk.level || 0) * 0.01 };
         },
         effectUiSummary: function(sk, e) {
             const close = (typeof engine !== "undefined" && engine.countVisibleIntrudersCloserThan)
@@ -2766,7 +2766,7 @@ let skills = {
     buffDescriptions: {
         "Fury": "Your next strike deals +1% damage per stack. All stacks are consumed when you attack.",
         "Desensitized": "Incoming damage is multiplied by 1 / (1 + 0.03 x stacks). Each stack expires on its own timer.",
-        "Outrage": "When Outrage is 10 or higher, your next slap or sandal spends 10. That attack's cooldown is halved, and when it lands you gain 50% of the coins that intruder would drop. That coin gain counts for other skills that trigger when coins are gained.",
+        "Outrage": "When Outrage is 10 or higher, your next slap or sandal spends 10. That attack's cooldown is 75% of normal, and when it lands you gain 25% of the coins that intruder would drop. That coin gain counts for other skills that trigger when coins are gained.",
         "Malice": "Builds a Malice counter, leading to 10% more damage on the next strike, increasing +10% per 20 stacks. Malice is capped at 10 + Okami's level x 5.",
         "Fake Tears": "Incoming damage is divided by 1 + 0.05 x floor(Fake Tears). Each attack that costs Audacity removes half of floor(Fake Tears), rounded up. Fractions are not spent. Fake Tears is capped at 5 + floor(Orb level / 2).",
         "Clout": "Each stack blocks 1 raw incoming damage before flat and multiplier reductions. Stacks consumed equal damage prevented. Clout cannot exceed your max Audacity."

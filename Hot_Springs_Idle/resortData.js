@@ -29,7 +29,7 @@ var resortData = {
     kitsuneWaterCarryAmount: 50,
     kitsuneWoodCarryAmount: 1,
     manaCarryAmount: 50,
-    manaBuildingKeys: ["inn", "torii", "stonePile"],
+    manaBuildingKeys: ["inn", "torii", "stonePile", "bonfire"],
 
     attributeDisplay: {
         str: { short: "Bru", name: "Brutality" },
@@ -91,7 +91,8 @@ var resortData = {
             rangePx: 90,
             intervalMs: 2000,
             emberCost: 200,
-            heatPerStrike: 3,
+            heatPerStrike: 4,
+            expPerHit: 0.5,
             maxEmbers: 1000,
             projectileDurationMs: 1050,
             mapPos: { x: 325, y: 242 }
@@ -141,7 +142,7 @@ var resortData = {
             key: "fertilizer",
             name: "Fertilizer",
             creditCost: 50,
-            seconds: 30,
+            seconds: 60,
             yieldAmount: 100,
             note: "Bamboo grows twice as fast while fertilizer is available."
         },
@@ -149,7 +150,7 @@ var resortData = {
             key: "coal",
             name: "Coal",
             creditCost: 100,
-            seconds: 30,
+            seconds: 60,
             yieldAmount: 20,
             note: "Bonfire carriers bring coal before wood; each coal gives 5x the heat."
         },
@@ -157,7 +158,7 @@ var resortData = {
             key: "soap",
             name: "Soap",
             creditCost: 100,
-            seconds: 30,
+            seconds: 60,
             yieldAmount: 10,
             note: "A hot bath uses one soap to double its Star Bead bonus (30% becomes 60%)."
         },
@@ -165,7 +166,7 @@ var resortData = {
             key: "towels",
             name: "Towels",
             creditCost: 200,
-            seconds: 30,
+            seconds: 60,
             yieldAmount: 5,
             minMarketLevel: 2,
             note: "A hot bath uses one towel for +100 restfulness."
@@ -174,7 +175,7 @@ var resortData = {
             key: "driedNoodles",
             name: "Dried Noodles",
             creditCost: 100,
-            seconds: 30,
+            seconds: 60,
             yieldAmount: 10,
             requiresBuilding: "noodleBar",
             note: "Guests eat these at the Noodle Bar."
@@ -189,11 +190,15 @@ var resortData = {
         const src = key === "starBeads" ? "img/starBead.svg"
             : key === "kitsune" ? "img/foxWorker.svg"
             : key === "wood" ? "img/wood.svg"
+            : key === "hardwood" ? "img/hardwood.svg"
+            : key === "ash" ? "img/ash.svg"
             : key === "stone" ? "img/stone.svg"
             : key === "ore" ? "img/ore.svg"
             : key === "bars" ? "img/bars.svg"
             : key === "mana" ? "img/mana.svg"
             : key === "credit" ? "img/credit.svg"
+            : key === "essence" ? "img/essence.svg"
+            : key === "divinity" ? "img/divinity.svg"
             : "img/coins.svg";
         return `<img class="inline-res-icon" src="${src}" alt="" draggable="false">`;
     },
@@ -274,7 +279,7 @@ var resortData = {
         if (key === "mana" && typeof engine !== "undefined" && engine.getManaCapacity && amount > engine.getManaCapacity()) {
             cls = " cost-amt-unaffordable";
         }
-        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "stone" || key === "ore" || key === "bars" || key === "mana" || key === "credit")
+        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "stone" || key === "ore" || key === "bars" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `<span class="cost-amt${cls}">${intToStringRound(amount)}</span>${icon} ${label}`;
@@ -1186,9 +1191,19 @@ var resortData = {
                 tendTheFlameUnlocked: false,
                 applyLiveSettingsToNextClone: false,
                 startWithFullManaUnlocked: false,
-                startWithFullManaEnabled: false
+                startWithFullManaEnabled: false,
+                kilnBuilt: false,
+                kilnHardwood: 0,
+                charcoalPitWood: 0,
+                charcoal: 0,
+                ash: 0,
+                mana: 0,
+                manaCapacity: 40000,
+                allowCarriersBringMana: false,
+                kilnSubTab: "clone",
+                charcoalPitProgressMs: 0
             },
-            upgradesOrder: ["tendTheFlame", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "plannedGrowthBlessing", "stokeFireSpirit", "startWithFullMana"],
+            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "plannedGrowthBlessing", "stokeFireSpirit", "startWithFullMana", "fillMana"],
             upgrades: {
                 tendTheFlame: {
                     key: "tend_the_flame",
@@ -1209,6 +1224,25 @@ var resortData = {
                         return !!data.progress.base.bonfire.tendTheFlameUnlocked;
                     },
                     soldOutButtonLabel: "Tended"
+                },
+                buildKiln: {
+                    key: "build_kiln",
+                    name: "Build Kiln",
+                    description: "Build a kiln beside the bonfire. Opens Clone Management and Kiln, and workers follow a fuel priority list.",
+                    getCost: function() {
+                        return { stone: 40000, essence: 20000 };
+                    },
+                    weavingTime: 8000,
+                    canBuy: function() {
+                        return !data.progress.base.bonfire.kilnBuilt;
+                    },
+                    onBuy: function() {
+                        engine.completeBuildKiln();
+                    },
+                    upgradeSoldOut: function() {
+                        return !!data.progress.base.bonfire.kilnBuilt;
+                    },
+                    soldOutButtonLabel: "Built"
                 },
                 autoRetry: {
                     key: "retry",
@@ -1383,6 +1417,22 @@ var resortData = {
                         return !!data.progress.base.bonfire.startWithFullManaUnlocked;
                     },
                     soldOutButtonLabel: "Unlocked"
+                },
+                fillMana: {
+                    key: "fill_mana",
+                    name: "Fill Mana",
+                    description: "Okami channels global mana into the kiln reservoir.",
+                    directWeave: true,
+                    cost: {},
+                    canBuy: function() {
+                        return engine.canStartFillMana("bonfire");
+                    },
+                    onBuy: function() {
+                        engine.completeFillMana("bonfire");
+                    },
+                    rowVisible: function() {
+                        return false;
+                    }
                 }
             }
         },
@@ -2009,7 +2059,7 @@ var resortData = {
                     },
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2) && engine.getPebblePayBought() < 5;
+                        return !!((hs && hs.earthSpiritsBought) >= 2) && engine.getPebblePayBought() < 10;
                     },
                     onBuy: function() {
                         data.progress.base.mine.pebblePayBought = engine.getPebblePayBought() + 1;
@@ -2018,7 +2068,7 @@ var resortData = {
                         return `Pebble stone and ore: +${engine.getPebblePayBought() * 20}%`;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getPebblePayBought() >= 5;
+                        return engine.getPebblePayBought() >= 10;
                     },
                     soldOutButtonLabel: "Max pay"
                 },
@@ -2184,7 +2234,7 @@ var resortData = {
                     getCost: function() {
                         const n = data.progress.base.inn.reinforceJointsBought || 0;
                         const mult = Math.pow(2, n);
-                        return { bars: 400 * mult, coins: 6000 * mult };
+                        return { bars: 400 * mult, coins: 12000 * mult };
                     },
                     weavingTime: 180,
                     weavingTimeIncrease: 2,
@@ -2368,8 +2418,8 @@ var resortData = {
                 { key: "characters", name: "Characters", coins: 3, beads: 5, mana: 15, progressStart: 300, rateNum: 1, rateDen: 10, product: "Strokes", target: "strokes" },
                 { key: "words", name: "Words", coins: 5, beads: 10, mana: 20, progressStart: 800, rateNum: 1, rateDen: 50, product: "Characters", target: "characters" },
                 { key: "phrases", name: "Phrases", coins: 8, beads: 15, mana: 25, progressStart: 3000, rateNum: 1, rateDen: 200, product: "Words", target: "words" },
-                { key: "clauses", name: "Clauses", coins: 12, beads: 30, mana: 35, progressStart: 8000, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
-                { key: "sentences", name: "Sentences", coins: 50, beads: 200, mana: 45, progressStart: 50000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
+                { key: "clauses", name: "Clauses", coins: 20, beads: 25, mana: 40, progressStart: 8000, rateNum: 1, rateDen: 600, product: "Phrases", target: "phrases" },
+                { key: "sentences", name: "Sentences", coins: 50, beads: 200, mana: 60, progressStart: 50000, rateNum: 1, rateDen: 1200, product: "Clauses", target: "clauses" },
                 { key: "paragraphs", name: "Paragraphs", coins: 150, beads: 500, mana: 60, progressStart: 100000, rateNum: 1, rateDen: 2400, product: "Sentences", target: "sentences" },
                 { key: "scrolls", name: "Scrolls", coins: 500, beads: 1000, mana: 75, progressStart: 300000, rateNum: 1, rateDen: 3600, product: "Paragraphs", target: "paragraphs" },
                 { key: "codices", name: "Codices", coins: 1000, beads: 2000, mana: 90, progressStart: 1000000, rateNum: 1, rateDen: 6000, product: "Scrolls", target: "scrolls" },
@@ -2400,10 +2450,11 @@ var resortData = {
                 forgeBuilt: false,
                 fireLaunchersBought: 0,
                 formDirtRoadsUnlocked: false,
+                drophammerUnlocked: false,
                 ore: 0,
                 bars: 0
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "mineshaftBeams"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "mineshaftBeams", "unlockDrophammer"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -2793,6 +2844,27 @@ var resortData = {
                         return engine.getMineshaftBeamsBought() >= 5;
                     },
                     soldOutButtonLabel: "Max beams"
+                },
+                unlockDrophammer: {
+                    key: "unlock_drophammer",
+                    name: "Unlock Drophammer",
+                    description: "Build a water wheel beside the Atelier. The stream to the Bamboo Forest turns it.",
+                    cost: { wood: 100, stone: 50 },
+                    weavingTime: 60,
+                    rowVisible: function() {
+                        return typeof showDrophammer !== "undefined" && !!showDrophammer;
+                    },
+                    canBuy: function() {
+                        const atelier = data.progress.base.atelier;
+                        return typeof showDrophammer !== "undefined" && !!showDrophammer && !(atelier && atelier.drophammerUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.atelier.drophammerUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        return !!(data.progress.base.atelier && data.progress.base.atelier.drophammerUnlocked);
+                    },
+                    soldOutButtonLabel: "Unlocked"
                 }
             }
         },
@@ -3565,7 +3637,7 @@ var resortData = {
                     getCost: function() {
                         const n = engine.getNoodleCrossTalkBought();
                         return {
-                            coins: Math.round(20000 * Math.pow(2, n)),
+                            coins: Math.round(80000 * Math.pow(2, n)),
                             starBeads: Math.round(80000 * Math.pow(2, n))
                         };
                     },
@@ -3653,6 +3725,7 @@ var resortData = {
                 exp: 0,
                 expToLevel: 30000,
                 credit: 0,
+                demandTaxExtra: 0,
                 assignedWorkers: 0,
                 assignedTraders: 0,
                 creditCarriers: [],
@@ -3905,7 +3978,7 @@ var resortData = {
                 literacyLessons: {
                     key: "literacy_lessons",
                     name: "Literacy Lessons",
-                    description: "Readers keep more of what they study. Each purchase multiplies research gained by x1.2. Max buyable increases by 3 per Market Level.",
+                    description: "Readers keep more of what they study. Each purchase multiplies inscription gained by x1.1. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
                         const n = engine.getLiteracyLessonsBought();
                         return { credit: Math.round(40000 * Math.pow(1.5, n)) };
@@ -3962,7 +4035,7 @@ var resortData = {
                 },
                 arsonistJournals: {
                     key: "arsonist_journals",
-                    name: "Buy Arsonist Journals",
+                    name: "Buy Hearth Tender Journals",
                     description: "Bonfire carriers learn to stack fuel, increasing the amount they carry per trip.",
                     getCost: function() {
                         const n = engine.getArsonistJournalsBought();
@@ -3982,7 +4055,7 @@ var resortData = {
                     extraInfo: function() {
                         const bought = engine.getArsonistJournalsBought();
                         const cap = resortData.getKitsuneWoodCarryAmount();
-                        return `Wood/Coal carry: ${cap} | Next journal: +${fibonacci(bought)}`;
+                        return `Burnable carry amount: ${cap} | Next journal: +${fibonacci(bought)}`;
                     },
                     rowVisible: function() {
                         return engine.getMarketLevel() >= 1;

@@ -62,7 +62,7 @@
         <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
             <div class="prog-track game-progress-track divinity-progress-track">
                 <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
-                <div class="game-progress-bar-label">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
+                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/divinity.svg" alt="" draggable="false">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
             </div>
         </div>
     </div>
@@ -88,6 +88,9 @@
             <div id="tabPane_base" class="tab-pane">
                 <div class="pane-title"><span class="pane-title-left"><span class="showthat" onmouseenter="events.refreshKitsuneAssignmentTooltip()"><img class="inline-res-icon" src="img/foxWorker.svg" alt="" draggable="false"> Kitsune <span id="baseWorkersAssigned"></span>/<span id="baseWorkersFound"></span><div id="kitsuneAssignTooltip" class="showthis kitsune-assign-tooltip"><div id="kitsuneAssignTooltipList"></div></div></span><span id="basePaneTitleCoins"> | <img class="inline-res-icon" src="img/coins.svg" alt="" draggable="false">Coins: <span id="baseCoinsText"></span></span><span id="basePaneTitleStarBeads"> | <img class="inline-res-icon" src="img/starBead.svg" alt="" draggable="false">Star Beads: <span id="baseStarBeadsText"></span></span><span id="basePaneTitleEssence" style="display:none"> | <img class="inline-res-icon" src="img/essence.svg" alt="" draggable="false">Essence: <span id="baseEssenceText"></span></span></span><span id="baseBuyableWrap" class="showthat pane-title-buyable" style="display:none" onmouseenter="events.setBuyableTooltipOpen(true)" onmouseleave="events.setBuyableTooltipOpen(false)">Buyable: <span id="baseBuyableCount">0</span><div id="baseBuyableTooltip" class="showthis kitsune-assign-tooltip"><div id="baseBuyableTooltipList"></div></div></span></div>
                 <div id="baseResortMap" class="base-map-wrap">
+                    <svg id="pondForestStream" class="pond-forest-stream" aria-hidden="true" style="display:none">
+                        <path id="pondForestStreamPath" class="pond-forest-stream-path" fill="none" stroke-width="2"></path>
+                    </svg>
                     <div class="resort-map-cave" aria-hidden="true"></div>
                     <svg id="dirtRoadLayer" class="dirt-road-svg" aria-hidden="true"></svg>
                     <div id="dirtRoadHoverLayer" class="dirt-road-hover-layer"></div>
@@ -132,9 +135,14 @@
                     <div id="mapInnWaterProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-inn-water" style="display:none"><div id="mapInnWaterProgressFill" class="base-mini-progress-fill prog-fill-water"></div></div>
                     <button id="baseBuilding_bonfire" class="base-building-label resort-building-label resort-building-map-btn resort-building-bonfire" onclick="events.selectBaseBuilding('bonfire')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
-                        <img class="resort-building-art" src="img/bonfire.svg" alt="" draggable="false">
+                        <span class="resort-building-art bonfire-map-art-row">
+                            <img class="bonfire-map-icon" src="img/bonfire.svg" alt="" draggable="false">
+                            <img class="bonfire-map-icon bonfire-map-kiln-art" src="img/kiln.svg" alt="" draggable="false">
+                        </span>
                         <span class="resort-building-label-text">Bonfire</span>
+                        <span id="bonfireMapDisplay" class="resort-building-display" style="display:none"></span>
                     </button>
+                    <div id="mapBonfireManaProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-bonfire-mana" style="display:none"><div id="mapBonfireManaProgressFill" class="base-mini-progress-fill prog-fill-mana"></div></div>
                     <div id="spiritSlots_bonfire_fire" class="spirit-slot-grid spirit-slot-grid-bonfire-fire" style="display:none"></div>
                     <button id="baseBuilding_garden" class="base-building-label resort-building-label resort-building-map-btn resort-building-garden" onclick="events.selectBaseBuilding('garden')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
@@ -143,7 +151,10 @@
                     </button>
                     <button id="baseBuilding_atelier" class="base-building-label resort-building-label resort-building-map-btn resort-building-atelier" onclick="events.selectBaseBuilding('atelier')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
-                        <img class="resort-building-art" src="img/atelier.svg" alt="" draggable="false">
+                        <span class="resort-building-art atelier-map-art-row">
+                            <img class="atelier-map-icon" src="img/atelier.svg" alt="" draggable="false">
+                            <img id="atelierMapWheel" class="atelier-map-icon atelier-map-wheel-art" src="img/wheel.svg" alt="" draggable="false">
+                        </span>
                         <span class="resort-building-label-text">Atelier</span>
                         <span id="atelierMapDisplay" class="resort-building-display"></span>
                     </button>
@@ -367,7 +378,16 @@
 
             <div id="tabPane_history" class="tab-pane">
                 <div class="pane-title">History</div>
-                <div id="historyList"></div>
+                <div id="historySubTabs" class="travel-subtabs-row" style="display:none">
+                    <button type="button" id="historySubTab_combat" class="tab-button travel-subtab-btn" onclick="events.switchHistorySubTab('combat')">Combat</button>
+                    <button type="button" id="historySubTab_prestige" class="tab-button travel-subtab-btn" onclick="events.switchHistorySubTab('prestige')">Prestige</button>
+                </div>
+                <div id="historyPane_combat">
+                    <div id="historyList"></div>
+                </div>
+                <div id="historyPane_prestige" style="display:none">
+                    <div id="prestigeHistoryList"></div>
+                </div>
             </div>
             <div id="tabPane_cardBonuses" class="tab-pane" style="display:none">
                 <div class="pane-title">Cards</div>
@@ -391,7 +411,7 @@
                 </div>
             </div>
             <div id="tabPane_prestige" class="tab-pane" style="display:none">
-                <div class="pane-title">Fade into Legend (Combat Prestige)</div>
+                <div class="pane-title">Fade into Legend (Prestige)</div>
                 <div id="cardsPrestigeMount"></div>
             </div>
             <div id="tabPane_options" class="tab-pane">

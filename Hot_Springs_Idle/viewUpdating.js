@@ -78,6 +78,7 @@ let view = {
             view.updateMarketCarriers();
             view.updatePathTokenPositions();
             view.updateFireLauncherProjectilePositions();
+            view.updateAtelierWheel();
         }
         if (events._buyableTooltipOpen) {
             view.updateBuyableUpgradesOverlay(true);
@@ -123,6 +124,7 @@ let view = {
         const sprites = {
             mana: "img/foxWorker_mana.svg",
             wood: "img/foxWorker_wood.svg",
+            hardwood: "img/foxWorker_wood.svg",
             stone: "img/foxWorker_stone.svg",
             water: "img/foxWorker_water.svg",
             bars: "img/foxWorker_bars.svg",
@@ -1055,7 +1057,19 @@ let view = {
         }
     },
     updateHistoryTab: function() {
+        const history = (data.progress && data.progress.prestigeHistory) || [];
+        const showSubs = history.length > 0;
+        view.updateVal("historySubTabs", showSubs ? "" : "none", "style.display");
+        let sub = (data.progress && data.progress.selectedHistorySubTab) || "combat";
+        if (!showSubs || sub !== "prestige") {
+            sub = "combat";
+        }
+        view.updateVal("historySubTab_combat", sub === "combat" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("historySubTab_prestige", sub === "prestige" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("historyPane_combat", sub === "combat" ? "" : "none", "style.display");
+        view.updateVal("historyPane_prestige", sub === "prestige" ? "" : "none", "style.display");
         view.updateHistoryList();
+        view.updatePrestigeHistoryList();
     },
     updateGuestsTab: function() {
         view.updateGuestsList();
@@ -1386,12 +1400,106 @@ let view = {
         }
     },
 
+    updateBonfireKilnPanel: function(bf) {
+        const kiln = !!bf.kilnBuilt;
+        view.updateVal("bonfireSubTabs", kiln ? "" : "none", "style.display");
+        view.updateVal("baseBuilding_bonfire", kiln, "classList.toggle", "has-kiln");
+        const tab = kiln && bf.kilnSubTab === "kiln" ? "kiln" : "clone";
+        view.updateVal("bonfireSubTab_clone", tab === "clone" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("bonfireSubTab_kiln", tab === "kiln" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        if (!kiln) {
+            view.updateVal("bonfireClonePane", "", "style.display");
+            view.updateVal("bonfireKilnPane", "", "style.display");
+            view.updateVal("bonfireKilnControls", "none", "style.display");
+            view.updateVal("bonfireUpgradesPane", "", "style.display");
+            return;
+        }
+        const showKiln = tab === "kiln";
+        view.updateVal("bonfireClonePane", showKiln ? "none" : "", "style.display");
+        view.updateVal("bonfireKilnPane", showKiln ? "" : "none", "style.display");
+        view.updateVal("bonfireKilnControls", showKiln ? "" : "none", "style.display");
+        view.updateVal("bonfireUpgradesPane", showKiln ? "none" : "", "style.display");
+        if (!showKiln) {
+            return;
+        }
+        const heatCapEl = viewData.cached.bonfireKilnHeatCap;
+        if (heatCapEl && document.activeElement !== heatCapEl) {
+            const cap = engine.bonfireKilnNumber(bf.kilnHeatCap);
+            heatCapEl.value = cap === null ? "" : cap;
+        }
+        const rows = engine.ensureBonfireKilnPriority(bf);
+        const list = viewData.cached.bonfirePriorityList;
+        if (list && !events._bonfireDragKey) {
+            const want = rows.map(function(row) { return row.key; }).join(",");
+            const have = Array.prototype.map.call(list.children, function(el) {
+                return el.getAttribute("data-priority-key");
+            }).join(",");
+            if (want !== have) {
+                for (let i = 0; i < rows.length; i++) {
+                    const el = viewData.cached["bonfirePriority_" + rows[i].key];
+                    if (el) {
+                        list.appendChild(el);
+                    }
+                }
+            }
+        }
+        const heatMult = engine.getBonfireHeatCardMultiplier ? engine.getBonfireHeatCardMultiplier() : 1;
+        const woodHeat = bonfireConfig.heatPerWood * heatMult;
+        const heatText = {
+            coal: roundNearestDecimals(woodHeat * bonfireConfig.heatPerCoalMult, 2) + " heat",
+            wood: roundNearestDecimals(woodHeat, 2) + " heat",
+            hardwood: "",
+            charcoalPit: roundNearestDecimals(50 * heatMult, 2) + " heat"
+        };
+        for (let r = 0; r < rows.length; r++) {
+            const row = rows[r];
+            const rowEl = viewData.cached["bonfirePriority_" + row.key];
+            if (rowEl) {
+                rowEl.classList.toggle("kiln-priority-row--off", !row.use);
+            }
+            const useEl = viewData.cached["bonfirePriorityUse_" + row.key];
+            if (useEl) {
+                useEl.checked = row.use !== false;
+            }
+            view.updateVal("bonfirePriorityHeat_" + row.key, heatText[row.key] || "");
+            if (row.key === "wood" || row.key === "hardwood") {
+                const keepEl = viewData.cached["bonfireKeep_" + row.key];
+                if (keepEl && document.activeElement !== keepEl) {
+                    const keep = engine.bonfireKilnNumber(row.keep);
+                    keepEl.value = keep === null ? "" : keep;
+                }
+            }
+        }
+        view.updateVal("bonfireKilnHardwood", intToStringRound(bf.kilnHardwood || 0));
+        const stopEl = viewData.cached.bonfireHardwoodStop;
+        if (stopEl && document.activeElement !== stopEl) {
+            const stop = engine.bonfireKilnNumber(bf.hardwoodStopAt);
+            stopEl.value = stop === null ? "" : stop;
+        }
+        const action = engine.pickBonfireKilnAction(bf);
+        const pitActive = !!(action && action.type === "charcoalPit") || (bf.charcoalPitProgressMs || 0) > 0;
+        view.updateVal("bonfireCharcoalPitProg", pitActive ? "" : "none", "style.display");
+        if (pitActive) {
+            const dur = engine.getCharcoalPitDurationMs();
+            const pct = dur > 0 ? Math.max(0, Math.min(100, ((bf.charcoalPitProgressMs || 0) / dur) * 100)) : 0;
+            view.updateVal("bonfireCharcoalPitFill", pct + "%", "style.width");
+        }
+        view.updateVal("bonfirePitWood", intToStringRound(bf.charcoalPitWood || 0));
+        view.updateVal("bonfireCharcoalRate", intToStringRound(engine.getCharcoalProductionAmount(bf)));
+        view.updateVal("bonfireCharcoalStock", intToStringRound(bf.charcoal || 0));
+        const requireEl = viewData.cached.bonfireCharcoalRequire;
+        if (requireEl) {
+            requireEl.classList.toggle("kiln-require-unmet", (bf.heat || 0) < 400 || (bf.mana || 0) < 100);
+        }
+    },
     updateBasePanelBonfire: function() {
         view.updateCloneCostDisplays();
         const bf = data.progress.base.bonfire;
+        const kiln = !!bf.kilnBuilt;
+        view.updateBonfireKilnPanel(bf);
         const garden = data.progress.base && data.progress.base.garden;
         const fireTendingUnlocked = !!(garden && garden.arrangementOfFireTendingUnlocked);
-        view.updateVal("bonfireFireTending_row", fireTendingUnlocked ? "" : "none", "style.display");
+        view.updateVal("bonfireFireTending_row", (!kiln && fireTendingUnlocked) ? "" : "none", "style.display");
         if (fireTendingUnlocked) {
             const fireChk = document.getElementById("bonfireFireTending_chk");
             if (fireChk) {
@@ -1422,7 +1530,7 @@ let view = {
         const marketBuilt = engine.isMarketBuilt();
         view.updateVal("bonfireWoodCarry_row", flameTended ? "" : "none", "style.display");
         if (flameTended) {
-            view.updateVal("bonfireWoodCarryLabel", marketBuilt ? "Wood/Coal carry" : "Wood carry");
+            view.updateVal("bonfireWoodCarryLabel", marketBuilt ? "Burnable Resource Carry" : "Wood Carry");
             view.updateVal("bonfireWoodCarry", resortData.getKitsuneWoodCarryAmount());
         }
         view.updateVal("bonfireHeatPerFuel_row", flameTended ? "" : "none", "style.display");
@@ -1435,9 +1543,15 @@ let view = {
                 view.updateVal("bonfireHeatPerCoal", roundNearestDecimals(heatWood * bonfireConfig.heatPerCoalMult, 2));
             }
         }
-        view.updateVal("bonfireCoal_row", marketBuilt ? "" : "none", "style.display");
+        view.updateVal("bonfireCoal_row", (marketBuilt || kiln) ? "" : "none", "style.display");
+        view.updateVal("bonfireCoalPart", marketBuilt ? "" : "none", "style.display");
         if (marketBuilt) {
             view.updateVal("bonfireCoalText", intToStringRound(engine.getMarketGoodAmount("coal")));
+        }
+        view.updateVal("bonfireAshSep", (marketBuilt && kiln) ? "" : "none", "style.display");
+        view.updateVal("bonfireAshPart", kiln ? "" : "none", "style.display");
+        if (kiln) {
+            view.updateVal("bonfireAshText", intToStringRound(bf.ash || 0));
         }
         const hs = data.progress.base && data.progress.base.hiddenSpring;
         const sparkBought = ((hs && hs.fireSpiritsBought) || 0) >= 1;
@@ -1699,8 +1813,57 @@ let view = {
         view.updateVal("atelierInfoOre", atelier.ore || 0, "textContent", "floor");
         view.updateVal("atelierInfoBars", atelier.bars || 0, "textContent", "floor");
         t.refreshOrderedPurchasables("atelier", resortData.buildings.atelier.upgradesOrder, t.soldOutUpgradeRowOpts(t.hideMaxed, "atelier"));
+        if (!engine.isDrophammerDebugEnabled()) {
+            view.updateVal("base_atelier_unlock_drophammer_row", "none", "style.display");
+        }
+        const tabsOn = engine.isDrophammerUnlocked();
+        let sub = data.progress.selectedAtelierSubTab || "atelier";
+        if (!tabsOn || (sub !== "atelier" && sub !== "dropHammer")) {
+            sub = "atelier";
+        }
+        view.updateVal("atelierSubTabs", tabsOn ? "" : "none", "style.display");
+        view.updateVal("atelierSubTab_atelier", !tabsOn || sub === "atelier" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("atelierSubTab_dropHammer", tabsOn && sub === "dropHammer" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("atelierPane_atelier", !tabsOn || sub === "atelier" ? "" : "none", "style.display");
+        view.updateVal("atelierPane_dropHammer", tabsOn && sub === "dropHammer" ? "" : "none", "style.display");
         if (viewData.cached.base_atelier_sandal_row) {
             view.updateVal("base_atelier_sandal_row", "none", "style.display");
+        }
+    },
+    updateAtelierWheel: function() {
+        const unlocked = engine.isDrophammerUnlocked();
+        view.updateVal("baseBuilding_atelier", unlocked, "classList.toggle", "has-drophammer");
+        const wheel = viewData.cached.atelierMapWheel;
+        if (!wheel) {
+            return;
+        }
+        if (!unlocked) {
+            if (wheel._spinAnim) {
+                wheel._spinAnim.pause();
+            }
+            return;
+        }
+        const deg = engine.getAtelierWheelDegreesPerSecond();
+        if (!wheel._spinAnim) {
+            wheel._spinAnim = wheel.animate(
+                [
+                    { transform: "rotate(0deg) scaleX(-1)" },
+                    { transform: "rotate(360deg) scaleX(-1)" }
+                ],
+                { duration: 6000, iterations: Infinity, easing: "linear" }
+            );
+        }
+        const paused = !!(data.gameSettings && data.gameSettings.stop);
+        if (paused || !(deg > 0)) {
+            wheel._spinAnim.pause();
+            return;
+        }
+        const playback = deg / 60;
+        if (Math.abs(wheel._spinAnim.playbackRate - playback) > 0.001) {
+            wheel._spinAnim.playbackRate = playback;
+        }
+        if (wheel._spinAnim.playState !== "running") {
+            wheel._spinAnim.play();
         }
     },
 
@@ -2590,6 +2753,65 @@ let view = {
             delete viewData.dirtRoadHoverEls[staleKey];
         }
     },
+    updatePondForestStream: function() {
+        const svg = viewData.cached.pondForestStream;
+        const path = viewData.cached.pondForestStreamPath;
+        if (!svg || !path) {
+            return;
+        }
+        const visible = typeof engine.isPondBuiltFromFoxDen === "function" && engine.isPondBuiltFromFoxDen();
+        view.updateVal("pondForestStream", visible ? "" : "none", "style.display");
+        if (!visible) {
+            return;
+        }
+        const from = engine.getMapBuildingPosition("pond");
+        const to = engine.getMapBuildingPosition("bambooForest");
+        if (!from || !to) {
+            return;
+        }
+        const sig = `${Math.round(from.x)},${Math.round(from.y)},${Math.round(to.x)},${Math.round(to.y)}`;
+        if (path._streamSig !== sig) {
+            path._streamSig = sig;
+            path.setAttribute("d", view.buildPondForestStreamPath(from, to));
+        }
+        const width = String(engine.getPondForestStreamWidthPx());
+        if (path.getAttribute("stroke-width") !== width) {
+            path.setAttribute("stroke-width", width);
+        }
+    },
+    buildPondForestStreamPath: function(from, to) {
+        const dx = to.x - from.x;
+        const dy = to.y - from.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const nx = -dy / len;
+        const ny = dx / len;
+        const amplitude = 14;
+        const cycles = 2;
+        const steps = 16;
+        const pts = [];
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const envelope = Math.sin(Math.PI * t);
+            const offset = Math.sin(t * Math.PI * 2 * cycles) * amplitude * envelope;
+            pts.push({
+                x: from.x + dx * t + nx * offset,
+                y: from.y + dy * t + ny * offset
+            });
+        }
+        let d = `M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[i === 0 ? 0 : i - 1];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[i + 2 < pts.length ? i + 2 : pts.length - 1];
+            const c1x = p1.x + (p2.x - p0.x) / 6;
+            const c1y = p1.y + (p2.y - p0.y) / 6;
+            const c2x = p2.x - (p3.x - p1.x) / 6;
+            const c2y = p2.y - (p3.y - p1.y) / 6;
+            d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2.x.toFixed(1)} ${p2.y.toFixed(1)}`;
+        }
+        return d;
+    },
     bindFoxDenQueueTip: function() {
         const btn = viewData.cached.baseBuilding_foxDen || document.getElementById("baseBuilding_foxDen");
         if (!btn || btn._foxDenTipBound) {
@@ -2834,6 +3056,7 @@ let view = {
         view.updateShrineProgressDisplays();
         view.updateMarketProgressDisplays();
         view.updateDirtRoadLayer();
+        view.updatePondForestStream();
         view.updateMapBuildingManaBar("inn", "mapInnManaProgressWrap", "mapInnManaProgressFill");
         view.updateMapBuildingManaBar("torii", "mapToriiManaProgressWrap", "mapToriiManaProgressFill");
         view.updateMapWaterBar(engine.isToriiDrinkingBowlUnlocked(), torii.water || 0, engine.getToriiWaterCapacity(), "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill");
@@ -2843,6 +3066,7 @@ let view = {
         view.updateMapWaterBar(engine.isNoodleBarBuilt(), Math.min(100, noodleBar.tipProgress || 0), 100, "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill");
         view.updateMapBuildingManaBar("stonePile", "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill");
         view.updateMapBuildingManaBar("hiddenSpring", "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill");
+        view.updateMapBuildingManaBar("bonfire", "mapBonfireManaProgressWrap", "mapBonfireManaProgressFill");
         const manaKeys = engine.getBuildingManaKeys();
         for (let mi = 0; mi < manaKeys.length; mi++) {
             view.updateBuildingManaRow(manaKeys[mi]);
@@ -2888,6 +3112,7 @@ let view = {
             view.updateVal(`base_market_traders_${decSuffixes[i]}_btn`, traders <= 0, "disabled");
         }
         view.updateVal("marketTradeStatus_row", engine.getMarketTradeStatusText(), "innerHTML");
+        view.updateVal("marketDemandTax_row", engine.getMarketDemandTaxText(), "textContent");
 
         const thresholdsUnlocked = !!garden.arrangementOfTraderResponsibilityUnlocked;
         const active = market.activeTrade;
@@ -2919,7 +3144,11 @@ let view = {
             if (!levelOk) {
                 view.updateVal(`marketTrade_${tk}_extra`, `Unlocks at Market level ${requiredLevel}`);
             } else {
-                const costHtml = resortData.formatCostAmountHtml(td.creditCost, "credit", "Credit");
+                const baseCredit = td.creditCost || 0;
+                const taxedCredit = engine.getMarketTradeCreditCost ? engine.getMarketTradeCreditCost(tk) : baseCredit;
+                const costHtml = taxedCredit !== baseCredit
+                    ? `${intToStringRound(baseCredit)} → ${resortData.formatCostAmountHtml(taxedCredit, "credit", "Credit")}`
+                    : resortData.formatCostAmountHtml(baseCredit, "credit", "Credit");
                 const baseSec = engine.getMarketTradeBaseSeconds
                     ? engine.getMarketTradeBaseSeconds(tk)
                     : (td.seconds || 0);
@@ -4222,6 +4451,11 @@ let view = {
             ? `${resortData.resourceIconHtml("ore")} ${intToStringRound(atelierOre)} | ${resortData.resourceIconHtml("bars")} ${intToStringRound(atelierBars)}`
             : "", "innerHTML");
         view.updateVal("bambooForestMapDisplay", `${resortData.resourceIconHtml("wood")} ${intToStringRound((base.bambooForest && base.bambooForest.wood) || 0)}`, "innerHTML");
+        const bonfire = base.bonfire || {};
+        view.updateVal("bonfireMapDisplay", bonfire.kilnBuilt
+            ? `${resortData.resourceIconHtml("ash")} ${intToStringRound(bonfire.ash || 0)}`
+            : "", "innerHTML");
+        view.updateVal("bonfireMapDisplay", bonfire.kilnBuilt ? "" : "none", "style.display");
         view.updateVal("toriiMapDisplay", `${torii.visitorsWaiting || 0}/${torii.maxVisitors || 2}`);
         view.updateVal("innMapDisplay", `${inn.roomsOccupied || 0}/${innCap}`);
         view.updateVal("innMapLabelText", engine.getInnDisplayName());
@@ -4643,6 +4877,80 @@ let view = {
         if (viewData.prevValues.historyHtml !== html) {
             el.innerHTML = html;
             viewData.prevValues.historyHtml = html;
+        }
+    },
+    formatPrestigeCardList: function(cards) {
+        if (!cards || !cards.length) {
+            return "None";
+        }
+        const escapeHtml = function(text) {
+            return String(text == null ? "" : text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+        };
+        const parts = [];
+        for (let i = 0; i < cards.length; i++) {
+            const card = cards[i];
+            const rarity = (typeof shrineCards !== "undefined" && shrineCards.rarityLabel)
+                ? shrineCards.rarityLabel(card.rarity)
+                : (card.rarity || "");
+            const name = card.name || card.key || "Card";
+            parts.push(escapeHtml(rarity + " " + name));
+        }
+        return parts.join(", ");
+    },
+    formatPrestigePackCounts: function(counts) {
+        const order = ["common", "rare", "epic"];
+        const parts = [];
+        const src = counts || {};
+        for (let i = 0; i < order.length; i++) {
+            const rarity = order[i];
+            const count = Math.floor(src[rarity] || 0);
+            if (count > 0) {
+                const label = (typeof shrineCards !== "undefined" && shrineCards.rarityLabel)
+                    ? shrineCards.rarityLabel(rarity).toLowerCase()
+                    : rarity;
+                parts.push(count + " " + label);
+            }
+        }
+        return parts.join(", ");
+    },
+    updatePrestigeHistoryList: function() {
+        const el = viewData.cached.prestigeHistoryList;
+        if (!el) {
+            return;
+        }
+        const runs = (data.progress && data.progress.prestigeHistory) || [];
+        let html = "";
+        if (!runs.length) {
+            html = `<div class="muted-text">No prestiges yet.</div>`;
+        }
+        for (let i = 0; i < runs.length; i++) {
+            const run = runs[i];
+            const number = runs.length - i;
+            const unopenedMilestone = view.formatPrestigePackCounts(run.unopenedMilestone);
+            const unopenedBought = view.formatPrestigePackCounts(run.unopenedBought);
+            html += `<div class="history-prestige-entry">`;
+            html += `<div class="history-prestige-title">Prestige ${number}</div>`;
+            html += `<div class="history-prestige-line">Time taken: ${secondsToTime(run.seconds || 0)}</div>`;
+            html += `<div class="history-prestige-line">Cards received from milestones: ${view.formatPrestigeCardList(run.milestoneCards)}</div>`;
+            if (unopenedMilestone) {
+                html += `<div class="history-prestige-line">Unopened milestone packs: ${unopenedMilestone}</div>`;
+            }
+            html += `<div class="history-prestige-line">Cards bought: ${view.formatPrestigeCardList(run.boughtCards)}</div>`;
+            if (unopenedBought) {
+                html += `<div class="history-prestige-line">Unopened bought packs: ${unopenedBought}</div>`;
+            }
+            html += `<div class="history-prestige-line">Total talent levels: ${Math.floor(run.talentLevels || 0)}</div>`;
+            html += `<div class="history-prestige-line">Total stars: ${Math.floor(run.totalStars || 0)}</div>`;
+            html += `<div class="history-prestige-line">Okami level: ${Math.floor(run.okamiLevel || 0)}</div>`;
+            html += `<div class="history-prestige-line">Total spirit level: ${Math.floor(run.spiritLevels || 0)}</div>`;
+            html += `</div>`;
+        }
+        if (viewData.prevValues.prestigeHistoryHtml !== html) {
+            el.innerHTML = html;
+            viewData.prevValues.prestigeHistoryHtml = html;
         }
     },
     stripHtmlForSearch: function(html) {
@@ -5449,13 +5757,17 @@ let view = {
                 .replace(/>/g, "&gt;")
                 .replace(/\n/g, "<br>");
         };
-        view.updateVal("legendRequirementText", `Write Legend ${nextNumber}: ${req} stars`);
+        view.updateVal("legendRequirementPrefix", `Write Legend ${nextNumber}: ${req} Stars, `);
+        view.updateVal("legendCurrentStars", `Current Stars: ${stars}`);
+        view.updateVal("legendCurrentStars", stars >= req, "classList.toggle", "legend-current-stars--ready");
+        view.updateVal("legendCurrentStars", stars < req, "classList.toggle", "legend-current-stars--short");
         view.updateVal("legendStarWarning", stars >= req ? "none" : "", "style.display");
         view.updateVal("legendWipWarning", hasNext ? "none" : "", "style.display");
         const gain = (typeof engine.getCombatPrestigeMaxDivinityGain === "function")
             ? engine.getCombatPrestigeMaxDivinityGain()
             : 0;
         view.updateVal("legendMaxDivinityGainValue", gain, "textContent", "floor");
+        view.updateVal("legendPenalty_row", engine.getLegendPenaltyText(), "textContent");
         const parts = [];
         parts.push(`<div class="legend-card ${ready ? "legend-card--ready" : "legend-card--short"}"><div class="legend-card-title">Legend ${nextNumber}</div><div class="legend-card-text">${legendText(nextNumber)}</div></div>`);
         for (let n = written; n >= 1; n--) {
