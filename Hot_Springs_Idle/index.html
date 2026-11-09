@@ -417,7 +417,7 @@
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
                 <div class="options-row"><button type="button" id="changelogButton" class="tab-button" onclick="changelog.open()">Changelog</button></div>
-                <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text">Time played: <span id="playTimeClock">0:00:00</span></div>
+                <div id="levelingPlayStats" class="options-row leveling-play-stats muted-text"><span id="playTimeThisLabel">Time played: </span><span id="playTimeClock">0:00:00</span><div id="playTimeTotalRow" style="display:none">Time played (total): <span id="playTimeTotalClock">0:00:00</span></div></div>
                 <div class="options-row"><button type="button" id="manualSaveButton" class="tab-button" onclick="saving.save()">Save now</button><button type="button" id="viewTipsButton" class="tab-button" onclick="toasts.openTips()">View Tips</button></div>
                 <div class="options-row" id="saveToFileRow"><button type="button" id="saveToFileButton" class="tab-button" onclick="saving.saveToFile()">Save to file</button><button type="button" id="importFromFileButton" class="tab-button" onclick="saving.importFromFile()">Import from file</button><input type="file" id="importFromFileInput" style="display:none" onchange="saving.onImportFromFileSelected(this)"></div>
                 <label class="options-row"><input type="checkbox" id="hideMaxedUpgradesToggle" onchange="events.setHideMaxedUpgrades(this.checked)"> Hide maxed upgrades</label>
@@ -455,8 +455,10 @@
                         <div id="playerMovePulse"></div>
                         <div id="playerToken">
                             <div id="playerTokenAudLayer"><div id="playerTokenAudFill"></div></div>
+                            <div id="playerTokenBarrierLayer"><div id="playerTokenBarrierFill"></div></div>
                         </div>
                         <div id="playerTokenOverlay" class="player-token-overlay intruder-overlay">
+                            <div id="playerStatCloutLine" style="display:none"></div>
                             <div id="playerStatAudLine" class="intruder-stat-aud" style="top:30px"></div>
                             <div id="playerStatDmgLine" class="intruder-stat-dmg"></div>
                         </div>
@@ -493,6 +495,12 @@
                 <div id="deathSummary"></div>
                 <div id="deathTalentDetails" class="death-talent-block"></div>
                 <button id="tryAgainButton" onclick="events.tryAgain()">Try Again?</button>
+                <div id="deathAutoRetry_row" class="death-retry-row" style="display:none">
+                    <label><input type="checkbox" id="deathAutoRetry_chk" onchange="events.toggleBonfireAutoRetry(this.checked)"> Retry after the clone disperses</label>
+                </div>
+                <div id="deathStartWithFullMana_row" class="death-retry-row" style="display:none">
+                    <label><input type="checkbox" id="deathStartWithFullMana_chk" onchange="events.toggleVentingSurplus(this.checked)"> Start when full Mana</label>
+                </div>
             </div>
         </div>
         <div id="battleHud">

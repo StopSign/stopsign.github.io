@@ -254,10 +254,14 @@ let createView = {
             function() {
                 const pondBuilt = engine.isPondBuiltFromFoxDen();
                 const marketBuilt = engine.isMarketBuilt();
+                const powerfulChops = engine.isPowerfulChopsBought()
+                    ? "<p>Powerful Chops carries unused chop power to the next segment of the same stalk at 50%, rounded down. It does not continue onto the next stalk. The harvest rate uses that carried chop.</p>"
+                    : "";
                 return `<p>Harvest bamboo for construction wood.</p>
                     <p>10 Chips become 1 Wood.</p>
                     <p>Gain Chop Power per assigned Kitsune or Okami.</p>
                     <p>One bamboo segment takes 2 minutes to fully grow. Bamboo grows when not being harvested.</p>
+                    ${powerfulChops}
                     ${pondBuilt ? "<p>Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</p>" : ""}
                     ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}`;
             },
@@ -537,7 +541,13 @@ let createView = {
             "resortInfo_hiddenSpring",
             function() {
                 let html = "<p>A quiet spring above the resort. Spirits are summoned here and sent out to their work sites.</p>";
-                html += "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. Okami Stone Bonus then adds 10% per rare card and 25% per epic card, and that total is rounded up. This trip uses the Okami, and it pauses her current path job.</p>";
+                let collectStone = "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. Okami Stone Bonus then adds 10% per rare card and 25% per epic card, and that total is rounded up.";
+                if (engine.getEchoedShelvingBought() > 0) {
+                    const shelvingMult = round2(Math.pow(1.25, engine.getEchoedShelvingBought()));
+                    collectStone += ` Echoed Shelving then multiplies that stone by x${shelvingMult} (x1.25 per level), rounded up.`;
+                }
+                collectStone += " This trip uses the Okami, and it pauses her current path job.</p>";
+                html += collectStone;
                 if (engine.isBuildingManaUnlocked("hiddenSpring")) {
                     html += "<p>Send Mana Clone costs 2000 mana plus the mana deposited, up to this spring's remaining capacity. It uses the Okami the same way.</p>";
                 }
@@ -565,6 +575,7 @@ let createView = {
                 }
                 if (engine.cisternWorkersRevealed()) {
                     html += "<p>Assigned kitsune, and the Okami while she is here, carry water to a building that still has room and is allowing carriers. They leave only when the Cistern is hot enough for that stop: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. A trip takes up to the Water carry amount. They prefer a stop that can hold a full load. Water that does not fit on delivery is returned to the Cistern.</p>";
+                    html += "<p>The ! appears when kitsune or the Okami are assigned, at least one stop still has room and is accepting carriers, and the Cistern is too cold for every one of those stops: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. It does not appear when every available stop is already full, including water already on the way, or while you are looking at the Cistern.</p>";
                 }
                 return html;
             },
@@ -580,6 +591,7 @@ let createView = {
                 }
                 if (engine.cisternWorkersRevealed()) {
                     keys.push("carriers");
+                    keys.push("notify");
                 }
                 return keys;
             }
@@ -613,7 +625,15 @@ let createView = {
                 let html = "<p>Exp to the next level is multiplied by 1.8.</p>";
                 if (kind === "earth") {
                     html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants dirt, stone, or ore. Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
-                    html += "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) stone or ore, plus 20% per Pebble Pay, rounded up. Stone arrives at the Stone Pile. Ore arrives at the Atelier.</p>";
+                    let pebbleInfo = "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) stone or ore, plus 20% per Pebble Pay, rounded up.";
+                    if (engine.getEchoedShelvingBought() > 0) {
+                        const shelvingMult = round2(Math.pow(1.25, engine.getEchoedShelvingBought()));
+                        pebbleInfo += ` Stone that arrives at the Stone Pile is then multiplied by x${shelvingMult} (x1.25 per Echoed Shelving), rounded up. Ore arrives at the Atelier and is not multiplied.`;
+                    } else {
+                        pebbleInfo += " Stone arrives at the Stone Pile. Ore arrives at the Atelier.";
+                    }
+                    pebbleInfo += "</p>";
+                    html += pebbleInfo;
                 } else if (kind === "water") {
                     html += "<p>At the Hidden Spring, a water spirit forms a droplet and sends it down the path. The delivered volume is granted as exp. The water joins the Cistern, and heat above 100C becomes essence.</p>";
                     html += "<p>At the Pond, a water spirit gains √(stored water) / 50 exp per second while the pond has water. Those levels set the Tatami Inn's Watch Water Spirits step, in seconds, equal to the total level of water spirits assigned there.</p>";
@@ -990,7 +1010,7 @@ let createView = {
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
-                    <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span></div>
+                    <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span><span class="game-progress-sep">|</span>ETA: <span id="shrineExpEtaText">-</span></div>
                 </div>
                 ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
             `;
@@ -1220,7 +1240,7 @@ let createView = {
                     <span id="base_market_traders_workers_label" class="base-worker-cap-label muted-text"></span>
                 </div>
                 <div id="marketTradeStatus_row" class="base-row muted-text"></div>
-                <div id="marketDemandTax_row" class="base-row muted-text"></div>
+                <div id="marketDemandTax_row" class="base-row"></div>
                 ${htmlMarketTradeRows()}
             `;
         };
@@ -1277,11 +1297,11 @@ let createView = {
                     </div>
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
-                    <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span></div>
+                    <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span><span id="spiritInfoTrainingGain" class="muted-text"></span></div>
                     <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
-                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span> stone/ore</div>
+                        <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span></div>
                         <div id="spiritInfoPebbleEtas" class="base-row" style="display:none"></div>
                         <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
                         <div id="spiritInfoAutoReturnMineRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoAutoReturnMine_chk" checked onchange="events.toggleSpiritAutoReturnToMine(this.checked)"> Return to the Mine when there are no resources to send with pebbles</label></div>
@@ -1573,6 +1593,10 @@ let createView = {
                         <div id="guestItineraryLine_2" class="guest-itinerary-line"></div>
                         <div id="guestItineraryLine_3" class="guest-itinerary-line"></div>
                         <div id="guestItineraryLine_4" class="guest-itinerary-line"></div>
+                        <div id="guestItineraryRestLine" class="guest-itinerary-line">
+                            <span id="guestRestLabel">Rest for 5s</span>
+                            <input type="range" id="guestRestDial" class="guest-rest-dial" min="5" max="5" step="1" value="5" oninput="events.setInnRestSeconds(this.value)">
+                        </div>
                     </div>
                     <div id="guestStarBeadsRange" class="guest-itinerary-line">Expected <img class="inline-res-icon" src="img/starBead.svg" alt="" draggable="false">Star Beads: <span id="guestStarBeadsMin">0</span> – <span id="guestStarBeadsMax">0</span></div>
                     <div id="guestStarBeadsRangeNote" class="muted-text guest-itinerary-line">Max assumes resources hold for the whole stay.</div>
@@ -1713,15 +1737,20 @@ let createView = {
         let filled = "";
         if (compact) {
             filled = `
-                <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
-                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})">
+                <div id="${idPrefix}_filled" class="skill-equip-slot-filled showthat" style="display:none" draggable="true"
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
+                    ondragend="events.skillDragEnd()"
+                    onmouseenter="view.positionSkillSlotTip(this)">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
                     <div class="skill-equip-slot-talent" id="${idPrefix}_talent"></div>
+                    <div id="${idPrefix}_tip" class="showthis skill-slot-hover"></div>
                 </div>`;
         } else {
             filled = `
-                <div id="${idPrefix}_filled" class="skill-equip-slot-filled" style="display:none" draggable="true"
-                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})">
+                <div id="${idPrefix}_filled" class="skill-equip-slot-filled showthat" style="display:none" draggable="true"
+                    ondragstart="events.skillEquipDragStart(event, '${viewName}', '${column}', ${index})"
+                    ondragend="events.skillDragEnd()"
+                    onmouseenter="view.positionSkillSlotTip(this)">
                     <div class="skill-equip-slot-name" id="${idPrefix}_name"></div>
                     <div id="${idPrefix}_stars" class="skill-stars-controls skill-stars-row-compact skill-equip-slot-stars">
                         <button id="${idPrefix}_star_bronze" class="skill-star-btn skill-panel-star-btn skill-star-bronze" onclick="event.stopPropagation(); events.toggleEquippedSlotStar('${column}', ${index}, 'bronze')">☆</button>
@@ -1733,6 +1762,7 @@ let createView = {
                         <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="${idPrefix}_exp_fill" class="prog-fill prog-fill-skill"></div></div>
                         <div class="prog-track skill-prog-mini skill-prog-row-full"><div id="${idPrefix}_talent_fill" class="prog-fill prog-fill-talent"></div></div>
                     </div>
+                    <div id="${idPrefix}_tip" class="showthis skill-slot-hover"></div>
                 </div>`;
         }
         return `
@@ -1783,7 +1813,7 @@ let createView = {
                 host.appendChild(slotEl);
                 const idPrefix = `skillSlot_${viewName}_${column}_${index}`;
                 createView.queueCache(
-                    idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`,
+                    idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_tip`,
                     `${idPrefix}_stars`, `${idPrefix}_star_bronze`, `${idPrefix}_star_silver`, `${idPrefix}_star_gold`,
                     `${idPrefix}_meta`, `${idPrefix}_exp_fill`, `${idPrefix}_talent_fill`, `${idPrefix}_talent`
                 );
@@ -1859,6 +1889,7 @@ let createView = {
             libraryRows += `
                 <div class="skill-row skill-block skill-library-row ${borderClass}" id="skill_wrap_${key}" data-skill-key="${key}" draggable="true"
                     ondragstart="events.librarySkillDragStart(event, '${key}')"
+                    ondragend="events.skillDragEnd()"
                     onclick="events.selectLibrarySkillForDetail('${key}', event)" style="display:none">
                     <div class="skill-row-head">
                         <div class="skill-row-head-left">
@@ -1956,10 +1987,10 @@ let createView = {
                 for (let i = 0; i < count; i++) {
                     const idPrefix = `skillSlot_${viewName}_${column}_${i}`;
                     if (compact) {
-                        createView.queueCache(idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_talent`);
+                        createView.queueCache(idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_talent`, `${idPrefix}_tip`);
                     } else {
                         createView.queueCache(
-                            idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_meta`,
+                            idPrefix, `${idPrefix}_empty`, `${idPrefix}_filled`, `${idPrefix}_name`, `${idPrefix}_meta`, `${idPrefix}_tip`,
                             `${idPrefix}_stars`, `${idPrefix}_star_bronze`, `${idPrefix}_star_silver`, `${idPrefix}_star_gold`,
                             `${idPrefix}_exp_fill`, `${idPrefix}_talent_fill`
                         );
@@ -2122,11 +2153,11 @@ let createView = {
         createView.queueCache(
             "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
             "divinityProgressBar", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
-            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
+            "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerTokenBarrierLayer", "playerTokenBarrierFill", "playerStatCloutLine", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
-            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
+            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "deathAutoRetry_row", "deathAutoRetry_chk", "deathStartWithFullMana_row", "deathStartWithFullMana_chk", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
             "cardsSubTab_get", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineBuyCardOdds", "shrineOpenPacksBtn", "shrineClassDebugBlock",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
@@ -2142,7 +2173,7 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoExp", "spiritInfoExpReq",
+            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoExp", "spiritInfoExpReq",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
@@ -2209,7 +2240,7 @@ let createView = {
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
             "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
             "shrineKarmaRateText", "shrineDivinityMultText", "shrineDivinityRateText",
-            "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText",
+            "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineExpEtaText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
             "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackAutoChoose", "prestigePackAutoChoose_chk", "prestigePackSummary", "prestigeFinishBtn",
             "shrineMilestonesList",
@@ -2252,7 +2283,7 @@ let createView = {
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "skillsList", "historyList",
             "historySubTabs", "historySubTab_combat", "historySubTab_prestige", "historyPane_combat", "historyPane_prestige", "prestigeHistoryList",
-            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
+            "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "playTimeThisLabel", "playTimeTotalRow", "playTimeTotalClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",
             "combatStarsInventory", "combatStarsCounts", "compactViewTabs", "compactPane_menus", "compactPane_battle"
         );
@@ -2292,7 +2323,8 @@ let createView = {
         }
         createView.queueCache(
             "guestItinerarySection", "guestItineraryPanel",
-            "guestItineraryLine_0", "guestItineraryLine_1", "guestItineraryLine_2", "guestItineraryLine_3", "guestItineraryLine_4"
+            "guestItineraryLine_0", "guestItineraryLine_1", "guestItineraryLine_2", "guestItineraryLine_3", "guestItineraryLine_4",
+            "guestItineraryRestLine", "guestRestLabel", "guestRestDial"
         );
         for (let si = 0; si < 3; si++) {
             createView.queueCache(`spiritSlot_hiddenSpring_earth_${si}`, `spiritSlot_hiddenSpring_water_${si}`);

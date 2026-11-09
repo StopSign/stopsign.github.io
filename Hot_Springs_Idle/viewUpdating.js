@@ -228,6 +228,30 @@ let view = {
             ? `Slap ${fmtDmg1(slapDmg)} · Sandal ${fmtDmg1(sandalDmg)}`
             : `Slap ${fmtDmg1(slapDmg)}`);
     },
+    syncBonfireRetryCheckboxes: function() {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        const rows = [
+            ["bonfireAutoRetry_row", "bonfireAutoRetry_chk", !!bf.autoRetryUnlocked, !!bf.autoRetryEnabled],
+            ["bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk", !!bf.startWithFullManaUnlocked, bf.startWithFullManaEnabled !== false],
+            ["deathAutoRetry_row", "deathAutoRetry_chk", !!bf.autoRetryUnlocked, !!bf.autoRetryEnabled],
+            ["deathStartWithFullMana_row", "deathStartWithFullMana_chk", !!bf.startWithFullManaUnlocked, bf.startWithFullManaEnabled !== false]
+        ];
+        for (let i = 0; i < rows.length; i++) {
+            const rowId = rows[i][0];
+            const chkId = rows[i][1];
+            view.updateVal(rowId, rows[i][2] ? "" : "none", "style.display");
+            if (!rows[i][2]) {
+                continue;
+            }
+            const chk = viewData.cached[chkId] || document.getElementById(chkId);
+            if (chk) {
+                chk.checked = rows[i][3];
+            }
+        }
+    },
     updateGlobals: function() { //updates user-facing UI
         const showBattle = !!(data.progress && data.progress.showBattle);
         const battleState = data.battle.state;
@@ -250,6 +274,18 @@ let view = {
             const audPct = Math.max(0, Math.min(100, (data.battle.player.aud / data.battle.player.maxAud) * 100));
             const audScale = Math.round((audPct / 100) * 1000) / 1000;
             view.updateVal("playerTokenAudFill", `scaleY(${audScale})`, "style.transform");
+            const cloutEntry = data.battle.buffs && data.battle.buffs.byKey && data.battle.buffs.byKey.clout;
+            const clout = cloutEntry ? (cloutEntry.stacks || 0) : 0;
+            const maxAudForBarrier = Math.max(1, data.battle.player.maxAud || 1);
+            const barrierPct = Math.max(0, Math.min(1, clout / maxAudForBarrier));
+            const barrierScale = Math.round(barrierPct * 1000) / 1000;
+            view.updateVal("playerTokenBarrierFill", `scaleY(${barrierScale})`, "style.transform");
+            if (clout > 0) {
+                view.updateVal("playerStatCloutLine", intToString(clout, 2));
+                view.updateVal("playerStatCloutLine", "", "style.display");
+            } else {
+                view.updateVal("playerStatCloutLine", "none", "style.display");
+            }
             const growthUnlocked = bonfire.isGrowthBlessingUnlocked();
             view.updateWaveInfoPanel(runClock, growthUnlocked);
         }
@@ -291,6 +327,7 @@ let view = {
                 view.updateVal("tryAgainButton", false, "disabled");
             }
             view.updateVal("deathTalentDetails", view.buildDeathTalentSummaryHtml(), "innerHTML");
+            view.syncBonfireRetryCheckboxes();
             viewData.deathOverlayFilled = true;
         } else if (viewData.deathOverlayFilled) {
             view.updateVal("deathSummary", "");
@@ -372,6 +409,11 @@ let view = {
         }
         if (!events.skillsTabUnlocked() && data.battle.currentTab === "skills") {
             data.battle.currentTab = "base";
+            createView.showCurrentTab();
+        }
+        const tabOrder = events.mainMenuTabOrder();
+        if (data.battle.currentTab === "prestige" && tabOrder.indexOf("prestige") < 0) {
+            data.battle.currentTab = tabOrder.indexOf("cardBonuses") >= 0 ? "cardBonuses" : "base";
             createView.showCurrentTab();
         }
         const activeTab = data.battle.currentTab || "base";
@@ -1082,8 +1124,17 @@ let view = {
                 disableCompactToggle.checked = wantOff;
             }
         }
-        const playSec = (data.currentGameState && data.currentGameState.secondsPassed) || 0;
+        const playHistory = (data.progress && data.progress.prestigeHistory) || [];
+        const prestiged = playHistory.length > 0;
+        const playSec = prestiged
+            ? ((data.progress && data.progress.secondsThisResort) || 0)
+            : ((data.currentGameState && data.currentGameState.secondsPassed) || 0);
+        view.updateVal("playTimeThisLabel", prestiged ? "Time played this prestige: " : "Time played: ");
         view.updateVal("playTimeClock", playSec, "textContent", "time");
+        view.updateVal("playTimeTotalRow", prestiged ? "" : "none", "style.display");
+        if (prestiged) {
+            view.updateVal("playTimeTotalClock", (data.progress && data.progress.secondsPlayedTotal) || 0, "textContent", "time");
+        }
     },
 
     /** Shared upgrade-row helpers for updateBasePanel. */
@@ -1510,22 +1561,7 @@ let view = {
                 capEl.value = bf.fireTendingHeatCap !== undefined ? bf.fireTendingHeatCap : 55;
             }
         }
-        const autoRetryUnlocked = !!bf.autoRetryUnlocked;
-        view.updateVal("bonfireAutoRetry_row", autoRetryUnlocked ? "" : "none", "style.display");
-        if (autoRetryUnlocked) {
-            const retryChk = viewData.cached.bonfireAutoRetry_chk || document.getElementById("bonfireAutoRetry_chk");
-            if (retryChk) {
-                retryChk.checked = !!bf.autoRetryEnabled;
-            }
-        }
-        const startWithFullManaUnlocked = !!bf.startWithFullManaUnlocked;
-        view.updateVal("bonfireStartWithFullMana_row", startWithFullManaUnlocked ? "" : "none", "style.display");
-        if (startWithFullManaUnlocked) {
-            const fullManaChk = viewData.cached.bonfireStartWithFullMana_chk || document.getElementById("bonfireStartWithFullMana_chk");
-            if (fullManaChk) {
-                fullManaChk.checked = bf.startWithFullManaEnabled !== false;
-            }
-        }
+        view.syncBonfireRetryCheckboxes();
         const flameTended = !!bf.tendTheFlameUnlocked;
         const marketBuilt = engine.isMarketBuilt();
         view.updateVal("bonfireWoodCarry_row", flameTended ? "" : "none", "style.display");
@@ -2046,9 +2082,9 @@ let view = {
             }
         } else if (siteKey === "bambooForest") {
             const bambooRate = engine.getBambooCutWorkerRate();
-            const chopPower = engine.getBambooChopPower();
+            const chipsPerChop = engine.getBambooChipsPerChop();
             const canComplete = bambooRate > 0;
-            const woodPerSec = required > 0 && canComplete ? (bambooRate / required) * chopPower : 0;
+            const woodPerSec = required > 0 && canComplete ? (bambooRate / required) * chipsPerChop : 0;
             view.updateVal(`${wpt}_rate`, round1(bambooRate));
             view.updateVal(`${wpt}_complete_wrap`, required > 0 ? "" : "none", "style.display");
             if (required > 0) {
@@ -2609,6 +2645,7 @@ let view = {
         view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
         view.updateVal("shrineDivinityMultText", engine.getShrineDivinityMultiplier());
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
+        view.updateEtaText("shrineExpEtaText", Math.max(0, expToLevel - exp), engine.getShrineKarmaRate());
         view.updateVal("shrineMapDisplay", `Lvl ${level}`, "textContent");
         view.updateVal("mapShrineProgressWrap", "", "style.display");
         view.updateVal("mapShrineProgressFill", `${pct}%`, "style.width");
@@ -2945,7 +2982,18 @@ let view = {
             left = maxLeft;
         }
         tip.style.left = `${left}px`;
-        tip.style.top = `${mapY + 12}px`;
+        let top = mapY + 12;
+        const tipH = tip.offsetHeight || 0;
+        if (top + tipH > rect.height - 4) {
+            top = mapY - tipH - 12;
+        }
+        const maxTop = Math.max(4, rect.height - tipH - 4);
+        if (top < 4) {
+            top = 4;
+        } else if (top > maxTop) {
+            top = maxTop;
+        }
+        tip.style.top = `${top}px`;
     },
     bindDirtRoadTipEvents: function(hit) {
         if (!hit || hit._dirtRoadTipBound) {
@@ -3112,7 +3160,7 @@ let view = {
             view.updateVal(`base_market_traders_${decSuffixes[i]}_btn`, traders <= 0, "disabled");
         }
         view.updateVal("marketTradeStatus_row", engine.getMarketTradeStatusText(), "innerHTML");
-        view.updateVal("marketDemandTax_row", engine.getMarketDemandTaxText(), "textContent");
+        view.updateVal("marketDemandTax_row", engine.getMarketDemandTaxText(), "innerHTML");
 
         const thresholdsUnlocked = !!garden.arrangementOfTraderResponsibilityUnlocked;
         const active = market.activeTrade;
@@ -3628,6 +3676,19 @@ let view = {
         const range = engine.getExpectedGuestStarBeadsRange();
         view.updateVal("guestStarBeadsMin", round1Fixed(range.min));
         view.updateVal("guestStarBeadsMax", round1Fixed(range.max));
+        const cap = engine.getInnRestDurationSeconds();
+        const allowed = engine.getInnRestAllowedSeconds();
+        const restShown = Math.abs(allowed - Math.round(allowed)) < 1e-6 ? String(Math.round(allowed)) : round1Fixed(allowed);
+        view.updateVal("guestRestLabel", `Rest for ${restShown}s`);
+        const dial = viewData.cached.guestRestDial || document.getElementById("guestRestDial");
+        if (dial) {
+            const dialMax = Math.max(5, cap);
+            dial.min = "5";
+            dial.max = String(dialMax);
+            if (document.activeElement !== dial) {
+                dial.value = String(Math.max(5, Math.min(dialMax, allowed)));
+            }
+        }
     },
     updateGuestsList: function() {
         const guests = (data.progress.base && data.progress.base.inn && data.progress.base.inn.guests) || [];
@@ -3767,6 +3828,12 @@ let view = {
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
+        if (atTraining) {
+            const trainGain = engine.getSpiritTrainingCardEffects().training;
+            view.updateVal("spiritInfoTrainingGain", ` (+${round1Fixed(trainGain)})`);
+        } else {
+            view.updateVal("spiritInfoTrainingGain", "");
+        }
         view.updateVal("spiritInfoExp", round2(spirit.exp || 0));
         view.updateVal("spiritInfoExpReq", round2(spirit.expToLevel || 15));
         view.updateVal("spiritInfoEarthExtras", kind === "earth" ? "" : "none", "style.display");
@@ -3779,7 +3846,7 @@ let view = {
             const pebbleMax = engine.getEarthSpiritPebbleMax();
             view.updateVal("spiritInfoPebbles", engine.countPebblesForSpirit(spirit.id));
             view.updateVal("spiritInfoPebblesMax", pebbleMax);
-            view.updateVal("spiritInfoPebbleCarry", engine.getEarthSpiritPebbleCarryAmount(spirit));
+            view.updateVal("spiritInfoPebbleCarry", engine.formatEarthSpiritPebbleCarry(spirit));
             const atHiddenSpring = (spirit.location || "hiddenSpring") === "hiddenSpring";
             const priorityUnlocked = engine.isArrangementOfPriorityUnlocked();
             const diggingUnlocked = engine.isArrangementOfDiggingUnlocked();
@@ -4796,6 +4863,9 @@ let view = {
             if (k === "cistern") {
                 need = need || engine.shouldShowCisternWaterNotify();
             }
+            if (k === data.progress.selectedBaseBuilding) {
+                need = false;
+            }
             applyNotifyLabel(k, need);
         }
     },
@@ -4879,42 +4949,18 @@ let view = {
             viewData.prevValues.historyHtml = html;
         }
     },
-    formatPrestigeCardList: function(cards) {
-        if (!cards || !cards.length) {
-            return "None";
+    prestigeHistoryPackCount: function(run, source) {
+        const totalKey = source === "bought" ? "boughtPacks" : "milestonePacks";
+        if (run && typeof run[totalKey] === "number") {
+            return Math.max(0, Math.floor(run[totalKey]));
         }
-        const escapeHtml = function(text) {
-            return String(text == null ? "" : text)
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
-        };
-        const parts = [];
-        for (let i = 0; i < cards.length; i++) {
-            const card = cards[i];
-            const rarity = (typeof shrineCards !== "undefined" && shrineCards.rarityLabel)
-                ? shrineCards.rarityLabel(card.rarity)
-                : (card.rarity || "");
-            const name = card.name || card.key || "Card";
-            parts.push(escapeHtml(rarity + " " + name));
-        }
-        return parts.join(", ");
-    },
-    formatPrestigePackCounts: function(counts) {
-        const order = ["common", "rare", "epic"];
-        const parts = [];
-        const src = counts || {};
-        for (let i = 0; i < order.length; i++) {
-            const rarity = order[i];
-            const count = Math.floor(src[rarity] || 0);
-            if (count > 0) {
-                const label = (typeof shrineCards !== "undefined" && shrineCards.rarityLabel)
-                    ? shrineCards.rarityLabel(rarity).toLowerCase()
-                    : rarity;
-                parts.push(count + " " + label);
-            }
-        }
-        return parts.join(", ");
+        const cardsKey = source === "bought" ? "boughtCards" : "milestoneCards";
+        const unopenedKey = source === "bought" ? "unopenedBought" : "unopenedMilestone";
+        const cards = run && run[cardsKey];
+        let n = Array.isArray(cards) ? cards.length : 0;
+        const unopened = (run && run[unopenedKey]) || {};
+        n += Math.floor(unopened.common || 0) + Math.floor(unopened.rare || 0) + Math.floor(unopened.epic || 0);
+        return n;
     },
     updatePrestigeHistoryList: function() {
         const el = viewData.cached.prestigeHistoryList;
@@ -4929,23 +4975,12 @@ let view = {
         for (let i = 0; i < runs.length; i++) {
             const run = runs[i];
             const number = runs.length - i;
-            const unopenedMilestone = view.formatPrestigePackCounts(run.unopenedMilestone);
-            const unopenedBought = view.formatPrestigePackCounts(run.unopenedBought);
             html += `<div class="history-prestige-entry">`;
             html += `<div class="history-prestige-title">Prestige ${number}</div>`;
             html += `<div class="history-prestige-line">Time taken: ${secondsToTime(run.seconds || 0)}</div>`;
-            html += `<div class="history-prestige-line">Cards received from milestones: ${view.formatPrestigeCardList(run.milestoneCards)}</div>`;
-            if (unopenedMilestone) {
-                html += `<div class="history-prestige-line">Unopened milestone packs: ${unopenedMilestone}</div>`;
-            }
-            html += `<div class="history-prestige-line">Cards bought: ${view.formatPrestigeCardList(run.boughtCards)}</div>`;
-            if (unopenedBought) {
-                html += `<div class="history-prestige-line">Unopened bought packs: ${unopenedBought}</div>`;
-            }
-            html += `<div class="history-prestige-line">Total talent levels: ${Math.floor(run.talentLevels || 0)}</div>`;
-            html += `<div class="history-prestige-line">Total stars: ${Math.floor(run.totalStars || 0)}</div>`;
-            html += `<div class="history-prestige-line">Okami level: ${Math.floor(run.okamiLevel || 0)}</div>`;
-            html += `<div class="history-prestige-line">Total spirit level: ${Math.floor(run.spiritLevels || 0)}</div>`;
+            html += `<div class="history-prestige-row"><span>Packs received from milestones: ${view.prestigeHistoryPackCount(run, "milestone")}</span><span>Packs bought: ${view.prestigeHistoryPackCount(run, "bought")}</span></div>`;
+            html += `<div class="history-prestige-row"><span>Total talent levels: ${Math.floor(run.talentLevels || 0)}</span><span>Total stars: ${Math.floor(run.totalStars || 0)}</span></div>`;
+            html += `<div class="history-prestige-row"><span>Okami level: ${Math.floor(run.okamiLevel || 0)}</span><span>Total spirit level: ${Math.floor(run.spiritLevels || 0)}</span></div>`;
             html += `</div>`;
         }
         if (viewData.prevValues.prestigeHistoryHtml !== html) {
@@ -5065,7 +5100,10 @@ let view = {
         }
         const shown = Math.floor(have);
         const pct = cost > 0 ? Math.max(0, Math.min(100, (have / cost) * 100)) : 0;
-        view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)} / ${intToString(Math.floor(cost), 1)} Shards until next Skill Slot`);
+        const shardRate = engine.getCloneShardRatePerSecond();
+        const shardRemain = Math.max(0, cost - have);
+        const shardEta = shardRate > 0 && shardRemain > 0 ? secondsToTime(shardRemain / shardRate) : "-";
+        view.updateVal("skillsShardSlotProgressLabel", `${intToString(shown, 1)} / ${intToString(Math.floor(cost), 1)} Shards until next Skill Slot | ETA: ${shardEta}`);
         view.updateVal("skillsShardSlotProgressFill", `${pct}%`, "style.width");
     },
     updateSkillLoadoutButtons: function() {
@@ -5166,6 +5204,51 @@ let view = {
         tip.style.left = left + "px";
         tip.style.top = (rect.bottom + 4) + "px";
     },
+    positionSkillSlotTip: function(el) {
+        if (!el || !el.querySelector) {
+            return;
+        }
+        const tip = el.querySelector(".skill-slot-hover");
+        if (!tip) {
+            return;
+        }
+        const rect = el.getBoundingClientRect();
+        const panel = document.getElementById("tabPane_skills");
+        const panelRect = panel ? panel.getBoundingClientRect() : null;
+        const bounds = panelRect && panelRect.width > 0 ? panelRect : {
+            left: 8,
+            top: 8,
+            right: window.innerWidth - 8,
+            bottom: window.innerHeight - 8
+        };
+        const margin = 8;
+        const tipW = tip.offsetWidth || 220;
+        const tipH = tip.offsetHeight || 48;
+        let left = rect.left;
+        let top = rect.bottom + 4;
+        if (left + tipW > bounds.right - margin) {
+            left = rect.left - tipW - 4;
+        }
+        if (top + tipH > bounds.bottom - margin) {
+            top = rect.top - tipH - 4;
+        }
+        const minLeft = bounds.left + margin;
+        const minTop = bounds.top + margin;
+        const maxLeft = Math.max(minLeft, bounds.right - margin - tipW);
+        const maxTop = Math.max(minTop, bounds.bottom - margin - tipH);
+        if (left < minLeft) {
+            left = minLeft;
+        } else if (left > maxLeft) {
+            left = maxLeft;
+        }
+        if (top < minTop) {
+            top = minTop;
+        } else if (top > maxTop) {
+            top = maxTop;
+        }
+        tip.style.left = left + "px";
+        tip.style.top = top + "px";
+    },
     positionLevelingStatTip: function(el) {
         if (!el || !el.querySelector) {
             return;
@@ -5216,7 +5299,7 @@ let view = {
                         }
                         if (filledEl) {
                             filledEl.style.display = "";
-                            const filledCls = `skill-equip-slot-filled skill-equip-slot-filled--${slotCat || "any"}`;
+                            const filledCls = `skill-equip-slot-filled showthat skill-equip-slot-filled--${slotCat || "any"}`;
                             if (filledEl.className !== filledCls) {
                                 filledEl.className = filledCls;
                             }
@@ -5228,6 +5311,9 @@ let view = {
                             slotEl.classList.toggle("skill-equip-slot--selected", !!key && key === selKey);
                         }
                         view.updateVal(`${idPrefix}_name`, skill ? skill.name : key);
+                        const shortDesc = view.escapeHtml(skills.getSkillShortDescription(key) || "");
+                        const currentFx = skills.skillEffectUiSummary(key, skill) || "";
+                        view.updateVal(`${idPrefix}_tip`, `<div>${shortDesc}</div><div class="skill-current">${currentFx}</div>`, "innerHTML");
                         if (compact) {
                             view.updateVal(`${idPrefix}_talent`, skill ? `Talent ${skill.talentLevel}` : "");
                         } else {
@@ -5886,6 +5972,51 @@ let view = {
                 view.updateVal(badgeId, needTabNotify ? "" : "none", "style.display");
             }
             view.updateVal(id, needTabNotify, "classList.toggle", "tab-button--notify");
+        }
+        let packLabel = "Cards";
+        if (typeof shrineCards !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
+            const shrine = data.progress.base && data.progress.base.shrine;
+            const packs = shrineCards.totalPacks(shrine);
+            if (packs >= 1) {
+                packLabel = `Cards (${packs})`;
+            }
+        }
+        view.setTabButtonLabel("cardBonuses", packLabel);
+        let skillsLabel = "Skills";
+        if (typeof skills !== "undefined" && skills.countEmptyEquipSlots) {
+            const emptySlots = skills.countEmptyEquipSlots();
+            if (emptySlots >= 1) {
+                skillsLabel = `Skills (${emptySlots})`;
+            }
+        }
+        view.setTabButtonLabel("skills", skillsLabel);
+    },
+    setTabButtonLabel: function(tabKey, text) {
+        const btn = viewData.cached["tabButton_" + tabKey] || document.getElementById("tabButton_" + tabKey);
+        if (!btn) {
+            return;
+        }
+        let label = btn.querySelector(".tab-button-label");
+        if (!label) {
+            label = document.createElement("span");
+            label.className = "tab-button-label";
+            const textNodes = [];
+            for (let i = 0; i < btn.childNodes.length; i++) {
+                if (btn.childNodes[i].nodeType === 3 && btn.childNodes[i].textContent.trim()) {
+                    textNodes.push(btn.childNodes[i]);
+                }
+            }
+            if (textNodes.length) {
+                btn.insertBefore(label, textNodes[0]);
+                for (let t = 0; t < textNodes.length; t++) {
+                    textNodes[t].remove();
+                }
+            } else {
+                btn.insertBefore(label, btn.firstChild);
+            }
+        }
+        if (label.textContent !== text) {
+            label.textContent = text;
         }
     },
     repositionBaseBuildingInfo: function() {
@@ -6612,22 +6743,30 @@ let view = {
         delete viewData.intruderRenderCache[intruderId];
     },
 
-    spawnInnBeadFloat: function(beads) {
+    formatGainAmount: function(amount) {
+        const n = Math.abs(Number(amount) || 0);
+        if (n >= 10000) {
+            return intToStringRound(n);
+        }
+        return String(round2(n));
+    },
+    spawnBuildingGainFloat: function(buildingId, html, color) {
         if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {
             return;
         }
         if (!view.isResortMapVisible()) {
             return;
         }
-        const innBtn = viewData.cached.baseBuilding_inn || document.getElementById("baseBuilding_inn");
-        if (!innBtn) {
+        const host = viewData.cached[buildingId] || document.getElementById(buildingId);
+        if (!host || !html) {
             return;
         }
-        const amount = Math.round(Number(beads) || 0);
         const el = document.createElement("div");
         el.className = "inn-bead-float hypervisible";
-        const label = Math.abs(amount) >= 10000 ? intToStringRound(amount) : String(amount);
-        el.textContent = `+${label}`;
+        el.innerHTML = html;
+        if (color) {
+            el.style.color = color;
+        }
         const beadX = (Math.random() - 0.5) * 50;
         const beadY = (Math.random() - 0.5) * 50;
         el.style.setProperty("--inn-bead-x", `${beadX}px`);
@@ -6635,7 +6774,37 @@ let view = {
         el.addEventListener("animationend", function() {
             el.remove();
         });
-        innBtn.appendChild(el);
+        host.appendChild(el);
+    },
+    spawnResourceFloat: function(buildingId, resourceKey, amount, color) {
+        const n = Number(amount) || 0;
+        if (!(n > 0)) {
+            return;
+        }
+        const icon = resortData.resourceIconHtml(resourceKey);
+        view.spawnBuildingGainFloat(buildingId, `+${icon}${view.formatGainAmount(n)}`, color);
+    },
+    spawnInnBeadFloat: function(beads) {
+        const amount = Math.round(Number(beads) || 0);
+        view.spawnResourceFloat("baseBuilding_inn", "starBeads", amount, "#17edfd");
+    },
+    spawnCisternGainFloat: function(waterGain, essenceGain) {
+        const water = Number(waterGain) || 0;
+        const essence = Number(essenceGain) || 0;
+        if (!(water > 0) && !(essence > 0)) {
+            return;
+        }
+        const essenceHtml = `${resortData.resourceIconHtml("essence")}<span style="color:#db0042">${view.formatGainAmount(essence)}</span>`;
+        if (water > 0 && essence > 0) {
+            const html = `<span style="color:#7ec8e3">${view.formatGainAmount(water)}L</span> | ${essenceHtml}`;
+            view.spawnBuildingGainFloat("baseBuilding_cistern", html, "#cdd6f4");
+            return;
+        }
+        if (water > 0) {
+            view.spawnBuildingGainFloat("baseBuilding_cistern", `${view.formatGainAmount(water)}L`, "#7ec8e3");
+            return;
+        }
+        view.spawnBuildingGainFloat("baseBuilding_cistern", essenceHtml, "#db0042");
     },
     spawnNoodleTipFloat: function(skillName) {
         if (document.hidden || (typeof isProcessingOffline !== "undefined" && isProcessingOffline)) {

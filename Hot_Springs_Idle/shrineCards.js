@@ -1143,7 +1143,7 @@ var shrineCards = {
     /** Legend N is index N - 1. Each entry is { text, apply }. Effects read legendsWritten at use time. */
     legendEffects: [
         {
-            text: "Add 5 upgrades to Shrine that cost Divinity.\nx2 divinity/s\nIncrease max density to be the Orb Level/2\nAdd 4 upgrades to Cistern that let you buy more spirits for Essence",
+            text: "Add 10 upgrades to Shrine that cost Divinity.\nx2 divinity/s\nIncrease max density to be the Orb Level/2\nAdd 4 upgrades to Cistern that let you buy more spirits for Essence",
             apply: function() {}
         }
     ],
@@ -1175,18 +1175,18 @@ var shrineCards = {
         common: {
             slots: 6,
             choose: 1,
-            weights: { common: 85, rare: 14, epic: 1 },
+            weights: { common: 91, rare: 8, epic: 1 },
             minRare: 0,
             minEpic: 0,
-            oddsHtml: "6 cards with their own rolls for rarity:<br>85% Common Cards<br>14% Rare Cards<br>1% Epic Cards<br>Open and choose one!"
+            oddsHtml: "6 cards with their own rolls for rarity:<br>91% Common Cards<br>8% Rare Cards<br>1% Epic Cards<br>Open and choose one!"
         },
         rare: {
             slots: 6,
             choose: 1,
-            weights: { common: 70, rare: 27, epic: 3 },
+            weights: { common: 78, rare: 20, epic: 2 },
             minRare: 2,
             minEpic: 0,
-            oddsHtml: "6 cards with their own rolls for rarity:<br>70% Common Cards<br>27% Rare Cards<br>3% Epic Cards<br>At least 2 cards will be rare<br>Open and choose one!"
+            oddsHtml: "6 cards with their own rolls for rarity:<br>78% Common Cards<br>20% Rare Cards<br>2% Epic Cards<br>At least 2 cards will be rare<br>Open and choose one!"
         },
         epic: {
             slots: 9,

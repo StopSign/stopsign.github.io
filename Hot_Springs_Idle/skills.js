@@ -732,10 +732,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"I learn more from the wreck than from the lesson plan.\"",
         shortDescription: "Siphon clone exp from intruders in slap range.",
         rewardText: function() {
-            return "Reward: each second, gain 10% (+2% per skill level) of the clone exp each intruder in slap range would award. That exp also grants the usual Okami exp.";
+            return "Reward: each second, gain 5% (+1% per skill level) of the clone exp each intruder in slap range would award. That exp also grants the usual Okami exp.";
         },
         getEffect: function(sk) {
-            return { cloneExpFractionPerSec: 0.10 + 0.02 * (sk.level || 0) };
+            return { cloneExpFractionPerSec: 0.05 + 0.01 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             const pct = roundNearestDecimals((e.cloneExpFractionPerSec || 0) * 100, 1);
@@ -965,10 +965,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Peak confidence is when I stop introducing myself.\"",
         shortDescription: "Clout while at max Audacity.",
         rewardText: function(sk) {
-            return `Reward: 4 (+2 per skill level) Clout every 1s while at max Aud.`;
+            return `Reward: 3 (+1.5 per skill level) Clout every 1s while at max Aud.`;
         },
         getEffect: function(sk) {
-            return { cloutPerSec: 4 + (sk.level || 0) * 2 };
+            return { cloutPerSec: 3 + (sk.level || 0) * 1.5 };
         },
         effectUiSummary: function(sk, e) {
             return `Current: +${round2(e.cloutPerSec || 0)} Clout/s at max Aud`;
@@ -2035,6 +2035,23 @@ let skills = {
 
     isSkillEquipped: function(skillKey) {
         return !!skills.findSkillEquipSlot(skillKey);
+    },
+
+    countEmptyEquipSlots: function() {
+        const eq = skills.ensureSkillEquip();
+        if (!eq) {
+            return 0;
+        }
+        let empty = 0;
+        for (let c = 0; c < skills.SLOT_COLUMNS.length; c++) {
+            const arr = eq.slots[skills.SLOT_COLUMNS[c]] || [];
+            for (let i = 0; i < arr.length; i++) {
+                if (!arr[i]) {
+                    empty++;
+                }
+            }
+        }
+        return empty;
     },
 
     anyEquipped: function(type) {

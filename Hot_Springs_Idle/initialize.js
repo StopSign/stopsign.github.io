@@ -461,7 +461,8 @@ let initials = {
                 manaCapacity: 4000,
                 allowUnduplicatedStone: true,
                 dupeTimerMs: 10000,
-                stoneDuplicatorUnlocked: false
+                stoneDuplicatorUnlocked: false,
+                echoedShelvingBought: 0
             },
             fireLaunchers: {
                 builtCount: 0,
@@ -648,10 +649,12 @@ let initials = {
             legendsWritten: 0,
             legendPenaltyExtra: 0,
             secondsThisResort: 0,
+            secondsPlayedTotal: 0,
             prestigeHistory: [],
             selectedHistorySubTab: "combat",
             packSourceQueues: { common: [], rare: [], epic: [] },
             prestigeRunCards: { milestone: [], bought: [] },
+            prestigeRunPacks: { milestone: 0, bought: 0 },
             mapWorkersFound: {},
             currentClassKey: "none",
             pendingClassKey: "",
@@ -785,6 +788,9 @@ let initialize = {
         }
         if (bf.infuseSoilBought === undefined || bf.infuseSoilBought === null) {
             bf.infuseSoilBought = 0;
+        }
+        if (bf.echoedAxeBought === undefined || bf.echoedAxeBought === null) {
+            bf.echoedAxeBought = 0;
         }
     },
     initializeScrollArchives: function() {
@@ -922,6 +928,55 @@ let initialize = {
             }
             if (pile.stoneDuplicatorUnlocked === undefined) {
                 pile.stoneDuplicatorUnlocked = false;
+            }
+            if (pile.echoedShelvingBought === undefined || pile.echoedShelvingBought === null) {
+                const forest = base.bambooForest;
+                pile.echoedShelvingBought = (forest && forest.echoedShelvingBought) || 0;
+            }
+        }
+        if (base.bambooForest && base.bambooForest.echoedShelvingBought !== undefined) {
+            delete base.bambooForest.echoedShelvingBought;
+        }
+        const oldShelvingJob = "upgrade:bambooForest:echoedShelving";
+        const newShelvingJob = "upgrade:stonePile:echoedShelving";
+        const fox = base.foxDen;
+        if (fox && fox.upgradeGatherJobs && fox.upgradeGatherJobs[oldShelvingJob]) {
+            const job = fox.upgradeGatherJobs[oldShelvingJob];
+            job.scopeKey = "stonePile";
+            fox.upgradeGatherJobs[newShelvingJob] = job;
+            delete fox.upgradeGatherJobs[oldShelvingJob];
+        }
+        if (fox && fox.jobQueue) {
+            for (let qi = 0; qi < fox.jobQueue.length; qi++) {
+                if (fox.jobQueue[qi] === oldShelvingJob) {
+                    fox.jobQueue[qi] = newShelvingJob;
+                }
+            }
+        }
+        const carriers = fox && fox.constructionCarriers;
+        if (carriers) {
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci] && carriers[ci].jobKey === oldShelvingJob) {
+                    carriers[ci].jobKey = newShelvingJob;
+                }
+            }
+        }
+        const weaving = data.progress && data.progress.weaving;
+        if (weaving) {
+            if (weaving.active && weaving.active.scopeKey === "bambooForest" && weaving.active.upgradeKey === "echoedShelving") {
+                weaving.active.scopeKey = "stonePile";
+                weaving.active.buildingName = "Stone Pile";
+            }
+            const paused = weaving.paused;
+            if (paused && paused.scopeKey === "bambooForest" && paused.upgradeKey === "echoedShelving") {
+                paused.scopeKey = "stonePile";
+                paused.buildingName = "Stone Pile";
+            } else if (paused && paused["bambooForest:echoedShelving"]) {
+                const entry = paused["bambooForest:echoedShelving"];
+                entry.scopeKey = "stonePile";
+                entry.buildingName = "Stone Pile";
+                paused["stonePile:echoedShelving"] = entry;
+                delete paused["bambooForest:echoedShelving"];
             }
         }
         const garden = base.garden;
@@ -1316,6 +1371,9 @@ let initialize = {
         }
         if (shrine.selectedClassKey === undefined || shrine.selectedClassKey === null) {
             shrine.selectedClassKey = "none";
+        }
+        if (!shrine.prepareToWriteLegendBought && typeof engine !== "undefined" && engine.getLegendsWritten && engine.getLegendsWritten() >= 1) {
+            shrine.prepareToWriteLegendBought = true;
         }
         if (shrine.allowClasslessWithoutDivinity !== undefined) {
             delete shrine.allowClasslessWithoutDivinity;

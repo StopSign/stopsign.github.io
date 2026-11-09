@@ -536,6 +536,36 @@ button {
     pointer-events: none;
 }
 
+#playerTokenBarrierLayer {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+#playerTokenBarrierFill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: #7EB6FF;
+    transform-origin: bottom center;
+    transform: scaleY(0);
+    pointer-events: none;
+}
+
+#playerStatCloutLine {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #7EB6FF;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+}
+
 /* Sibling of #playerToken so Aud text is not clipped by the token's overflow; sits above the circle. */
 #playerTokenOverlay {
     position: absolute;
@@ -776,6 +806,25 @@ button {
 .skill-reward,
 #skillInfo_trigger {
     color: #9ca3af;
+}
+
+#skillInfo_reward,
+#libSkillInfo_reward {
+    color: #bac2de;
+}
+
+.skill-slot-hover {
+    position: fixed;
+    width: max-content;
+    max-width: 260px;
+    white-space: normal;
+    z-index: 1000;
+    margin-top: 0;
+    pointer-events: none;
+}
+
+.skill-slot-hover .skill-current {
+    margin: 4px 0 0;
 }
 
 .intruder-token {
@@ -1093,6 +1142,15 @@ button {
     color: white;
     border: none;
     padding: 8px 16px;
+    cursor: pointer;
+}
+
+.death-retry-row {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.death-retry-row label {
     cursor: pointer;
 }
 
@@ -2198,6 +2256,13 @@ button {
     margin: 2px 0;
 }
 
+.history-prestige-row {
+    display: flex;
+    gap: 18px;
+    font-size: 13px;
+    margin: 2px 0;
+}
+
 .history-talent {
     margin: 0;
     font-size: 11px;
@@ -2483,6 +2548,11 @@ button {
 .leveling-play-stats {
     margin-top: 10px;
     font-size: 13px;
+    flex-wrap: wrap;
+}
+
+#playTimeTotalRow {
+    flex-basis: 100%;
 }
 
 .resort-building-art {
@@ -4725,6 +4795,12 @@ button[id^="inscriptionAssign_"]:disabled:hover {
     gap: 8px;
 }
 
+.guest-rest-dial {
+    width: 140px;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
 .guest-itinerary-line {
     font-size: 12px;
     line-height: 1.45;
@@ -4952,6 +5028,9 @@ button[id^="inscriptionAssign_"]:disabled:hover {
 .showthat:hover .showthis {
     display:block;
 }
+body.skill-dragging .showthis {
+    display: none !important;
+}
 .showthis {
     display:none;
     position:absolute;
@@ -4963,6 +5042,16 @@ button[id^="inscriptionAssign_"]:disabled:hover {
     z-index:999;
     text-align:left;
     color: var(--text-primary);
+}
+
+.showthis.skill-slot-hover {
+    position: fixed;
+    width: max-content;
+    max-width: 260px;
+    white-space: normal;
+    z-index: 1000;
+    margin-top: 0;
+    pointer-events: none;
 }
 
 .skill-stars-controls {

@@ -11,6 +11,29 @@ let events = {
             }
         }
     },
+    setInnRestSeconds: function(raw) {
+        const inn = data.progress.base && data.progress.base.inn;
+        if (!inn) {
+            return;
+        }
+        const cap = engine.getInnRestDurationSeconds();
+        const dialMax = Math.max(5, cap);
+        let value = Math.round(Number(raw));
+        if (!isFinite(value)) {
+            value = dialMax;
+        }
+        value = Math.max(5, Math.min(dialMax, value));
+        inn.restSecondsAllowed = value;
+        inn.restPinnedToMax = value >= dialMax - 0.501;
+        const allowed = engine.getInnRestAllowedSeconds();
+        const guests = inn.guests || [];
+        for (let i = 0; i < guests.length; i++) {
+            const guest = guests[i];
+            if ((guest.itineraryStep || "") === "rest" && (guest.timeToNext || 0) > allowed) {
+                guest.timeToNext = allowed;
+            }
+        }
+    },
     tryAgain: function() {
         if (bonfire.isApplyLiveSettingsToNextClone()) {
             bonfire.startNextClone();
@@ -99,7 +122,10 @@ let events = {
             if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
                 const optIx = preTabs.indexOf("options");
                 if (optIx >= 0) {
-                    preTabs.splice(optIx, 0, "cardBonuses", "prestige");
+                    preTabs.splice(optIx, 0, "cardBonuses");
+                    if (engine.isPrepareToWriteLegendBought && engine.isPrepareToWriteLegendBought()) {
+                        preTabs.splice(optIx + 1, 0, "prestige");
+                    }
                 }
             }
             return preTabs;
@@ -119,7 +145,10 @@ let events = {
         if (typeof engine !== "undefined" && engine.isShrineBuilt && engine.isShrineBuilt()) {
             const optIx = tabs.indexOf("options");
             if (optIx >= 0) {
-                tabs.splice(optIx, 0, "cardBonuses", "prestige");
+                tabs.splice(optIx, 0, "cardBonuses");
+                if (engine.isPrepareToWriteLegendBought && engine.isPrepareToWriteLegendBought()) {
+                    tabs.splice(optIx + 1, 0, "prestige");
+                }
             }
         }
         return tabs;
@@ -636,6 +665,7 @@ let events = {
         ev.dataTransfer.setData("text/plain", payload);
         ev.dataTransfer.effectAllowed = "move";
         viewData.skillDragPayload = payload;
+        events._setSkillDragImage(ev, ev.currentTarget);
     },
     librarySkillDragStart: function(ev, skillKey) {
         if (!ev || !ev.dataTransfer) {
@@ -649,6 +679,40 @@ let events = {
         ev.dataTransfer.setData("text/plain", payload);
         ev.dataTransfer.effectAllowed = "copyMove";
         viewData.skillDragPayload = payload;
+        events._setSkillDragImage(ev, ev.currentTarget);
+    },
+    skillDragEnd: function() {
+        document.body.classList.remove("skill-dragging");
+        const marked = document.querySelectorAll(".skill-equip-slot--dragover, .skill-equip-slot--dragover-invalid");
+        for (let i = 0; i < marked.length; i++) {
+            events._clearSkillSlotDragOver(marked[i]);
+        }
+    },
+    _setSkillDragImage: function(ev, sourceEl) {
+        if (!ev || !ev.dataTransfer || !sourceEl) {
+            return;
+        }
+        document.body.classList.add("skill-dragging");
+        const clone = sourceEl.cloneNode(true);
+        const tips = clone.querySelectorAll(".showthis");
+        for (let i = 0; i < tips.length; i++) {
+            tips[i].remove();
+        }
+        clone.style.position = "fixed";
+        clone.style.left = "-10000px";
+        clone.style.top = "0";
+        clone.style.width = sourceEl.offsetWidth + "px";
+        clone.style.maxWidth = sourceEl.offsetWidth + "px";
+        clone.style.margin = "0";
+        clone.style.pointerEvents = "none";
+        document.body.appendChild(clone);
+        const rect = sourceEl.getBoundingClientRect();
+        ev.dataTransfer.setDragImage(clone, ev.clientX - rect.left, ev.clientY - rect.top);
+        setTimeout(function() {
+            if (clone.parentNode) {
+                clone.parentNode.removeChild(clone);
+            }
+        }, 0);
     },
     _clearSkillSlotDragOver: function(slot) {
         if (!slot || !slot.classList) {
@@ -2600,7 +2664,6 @@ let events = {
             view.renderPrestigePackPanel();
             return;
         }
-        const packSource = session.openPack.source || "carried";
         for (let i = 0; i < sel.length; i++) {
             const card = session.openPack.cards[sel[i]];
             if (!card) {
@@ -2608,7 +2671,6 @@ let events = {
             }
             shrineCards.grant(card.key, card.rarity, 1);
             session.gained.push({ key: card.key, rarity: card.rarity });
-            engine.notePrestigeChosenCard(packSource, card);
         }
         if (typeof view !== "undefined" && view.updateCardBonusesTab) {
             view.updateCardBonusesTab();

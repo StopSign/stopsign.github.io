@@ -12,6 +12,13 @@ function round1(num) {
 function round1Fixed(num) {
     return round1(num).toFixed(1);
 }
+function round3(num) {
+    return Math.floor(num * 1000 + .000000001) / 1000;
+}
+/** Like round1Fixed, but always shows three decimals. */
+function round3Fixed(num) {
+    return round3(num).toFixed(3);
+}
 function round2(num) {
     return Math.floor(num * 100 + .000000001) / 100;
 }
@@ -80,7 +87,7 @@ function intToStringNegative(value, amount) {
         value *= -1;
     }
     if (value >= 10000) {
-        return (isPositive === 1 ? "+" : "-") + nFormatter(value, 3);
+        return (isPositive === 1 ? "+" : "-") + nFormatterFixed(value, 3);
     }
     let baseValue = 3;
     if (amount) {
@@ -149,7 +156,7 @@ function intToString(value, amount, hideSmall) {
     if (value + .0000001 >= 10000) {
         value += .0000001; //anti floating point rounding issues
         if(data.gameSettings.numberType === "numberSuffix") {
-            return (isNeg ? "-" : "") + nFormatter(value, 3);
+            return (isNeg ? "-" : "") + nFormatterFixed(value, 3);
         } else if(data.gameSettings.numberType === "scientific") {
             return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         } else if(data.gameSettings.numberType === "engineering") {
@@ -185,7 +192,7 @@ function intToStringRound(value) {
     value *= isNeg ? -1 : 1;
     if (value >= 10000) {
         if(data.gameSettings.numberType === "numberSuffix") {
-            return (isNeg ? "-" : "") + nFormatter(value, 3);
+            return (isNeg ? "-" : "") + nFormatterFixed(value, 3);
         } else if(data.gameSettings.numberType === "scientific") {
             return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         } else if(data.gameSettings.numberType === "engineering") {
@@ -200,7 +207,7 @@ function intToStringManaCap(value) {
     value *= isNeg ? -1 : 1;
     if (value >= 100000) {
         if(data.gameSettings.numberType === "numberSuffix") {
-            return (isNeg ? "-" : "") + nFormatter(value, 3);
+            return (isNeg ? "-" : "") + nFormatterFixed(value, 3);
         } else if(data.gameSettings.numberType === "scientific") {
             return (isNeg ? "-" : "") + Math.abs(value).toExponential(2).replace("+", "");
         } else if(data.gameSettings.numberType === "engineering") {
@@ -289,6 +296,16 @@ function nFormatter(num, digits) {
         }
     }
     return num.toPrecision(digits).replace(rx, "$1");
+}
+
+/** Same 3-significant-digit suffixes as nFormatter, keeping trailing zeros (30.0K, 1.00M). */
+function nFormatterFixed(num, digits) {
+    for (let i = 0; i < si.length; i++) {
+        if ((num) >= si[i].value / 1.000501) {
+            return (num / si[i].value).toPrecision(digits) + si[i].symbol;
+        }
+    }
+    return num.toPrecision(digits);
 }
 
 function decamelize(str) {

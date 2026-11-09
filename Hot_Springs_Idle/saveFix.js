@@ -45,6 +45,8 @@ let saveFix = {
         }
         engine.ensureShardProgress();
         engine.processShardSkillSlotUnlocks();
+        engine.ensurePrestigeRunPacks();
+        engine.ensureSecondsPlayedTotal();
     },
 
     /** Alacrity was offered as a Scroll Archives research. Return that point once. */

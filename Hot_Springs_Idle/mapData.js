@@ -98,7 +98,7 @@ mapData.getDefaultMaps = function() {
             name: "Romance Novelists",
             description: "Masses of novelists are determined in their pursuit of finding inspiration from the truth of the rumor's surrounding the hotspring. The Okami must fill their hearts with shame for their vanity.",
             seed: 9944,
-            baseDifficulty: 4.5,
+            baseDifficulty: 5.5,
             unlocksAfterMapKey: "map_5",
             zones: [
                 mapData.createZone(5, "scoundrel", 0, 100, 1, 1),

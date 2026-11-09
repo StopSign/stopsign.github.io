@@ -179,6 +179,13 @@ let driver = {
             } else {
                 data.progress.secondsThisResort++;
             }
+            const hadPlayTotal = typeof data.progress.secondsPlayedTotal === "number";
+            if (typeof engine !== "undefined" && engine.ensureSecondsPlayedTotal) {
+                engine.ensureSecondsPlayedTotal();
+            }
+            if (hadPlayTotal) {
+                data.progress.secondsPlayedTotal++;
+            }
         }
         if (typeof engine.tryAutobuyUpgrades === "function") {
             engine.tryAutobuyUpgrades();

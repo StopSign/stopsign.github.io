@@ -180,7 +180,10 @@ var bonfire = {
 
     isApplyLiveSettingsToNextClone: function() {
         const bf = data.progress.base && data.progress.base.bonfire;
-        return !!(bf && bf.applyLiveSettingsToNextClone);
+        if (!bf || !bf.denseClonesUnlocked) {
+            return true;
+        }
+        return !!bf.applyLiveSettingsToNextClone;
     },
 
     shouldUseLiveCloneSettings: function() {
