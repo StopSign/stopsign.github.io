@@ -132,8 +132,8 @@ var resortData = {
     workerDockSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "bonfire", "cistern", "scrollArchives",  "mage_tower", "market"],
 
     /** Credit paid per unit of each haulable resource delivered to the Market. */
-    marketCreditPerResource: { stone: 5, wood: 3, bars: 10 },
-    marketHaulResourceOrder: ["stone", "wood", "bars"],
+    marketCreditPerResource: { stone: 5, wood: 3, hardwood: 20, bars: 10 },
+    marketHaulResourceOrder: ["stone", "wood", "hardwood", "bars"],
 
     /** Market Resources trades bought by assigned Traders. Order drives round-robin. */
     marketTradesOrder: ["fertilizer", "coal", "soap", "towels", "driedNoodles"],
@@ -245,6 +245,9 @@ var resortData = {
         if (key === "wood") {
             return (base.bambooForest && base.bambooForest.wood) || 0;
         }
+        if (key === "hardwood") {
+            return (base.bambooForest && base.bambooForest.hardwood) || 0;
+        }
         if (key === "stone") {
             if (typeof engine !== "undefined" && engine.isStoneCarryUnduplicatedAllowed && !engine.isStoneCarryUnduplicatedAllowed() && engine.getConstructionResourceAvailable) {
                 return engine.getConstructionResourceAvailable("stone");
@@ -279,7 +282,7 @@ var resortData = {
         if (key === "mana" && typeof engine !== "undefined" && engine.getManaCapacity && amount > engine.getManaCapacity()) {
             cls = " cost-amt-unaffordable";
         }
-        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "stone" || key === "ore" || key === "bars" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
+        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `<span class="cost-amt${cls}">${intToStringRound(amount)}</span>${icon} ${label}`;
@@ -288,7 +291,7 @@ var resortData = {
         const remaining = Math.max(0, required - delivered);
         const owned = resortData.ownedAmountForCostKey(key);
         const cls = owned >= remaining ? " cost-amt-affordable" : "";
-        const icon = (key === "wood" || key === "stone" || key === "ore" || key === "bars")
+        const icon = (key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `${intToStringRound(delivered)}/<span class="cost-amt${cls}">${intToStringRound(required)}</span>${icon} ${label}`;
@@ -301,6 +304,7 @@ var resortData = {
         if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
         if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
         if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
+        if ((c.hardwood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.hardwood, "hardwood", "hardwood"));
         if ((c.coins || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.coins, "coins", "coins"));
         if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
         if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
@@ -382,7 +386,7 @@ var resortData = {
         return `Buy for [${parts.join(", ")}]`;
     },
 
-    gatherResourceKeys: ["wood", "stone", "bars", "ore"],
+    gatherResourceKeys: ["wood", "hardwood", "stone", "bars", "ore"],
 
     emptyGatherDelivered: function() {
         const out = {};
@@ -458,6 +462,11 @@ var resortData = {
         }
         if (woodReq > 0) {
             parts.push(resortData.formatCollectedPartHtml(woodDel, woodReq, "wood", "wood"));
+        }
+        const hardwoodDel = (delivered && delivered.hardwood) || 0;
+        const hardwoodReq = (required && required.hardwood) || 0;
+        if (hardwoodReq > 0) {
+            parts.push(resortData.formatCollectedPartHtml(hardwoodDel, hardwoodReq, "hardwood", "hardwood"));
         }
         const barsDel = (delivered && delivered.bars) || 0;
         const barsReq = (required && required.bars) || 0;
@@ -646,6 +655,7 @@ var resortData = {
         if ((c.divinity || 0) > ((data.progress.divinity && data.progress.divinity.amount) || 0)) return false;
         if ((c.essence || 0) > ((base.cistern && base.cistern.essence) || 0)) return false;
         if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) return false;
+        if ((c.hardwood || 0) > ((base.bambooForest && base.bambooForest.hardwood) || 0)) return false;
         if ((c.stone || 0) > engine.getTotalStone()) return false;
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) return false;
         if ((c.bars || 0) > ((base.atelier && base.atelier.bars) || 0)) return false;
@@ -680,6 +690,9 @@ var resortData = {
         }
         if ((c.wood || 0) > 0 && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - (c.wood || 0));
+        }
+        if ((c.hardwood || 0) > 0 && base.bambooForest) {
+            base.bambooForest.hardwood = Math.max(0, (base.bambooForest.hardwood || 0) - (c.hardwood || 0));
         }
         if ((c.stone || 0) > 0) {
             engine.deductStone(c.stone, { allowUnduplicated: true });
@@ -1452,6 +1465,8 @@ var resortData = {
                 assignedWorkers: 0,
                 workerPower: 0,
                 wood: 0,
+                hardwood: 0,
+                hardwoodChips: 0,
                 chips: 0,
                 rowCount: 3,
                 stalkCount: 4,
@@ -1460,9 +1475,10 @@ var resortData = {
                 stalks: null,
                 water: 0,
                 infuseSoilBought: 0,
-                echoedAxeBought: 0
+                echoedAxeBought: 0,
+                growHardwoodBought: 0
             },
-            upgradesOrder: ["infuseSoil", "echoedAxe"],
+            upgradesOrder: ["infuseSoil", "echoedAxe", "growHardwood"],
             upgrades: {
                 infuseSoil: {
                     key: "infuse_soil",
@@ -1521,6 +1537,24 @@ var resortData = {
                         return engine.getEchoedAxeBought() >= 2;
                     },
                     soldOutButtonLabel: "Max echoes"
+                },
+                growHardwood: {
+                    key: "grow_hardwood",
+                    name: "Grow Hardwood",
+                    description: "The grove can grow hardwood. Each column can switch between bamboo and hardwood. Hardwood grows at 1/4 speed, has twice the base chips, and 20 chips become 1 hardwood.",
+                    cost: { ore: 6000, essence: 10000 },
+                    weavingTime: 8000,
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.bambooForest.growHardwoodBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    soldOutButtonLabel: "Hardwood growing"
                 }
             }
         },
@@ -2152,6 +2186,7 @@ var resortData = {
                 furnitureBought: 0,
                 decorationBought: 0,
                 addRoomBought: 0,
+                secondFloorRoomsBought: 0,
                 reinforceJointsBought: 0,
                 restfulnessPerSecond: 1,
                 pondPathBuilt: false,
@@ -2167,7 +2202,7 @@ var resortData = {
                 gentleLightsUnlocked: false,
                 shapedLampsBought: 0
             },
-            upgradesOrder: ["addFurniture", "addDecoration", "addRoom", "buildPathToPond", "convertToOnsen", "reinforceJoints", "createGentleLights", "shapedLamps", "fillMana"],
+            upgradesOrder: ["addFurniture", "addDecoration", "addRoom", "secondFloorRooms", "buildPathToPond", "convertToOnsen", "reinforceJoints", "createGentleLights", "shapedLamps", "fillMana"],
             upgrades: {
                 addFurniture: {
                     key: "add_furniture",
@@ -2240,6 +2275,45 @@ var resortData = {
                         return engine.getInnAddRoomAbsoluteMaxPurchases();
                     },
                     soldOutButtonLabel: "Max rooms",
+                },
+                secondFloorRooms: {
+                    key: "second_floor_rooms",
+                    name: "Second Floor Rooms",
+                    description: "Add another room to the Tatami Onsen.",
+                    getCost: function() {
+                        const n = data.progress.base.inn.secondFloorRoomsBought || 0;
+                        const mult = Math.pow(2, n);
+                        return {
+                            wood: Math.round(10000 * mult),
+                            hardwood: Math.round(10000 * mult)
+                        };
+                    },
+                    weavingTime: 6000,
+                    weavingTimeIncreaseAdd: 3000,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.inn.secondFloorRoomsBought || 0;
+                    },
+                    maxPurchases: 6,
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought()
+                            && engine.isInnOnsenConverted()
+                            && (data.progress.base.inn.secondFloorRoomsBought || 0) < 6;
+                    },
+                    onBuy: function() {
+                        data.progress.base.inn.secondFloorRoomsBought = (data.progress.base.inn.secondFloorRoomsBought || 0) + 1;
+                        engine.syncInnRoomCounts();
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought() && engine.isInnOnsenConverted();
+                    },
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.inn.secondFloorRoomsBought || 0) >= 6;
+                    },
+                    soldOutButtonLabel: "Max rooms",
+                    extraInfo: function() {
+                        const n = data.progress.base.inn.secondFloorRoomsBought || 0;
+                        return `Second floor rooms: ${n}/6`;
+                    }
                 },
                 buildPathToPond: {
                     key: "build_path_to_pond",
@@ -2394,9 +2468,10 @@ var resortData = {
                 researchChoices: [],
                 selectedResearchChoice: "",
                 collectShardsLevel: 0,
+                sturdyShelvesBought: 0,
                 lockedSkillKeys: []
             },
-            upgradesOrder: ["finishResearch", "collectShards"],
+            upgradesOrder: ["finishResearch", "collectShards", "sturdyShelves"],
             upgrades: {
                 finishResearch: {
                     key: "finish_research",
@@ -2445,6 +2520,33 @@ var resortData = {
                             return "Unlocks shard drops and skill-slot progress";
                         }
                         return `Shard drop amount: x${round1(Math.pow(1.3, lv - 1))}`;
+                    }
+                },
+                sturdyShelves: {
+                    key: "sturdy_shelves",
+                    name: "Sturdy Shelves",
+                    description: "Each purchase multiplies all scribing output by x1.3.",
+                    getCost: function() {
+                        const n = engine.getSturdyShelvesBought();
+                        return { hardwood: Math.round(7500 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 6000,
+                    weavingTimeIncreaseAdd: 3000,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getSturdyShelvesBought();
+                    },
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.scrollArchives.sturdyShelvesBought = engine.getSturdyShelvesBought() + 1;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    extraInfo: function() {
+                        const n = engine.getSturdyShelvesBought();
+                        return `Scribing output: x${round2(Math.pow(1.3, n))}`;
                     }
                 }
             },
@@ -3693,9 +3795,10 @@ var resortData = {
                 lastTipText: "",
                 crossTalkBought: 0,
                 comfyStoolsBought: 0,
+                sturdyWallsBought: 0,
                 trophyDecorationsBought: 0
             },
-            upgradesOrder: ["crossTalk", "comfyStools", "trophyDecorations"],
+            upgradesOrder: ["crossTalk", "comfyStools", "sturdyWalls", "trophyDecorations"],
             upgrades: {
                 crossTalk: {
                     key: "cross_talk",
@@ -3750,6 +3853,38 @@ var resortData = {
                         return `Noodle restfulness: +${engine.getNoodleEatRestBonus()}/s`;
                     },
                 },
+                sturdyWalls: {
+                    key: "sturdy_walls",
+                    name: "Sturdy Walls",
+                    description: "Each purchase increases the time guests spend at the noodle bar by 2s.",
+                    getCost: function() {
+                        const n = engine.getNoodleSturdyWallsBought();
+                        return { hardwood: Math.round(6000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 6000,
+                    weavingTimeIncreaseAdd: 3000,
+                    maxPurchases: 4,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getNoodleSturdyWallsBought();
+                    },
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought() && engine.getNoodleSturdyWallsBought() < 4;
+                    },
+                    onBuy: function() {
+                        const bar = data.progress.base.noodleBar;
+                        bar.sturdyWallsBought = engine.getNoodleSturdyWallsBought() + 1;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getNoodleSturdyWallsBought() >= 4;
+                    },
+                    soldOutButtonLabel: "Max walls",
+                    extraInfo: function() {
+                        return `Noodle time: ${engine.getNoodleEatDurationSeconds()}s`;
+                    }
+                },
                 trophyDecorations: {
                     key: "trophy_decorations",
                     name: "Trophy Decorations",
@@ -3799,6 +3934,7 @@ var resortData = {
                 carrierIdCounter: 1,
                 allowStone: true,
                 allowWood: false,
+                allowHardwood: false,
                 allowBars: false,
                 nextHaulResourceIndex: 0,
                 creditOnlyPurchases: false,
@@ -4045,7 +4181,7 @@ var resortData = {
                 literacyLessons: {
                     key: "literacy_lessons",
                     name: "Literacy Lessons",
-                    description: "Readers keep more of what they study. Each purchase multiplies inscription gained by x1.1. Max buyable increases by 3 per Market Level.",
+                    description: "Readers keep more of what they study. Each purchase multiplies inscription gained by x1.2. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
                         const n = engine.getLiteracyLessonsBought();
                         return { credit: Math.round(40000 * Math.pow(1.5, n)) };
@@ -4134,7 +4270,7 @@ var resortData = {
                 lostScrolls: {
                     key: "lost_scrolls",
                     name: "Lost Scrolls",
-                    description: "A scroll that was never catalogued. Each purchase adds one research choice and does not raise the price of the next paid research. Max buyable increases by 1 per Market Level.",
+                    description: "A scroll that was never catalogued. Each purchase adds one research without raising the scribings cost. Max buyable increases by 1 per Market Level.",
                     getCost: function() {
                         const n = engine.getLostScrollsBought();
                         return { credit: Math.round(100000 * Math.pow(3, n)) };
@@ -4855,7 +4991,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = engine.getShardEchoesBought();
-                        return { divinity: 30000 + 10000 * bought };
+                        return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
@@ -4884,7 +5020,7 @@ var resortData = {
                 artAppreciation: {
                     key: "art_appreciation",
                     name: "Art Appreciation",
-                    description: "Each level unlocks a new Rock Garden Arrangement to buy. 1) Auto-Depth 2) Okami Hidden Spring Stone & Refill Mana 3&4) Autobuy Orb mana upgrades",
+                    description: "Each level unlocks a new Rock Garden Arrangement to buy. 1&2) Autobuy Orb mana upgrades 3) Okami Hidden Spring Stone & Refill Mana 4) Auto-Depth",
                     weavingTime: 300,
                     getWeavingPurchaseIndex: function() {
                         return engine.getArtAppreciationBought();
@@ -4944,7 +5080,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = engine.getLanguageEchoesBought();
-                        return { divinity: 40000 + 10000 * bought };
+                        return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLanguageEchoesMax();
@@ -4985,7 +5121,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = engine.getSkillEchoesBought();
-                        return { divinity: 40000 + 10000 * bought };
+                        return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
@@ -5057,7 +5193,7 @@ var resortData = {
                     description: "Multiplies karma gain by 2^(Legends Written).",
                     weavingTime: 800,
                     getCost: function() {
-                        return { divinity: 55000 };
+                        return { divinity: 30000 };
                     },
                     maxPurchases: 1,
                     canBuy: function() {
@@ -5214,6 +5350,9 @@ resortData.getScopeDisplayName = function(scopeKey) {
     }
     if (scopeKey === "inn") {
         return engine.getInnDisplayName();
+    }
+    if (scopeKey === "bambooForest") {
+        return engine.getBambooForestDisplayName();
     }
     if (scopeKey && scopeKey.indexOf("fireLauncher_") === 0) {
         const platformKey = scopeKey.slice("fireLauncher_".length);

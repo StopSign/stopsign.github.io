@@ -764,6 +764,15 @@ let initialize = {
         if (bf.chips === undefined) {
             bf.chips = 0;
         }
+        if (bf.hardwood === undefined || bf.hardwood === null) {
+            bf.hardwood = 0;
+        }
+        if (bf.hardwoodChips === undefined || bf.hardwoodChips === null) {
+            bf.hardwoodChips = 0;
+        }
+        if (bf.growHardwoodBought === undefined || bf.growHardwoodBought === null) {
+            bf.growHardwoodBought = 0;
+        }
         if (bf.water === undefined) {
             bf.water = 0;
         }
@@ -780,9 +789,11 @@ let initialize = {
         }
         for (let sj = 0; sj < bf.stalks.length; sj++) {
             const stalk = bf.stalks[sj];
+            const stalkType = stalk && stalk.type === "hardwood" ? "hardwood" : "bamboo";
             if (!stalk.cells || stalk.cells.length !== rowCount) {
-                bf.stalks[sj] = engine.createBambooStalk(rowCount, stalk.baseWood);
+                bf.stalks[sj] = engine.createBambooStalk(rowCount, stalk && stalk.baseWood, stalkType);
             } else {
+                stalk.type = stalkType;
                 engine.refreshBambooStalkCapacities(stalk);
             }
         }
@@ -1571,6 +1582,9 @@ let initialize = {
         const market = base.market;
         if (market && (market.driedNoodles === undefined || market.driedNoodles === null)) {
             market.driedNoodles = 0;
+        }
+        if (market && (market.allowHardwood === undefined || market.allowHardwood === null)) {
+            market.allowHardwood = false;
         }
         if (market && (market.launcherDesignsBought === undefined || market.launcherDesignsBought === null)) {
             market.launcherDesignsBought = 0;

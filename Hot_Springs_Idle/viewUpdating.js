@@ -1748,7 +1748,7 @@ let view = {
             view.updateVal(`inscriptionActual_${def.key}`, row.actual || 0, "textContent", 3);
             view.updateVal(`inscriptionBought_${def.key}`, row.bought || 0, "textContent", 2);
             view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product} each`);
-            view.updateVal(`inscriptionOutput_${def.key}`, `+${intToString(engine.inscriptionRate(def) * (row.actual || 0), 3)}/s`);
+            view.updateVal(`inscriptionOutput_${def.key}`, `+${intToString(engine.inscriptionRate(def) * (row.actual || 0) * engine.getSturdyShelvesOutputMultiplier(), 3)}/s`);
             view.updateVal(`inscriptionReq_${def.key}`, need, "textContent", 3);
             const unit = engine.getInscriptionUnitCost(def);
             view.updateVal(`inscriptionCoins_${def.key}`, unit.coins, "textContent", 3);
@@ -3137,7 +3137,9 @@ let view = {
         view.updateMarketProgressDisplays();
         setChk("marketAllowStone_chk", market.allowStone);
         setChk("marketAllowWood_chk", market.allowWood);
+        setChk("marketAllowHardwood_chk", market.allowHardwood);
         setChk("marketAllowBars_chk", market.allowBars);
+        view.updateVal("marketAllowHardwood_wrap", engine.isGrowHardwoodBought() ? "" : "none", "style.display");
         const garden = data.progress.base.garden || {};
         const repeatUnlocked = !!garden.arrangementOfPaperMoneyUnlocked;
         view.updateVal("marketRepeatExchange_row", repeatUnlocked ? "" : "none", "style.display");
@@ -3314,6 +3316,15 @@ let view = {
         const bf = data.progress.base.bambooForest;
         view.updateVal("bambooForestInfoChips", bf.chips || 0, "textContent", "floor");
         view.updateVal("bambooForestInfoWood", bf.wood || 0, "textContent", "floor");
+        view.updateVal("bambooForestInfoTitle", engine.getBambooForestDisplayName());
+        const hardwoodOn = engine.isGrowHardwoodBought();
+        view.updateVal("bambooForestHardwood_row", hardwoodOn ? "" : "none", "style.display");
+        view.updateVal("bambooSwitchRow", hardwoodOn ? "" : "none", "style.display");
+        view.updateVal("bambooTypeRow", hardwoodOn ? "" : "none", "style.display");
+        if (hardwoodOn) {
+            view.updateVal("bambooForestInfoHardwoodChips", bf.hardwoodChips || 0, "textContent", "floor");
+            view.updateVal("bambooForestInfoHardwood", bf.hardwood || 0, "textContent", "floor");
+        }
         view.updateVal("bambooChopPower", engine.getBambooChopPower());
         const pond = data.progress.base.pond;
         const pondBuilt = typeof engine.isPondBuiltFromFoxDen === "function" && engine.isPondBuiltFromFoxDen();
@@ -3343,6 +3354,7 @@ let view = {
         for (let si = 0; si < stalkCount; si++) {
             const stalk = bf.stalks[si];
             view.updateVal(`bambooCutBtn_${si}`, active === si, "classList.toggle", "bamboo-cut-active");
+            view.updateVal(`bambooType_${si}`, stalk && stalk.type === "hardwood" ? "Hardwood" : "Bamboo");
             let statusText;
             if (active === si && engine.getBambooChopPower() > 0) {
                 statusText = "Harvesting";
@@ -4517,7 +4529,11 @@ let view = {
         view.updateVal("atelierMapDisplay", data.progress.base.hiddenSpring.bringOreToAtelierUnlocked
             ? `${resortData.resourceIconHtml("ore")} ${intToStringRound(atelierOre)} | ${resortData.resourceIconHtml("bars")} ${intToStringRound(atelierBars)}`
             : "", "innerHTML");
-        view.updateVal("bambooForestMapDisplay", `${resortData.resourceIconHtml("wood")} ${intToStringRound((base.bambooForest && base.bambooForest.wood) || 0)}`, "innerHTML");
+        const forest = base.bambooForest || {};
+        const woodMap = `${resortData.resourceIconHtml("wood")} ${intToStringRound(forest.wood || 0)}`;
+        view.updateVal("bambooForestMapDisplay", engine.isGrowHardwoodBought()
+            ? `${woodMap} | ${resortData.resourceIconHtml("hardwood")} ${intToStringRound(forest.hardwood || 0)}`
+            : woodMap, "innerHTML");
         const bonfire = base.bonfire || {};
         view.updateVal("bonfireMapDisplay", bonfire.kilnBuilt
             ? `${resortData.resourceIconHtml("ash")} ${intToStringRound(bonfire.ash || 0)}`

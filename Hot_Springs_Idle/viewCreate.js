@@ -263,7 +263,8 @@ let createView = {
                     <p>One bamboo segment takes 2 minutes to fully grow. Bamboo grows when not being harvested.</p>
                     ${powerfulChops}
                     ${pondBuilt ? "<p>Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</p>" : ""}
-                    ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}`;
+                    ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}
+                    ${engine.isGrowHardwoodBought() ? "<p>Hardwood grows at 1/4 speed and has twice the base chips. Water and fertilizer still double that growth. 20 Hardwood Chips become 1 Hardwood.</p>" : ""}`;
             },
             56,
             function() {
@@ -1201,13 +1202,14 @@ let createView = {
             const credit = resortData.resourceIconHtml("credit");
             const order = resortData.marketHaulResourceOrder || [];
             const rates = resortData.marketCreditPerResource || {};
-            const names = { stone: "Stone", wood: "Wood", bars: "Bars" };
+            const names = { stone: "Stone", wood: "Wood", hardwood: "Hardwood", bars: "Bars" };
             let h = "";
             for (let hi = 0; hi < order.length; hi++) {
                 const key = order[hi];
                 const idKey = key.charAt(0).toUpperCase() + key.slice(1);
                 const name = names[key] || key;
-                h += `<label><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (${rates[key] || 0} ${credit})</label> `;
+                const wrapId = key === "hardwood" ? ` id="marketAllowHardwood_wrap"` : "";
+                h += `<label${wrapId}><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (${rates[key] || 0} ${credit})</label> `;
             }
             return h;
         };
@@ -1467,14 +1469,17 @@ let createView = {
                     ${htmlScrollArchivesPanel()}
                 </div>
                 <div id="resortInfo_bambooForest" class="resort-info-section">
-                    <div class="base-info-title">Bamboo Forest</div>
+                    <div id="bambooForestInfoTitle" class="base-info-title">Bamboo Forest</div>
                     <div class="base-row">Bamboo Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
+                    <div id="bambooForestHardwood_row" class="base-row" style="display:none">Hardwood Chips: <span id="bambooForestInfoHardwoodChips"></span> <span class="muted-text"> -> 20 -> </span> ${resortData.resourceIconHtml("hardwood")} Hardwood: <span id="bambooForestInfoHardwood"></span></div>
                     <div class="base-row">Chop Power: <span id="bambooChopPower"></span></div>
                     <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span></div>
                     <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span></div>
                     <div class="base-row muted-text">Select which stalk to cut.</div>
                     <div id="bambooStalkGrid" class="bamboo-stalk-grid"></div>
                     <div id="bambooCutRow" class="bamboo-harvest-row"></div>
+                    <div id="bambooSwitchRow" class="bamboo-harvest-row" style="display:none"></div>
+                    <div id="bambooTypeRow" class="bamboo-harvest-row" style="display:none"></div>
                     <div id="bambooStatusRow" class="bamboo-status-row"></div>
                     <div id="bambooBaseWoodRow" class="bamboo-base-wood-row"></div>
                     <div id="bambooTagline_row" class="base-row muted-text bamboo-tagline" style="display:none">Bamboo grows stronger only when fully cut</div>
@@ -1630,14 +1635,18 @@ let createView = {
         if (pondWaterSlots) pondWaterSlots.innerHTML = slotHtml("water", "pond", 3);
         const bambooStalkGrid = document.getElementById("bambooStalkGrid");
         const bambooCutRow = document.getElementById("bambooCutRow");
+        const bambooSwitchRow = document.getElementById("bambooSwitchRow");
+        const bambooTypeRow = document.getElementById("bambooTypeRow");
         const bambooStatusRow = document.getElementById("bambooStatusRow");
         const bambooBaseWoodRow = document.getElementById("bambooBaseWoodRow");
-        if (bambooStalkGrid && bambooCutRow && bambooStatusRow && bambooBaseWoodRow) {
+        if (bambooStalkGrid && bambooCutRow && bambooSwitchRow && bambooTypeRow && bambooStatusRow && bambooBaseWoodRow) {
             const cfg = resortData.bambooForestConfig;
             const stalkCount = cfg.stalkCount || 4;
             const rowCount = cfg.rowCount || 3;
             let gridH = "";
             let cutH = "";
+            let switchH = "";
+            let typeH = "";
             let statusH = "";
             let baseWoodH = "";
             for (let si = 0; si < stalkCount; si++) {
@@ -1654,11 +1663,15 @@ let createView = {
                 }
                 gridH += `</div>`;
                 cutH += `<button type="button" id="bambooCutBtn_${si}" class="tab-button bamboo-cut-btn" onclick="events.toggleBambooCut(${si})">Cut</button>`;
+                switchH += `<button type="button" id="bambooSwitchBtn_${si}" class="tab-button bamboo-cut-btn" onclick="events.switchBambooStalk(${si})">Switch</button>`;
+                typeH += `<div id="bambooType_${si}" class="bamboo-type-text muted-text"></div>`;
                 statusH += `<div id="bambooStatus_${si}" class="bamboo-status-text"></div>`;
                 baseWoodH += `<div class="bamboo-base-wood-col"><span>Base Chips</span> <span id="bambooBaseWood_${si}"></span></div>`;
             }
             bambooStalkGrid.innerHTML = gridH;
             bambooCutRow.innerHTML = cutH;
+            bambooSwitchRow.innerHTML = switchH;
+            bambooTypeRow.innerHTML = typeH;
             bambooStatusRow.innerHTML = statusH;
             bambooBaseWoodRow.innerHTML = baseWoodH;
         }
@@ -2164,7 +2177,7 @@ let createView = {
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
             "gardenAppraisalAuto_row", "gardenAppraisalAuto_chk", "gardenReviewAuto_row", "gardenReviewAuto_chk", "gardenReviewPaused_row", "gardenReviewPaused_chk",
             "foxDenMapDisplay",
-            "bambooForestInfoChips", "bambooForestInfoWood", "bambooForestMapDisplay",
+            "bambooForestInfoChips", "bambooForestInfoWood", "bambooForestInfoTitle", "bambooForestHardwood_row", "bambooForestInfoHardwoodChips", "bambooForestInfoHardwood", "bambooSwitchRow", "bambooTypeRow", "bambooForestMapDisplay",
             "base_bambooForest_assign_one_btn", "base_bambooForest_assign_ten_btn", "base_bambooForest_assign_all_btn", "base_bambooForest_unassign_one_btn", "base_bambooForest_unassign_ten_btn", "base_bambooForest_unassign_all_btn", "base_bambooForest_workers_label", "base_bambooForest_worker_prod_text", "base_bambooForest_worker_prod_wrap", "base_bambooForest_worker_prog_fill", "base_bambooForest_assign_okami_btn",
             "base_foxDen_assign_one_btn", "base_foxDen_assign_ten_btn", "base_foxDen_assign_all_btn", "base_foxDen_unassign_one_btn", "base_foxDen_unassign_ten_btn", "base_foxDen_unassign_all_btn", "base_foxDen_workers_label", "base_foxDen_assign_okami_btn",
             "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "constructionMouseTip", "foxDenQueueTip", "baseResortMap", "pondForestStream", "pondForestStreamPath",
@@ -2218,7 +2231,7 @@ let createView = {
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
             "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row", "marketDemandTax_row",
-            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowBars_chk", "marketExchangeCredit_btn",
+            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowHardwood_chk", "marketAllowHardwood_wrap", "marketAllowBars_chk", "marketExchangeCredit_btn",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
@@ -2359,7 +2372,7 @@ let createView = {
         const bRows = bfcfg.rowCount || 3;
         createView.queueCache("bambooChopPower", "bambooAutoRotate_row", "bambooTagline_row");
         for (let bsi = 0; bsi < bStalks; bsi++) {
-            createView.queueCache(`bambooCutBtn_${bsi}`, `bambooStatus_${bsi}`, `bambooBaseWood_${bsi}`);
+            createView.queueCache(`bambooCutBtn_${bsi}`, `bambooSwitchBtn_${bsi}`, `bambooType_${bsi}`, `bambooStatus_${bsi}`, `bambooBaseWood_${bsi}`);
             for (let bri = 0; bri < bRows; bri++) {
                 createView.queueCache(`bambooCell_${bsi}_${bri}`, `bambooCellFill_${bsi}_${bri}`, `bambooCellLabel_${bsi}_${bri}`);
             }

@@ -3665,6 +3665,13 @@ button {
     color: #f3f4f6;
 }
 
+.bamboo-type-text {
+    width: 64px;
+    text-align: center;
+    font-size: 11px;
+    margin-top: 0;
+}
+
 .bamboo-status-text,
 .bamboo-base-wood-col {
     width: 64px;

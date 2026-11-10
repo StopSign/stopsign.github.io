@@ -3663,7 +3663,8 @@ let engine = {
     getTatamiInnRoomCapacity: function() {
         const inn = data.progress.base && data.progress.base.inn;
         const bought = inn && inn.addRoomBought ? inn.addRoomBought : 0;
-        return 1 + bought;
+        const secondFloor = inn && inn.secondFloorRoomsBought ? inn.secondFloorRoomsBought : 0;
+        return 1 + bought + secondFloor;
     },
     getInnRestDurationSeconds: function() {
         const inn = data.progress.base && data.progress.base.inn;
@@ -4344,7 +4345,7 @@ let engine = {
             maxBeads += 5 * (R + 0.5);
         }
         if (engine.canGuestEatNoodles()) {
-            const eatSec = 10;
+            const eatSec = engine.getNoodleEatDurationSeconds();
             maxSec += eatSec;
             maxBeads += eatSec * (R + engine.getNoodleEatRestBonus());
         }
@@ -4684,7 +4685,7 @@ let engine = {
             return 5;
         }
         if (stepKey === "eatNoodles") {
-            return 10;
+            return engine.getNoodleEatDurationSeconds();
         }
         return 0;
     },
@@ -4725,7 +4726,7 @@ let engine = {
             lines.push(soakLine);
         }
         if (engine.isNoodleBarBuilt()) {
-            lines.push(`Eat Noodles for 10s (+${engine.getNoodleEatRestBonus()} restfulness/s) - Requires 100L hot water and 1 Dried Noodle`);
+            lines.push(`Eat Noodles for ${engine.getNoodleEatDurationSeconds()}s (+${engine.getNoodleEatRestBonus()} restfulness/s) - Requires 100L hot water and 1 Dried Noodle`);
         }
         return lines;
     },
@@ -5377,7 +5378,13 @@ let engine = {
         if (spirit) {
             chips += Math.ceil(engine.getEffectiveSpiritPower(spirit) || 1);
         }
-        return Math.floor(chips * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        let result = Math.floor(chips * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        const bf = data.progress.base && data.progress.base.bambooForest;
+        const stalk = bf && bf.stalks && bf.stalks[stalkIndex];
+        if (stalk && stalk.type === "hardwood") {
+            result *= 2;
+        }
+        return result;
     },
     refreshBambooForestBaseChips: function() {
         const bf = data.progress.base && data.progress.base.bambooForest;
@@ -5958,6 +5965,10 @@ let engine = {
         "#2d6a2d", "#3a7d3a", "#4a9a4a", "#5cb85c",
         "#358835", "#42a042", "#6ecf6e", "#88d888"
     ],
+    hardwoodCellColors: [
+        "#5c3a1e", "#6b4423", "#7a5230", "#8b5a2b",
+        "#4a2f1a", "#6f4e37", "#8d6e63", "#a67c52"
+    ],
     getSpiritColor: function(spirit) {
         if (!spirit) {
             return "#888";
@@ -5975,6 +5986,17 @@ let engine = {
     randomBambooCellColor: function() {
         const palette = engine.bambooCellColors;
         return palette[Math.floor(Math.random() * palette.length)];
+    },
+    randomStalkCellColor: function(stalk) {
+        const palette = stalk && stalk.type === "hardwood" ? engine.hardwoodCellColors : engine.bambooCellColors;
+        return palette[Math.floor(Math.random() * palette.length)];
+    },
+    isGrowHardwoodBought: function() {
+        const bf = data.progress.base && data.progress.base.bambooForest;
+        return !!((bf && bf.growHardwoodBought) || 0);
+    },
+    getBambooForestDisplayName: function() {
+        return engine.isGrowHardwoodBought() ? "Forest" : "Bamboo Forest";
     },
     getHiddenSpringSpiritSlotMax: function() {
         const hs = data.progress.base && data.progress.base.hiddenSpring;
@@ -9430,7 +9452,7 @@ let engine = {
         }
     },
     getConstructionSourceBuildingKey: function(resourceType) {
-        if (resourceType === "wood") {
+        if (resourceType === "wood" || resourceType === "hardwood") {
             return "bambooForest";
         }
         if (resourceType === "stone") {
@@ -9530,6 +9552,9 @@ let engine = {
         if (resourceType === "wood") {
             return (base.bambooForest && base.bambooForest.wood) || 0;
         }
+        if (resourceType === "hardwood") {
+            return (base.bambooForest && base.bambooForest.hardwood) || 0;
+        }
         if (resourceType === "stone") {
             const pile = base.stonePile;
             if (!pile) {
@@ -9558,6 +9583,10 @@ let engine = {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - amt);
             return null;
         }
+        if (resourceType === "hardwood" && base.bambooForest) {
+            base.bambooForest.hardwood = Math.max(0, (base.bambooForest.hardwood || 0) - amt);
+            return null;
+        }
         if (resourceType === "stone") {
             return engine.deductStone(amt, {
                 allowUnduplicated: engine.isStoneCarryUnduplicatedAllowed()
@@ -9582,6 +9611,8 @@ let engine = {
         const amt = Math.max(0, amount || 0);
         if (resourceType === "wood" && base.bambooForest) {
             base.bambooForest.wood = (base.bambooForest.wood || 0) + amt;
+        } else if (resourceType === "hardwood" && base.bambooForest) {
+            base.bambooForest.hardwood = (base.bambooForest.hardwood || 0) + amt;
         } else if (resourceType === "stone") {
             engine.refundStone(amt, stoneTaken);
         } else if (resourceType === "bars" && base.atelier) {
@@ -10044,7 +10075,7 @@ let engine = {
         return true;
     },
     getConstructionSourcePosition: function(resourceType) {
-        if (resourceType === "wood") {
+        if (resourceType === "wood" || resourceType === "hardwood") {
             return engine.getMapBuildingPosition("bambooForest");
         }
         if (resourceType === "stone") {
@@ -10231,13 +10262,14 @@ let engine = {
         engine.tryFoxDenOkamiAutoPathJobs();
         engine.updateArrangementOfReview(tickMs);
         const minGap = (resortData.foxDenCarrierSpawnMinMs !== undefined) ? resortData.foxDenCarrierSpawnMinMs : 500;
-        const materialKeys = ["wood", "stone", "bars", "ore"];
+        const soloKeys = ["stone", "bars", "ore"];
         if (!rh._carrierGapMsByResource) {
             rh._carrierGapMsByResource = {};
         }
         const gapByResource = rh._carrierGapMsByResource;
-        for (let gi = 0; gi < materialKeys.length; gi++) {
-            const resKey = materialKeys[gi];
+        const tickKeys = soloKeys.concat(["forest"]);
+        for (let gi = 0; gi < tickKeys.length; gi++) {
+            const resKey = tickKeys[gi];
             if (gapByResource[resKey] === undefined) {
                 gapByResource[resKey] = rh._sinceLastCarrierMs || 0;
             }
@@ -10247,12 +10279,17 @@ let engine = {
         while (keepSpawningMaterials) {
             const allowed = {};
             let anyReady = false;
-            for (let gi = 0; gi < materialKeys.length; gi++) {
-                const resKey = materialKeys[gi];
+            for (let gi = 0; gi < soloKeys.length; gi++) {
+                const resKey = soloKeys[gi];
                 if ((gapByResource[resKey] || 0) >= minGap) {
                     allowed[resKey] = true;
                     anyReady = true;
                 }
+            }
+            if ((gapByResource.forest || 0) >= minGap) {
+                allowed.wood = true;
+                allowed.hardwood = true;
+                anyReady = true;
             }
             if (!anyReady) {
                 break;
@@ -10260,6 +10297,8 @@ let engine = {
             const spawnedRes = engine.trySpawnFoxDenCarrier(allowed);
             if (!spawnedRes || !allowed[spawnedRes]) {
                 keepSpawningMaterials = false;
+            } else if (spawnedRes === "wood" || spawnedRes === "hardwood") {
+                gapByResource.forest = 0;
             } else {
                 gapByResource[spawnedRes] = 0;
             }
@@ -10915,8 +10954,15 @@ let engine = {
         const order = resortData.marketHaulResourceOrder || [];
         for (let i = 0; i < order.length; i++) {
             const rt = order[i];
-            const field = rt === "stone" ? "allowStone" : rt === "wood" ? "allowWood" : "allowBars";
-            if (market[field]) {
+            const field = rt === "stone" ? "allowStone"
+                : rt === "wood" ? "allowWood"
+                : rt === "hardwood" ? "allowHardwood"
+                : rt === "bars" ? "allowBars"
+                : null;
+            if (rt === "hardwood" && !engine.isGrowHardwoodBought()) {
+                continue;
+            }
+            if (field && market[field]) {
                 out.push(rt);
             }
         }
@@ -11823,9 +11869,10 @@ let engine = {
             }
         }
     },
-    createBambooStalk: function(rowCount, baseWood) {
+    createBambooStalk: function(rowCount, baseWood, stalkType) {
         const cfg = resortData.bambooForestConfig;
         const stalk = {
+            type: stalkType === "hardwood" ? "hardwood" : "bamboo",
             baseWood: baseWood !== undefined ? baseWood : engine.getBambooForestBaseChips(),
             cells: []
         };
@@ -11834,7 +11881,7 @@ let engine = {
             stalk.cells.push({
                 lumber: capacity,
                 capacity: capacity,
-                color: engine.randomBambooCellColor(),
+                color: engine.randomStalkCellColor(stalk),
                 growthRemainMs: 0
             });
         }
@@ -11952,13 +11999,47 @@ let engine = {
             bf.activeHarvestStalk = stalkIndex;
         }
     },
+    switchBambooStalkType: function(stalkIndex) {
+        if (!engine.isGrowHardwoodBought()) {
+            return;
+        }
+        const bf = data.progress.base && data.progress.base.bambooForest;
+        if (!bf || !bf.stalks) {
+            return;
+        }
+        const max = bf.stalkCount || 4;
+        if (stalkIndex < 0 || stalkIndex >= max) {
+            return;
+        }
+        const stalk = bf.stalks[stalkIndex];
+        if (!stalk || !stalk.cells) {
+            return;
+        }
+        stalk.type = stalk.type === "hardwood" ? "bamboo" : "hardwood";
+        for (let ri = 0; ri < stalk.cells.length; ri++) {
+            stalk.cells[ri].lumber = 0;
+            stalk.cells[ri].growthRemainMs = 0;
+        }
+        stalk.baseWood = engine.getBambooStalkComputedBaseChips(stalkIndex);
+        engine.refreshBambooStalkCapacities(stalk);
+        for (let ri = 0; ri < stalk.cells.length; ri++) {
+            stalk.cells[ri].color = engine.randomStalkCellColor(stalk);
+        }
+        if (bf.activeHarvestStalk === stalkIndex) {
+            bf.activeHarvestStalk = null;
+        }
+    },
     applyBambooSpiritRemoved: function(stalkIndex) {
         const bf = data.progress.base.bambooForest;
         if (!bf.stalks || stalkIndex < 0 || stalkIndex >= bf.stalks.length) {
             return;
         }
         const stalk = bf.stalks[stalkIndex];
-        stalk.baseWood = Math.floor(engine.getBambooForestBaseChips() * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        let baseWood = Math.floor(engine.getBambooForestBaseChips() * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        if (stalk.type === "hardwood") {
+            baseWood *= 2;
+        }
+        stalk.baseWood = baseWood;
         engine.refreshBambooStalkCapacities(stalk);
         for (let ri = 0; ri < stalk.cells.length; ri++) {
             stalk.cells[ri].growthRemainMs = 0;
@@ -11979,7 +12060,7 @@ let engine = {
                 const cell = stalk.cells[ri];
                 cell.lumber = 0;
                 cell.growthRemainMs = 0;
-                cell.color = engine.randomBambooCellColor();
+                cell.color = engine.randomStalkCellColor(stalk);
             }
             engine.refreshBambooStalkCapacities(stalk);
         }
@@ -11992,7 +12073,7 @@ let engine = {
             const cell = stalk.cells[ri];
             cell.lumber = 0;
             cell.growthRemainMs = 0;
-            cell.color = engine.randomBambooCellColor();
+            cell.color = engine.randomStalkCellColor(stalk);
         }
         const garden = data.progress.base && data.progress.base.garden;
         const rotateOn = garden && garden.arrangementOfRotationUnlocked && bf.autoRotateHarvest;
@@ -12036,6 +12117,15 @@ let engine = {
         }
         if (gained > 0 && typeof view !== "undefined" && view.spawnResourceFloat) {
             view.spawnResourceFloat("baseBuilding_bambooForest", "wood", gained, "#e1aa14");
+        }
+        let hardwoodGained = 0;
+        while ((bf.hardwoodChips || 0) >= 20) {
+            bf.hardwoodChips -= 20;
+            bf.hardwood = (bf.hardwood || 0) + 1;
+            hardwoodGained++;
+        }
+        if (hardwoodGained > 0 && typeof view !== "undefined" && view.spawnResourceFloat) {
+            view.spawnResourceFloat("baseBuilding_bambooForest", "hardwood", hardwoodGained, "#a67c52");
         }
     },
     rotateBambooHarvestIfColumnEmpty: function(bf) {
@@ -12086,7 +12176,7 @@ let engine = {
                 cell.lumber = lumber - taken;
                 if (cell.lumber <= 0) {
                     cell.lumber = 0;
-                    cell.color = engine.randomBambooCellColor();
+                    cell.color = engine.randomStalkCellColor(stalk);
                     cell.growthRemainMs = 0;
                 }
             }
@@ -12128,7 +12218,11 @@ let engine = {
         if (chopped <= 0) {
             return;
         }
-        bf.chips = (bf.chips || 0) + chopped;
+        if (stalk.type === "hardwood") {
+            bf.hardwoodChips = (bf.hardwoodChips || 0) + chopped;
+        } else {
+            bf.chips = (bf.chips || 0) + chopped;
+        }
         engine.convertBambooChipsToWood(bf);
         let allEmpty = true;
         for (let ri = 0; ri < stalk.cells.length; ri++) {
@@ -12165,7 +12259,8 @@ let engine = {
         const msPerWood = fullMs / cap;
         const hasWater = (bf.water || 0) >= 1;
         const hasFertilizer = engine.getMarketGoodAmount("fertilizer") > 0;
-        const growthMult = (hasWater ? 2 : 1) * (hasFertilizer ? 2 : 1);
+        // Fill time is cellGrowFullMs / this multiplier. Doubled capacity shortens the per-chip clock, so 1/8 keeps each hardwood chip at 1/4 speed and the segment at 8x.
+        const growthMult = (stalk.type === "hardwood" ? 0.125 : 1) * (hasWater ? 2 : 1) * (hasFertilizer ? 2 : 1);
         cell.growthRemainMs = (cell.growthRemainMs || 0) + tickMs * growthMult;
         while (cell.growthRemainMs >= msPerWood && lumber < cap) {
             if (hasWater && (bf.water || 0) < 1) {
@@ -12835,6 +12930,13 @@ let engine = {
     getNoodleEatRestBonus: function() {
         return 10 + 5 * engine.getNoodleComfyStoolsBought();
     },
+    getNoodleSturdyWallsBought: function() {
+        const bar = data.progress.base && data.progress.base.noodleBar;
+        return (bar && bar.sturdyWallsBought) || 0;
+    },
+    getNoodleEatDurationSeconds: function() {
+        return 10 + 2 * engine.getNoodleSturdyWallsBought();
+    },
     getNoodleTrophyDecorationsBought: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
         return (bar && bar.trophyDecorationsBought) || 0;
@@ -13091,7 +13193,7 @@ let engine = {
         return 3 + 3 * Math.max(0, engine.getMarketLevel() - 2);
     },
     getLiteracyResearchMultiplier: function() {
-        return Math.pow(1.1, engine.getLiteracyLessonsBought());
+        return Math.pow(1.2, engine.getLiteracyLessonsBought());
     },
     isForgingInstructionsBought: function() {
         const market = data.progress.base && data.progress.base.market;
@@ -14914,13 +15016,21 @@ let engine = {
         }
         engine.refreshInscriptionUnlock(lib);
     },
+    getSturdyShelvesBought: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        return (lib && lib.sturdyShelvesBought) || 0;
+    },
+    getSturdyShelvesOutputMultiplier: function() {
+        return Math.pow(1.3, engine.getSturdyShelvesBought());
+    },
     scribingsGainedAfterTicks: function(lib, ticks) {
         const defs = engine.INSCRIPTION_ROWS;
         const M = Math.floor(ticks);
         if (!lib || !lib.inscriptions || !defs.length || M <= 0) {
             return 0;
         }
-        let term = engine.inscriptionRate(defs[0]) * M;
+        const mult = engine.getSturdyShelvesOutputMultiplier();
+        let term = engine.inscriptionRate(defs[0]) * M * mult;
         const first = lib.inscriptions[defs[0].key];
         let gain = ((first && first.actual) || 0) * term;
         const rowCount = Math.min(defs.length, engine.getInscriptionRowLimit() + 1);
@@ -14929,7 +15039,7 @@ let engine = {
             if (stepsLeft <= 0) {
                 break;
             }
-            term *= engine.inscriptionRate(defs[k]) * stepsLeft / (k + 1);
+            term *= engine.inscriptionRate(defs[k]) * stepsLeft / (k + 1) * mult;
             const row = lib.inscriptions[defs[k].key];
             gain += ((row && row.actual) || 0) * term;
         }
@@ -14984,10 +15094,11 @@ let engine = {
         for (let i = 0; i < rowCount; i++) {
             snap.push(lib.inscriptions[defs[i].key].actual || 0);
         }
-        lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]);
+        const shelfMult = engine.getSturdyShelvesOutputMultiplier();
+        lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]) * shelfMult;
         for (let i = 1; i < rowCount; i++) {
             const above = lib.inscriptions[defs[i - 1].key];
-            above.actual = (above.actual || 0) + snap[i] * engine.inscriptionRate(defs[i]);
+            above.actual = (above.actual || 0) + snap[i] * engine.inscriptionRate(defs[i]) * shelfMult;
         }
         let sGuard = 0;
         while ((lib.scribings || 0) >= lib.scribingsRequired && lib.scribingsRequired > 0 && sGuard < 10000) {

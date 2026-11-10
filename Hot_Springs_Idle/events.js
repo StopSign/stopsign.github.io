@@ -1972,6 +1972,9 @@ let events = {
     toggleBambooCut: function(stalkIndex) {
         engine.toggleBambooCut(stalkIndex);
     },
+    switchBambooStalk: function(stalkIndex) {
+        engine.switchBambooStalkType(stalkIndex);
+    },
     toggleBonfireFireTending: function(checked) {
         const bf = data.progress.base && data.progress.base.bonfire;
         if (bf) {
@@ -2129,6 +2132,7 @@ let events = {
         }
         const field = resourceType === "stone" ? "allowStone"
             : resourceType === "wood" ? "allowWood"
+            : resourceType === "hardwood" ? "allowHardwood"
             : resourceType === "bars" ? "allowBars"
             : null;
         if (!field) {
