@@ -379,6 +379,7 @@ let initials = {
                 readyNotifySeenByDepth: {},
                 pebblePayBought: 0,
                 playPitBought: 0,
+                mineshaftBeamsBought: 0,
                 autoIncreaseDepth: false
             },
             scrollArchives: pb("scrollArchives"),
@@ -1676,6 +1677,56 @@ let initialize = {
         if (mine.playPitBought === undefined || mine.playPitBought === null) {
             mine.playPitBought = 0;
         }
+        if (mine.mineshaftBeamsBought === undefined || mine.mineshaftBeamsBought === null) {
+            mine.mineshaftBeamsBought = 0;
+        }
+        const atelierBeams = base.atelier && base.atelier.mineshaftBeamsBought;
+        if ((mine.mineshaftBeamsBought || 0) === 0 && atelierBeams > 0) {
+            mine.mineshaftBeamsBought = atelierBeams;
+        }
+        initialize.migrateMineshaftBeamsWork();
+    },
+    migrateMineshaftBeamsWork: function() {
+        const base = data.progress.base;
+        const rh = base && base.foxDen;
+        const oldJobKey = "upgrade:atelier:mineshaftBeams";
+        const newJobKey = "upgrade:mine:mineshaftBeams";
+        if (rh && rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJobKey]) {
+            const job = rh.upgradeGatherJobs[oldJobKey];
+            job.scopeKey = "mine";
+            if (!rh.upgradeGatherJobs[newJobKey]) {
+                rh.upgradeGatherJobs[newJobKey] = job;
+            }
+            delete rh.upgradeGatherJobs[oldJobKey];
+            if (rh.jobQueue) {
+                for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                    if (rh.jobQueue[qi] === oldJobKey) {
+                        rh.jobQueue[qi] = newJobKey;
+                    }
+                }
+            }
+            if (rh.constructionCarriers && typeof engine.cancelCarriersForJob === "function") {
+                engine.cancelCarriersForJob(oldJobKey);
+            }
+        }
+        if (typeof engine.getWeavingState !== "function") {
+            return;
+        }
+        const weaving = engine.getWeavingState();
+        const retarget = function(entry) {
+            if (!entry || entry.scopeKey !== "atelier" || entry.upgradeKey !== "mineshaftBeams") {
+                return;
+            }
+            entry.scopeKey = "mine";
+            entry.buildingName = resortData.getScopeDisplayName("mine");
+        };
+        retarget(weaving.active);
+        if (weaving.paused && weaving.paused["atelier:mineshaftBeams"]) {
+            const paused = weaving.paused["atelier:mineshaftBeams"];
+            retarget(paused);
+            weaving.paused["mine:mineshaftBeams"] = paused;
+            delete weaving.paused["atelier:mineshaftBeams"];
+        }
     },
     initializePathSegments: function() {
         const base = data.progress.base;
@@ -1689,16 +1740,33 @@ let initialize = {
                         state: prev[i].state,
                         hasRailing: !!prev[i].hasRailing,
                         hasStairs: !!prev[i].hasStairs,
-                        hasLanterns: !!prev[i].hasLanterns
+                        hasLanterns: !!prev[i].hasLanterns,
+                        roadProgress: prev[i].roadProgress || 0,
+                        roadDecayAccMs: prev[i].roadDecayAccMs || 0
                     });
                 } else {
                     base.pathSegments.push({
                         state: "Large Rocks",
                         hasRailing: false,
                         hasStairs: false,
-                        hasLanterns: false
+                        hasLanterns: false,
+                        roadProgress: 0,
+                        roadDecayAccMs: 0
                     });
                 }
+            }
+        }
+        const segs = base.pathSegments || [];
+        for (let si = 0; si < segs.length; si++) {
+            const seg = segs[si];
+            if (!seg) {
+                continue;
+            }
+            if (seg.roadProgress === undefined || seg.roadProgress === null) {
+                seg.roadProgress = 0;
+            }
+            if (seg.roadDecayAccMs === undefined || seg.roadDecayAccMs === null) {
+                seg.roadDecayAccMs = 0;
             }
         }
     },

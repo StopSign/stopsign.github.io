@@ -2111,7 +2111,7 @@ var resortData = {
 
         mine: {
             label: "Mine",
-            upgradesOrder: ["pebblePay", "formPlayPit"],
+            upgradesOrder: ["pebblePay", "mineshaftBeams", "formPlayPit"],
             upgrades: {
                 pebblePay: {
                     key: "pebble_pay",
@@ -2140,6 +2140,35 @@ var resortData = {
                         return engine.getPebblePayBought() >= 10;
                     },
                     soldOutButtonLabel: "Max pay"
+                },
+                mineshaftBeams: {
+                    key: "mineshaft_beams",
+                    name: "Mineshaft Beams",
+                    description: "Timber bracing in the mine. Earth spirits assigned there gain +20% spirit power per purchase.",
+                    getCost: function() {
+                        const n = engine.getMineshaftBeamsBought();
+                        return { wood: Math.round(400 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 240,
+                    weavingTimeIncreaseAdd: 120,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getMineshaftBeamsBought();
+                    },
+                    canBuy: function() {
+                        const hs = data.progress.base.hiddenSpring;
+                        return !!((hs && hs.earthSpiritsBought) >= 2)
+                            && engine.getMineshaftBeamsBought() < 5;
+                    },
+                    onBuy: function() {
+                        data.progress.base.mine.mineshaftBeamsBought = engine.getMineshaftBeamsBought() + 1;
+                    },
+                    extraInfo: function() {
+                        return `Mine spirit power: +${engine.getMineshaftBeamsBought() * 20}%`;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.getMineshaftBeamsBought() >= 5;
+                    },
+                    soldOutButtonLabel: "Max beams"
                 },
                 formPlayPit: {
                     key: "form_play_pit",
@@ -2591,7 +2620,7 @@ var resortData = {
                 ore: 0,
                 bars: 0
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "mineshaftBeams", "unlockDrophammer"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "unlockDrophammer"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -2952,35 +2981,6 @@ var resortData = {
                         return (data.progress.base.atelier.improveDirtRoadsBought || 0) >= 5;
                     },
                     soldOutButtonLabel: "Max roads"
-                },
-                mineshaftBeams: {
-                    key: "mineshaft_beams",
-                    name: "Mineshaft Beams",
-                    description: "Timber bracing in the mine. Earth spirits assigned there gain +20% spirit power per purchase.",
-                    getCost: function() {
-                        const n = engine.getMineshaftBeamsBought();
-                        return { wood: Math.round(400 * Math.pow(1.5, n)) };
-                    },
-                    weavingTime: 240,
-                    weavingTimeIncreaseAdd: 120,
-                    getWeavingPurchaseIndex: function() {
-                        return engine.getMineshaftBeamsBought();
-                    },
-                    canBuy: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2)
-                            && engine.getMineshaftBeamsBought() < 5;
-                    },
-                    onBuy: function() {
-                        data.progress.base.atelier.mineshaftBeamsBought = engine.getMineshaftBeamsBought() + 1;
-                    },
-                    extraInfo: function() {
-                        return `Mine spirit power: +${engine.getMineshaftBeamsBought() * 20}%`;
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getMineshaftBeamsBought() >= 5;
-                    },
-                    soldOutButtonLabel: "Max beams"
                 },
                 unlockDrophammer: {
                     key: "unlock_drophammer",

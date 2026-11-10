@@ -5480,9 +5480,28 @@ let engine = {
     getFireLauncherEmberRegenMult: function(platformKey) {
         return 1 + 0.25 * engine.getFireLauncherUpgradeBought(platformKey, "woodPitBought");
     },
+    isPathHaulScope: function(scopeKey) {
+        return scopeKey === "mine" || !!engine.parseFireLauncherScopeKey(scopeKey);
+    },
+    getPathHaulStopProgress: function(scopeKey) {
+        if (scopeKey === "mine") {
+            return 0;
+        }
+        const platformKey = engine.parseFireLauncherScopeKey(scopeKey);
+        const fromBottom = platformKey === "pathLower" ? 6 : platformKey === "pathMid" ? 21 : platformKey === "bendTop" ? 45 : 0;
+        if (!fromBottom) {
+            return 0;
+        }
+        const specs = engine.getResortPathSegmentSpecs();
+        const idx = specs.length - fromBottom;
+        if (idx < 0 || !specs[idx]) {
+            return 0;
+        }
+        return specs[idx].startDist;
+    },
     getUpgradeGatherDeliverMapKey: function(scopeKey) {
-        if (engine.parseFireLauncherScopeKey(scopeKey)) {
-            return "atelier";
+        if (engine.isPathHaulScope(scopeKey)) {
+            return "pathEnd";
         }
         return scopeKey;
     },
@@ -6014,8 +6033,8 @@ let engine = {
         return Math.ceil(amount * (1 + 0.2 * n));
     },
     getMineshaftBeamsBought: function() {
-        const atelier = data.progress.base && data.progress.base.atelier;
-        return (atelier && atelier.mineshaftBeamsBought) || 0;
+        const mine = data.progress.base && data.progress.base.mine;
+        return (mine && mine.mineshaftBeamsBought) || 0;
     },
     getEarthSpiritPebbleCarryAmount: function(spirit) {
         const power = engine.getEffectiveSpiritPower(spirit);
@@ -9397,6 +9416,84 @@ let engine = {
         const progress = road ? Math.max(0, Math.min(cap, road.progress || 0)) : 0;
         return 1 + 0.005 * progress;
     },
+    getRoadProgressSpeedMult: function(progress) {
+        const cap = engine.getDirtRoadMaxProgress();
+        const p = Math.max(0, Math.min(cap, progress || 0));
+        return 1 + 0.005 * p;
+    },
+    getRoadProgressOpacity: function(progress) {
+        const cap = engine.getDirtRoadMaxProgress();
+        const p = Math.max(0, Math.min(cap, progress || 0));
+        if (p < 1) {
+            return 0;
+        }
+        return 0.2 + 0.8 * ((p - 1) / Math.max(1, cap - 1));
+    },
+    getRoadProgressTipHtml: function(progress, decayAccMs) {
+        const cap = engine.getDirtRoadMaxProgress();
+        const p = Math.max(0, Math.min(cap, progress || 0));
+        if (p <= 0) {
+            return "";
+        }
+        const remainMs = Math.max(0, 30000 - (decayAccMs || 0));
+        return `${p} / ${cap}<br>+${round1(p * 0.5)}% speed<br>${Math.ceil(remainMs / 1000)}s to next decrease`;
+    },
+    getPathSegmentRoadTipHtml: function(segmentIndex) {
+        const seg = engine.getPathSegmentData(segmentIndex);
+        if (!seg || (seg.roadProgress || 0) <= 0) {
+            return "";
+        }
+        return engine.getRoadProgressTipHtml(seg.roadProgress, seg.roadDecayAccMs);
+    },
+    getPathSegmentRoadSpeedMult: function(segmentIndex) {
+        if (!engine.isDirtRoadsUnlocked()) {
+            return 1;
+        }
+        const seg = engine.getPathSegmentData(segmentIndex);
+        return engine.getRoadProgressSpeedMult(seg && seg.roadProgress);
+    },
+    addPathSegmentRoadProgress: function(segmentIndex) {
+        if (!engine.isDirtRoadsUnlocked()) {
+            return;
+        }
+        const seg = engine.getPathSegmentData(segmentIndex);
+        if (!seg) {
+            return;
+        }
+        const prev = seg.roadProgress || 0;
+        seg.roadProgress = Math.min(engine.getDirtRoadMaxProgress(), prev + engine.getDirtRoadProgressPerDelivery());
+        if (prev <= 0 && seg.roadProgress > 0) {
+            seg.roadDecayAccMs = 0;
+        }
+    },
+    creditPathSegmentsCrossed: function(before, after) {
+        if (!engine.isDirtRoadsUnlocked()) {
+            return;
+        }
+        const specs = engine.getResortPathSegmentSpecs();
+        for (let i = 0; i < specs.length; i++) {
+            const start = specs[i].startDist;
+            if (start < before - 1e-6 && start >= after - 1e-6) {
+                engine.addPathSegmentRoadProgress(i);
+            }
+        }
+    },
+    decayRoadRecord: function(record, progressKey, decayKey, tickMs) {
+        if ((record[progressKey] || 0) <= 0) {
+            record[progressKey] = 0;
+            record[decayKey] = 0;
+            return;
+        }
+        record[decayKey] = (record[decayKey] || 0) + (tickMs || 0);
+        while ((record[progressKey] || 0) > 0 && record[decayKey] >= 30000) {
+            record[decayKey] -= 30000;
+            record[progressKey] = (record[progressKey] || 0) - 1;
+        }
+        if ((record[progressKey] || 0) <= 0) {
+            record[progressKey] = 0;
+            record[decayKey] = 0;
+        }
+    },
     getCarrierRoadSpeedMult: function(carrier) {
         return (carrier && carrier.roadSpeedMult) || 1;
     },
@@ -9434,20 +9531,15 @@ let engine = {
         const roads = engine.getDirtRoads();
         const step = tickMs || 0;
         for (let i = 0; i < roads.length; i++) {
-            const road = roads[i];
-            if ((road.progress || 0) <= 0) {
-                road.progress = 0;
-                road.decayAccMs = 0;
-                continue;
-            }
-            road.decayAccMs = (road.decayAccMs || 0) + step;
-            while ((road.progress || 0) > 0 && road.decayAccMs >= 30000) {
-                road.decayAccMs -= 30000;
-                road.progress = (road.progress || 0) - 1;
-            }
-            if ((road.progress || 0) <= 0) {
-                road.progress = 0;
-                road.decayAccMs = 0;
+            engine.decayRoadRecord(roads[i], "progress", "decayAccMs", step);
+        }
+        const segs = data.progress.base && data.progress.base.pathSegments;
+        if (!segs) {
+            return;
+        }
+        for (let si = 0; si < segs.length; si++) {
+            if (segs[si]) {
+                engine.decayRoadRecord(segs[si], "roadProgress", "roadDecayAccMs", step);
             }
         }
     },
@@ -10017,6 +10109,9 @@ let engine = {
         };
     },
     getMapBuildingPosition: function(buildingKey) {
+        if (buildingKey === "pathEnd") {
+            return engine.getResortPathEnd();
+        }
         if (!viewData.mapBuildingPositionsLocked) {
             engine.cacheMapBuildingPositions();
         }
@@ -10119,6 +10214,53 @@ let engine = {
         }
         return speed * engine.getCarrierRoadSpeedMult(carrier) * engine.getCarrierSpeedCardMultiplier();
     },
+    getFoxDenPathHaulBaseSpeed: function(carrier) {
+        let speed = engine.getOkamiTravelSpeed() / 4;
+        if (carrier && carrier.isOkami) {
+            speed *= 2;
+        }
+        const okami = engine.getOkami();
+        if (okami.assignedBuildingKey === "foxDen") {
+            speed *= engine.getOkamiInspirationBonus();
+        }
+        return speed * engine.getCarrierSpeedCardMultiplier();
+    },
+    getFoxDenPathHaulSegmentMult: function(segmentIndex) {
+        return engine.getOkamiPathSegmentSpeedMultForIndex(segmentIndex) * engine.getPathSegmentRoadSpeedMult(segmentIndex);
+    },
+    deliverFoxDenCarrierLoad: function(rh, c) {
+        const jobKey = c.jobKey || (c.unlockKey ? engine.getBuildingJobKey(c.unlockKey) : "");
+        if (jobKey.indexOf("building:") === 0) {
+            const unlockKey = jobKey.slice("building:".length);
+            const site = rh.constructionSites[unlockKey];
+            if (site && site.delivered) {
+                site.delivered[c.resourceType] = (site.delivered[c.resourceType] || 0) + (c.amount || 0);
+            }
+            let complete = true;
+            if (site && site.required) {
+                const keys = resortData.gatherResourceKeys;
+                for (let ki = 0; ki < keys.length; ki++) {
+                    const k = keys[ki];
+                    if ((site.delivered[k] || 0) < (site.required[k] || 0)) {
+                        complete = false;
+                        break;
+                    }
+                }
+            }
+            if (complete) {
+                engine.completeFoxDenConstruction(unlockKey);
+            }
+        } else if (jobKey.indexOf("upgrade:") === 0) {
+            const job = rh.upgradeGatherJobs[jobKey];
+            if (job && job.delivered) {
+                job.delivered[c.resourceType] = (job.delivered[c.resourceType] || 0) + (c.amount || 0);
+            }
+            engine.checkUpgradeGatherJobComplete(jobKey);
+        } else if (jobKey.indexOf("mana:") === 0) {
+            const buildingKey = jobKey.slice("mana:".length);
+            engine.deliverManaToBuilding(buildingKey, c.amount || 0);
+        }
+    },
     cancelFoxDenCarriers: function() {
         const rh = data.progress.base.foxDen;
         for (let i = 0; i < rh.constructionCarriers.length; i++) {
@@ -10202,6 +10344,9 @@ let engine = {
             totalDist: dist,
             stoneTaken: resourceType === "stone" ? taken : undefined
         };
+        if (target.mapKey === "pathEnd") {
+            gatherCarrier.haulPhase = "toPathEnd";
+        }
         engine.applyDirtRoadOnSpawn(gatherCarrier, engine.getConstructionSourceBuildingKey(resourceType), target.mapKey);
         rh.constructionCarriers.push(gatherCarrier);
         rh.carrierIdCounter = (rh.carrierIdCounter || 1) + 1;
@@ -10219,40 +10364,36 @@ let engine = {
         const next = [];
         for (let i = 0; i < rh.constructionCarriers.length; i++) {
             const c = rh.constructionCarriers[i];
+            if (c.haulPhase === "onPath") {
+                const parsed = engine.parseUpgradeGatherJobKey(c.jobKey);
+                const stop = engine.getPathHaulStopProgress(parsed && parsed.scopeKey);
+                const before = (c.pathProgress === undefined || c.pathProgress === null)
+                    ? engine.getResortPathTotalDistance()
+                    : c.pathProgress;
+                c.pathProgress = engine.advancePathProgress(before, tickMs / 1000, -1, {
+                    baseSpeed: engine.getFoxDenPathHaulBaseSpeed(c),
+                    getSegmentMult: engine.getFoxDenPathHaulSegmentMult,
+                    minProgress: stop,
+                    maxProgress: engine.getResortPathTotalDistance()
+                });
+                engine.creditPathSegmentsCrossed(before, c.pathProgress);
+                if (c.pathProgress <= stop + 1e-4) {
+                    engine.deliverFoxDenCarrierLoad(rh, c);
+                } else {
+                    next.push(c);
+                }
+                continue;
+            }
             const speed = engine.getFoxDenCarrierSpeed(c);
             c.progress = (c.progress || 0) + (speed * (tickMs / 1000)) / (c.totalDist || 1);
             if (c.progress >= 1) {
                 engine.addDirtRoadProgress(c.fromKey, c.toKey);
-                const jobKey = c.jobKey || (c.unlockKey ? engine.getBuildingJobKey(c.unlockKey) : "");
-                if (jobKey.indexOf("building:") === 0) {
-                    const unlockKey = jobKey.slice("building:".length);
-                    const site = rh.constructionSites[unlockKey];
-                    if (site && site.delivered) {
-                        site.delivered[c.resourceType] = (site.delivered[c.resourceType] || 0) + (c.amount || 0);
-                    }
-                    let complete = true;
-                    if (site && site.required) {
-                        const keys = resortData.gatherResourceKeys;
-                        for (let ki = 0; ki < keys.length; ki++) {
-                            const k = keys[ki];
-                            if ((site.delivered[k] || 0) < (site.required[k] || 0)) {
-                                complete = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (complete) {
-                        engine.completeFoxDenConstruction(unlockKey);
-                    }
-                } else if (jobKey.indexOf("upgrade:") === 0) {
-                    const job = rh.upgradeGatherJobs[jobKey];
-                    if (job && job.delivered) {
-                        job.delivered[c.resourceType] = (job.delivered[c.resourceType] || 0) + (c.amount || 0);
-                    }
-                    engine.checkUpgradeGatherJobComplete(jobKey);
-                } else if (jobKey.indexOf("mana:") === 0) {
-                    const buildingKey = jobKey.slice("mana:".length);
-                    engine.deliverManaToBuilding(buildingKey, c.amount || 0);
+                if (c.haulPhase === "toPathEnd") {
+                    c.haulPhase = "onPath";
+                    c.pathProgress = engine.getResortPathTotalDistance();
+                    next.push(c);
+                } else {
+                    engine.deliverFoxDenCarrierLoad(rh, c);
                 }
             } else {
                 next.push(c);

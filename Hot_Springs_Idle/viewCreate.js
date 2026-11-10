@@ -1406,6 +1406,7 @@ let createView = {
                 <div id="resortInfo_path" class="resort-info-section">
                     <div class="base-info-title">Clear Debris</div>
                     <div class="base-row">State: <span id="pathSegmentStateText"></span></div>
+                    <div id="pathSegmentRoadRow" class="base-row" style="display:none"></div>
                     <div id="base_path_select_next_row" class="base-row" style="display:none">
                         <button type="button" id="base_path_select_next_btn" class="tab-button" onclick="events.selectNextPathSegment()">Select Next Path Segment</button>
                     </div>
@@ -2181,7 +2182,7 @@ let createView = {
             "base_bambooForest_assign_one_btn", "base_bambooForest_assign_ten_btn", "base_bambooForest_assign_all_btn", "base_bambooForest_unassign_one_btn", "base_bambooForest_unassign_ten_btn", "base_bambooForest_unassign_all_btn", "base_bambooForest_workers_label", "base_bambooForest_worker_prod_text", "base_bambooForest_worker_prod_wrap", "base_bambooForest_worker_prog_fill", "base_bambooForest_assign_okami_btn",
             "base_foxDen_assign_one_btn", "base_foxDen_assign_ten_btn", "base_foxDen_assign_all_btn", "base_foxDen_unassign_one_btn", "base_foxDen_unassign_ten_btn", "base_foxDen_unassign_all_btn", "base_foxDen_workers_label", "base_foxDen_assign_okami_btn",
             "baseBuilding_bambooForest", "baseBuilding_foxDen", "okamiTravelToken", "dirtRoadLayer", "dirtRoadHoverLayer", "dirtRoadMouseTip", "constructionMouseTip", "foxDenQueueTip", "baseResortMap", "pondForestStream", "pondForestStreamPath",
-            "pathSegmentStateText", "base_path_select_next_row", "base_path_select_next_btn", "base_path_remove_rocks_row", "base_path_remove_rocks_btn", "base_path_remove_rocks_extra", "base_path_add_railing_row", "base_path_add_railing_btn", "base_path_add_railing_extra", "base_torii_call_for_ally_row", "base_torii_call_for_ally_btn", "base_torii_call_for_ally_extra", "okamiTravelToken", "okamiPathWeaveToken",
+            "pathSegmentStateText", "pathSegmentRoadRow", "base_path_select_next_row", "base_path_select_next_btn", "base_path_remove_rocks_row", "base_path_remove_rocks_btn", "base_path_remove_rocks_extra", "base_path_add_railing_row", "base_path_add_railing_btn", "base_path_add_railing_extra", "base_torii_call_for_ally_row", "base_torii_call_for_ally_btn", "base_torii_call_for_ally_extra", "okamiTravelToken", "okamiPathWeaveToken",
             "baseBuildingInfoClose", "baseBuildingInfoHideToggle", "baseBuildingInfoHeaderBtns",
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
@@ -2556,11 +2557,13 @@ let createView = {
         const highlightLayer = document.getElementById("pathSegmentHighlightLayer");
         const trackLayer = document.getElementById("pathSegmentTrackLayer");
         const hollowLayer = document.getElementById("pathSegmentHollowLayer");
-        if (!hitLayer || !highlightLayer || !trackLayer || !hollowLayer || typeof engine.getResortPathSegmentSpecs !== "function") {
+        const roadLayer = document.getElementById("pathSegmentRoadLayer");
+        if (!hitLayer || !highlightLayer || !trackLayer || !hollowLayer || !roadLayer || typeof engine.getResortPathSegmentSpecs !== "function") {
             return;
         }
         viewData.pathSegHighlightEls = [];
         viewData.pathSegHitEls = [];
+        viewData.pathSegRoadEls = [];
         viewData.pathHighlightSig = null;
         engine._pathDomSig = null;
         engine._pathDomGlobalsApplied = false;
@@ -2570,6 +2573,7 @@ let createView = {
         highlightLayer.innerHTML = "";
         trackLayer.innerHTML = "";
         hollowLayer.innerHTML = "";
+        roadLayer.innerHTML = "";
         for (let i = 0; i < specs.length; i++) {
             const d = engine.getPathSegmentSvgSubpath(i);
             const trackPath = document.createElementNS(svgNs, "path");
@@ -2586,6 +2590,12 @@ let createView = {
             hollowPath.setAttribute("fill", "none");
             hollowPath.setAttribute("pointer-events", "none");
             hollowLayer.appendChild(hollowPath);
+            const roadPath = document.createElementNS(svgNs, "path");
+            roadPath.setAttribute("d", d);
+            roadPath.setAttribute("class", "path-seg-road");
+            roadPath.setAttribute("stroke-opacity", "0");
+            roadLayer.appendChild(roadPath);
+            viewData.pathSegRoadEls[i] = roadPath;
             const hitPath = document.createElementNS(svgNs, "path");
             hitPath.setAttribute("d", d);
             hitPath.setAttribute("class", "path-seg-hit");

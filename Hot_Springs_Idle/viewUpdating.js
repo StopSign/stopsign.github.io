@@ -2195,14 +2195,22 @@ let view = {
             }
             view.setDisplayById(elId, !!carrier);
             if (carrier) {
-                const route = engine.getCarrierRoutePoints(carrier);
-                const p = carrier.progress || 0;
-                const x = route.fromX + (route.toX - route.fromX) * p;
-                const y = route.fromY + (route.toY - route.fromY) * p;
-                view.setGpuPosById(elId, x, y, false);
                 const el = viewData.cached[elId];
-                if (el) {
-                    const img = el.querySelector(".fox-den-carrier-img");
+                const img = el ? el.querySelector(".fox-den-carrier-img") : null;
+                if (carrier.haulPhase === "onPath") {
+                    const pos = engine.getResortPathPosition(carrier.pathProgress || 0);
+                    view.setGpuPosById(elId, pos.x, pos.y, false);
+                    if (img) {
+                        img.src = view.getCarrierSprite(carrier);
+                        const east = !engine.getPathTravelDirectionEast(carrier.pathProgress || 0, -1);
+                        view.setFoxTravelMirror(img, east);
+                    }
+                } else {
+                    const route = engine.getCarrierRoutePoints(carrier);
+                    const p = carrier.progress || 0;
+                    const x = route.fromX + (route.toX - route.fromX) * p;
+                    const y = route.fromY + (route.toY - route.fromY) * p;
+                    view.setGpuPosById(elId, x, y, false);
                     if (img) {
                         img.src = view.getCarrierSprite(carrier);
                         view.setFoxTravelMirror(img, route.toX > route.fromX);
@@ -2748,10 +2756,7 @@ let view = {
             }
             const roadCap = engine.getDirtRoadMaxProgress();
             const progress = Math.max(0, Math.min(roadCap, road.progress || 0));
-            let opacity = 0;
-            if (progress >= 1) {
-                opacity = 0.2 + 0.8 * ((progress - 1) / Math.max(1, roadCap - 1));
-            }
+            const opacity = engine.getRoadProgressOpacity(progress);
             if (line._dirtRoadOpacity !== opacity) {
                 line._dirtRoadOpacity = opacity;
                 line.setAttribute("stroke-opacity", String(opacity));
@@ -2760,8 +2765,7 @@ let view = {
                 const showTip = progress > 0;
                 hotspot.style.display = showTip ? "" : "none";
                 if (showTip) {
-                    const remainMs = Math.max(0, 30000 - (road.decayAccMs || 0));
-                    hotspot._dirtRoadTipHtml = `${progress} / ${roadCap}<br>+${round1(progress * 0.5)}% speed<br>${Math.ceil(remainMs / 1000)}s to next decrease`;
+                    hotspot._dirtRoadTipHtml = engine.getRoadProgressTipHtml(progress, road.decayAccMs);
                 }
             }
         }
@@ -2788,6 +2792,24 @@ let view = {
                 staleHover.parentNode.removeChild(staleHover);
             }
             delete viewData.dirtRoadHoverEls[staleKey];
+        }
+    },
+    updatePathSegmentRoads: function() {
+        const els = viewData.pathSegRoadEls;
+        if (!els || !els.length) {
+            return;
+        }
+        for (let i = 0; i < els.length; i++) {
+            const el = els[i];
+            if (!el) {
+                continue;
+            }
+            const seg = engine.getPathSegmentData(i);
+            const opacity = engine.getRoadProgressOpacity(seg && seg.roadProgress);
+            if (el._roadOpacity !== opacity) {
+                el._roadOpacity = opacity;
+                el.setAttribute("stroke-opacity", String(opacity));
+            }
         }
     },
     updatePondForestStream: function() {
@@ -3104,6 +3126,7 @@ let view = {
         view.updateShrineProgressDisplays();
         view.updateMarketProgressDisplays();
         view.updateDirtRoadLayer();
+        view.updatePathSegmentRoads();
         view.updatePondForestStream();
         view.updateMapBuildingManaBar("inn", "mapInnManaProgressWrap", "mapInnManaProgressFill");
         view.updateMapBuildingManaBar("torii", "mapToriiManaProgressWrap", "mapToriiManaProgressFill");
@@ -4338,6 +4361,9 @@ let view = {
                 stateText += " (Lanterns)";
             }
             view.updateVal("pathSegmentStateText", stateText);
+            const roadTip = engine.getPathSegmentRoadTipHtml(pathIdx);
+            view.updateVal("pathSegmentRoadRow", roadTip ? "" : "none", "style.display");
+            view.updateVal("pathSegmentRoadRow", roadTip, "innerHTML");
             const showNextPathBtn = !!(seg && seg.state !== "Large Rocks" && pathIdx > 0);
             view.updateVal("base_path_select_next_row", showNextPathBtn ? "" : "none", "style.display");
             const t = view._basePanelPurchasingTools(base, null, data.progress.options.hideMaxedUpgrades);

@@ -2476,6 +2476,16 @@ button {
     vector-effect: non-scaling-stroke;
 }
 
+.path-seg-road {
+    fill: none;
+    stroke: #6b4423;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+}
+
 .resort-building-label {
     z-index: 12;
     text-shadow: 0 1px 3px #000;

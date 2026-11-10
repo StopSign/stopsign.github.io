@@ -1282,9 +1282,36 @@ let events = {
                 view.updatePathSegmentHighlight(idx);
             }
         });
+        hitLayer.addEventListener("mousemove", function(e) {
+            const path = e.target.closest(".path-seg-hit");
+            const tip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
+            if (!tip) {
+                return;
+            }
+            if (!path) {
+                tip.style.display = "none";
+                return;
+            }
+            const idx = parseInt(path.getAttribute("data-segment-index"), 10);
+            const html = isNaN(idx) ? "" : engine.getPathSegmentRoadTipHtml(idx);
+            if (!html) {
+                tip.style.display = "none";
+                return;
+            }
+            if (tip._dirtRoadTipHtml !== html) {
+                tip._dirtRoadTipHtml = html;
+                tip.innerHTML = html;
+            }
+            tip.style.display = "block";
+            view.positionResortMapMouseTip(tip, e);
+        });
         hitLayer.addEventListener("mouseout", function(e) {
             if (!e.relatedTarget || !hitLayer.contains(e.relatedTarget)) {
                 view.updatePathSegmentHighlight(null);
+                const tip = viewData.cached.dirtRoadMouseTip || document.getElementById("dirtRoadMouseTip");
+                if (tip) {
+                    tip.style.display = "none";
+                }
             }
         });
     },
