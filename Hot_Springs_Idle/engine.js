@@ -9007,6 +9007,12 @@ let engine = {
             return;
         }
         const scopeKeys = Object.keys(buildings);
+        const garden = data.progress.base && data.progress.base.garden;
+        const reserveCloneMana = !!(garden && garden.reserveCloneManaForAutobuy);
+        let reservedMana = 0;
+        if (reserveCloneMana && typeof bonfire !== "undefined" && bonfire.getCreateClonePlan) {
+            reservedMana = bonfire.getCreateClonePlan().manaCost || 0;
+        }
         let weaverTaken = !!(engine.getWeavingState().active);
         for (let si = 0; si < scopeKeys.length; si++) {
             const scopeKey = scopeKeys[si];
@@ -9014,8 +9020,35 @@ let engine = {
             if (!cfg || !cfg.upgrades || !cfg.upgradesOrder) {
                 continue;
             }
-            for (let ui = 0; ui < cfg.upgradesOrder.length; ui++) {
-                const upgradeKey = cfg.upgradesOrder[ui];
+            let orderKeys = cfg.upgradesOrder;
+            if (reserveCloneMana) {
+                orderKeys = orderKeys.slice();
+                const manaSlots = [];
+                for (let oi = 0; oi < orderKeys.length; oi++) {
+                    const candidate = cfg.upgrades[orderKeys[oi]];
+                    if (!candidate || !candidate.autobuy) {
+                        continue;
+                    }
+                    const candidateCost = resortData.resolveCost(candidate);
+                    if (!candidateCost || !(candidateCost.mana > 0)) {
+                        continue;
+                    }
+                    manaSlots.push({ index: oi, key: orderKeys[oi], mana: candidateCost.mana });
+                }
+                if (manaSlots.length > 1) {
+                    const sortedSlots = manaSlots.slice().sort(function(a, b) {
+                        if (a.mana !== b.mana) {
+                            return a.mana - b.mana;
+                        }
+                        return a.index - b.index;
+                    });
+                    for (let s = 0; s < manaSlots.length; s++) {
+                        orderKeys[manaSlots[s].index] = sortedSlots[s].key;
+                    }
+                }
+            }
+            for (let ui = 0; ui < orderKeys.length; ui++) {
+                const upgradeKey = orderKeys[ui];
                 const up = cfg.upgrades[upgradeKey];
                 if (!up || !up.autobuy) {
                     continue;
@@ -9039,6 +9072,12 @@ let engine = {
                         continue;
                     }
                     const cost = resortData.resolveCost(up, scopeKey);
+                    if (reserveCloneMana && cost && (cost.mana || 0) > 0) {
+                        const manaHave = (data.progress.mana && data.progress.mana.amount) || 0;
+                        if ((cost.mana || 0) > Math.max(0, manaHave - reservedMana)) {
+                            continue;
+                        }
+                    }
                     if (!resortData.canAffordCost(cost)) {
                         continue;
                     }

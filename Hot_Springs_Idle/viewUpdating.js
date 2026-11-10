@@ -1177,9 +1177,12 @@ let view = {
                 const rowEl = resortData.idRow(buildingSegment, slug);
                 const btnEl = resortData.idBtn(buildingSegment, slug);
                 const extraEl = resortData.idExtra(buildingSegment, slug);
-                let show = resortData.isUpgradeRowVisible(u, hideMx);
-                if (resortData.isUpgradeSoldOut(u)) {
-                    show = !hideMx;
+                let show = false;
+                if (!u.revealLater) {
+                    show = resortData.isUpgradeRowVisible(u, hideMx);
+                    if (resortData.isUpgradeSoldOut(u)) {
+                        show = !hideMx;
+                    }
                 }
                 view.updateVal(rowEl, show ? "" : "none", "style.display");
                 if (u.autobuy) {
@@ -1903,6 +1906,70 @@ let view = {
         }
     },
 
+    /** Reorder upgrade rows once. Called only when that building's info is opened. */
+    sortBuildingUpgradeRows: function(scopeKey, resourceKey) {
+        const cfg = resortData.buildings[scopeKey];
+        if (!cfg || !cfg.upgrades || !cfg.upgradesOrder) {
+            return;
+        }
+        const order = cfg.upgradesOrder;
+        const entries = [];
+        let parent = null;
+        let firstRow = null;
+        for (let i = 0; i < order.length; i++) {
+            const pk = order[i];
+            const u = cfg.upgrades[pk];
+            if (!u || !u.key) {
+                continue;
+            }
+            const rowId = resortData.idRow(scopeKey, resortData.slug(u));
+            const row = viewData.cached[rowId] || document.getElementById(rowId);
+            if (!row || !row.parentNode) {
+                continue;
+            }
+            if (!parent) {
+                parent = row.parentNode;
+            }
+            if (row.parentNode !== parent) {
+                continue;
+            }
+            if (!firstRow || (row.compareDocumentPosition(firstRow) & Node.DOCUMENT_POSITION_FOLLOWING)) {
+                firstRow = row;
+            }
+            const cost = resortData.upgradeCost(u);
+            const hasAmount = !!(cost && Object.prototype.hasOwnProperty.call(cost, resourceKey)
+                && cost[resourceKey] !== null && cost[resourceKey] !== undefined);
+            entries.push({
+                row: row,
+                amount: hasAmount ? cost[resourceKey] : null,
+                weave: resortData.getUpgradeWeavingBaseSeconds(u, scopeKey),
+                index: i
+            });
+        }
+        if (!parent || !firstRow || entries.length < 2) {
+            return;
+        }
+        entries.sort(function(a, b) {
+            const aMissing = a.amount === null;
+            const bMissing = b.amount === null;
+            if (aMissing !== bMissing) {
+                return aMissing ? 1 : -1;
+            }
+            if (!aMissing && a.amount !== b.amount) {
+                return a.amount - b.amount;
+            }
+            if (a.weave !== b.weave) {
+                return a.weave - b.weave;
+            }
+            return a.index - b.index;
+        });
+        let cursor = firstRow;
+        for (let ei = 0; ei < entries.length; ei++) {
+            parent.insertBefore(entries[ei].row, cursor);
+            cursor = entries[ei].row.nextSibling;
+        }
+    },
+
     updateBasePanelGarden: function(base, t) {
         const g = base.garden || {};
         view.updateVal("gardenAppraisalAuto_row", g.arrangementOfAppraisalUnlocked ? "" : "none", "style.display");
@@ -1919,6 +1986,17 @@ let view = {
         const reviewPausedChk = viewData.cached.gardenReviewPaused_chk;
         if (reviewPausedChk && reviewPausedChk.checked !== !!g.autoWeaveIncludePausedWeaves) {
             reviewPausedChk.checked = !!g.autoWeaveIncludePausedWeaves;
+        }
+        view.updateVal("gardenManaReserve_row", g.arrangementOfManaReserveUnlocked ? "" : "none", "style.display");
+        const reserveChk = viewData.cached.gardenManaReserve_chk;
+        if (reserveChk && reserveChk.checked !== !!g.reserveCloneManaForAutobuy) {
+            reserveChk.checked = !!g.reserveCloneManaForAutobuy;
+        }
+        if (g.arrangementOfManaReserveUnlocked) {
+            const reserved = (typeof bonfire !== "undefined" && bonfire.getCreateClonePlan)
+                ? bonfire.getCreateClonePlan().manaCost
+                : 0;
+            view.updateVal("gardenManaReserve_label", `Don't count mana equal to the current clone's cost for mana autobuy (${formatNumber(reserved)} mana)`);
         }
         t.refreshOrderedPurchasables("garden", resortData.buildings.garden.upgradesOrder, { hideMaxed: t.hideMaxed });
     },

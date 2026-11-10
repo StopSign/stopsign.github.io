@@ -571,7 +571,7 @@ var resortData = {
      * Torii Fill Mana has no rowVisible and stays shown; the other Fill Mana rows return false.
      */
     isUpgradeRowVisible: function(upgradeDef, hideMaxed) {
-        if (!upgradeDef) {
+        if (!upgradeDef || upgradeDef.revealLater) {
             return false;
         }
         let show;
@@ -1242,6 +1242,7 @@ var resortData = {
                     key: "build_kiln",
                     name: "Build Kiln",
                     description: "Build a kiln beside the bonfire. Opens Clone Management and Kiln, and workers follow a fuel priority list.",
+                    revealLater: true,
                     getCost: function() {
                         return { stone: 40000, essence: 20000 };
                     },
@@ -1750,6 +1751,7 @@ var resortData = {
                     key: "grow_plant_spirit",
                     name: "Grow Plant Spirit",
                     description: "Summon one plant spirit.",
+                    revealLater: true,
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
@@ -1771,6 +1773,7 @@ var resortData = {
                     key: "condense_water_spirit",
                     name: "Condense Water Spirit",
                     description: "Summon one water spirit.",
+                    revealLater: true,
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
@@ -1792,6 +1795,7 @@ var resortData = {
                     key: "raise_earth_spirit",
                     name: "Raise Earth Spirit",
                     description: "Summon one earth spirit.",
+                    revealLater: true,
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
@@ -1813,6 +1817,7 @@ var resortData = {
                     key: "spin_fire_spirit",
                     name: "Spin Fire Spirit",
                     description: "Summon one fire spirit.",
+                    revealLater: true,
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
@@ -3039,6 +3044,8 @@ var resortData = {
                 arrangementOfSelfSufficiencyUnlocked: false,
                 arrangementOfOrbGrowthUnlocked: false,
                 arrangementOfManaCurrentsUnlocked: false,
+                arrangementOfManaReserveUnlocked: false,
+                reserveCloneManaForAutobuy: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
                 autoWeaveIncludePausedWeaves: false
@@ -3051,7 +3058,7 @@ var resortData = {
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
                 "arrangementOfPaperMoney", "arrangementOfHeatTargeting",
-                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents"],
+                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents", "arrangementOfManaReserve"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3694,6 +3701,28 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfManaCurrentsUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfManaReserve: {
+                    key: "arrangement_of_mana_reserve",
+                    name: "Arrangement of Mana Reserve",
+                    description: "Reveal a Rock Garden checkbox. When checked, mana autobuy leaves aside mana equal to the current clone's cost.",
+                    cost: { stone: 200 },
+                    weavingTime: 400,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && (g.arrangementOfOrbGrowthUnlocked || g.arrangementOfManaCurrentsUnlocked))
+                            && !(g && g.arrangementOfManaReserveUnlocked);
+                    },
+                    onBuy: function() {
+                        const g = data.progress.base.garden;
+                        g.arrangementOfManaReserveUnlocked = true;
+                        g.reserveCloneManaForAutobuy = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfManaReserveUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 }

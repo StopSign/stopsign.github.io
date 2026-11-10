@@ -1417,6 +1417,9 @@ let events = {
             }
         }
         events.refreshBaseBuildingPanels();
+        if ((buildingKey === "garden" || buildingKey === "shrine") && typeof view.sortBuildingUpgradeRows === "function") {
+            view.sortBuildingUpgradeRows(buildingKey, buildingKey === "garden" ? "stone" : "divinity");
+        }
     },
     applyBaseBuildingInfoOverlay: function(buildingKey) {
         const infoPanel = viewData.cached.baseBuildingInfo || document.getElementById("baseBuildingInfo");
@@ -2053,6 +2056,12 @@ let events = {
         const g = data.progress.base && data.progress.base.garden;
         if (g) {
             g.autoWeaveIncludePausedWeaves = !!checked;
+        }
+    },
+    toggleGardenReserveCloneMana: function(checked) {
+        const g = data.progress.base && data.progress.base.garden;
+        if (g) {
+            g.reserveCloneManaForAutobuy = !!checked;
         }
     },
     toggleFoxDenManaOrders: function(checked) {
