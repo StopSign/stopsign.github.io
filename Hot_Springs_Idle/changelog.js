@@ -94,7 +94,7 @@ Prestige Changes:
 
 Combat changes:
 * Skill Slots base cost has been lowered, but with higher increasing costs per slot. Additionally cost increases again after 12 shards. Stars give x1.2 per star instead of x1.1 and maps have higher shard drop amounts to slightly offset it, but it will result in less slots.
-* One of the research options will be the category that you least have in your library
+* One of the research options in scroll archive will be the category that you least have in your library, the other 2 being random
 * Peer pressure 3% (+2%/lvl) -> 2% (+1%/lvl)
 * Outrage bonus from 50% attack speed/coins to 25% attack speed/coins
 * Brand Recognition 4 (+2/lvl) -> 3 (+1.5/lvl)

@@ -723,15 +723,14 @@ let createView = {
                     text += def.choose === 1 ? " Choose 1." : ` Choose ${def.choose}.`;
                     return text;
                 };
-                let html = "<p>Cards are permanent bonuses. Each copy you own adds its effect, and that total applies immediately. Owned cards and unopened packs are kept when you Fade into Legend.</p>";
+                let html = "<p>Cards are permanent bonuses. Each copy you own adds its effect, and that total applies immediately. Owned cards and unopened packs are kept when you Prestige.</p>";
                 html += `<p><strong>Buy Card</strong> spends ${cost} divinity on one pack. The pack rarity is ${odds}.</p>`;
-                html += "<p><strong>Open Packs</strong> opens Common packs first, then Rare, then Epic. You keep only the cards you choose. A card already at its maximum for that rarity is not offered. If a rolled rarity has none left, that card drops to the next lower rarity. Closing the window keeps the open pack, and the button becomes Resume Opening Packs. Choose as soon as clicked confirms the pack as soon as enough cards are selected.</p>";
+                html += "<p><strong>Open Packs</strong> opens Common packs first, then Rare, then Epic. You keep only the cards you choose. A card already at its maximum for that rarity is not offered. If a rolled rarity has none left, that card drops to the next lower rarity. Closing the window keeps the open pack ready for when you resume.</p>";
                 html += `<p>${packText("common", "Common")}</p>`;
                 html += `<p>${packText("rare", "Rare")}</p>`;
                 html += `<p>${packText("epic", "Epic")}</p>`;
-                html += "<p><strong>Capped milestones</strong> are Total Stars and Okami Level. Each mark grants the pack shown above it, once. Fade into Legend clears those claims, so they can be earned again.</p>";
-                html += "<p><strong>Repeating milestones</strong> are Depth Reached, Orb Level, Max Mana, Total Gold Stars, Market Level, and Essence Made. Reaching the target grants the pack on the bar and raises the next target. Fade into Legend returns these targets to their first value.</p>";
-                html += "<p><strong>One-time milestones</strong> are Shrine Level, Divinity Amount, and Build Shrine. Building the Shrine grants one Epic pack. Shrine Level and Divinity Amount stay claimed, because the Shrine, its level, and your divinity are kept.</p>";
+                html += `<p><strong>Milestones</strong> will give card packs when you meet the requirements. Repeating milestones can be done endlessly, giving increasing pack rarities as it gets more difficult. Both Capped and Repeating milestones will reset upon prestige, ready to get those card packs again.</p>`;
+                html += "<p><strong>One-time milestones</strong> can only be done once, as these resource track between prestiges.</p>";
                 html += "<p><strong>Card Bonuses</strong> lists every card you have received. Each rarity shows owned / maximum. ∞ means that rarity has no cap. An empty slot means that card has no version of that rarity. The line under the counts is the total from every copy you own.</p>";
                 return html;
             },
