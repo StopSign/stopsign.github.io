@@ -4958,6 +4958,15 @@ button[id^="inscriptionAssign_"]:disabled:hover {
     gap: 8px;
 }
 
+.options-discord-link {
+    color: #7EB6FF;
+    text-decoration: underline;
+}
+
+.options-discord-link:hover {
+    color: var(--text-primary);
+}
+
 .options-separator {
     margin-top: 10px;
     margin-bottom: 4px;
