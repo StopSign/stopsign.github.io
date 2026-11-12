@@ -415,6 +415,7 @@ let initials = {
                 visitorsWaiting: 0,
                 maxVisitors: 2,
                 queuePostsBought: 0,
+                addBenchesBought: 0,
                 nextVisitorTimerMs: 60000,
                 visitorIntervalMs: 60000,
                 callForAllyBought: 0,
@@ -635,6 +636,14 @@ let initials = {
             selectedStatsTab: "combat",
             compactViewPane: "menus",
             autoRetryCountdownSec: 0,
+            mapTour: {
+                active: false,
+                returnMapKey: "",
+                tried: {},
+                pendingMapKey: "",
+                waitingForMana: false,
+                countdownSec: 0
+            },
             options: {
                 hideMaxedUpgrades: true,
                 disableCompactLayout: false,
@@ -829,6 +838,10 @@ let initialize = {
         if (!lib.unlockedSkills) {
             lib.unlockedSkills = {};
         }
+        delete lib.researchTaskRequired;
+        delete lib.researchTaskProgress;
+        delete lib.researchCoinCosts;
+        delete lib.freeResearchCostCredit;
         if (!lib.researchChoices) {
             lib.researchChoices = [];
         }
@@ -842,10 +855,13 @@ let initialize = {
         if ((lib.researchesToChoose || 0) > 0) {
             const choices = lib.researchChoices || [];
             let choicesValid = choices.length > 0;
+            const seenChoice = {};
             for (let ci = 0; ci < choices.length && choicesValid; ci++) {
-                if (!engine.isScrollArchivesSkillViable(choices[ci])) {
+                const choiceKey = choices[ci];
+                if (!engine.isScrollArchivesSkillViable(choiceKey) || seenChoice[choiceKey]) {
                     choicesValid = false;
                 }
+                seenChoice[choiceKey] = true;
             }
             if (!choicesValid) {
                 engine.rollScrollArchivesResearchChoices();
@@ -1601,7 +1617,7 @@ let initialize = {
     initializePond: function() {
         const base = data.progress.base;
         if (!base.pond) {
-            base.pond = { waterVolume: 0, wishingWellBought: 0 };
+            base.pond = { waterVolume: 0, wishingWellBought: 0, wetlandBoardwalkBought: 0 };
         }
         const pond = base.pond;
         if (pond.waterVolume === undefined || pond.waterVolume === null) {
@@ -1609,6 +1625,9 @@ let initialize = {
         }
         if (pond.wishingWellBought === undefined || pond.wishingWellBought === null) {
             pond.wishingWellBought = 0;
+        }
+        if (pond.wetlandBoardwalkBought === undefined || pond.wetlandBoardwalkBought === null) {
+            pond.wetlandBoardwalkBought = 0;
         }
         if (typeof engine !== "undefined" && engine.isPondBuiltFromFoxDen && engine.isPondBuiltFromFoxDen()) {
             pond.pipesToForestUnlocked = true;
@@ -1741,6 +1760,7 @@ let initialize = {
                         hasRailing: !!prev[i].hasRailing,
                         hasStairs: !!prev[i].hasStairs,
                         hasLanterns: !!prev[i].hasLanterns,
+                        hasReinforcedStairs: !!prev[i].hasReinforcedStairs,
                         roadProgress: prev[i].roadProgress || 0,
                         roadDecayAccMs: prev[i].roadDecayAccMs || 0
                     });
@@ -1750,6 +1770,7 @@ let initialize = {
                         hasRailing: false,
                         hasStairs: false,
                         hasLanterns: false,
+                        hasReinforcedStairs: false,
                         roadProgress: 0,
                         roadDecayAccMs: 0
                     });
@@ -1767,6 +1788,9 @@ let initialize = {
             }
             if (seg.roadDecayAccMs === undefined || seg.roadDecayAccMs === null) {
                 seg.roadDecayAccMs = 0;
+            }
+            if (seg.hasReinforcedStairs === undefined || seg.hasReinforcedStairs === null) {
+                seg.hasReinforcedStairs = false;
             }
         }
     },
@@ -1986,14 +2010,14 @@ let initialize = {
             ? shrineCards.getAggregatedEffects() : {};
         const columnAud = (typeof skills.columnReward === "function") ? (skills.columnReward("defense").value || 0) : 0;
         const columnSlap = (typeof skills.columnReward === "function") ? (skills.columnReward("offense").value || 0) : 0;
-        const denseAud = (gc.baseAudInner + (cardEff.baseAudFlat || 0) + columnAud) * densMult;
+        const denseAud = (gc.baseAudInner + engine.getCloneFoundationAudFlat() + (cardEff.baseAudFlat || 0) + columnAud) * densMult * engine.getContemplateSturdinessMult();
         const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0) + columnSlap) * densMult;
         const conMult = 1 + totalCon / div;
         const bravadoMult = skills.getSkillEffect("bravado").maxAudMultiplier || 1;
         const validationAud = skillEngine.getValidationAudFromKills();
         const padEff = skills.getSkillEffect("paddingResume");
         const paddingAud = padEff.audBonus || 0;
-        // ((base + cards) x density + skill Aud) x Confidence x Bravado
+        // ((base + foundation + cards + column) x density x sturdiness + skill Aud) x Confidence x Bravado
         // Skill Aud is max only; "additionally recover" heals are applied as current, not max.
         const skillAud = fortLvl + tenInner + validationAud + paddingAud + mountingAud;
         const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult * bravadoMult));

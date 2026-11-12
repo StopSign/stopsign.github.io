@@ -494,10 +494,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"The more we agree, the louder I get.\"",
         shortDescription: "Increase the exp gain of other skills.",
         rewardText: function() {
-            return "Reward: +10% (+2% per level) skill exp for every other skill per Echo Chamber skill level.";
+            return "Reward: +6% (+3% per level) skill exp for every other skill per Echo Chamber skill level.";
         },
         getEffect: function(sk) {
-            return { otherSkillExpMultiplier: 1.1 + 0.02 * (sk.level || 0) };
+            return { otherSkillExpMultiplier: 1.06 + 0.03 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: x${roundNearestDecimals(e.otherSkillExpMultiplier || 1, 4)} other skills' skill exp`;
@@ -1269,10 +1269,10 @@ const SKILL_DEFINITION_ROWS = [
         flavorText: "\"Your breakthrough is my group project.\"",
         shortDescription: "Increase the exp gain of other skills, gaining exp on clone levels.",
         rewardText: function(sk) {
-            return `Reward: +10% (+5% per skill level) exp for every other skill.`;
+            return `Reward: +8% (+4% per skill level) exp for every other skill.`;
         },
         getEffect: function(sk) {
-            return { otherSkillExpMultiplier: 1.1 + 0.05 * (sk.level || 0) };
+            return { otherSkillExpMultiplier: 1.08 + 0.04 * (sk.level || 0) };
         },
         effectUiSummary: function(sk, e) {
             return `Current: x${roundNearestDecimals(e.otherSkillExpMultiplier || 1, 4)} other skills' skill exp`;

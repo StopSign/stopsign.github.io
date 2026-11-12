@@ -1211,7 +1211,11 @@ let events = {
             events.selectBaseBuilding(buildingKey);
         }
         if (buildingKey === "hiddenSpring") {
-            events.startCollectStone();
+            if (engine.isArrangementOfSelfSufficiencyUnlocked()) {
+                events.assignOkami("hiddenSpring");
+            } else {
+                events.startCollectStone();
+            }
             return;
         }
         if (shiftKey) {
@@ -2191,6 +2195,9 @@ let events = {
         }
         market.tradeEnabled[tradeKey] = !!checked;
     },
+    setMarketHaulKeep: function(resourceType, value) {
+        engine.setShrineHaulKeep(resourceType, value);
+    },
     setMarketTradeThreshold: function(tradeKey, value) {
         const market = data.progress.base && data.progress.base.market;
         if (!market || !resortData.marketTrades[tradeKey]) {
@@ -2451,6 +2458,30 @@ let events = {
     },
     startTravelWithBonfireSettings: function() {
         bonfire.startNextClone(data.progress.selectedTravelMapKey);
+    },
+    tryEveryMapOnce: function() {
+        engine.startMapTour();
+    },
+    stopMapTour: function() {
+        engine.stopMapTour();
+    },
+    setMapTourSkipCompleted: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.mapTourSkipCompleted = !!checked;
+        }
+    },
+    setMapTourRepeat: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.mapTourRepeat = !!checked;
+        }
+    },
+    setMapTourEndOnLastGold: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.mapTourEndOnLastGold = !!checked;
+        }
     },
     goToBonfire: function() {
         events.switchTab("base");

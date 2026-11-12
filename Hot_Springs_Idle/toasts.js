@@ -71,7 +71,7 @@ let toasts = {
         {
             title: "More Stone",
             text: `You've got the full path, and now your first Earth Spirit! Earth Spirits can be placed in either the Mine or the Hidden Spring's slots - click the spirit and then a slot to move it. In the Mine, they will dig for ${tutorialIcon("stone.svg")} Stone, but they must be assigned to the Hidden Spring's slots to create Pebbles that carry the ${tutorialIcon("stone.svg")} Stone down to the Stone Pile. If you want more ${tutorialIcon("stone.svg")} Stone right away, you can always send the Okami to collect stone herself from the Hidden Spring.`,
-            trigger: function() { return toasts.earthSpiritsBought() > 0; }
+            trigger: function() { return engine.hasFirstEarthSpirit(); }
         },
         {
             title: "Increasing Depth",

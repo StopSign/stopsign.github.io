@@ -3999,6 +3999,14 @@ button {
     stroke: #1a3a4a;
 }
 
+.path-seg-track-tier-reinforced {
+    stroke: #e4c07a;
+}
+
+.path-seg-hollow-tier-reinforced {
+    stroke: #6e5228;
+}
+
 .resort-map-progress {
     position: absolute;
     z-index: 12;

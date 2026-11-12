@@ -208,7 +208,15 @@ let driver = {
             return;
         }
 
+        if (typeof engine.tickMapTour === "function") {
+            engine.tickMapTour();
+        }
+
         const bf = data.progress.base && data.progress.base.bonfire;
+        if (typeof engine.isMapTourActive === "function" && engine.isMapTourActive()) {
+            data.progress.autoRetryCountdownSec = 0;
+            return;
+        }
         if (!bf || (!bonfire.isAutoRetryEnabled() && !bonfire.isStartWithFullManaEnabled())) {
             return;
         }

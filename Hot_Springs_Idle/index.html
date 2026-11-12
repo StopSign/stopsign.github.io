@@ -368,6 +368,16 @@
                 <div class="travel-launch-row row-buttons">
                     <button type="button" id="travelBonfireLaunchBtn" class="tab-button" onclick="events.startTravelWithBonfireSettings()">Travel with Bonfire settings for <span id="travelBonfireManaCost">0 mana</span></button>
                     <button type="button" id="travelGoBonfireBtn" class="tab-button" onclick="events.goToBonfire()">Go to Bonfire</button>
+                    <button type="button" id="travelTryEveryMapBtn" class="tab-button" style="display:none" onclick="events.tryEveryMapOnce()">Try Every Map Once</button>
+                </div>
+                <div id="travelTourOptionsRow" class="travel-launch-row row-buttons" style="display:none">
+                    <label id="travelSkipCompleted_row" style="display:none"><input type="checkbox" id="travelSkipCompleted_chk" onchange="events.setMapTourSkipCompleted(this.checked)"> Skip Completed Maps</label>
+                    <label id="travelRepeatCycle_row" style="display:none"><input type="checkbox" id="travelRepeatCycle_chk" onchange="events.setMapTourRepeat(this.checked)"> Repeat Cycle</label>
+                    <label id="travelEndOnLastGold_row" style="display:none"><input type="checkbox" id="travelEndOnLastGold_chk" onchange="events.setMapTourEndOnLastGold(this.checked)"> End on Last Gold</label>
+                </div>
+                <div id="travelTourStatusRow" class="base-row" style="display:none">
+                    <span id="travelTourStatusText"></span>
+                    <button type="button" id="travelStopTourBtn" class="tab-button" onclick="events.stopMapTour()">Stop tour</button>
                 </div>
                 <div class="travel-subtabs-row">
                     <button type="button" id="travelSubTab_maps" class="tab-button travel-subtab-btn" onclick="events.switchTravelSubTab('maps')">Maps</button>

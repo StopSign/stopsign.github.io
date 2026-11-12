@@ -58,10 +58,13 @@ let saveFix = {
         lib.researchesToChoose = (lib.researchesToChoose || 0) + 1;
         const choices = lib.researchChoices || [];
         let choicesValid = choices.length > 0;
+        const seenChoice = {};
         for (let ci = 0; ci < choices.length && choicesValid; ci++) {
-            if (!engine.isScrollArchivesSkillViable(choices[ci])) {
+            const choiceKey = choices[ci];
+            if (!engine.isScrollArchivesSkillViable(choiceKey) || seenChoice[choiceKey]) {
                 choicesValid = false;
             }
+            seenChoice[choiceKey] = true;
         }
         if (!choicesValid) {
             engine.rollScrollArchivesResearchChoices();
@@ -94,7 +97,7 @@ let saveFix = {
 
     /**
      * Pool per-skill shards into global currency, fix default Any slot, apply slot unlocks,
-     * and recompute Scroll Archives research cost under the new formula.
+     * and drop obsolete Scroll Archives research-cost fields.
      */
     migrateGlobalShardsRework: function() {
         engine.ensureShardProgress();
@@ -162,7 +165,9 @@ let saveFix = {
         const lib = data.progress.base && data.progress.base.scrollArchives;
         if (lib) {
             delete lib.researchCoinCosts;
-            engine.syncScrollArchivesResearchCost(lib);
+            delete lib.researchTaskRequired;
+            delete lib.researchTaskProgress;
+            delete lib.freeResearchCostCredit;
         }
     },
 
@@ -198,20 +203,6 @@ let saveFix = {
         saveFix.migrateCarrierStoneTakenUsed();
         saveFix.roundUpgradeGatherStoneOnce();
         saveFix.migrateShrineKarmaMechanic();
-    },
-
-    applyResearchTaskRequired: function(lib) {
-        if (!lib) {
-            return;
-        }
-        const curveLen = Array.isArray(lib.researchCoinCosts) ? lib.researchCoinCosts.length : 0;
-        const prev = lib.researchTaskRequired || 0;
-        const progress = lib.researchTaskProgress || 0;
-        engine.syncScrollArchivesResearchCost(lib);
-        const next = lib.researchTaskRequired || 0;
-        if (curveLen <= 1 && prev > 0 && next > 0 && progress > 0 && prev !== next) {
-            lib.researchTaskProgress = progress * (next / prev);
-        }
     },
 
     removeOneStarFromEconomy: function(starType) {
@@ -417,7 +408,6 @@ let saveFix = {
             lib.researchChoices = [];
             lib.selectedResearchChoice = "";
         }
-        saveFix.applyResearchTaskRequired(lib);
 
         if ((lib.researchesToChoose || 0) > 0 && (!lib.researchChoices || !lib.researchChoices.length)) {
             engine.rollScrollArchivesResearchChoices();

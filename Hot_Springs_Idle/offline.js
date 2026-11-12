@@ -562,8 +562,9 @@ let offline = {
             offline.gains.characterExp += charExp;
             const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
                 ? (shrineCards.getAggregatedEffects().okamiExpAdd || 0) : 0;
+            const legendMult = engine.getLegendOkamiExpMultiplier ? engine.getLegendOkamiExpMultiplier() : 1;
             const okami = engine.getOkami();
-            okami.exp = (okami.exp || 0) + charExp * 0.01 * (1 + cardAdd);
+            okami.exp = (okami.exp || 0) + charExp * 0.01 * (1 + cardAdd) * legendMult;
             engine.applyOkamiLevelUps();
         }
 
@@ -821,6 +822,58 @@ let offline = {
         }
     },
 
+    /** Step a Legend tour battle by battle until the time budget or the tour ends. Returns milliseconds used. */
+    advanceMapTour: async function(maxMs) {
+        let remaining = Math.max(0, maxMs);
+        let guard = 0;
+        while (remaining >= 1000 && engine.isMapTourActive() && guard < 100000) {
+            guard++;
+            const before = remaining;
+            if (data.battle && data.battle.state === "running") {
+                const usedSec = await offline.advanceBattleSeconds(remaining / 1000);
+                remaining -= usedSec * 1000;
+                if (data.battle && data.battle.state === "running") {
+                    break;
+                }
+            }
+            if (!engine.isMapTourActive()) {
+                break;
+            }
+            const tour = engine.ensureMapTour();
+            if ((tour.countdownSec || 0) > 0) {
+                const whole = Math.min(tour.countdownSec, Math.floor(remaining / 1000));
+                if (whole > 0) {
+                    await offline.runGameSecondsChunked(whole, { nonCombatOnly: true });
+                    remaining -= whole * 1000;
+                    tour.countdownSec -= whole;
+                }
+                if (tour.countdownSec > 0) {
+                    break;
+                }
+            }
+            if (!engine.isMapTourActive() || (data.battle && data.battle.state === "running")) {
+                continue;
+            }
+            engine.advanceTourAfterCountdown();
+            if (data.battle && data.battle.state === "running") {
+                continue;
+            }
+            if (!engine.isMapTourActive()) {
+                break;
+            }
+            if (engine.ensureMapTour().waitingForMana) {
+                offline.runOneGameSecond({ nonCombatOnly: true });
+                remaining -= 1000;
+                offline.markProcessed(1000);
+                continue;
+            }
+            if (remaining === before) {
+                break;
+            }
+        }
+        return Math.max(0, maxMs - remaining);
+    },
+
     /** Wall-clock slice of resort time, then combat rates for the uptime portion. */
     applyRateSlice: async function(rates, wallSec) {
         if (!rates || !(wallSec > 0)) {
@@ -999,8 +1052,22 @@ let offline = {
                 offline.accumulateGainsFromSnapshots(before, after);
             }
 
-            // Phase B: hour chunks with sample + rates
+            // Phase B: a live map tour walks each map. Otherwise hour chunks sample one run and spread its rates.
             while (remaining >= 1000) {
+                if (typeof engine.isMapTourActive === "function" && engine.isMapTourActive()) {
+                    const usedMs = await offline.advanceMapTour(remaining);
+                    remaining -= Math.max(0, usedMs);
+                    if (engine.isMapTourActive()) {
+                        if (!(usedMs > 0)) {
+                            break;
+                        }
+                        await offline.yieldToBrowser();
+                        continue;
+                    }
+                }
+                if (remaining < 1000) {
+                    break;
+                }
                 const chunk = Math.min(OFFLINE_HOUR_MS, remaining);
                 const beforeChunk = remaining;
                 await offline.processHourChunk(chunk);

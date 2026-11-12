@@ -232,6 +232,8 @@ let createView = {
             function() {
                 const stars = engine.countAchievedMapStarsByType();
                 const bronzeMult = engine.getScrollArchivesBronzeResearchCostMult();
+                const furnitureBought = engine.getWorkspaceFurnitureBought();
+                const furnitureMult = engine.getWorkspaceFurnitureResearchCostMult();
                 const silverMult = engine.getScrollArchivesSilverResearchSpeedMult();
                 const goldMult = engine.getScrollArchivesGoldResearchGainMult();
                 const bronzeStar = `<span class="star-bronze">★</span>`;
@@ -239,6 +241,7 @@ let createView = {
                 const goldStar = `<span class="star-gold">★</span>`;
                 return `<p>Assign researchers to generate research progress. When a research task completes, you get 3 skill choices - select one and weave it with Finish Research to unlock that skill.</p>
                     <p>Each ${bronzeStar} reduces research cost by 10%. Total effect with ${stars.bronze} ${bronzeStar}: ${round1Fixed(bronzeMult * 100)}%</p>
+                    <p>Each Workspace Furniture purchase reduces inscription cost by 10%. Total effect with ${furnitureBought}: ${round1Fixed(furnitureMult * 100)}%</p>
                     <p>Each ${silverStar} increases research speed by 10%. Total effect with ${stars.silver} ${silverStar}: ${round1Fixed(silverMult * 100)}%</p>
                     <p>Each ${goldStar} increases research gain by 10%. Total effect with ${stars.gold} ${goldStar}: ${round1Fixed(goldMult * 100)}%</p>
                     <p>Assigned kitsune, and the Okami while she is here, inscribe one row at a time. Click a row to put their inscription power on it. They fill that row's bar and spend its coin, star bead, and mana cost. Finishing the bar adds 1 to that row's count, and to the number in parentheses. The next bar on that row asks for 10% more.</p>
@@ -264,7 +267,7 @@ let createView = {
                     ${powerfulChops}
                     ${pondBuilt ? "<p>Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</p>" : ""}
                     ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}
-                    ${engine.isGrowHardwoodBought() ? "<p>Hardwood grows at 1/4 speed and has twice the base chips. Water and fertilizer still double that growth. 20 Hardwood Chips become 1 Hardwood.</p>" : ""}`;
+                    ${engine.isGrowHardwoodBought() ? "<p>Hardwood grows at 2/5 speed and has 5 times the chips per segment. Water and fertilizer still double that growth. 50 Hardwood Chips become 1 Hardwood.</p>" : ""}`;
             },
             56,
             function() {
@@ -282,7 +285,7 @@ let createView = {
         );
         createView.createInfoButton(
             "tabPane_stats",
-            "<p><strong>Audacity order:</strong> ((Base Aud + card Base Audacity) x Dense Clones + Aud) x Confidence.</p>"
+            "<p><strong>Audacity order:</strong> ((Base Aud + Clone Foundation + card Base Audacity) x Dense Clones x Contemplate Sturdiness + Aud) x Confidence.</p>"
             + "<p><strong>Max Aud recover:</strong> Whenever max Aud increases, recover an equal amount of current Audacity (+max and +current)."
             + "<p><strong>Ego Damage order:</strong> ((Base slap + card Base Ego Damage) x Dense Clones + Flat Damage) x Brutality x damage multipliers</p>"
             + "<p><strong>Damage reduction order:</strong> (1) Clout absorbs raw incoming damage, (2) flat reduction, (3) multiplier reductions from skills, buffs, and class.</p>"
@@ -643,7 +646,7 @@ let createView = {
                     html += "<p>At the Atelier, every 60 seconds a fire spirit smelts floor(√effective power) ore into bars. After Larger Forge, the batch is ceil(√effective power × (1 + 0.5 per Larger Forge)). Exp equals bars smelted times 3.</p>";
                     html += "<p>On a fire launcher, a fire spirit restores embers from effective spirit power and fires when a droplet is in range. The Long-Range Launcher grants 0.5 exp per hit. Other launchers grant exp per hit equal to heat per strike divided by 5.</p>";
                 } else if (kind === "plant") {
-                    html += "<p>At the Bamboo Forest, a plant spirit adds its effective spirit power to that stalk's base chips, and gains 1 exp each time a chip regrows in that column.</p>";
+                    html += "<p>At the Bamboo Forest, a plant spirit adds its effective spirit power to that stalk's base chips, and gains 1 exp each time a bamboo chip regrows in that column, or 0.25 exp for a hardwood chip.</p>";
                 }
                 html += createView.spiritTrainingInfoHtml();
                 return html;
@@ -1035,18 +1038,18 @@ let createView = {
                     </div>
                     <div id="shrineMilestonesList" class="shrine-milestones-list">
                         ${htmlShrineMilestoneHeading("Capped Milestones", false)}
-                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
                         ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
                         ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
                         ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
                         ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
                         ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
                         ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
-                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
                         ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
                         ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
                         ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
                         ${htmlShrineMilestoneHeading("One Time Milestones", true)}
+                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
+                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
                         ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
                     </div>
                 </div>
@@ -1209,7 +1212,7 @@ let createView = {
                 const idKey = key.charAt(0).toUpperCase() + key.slice(1);
                 const name = names[key] || key;
                 const wrapId = key === "hardwood" ? ` id="marketAllowHardwood_wrap"` : "";
-                h += `<label${wrapId}><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (${rates[key] || 0} ${credit})</label> `;
+                h += `<label${wrapId}><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (<span id="marketHaulCredit_${key}">${rates[key] || 0}</span> ${credit}) <span id="marketHaulKeep_${key}_wrap" style="display:none">Keep: <input type="number" id="marketHaulKeep_${key}" class="market-trade-threshold" min="0" step="1" value="0" onchange="events.setMarketHaulKeep('${key}', this.value)"></span></label> `;
             }
             return h;
         };
@@ -1300,7 +1303,7 @@ let createView = {
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
                     <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span><span id="spiritInfoTrainingGain" class="muted-text"></span></div>
-                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span></div>
+                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpBonus" class="muted-text"></span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
                         <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span></div>
@@ -1473,7 +1476,7 @@ let createView = {
                 <div id="resortInfo_bambooForest" class="resort-info-section">
                     <div id="bambooForestInfoTitle" class="base-info-title">Bamboo Forest</div>
                     <div class="base-row">Bamboo Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
-                    <div id="bambooForestHardwood_row" class="base-row" style="display:none">Hardwood Chips: <span id="bambooForestInfoHardwoodChips"></span> <span class="muted-text"> -> 20 -> </span> ${resortData.resourceIconHtml("hardwood")} Hardwood: <span id="bambooForestInfoHardwood"></span></div>
+                    <div id="bambooForestHardwood_row" class="base-row" style="display:none">Hardwood Chips: <span id="bambooForestInfoHardwoodChips"></span> <span class="muted-text"> -> 50 -> </span> ${resortData.resourceIconHtml("hardwood")} Hardwood: <span id="bambooForestInfoHardwood"></span></div>
                     <div class="base-row">Chop Power: <span id="bambooChopPower"></span></div>
                     <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span></div>
                     <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span></div>
@@ -2189,7 +2192,7 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoExp", "spiritInfoExpReq",
+            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpBonus",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
@@ -2235,6 +2238,8 @@ let createView = {
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
             "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row", "marketDemandTax_row",
             "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowHardwood_chk", "marketAllowHardwood_wrap", "marketAllowBars_chk", "marketExchangeCredit_btn",
+            "marketHaulCredit_stone", "marketHaulCredit_wood", "marketHaulCredit_hardwood", "marketHaulCredit_bars",
+            "marketHaulKeep_stone_wrap", "marketHaulKeep_wood_wrap", "marketHaulKeep_hardwood_wrap", "marketHaulKeep_bars_wrap",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
@@ -2297,7 +2302,9 @@ let createView = {
             "baseBuilding_hiddenSpring", "baseBuilding_torii", "baseBuilding_shrine", "baseBuilding_inn", "baseBuilding_noodleBar", "baseBuilding_laundry", "baseBuilding_stonePile", "baseBuilding_cistern", "baseBuilding_pond", "baseBuilding_mine",
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
-            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost", "skillsList", "historyList",
+            "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost",
+            "travelTryEveryMapBtn", "travelTourOptionsRow", "travelSkipCompleted_row", "travelSkipCompleted_chk", "travelRepeatCycle_row", "travelRepeatCycle_chk", "travelEndOnLastGold_row", "travelEndOnLastGold_chk", "travelTourStatusRow", "travelTourStatusText", "travelStopTourBtn",
+            "skillsList", "historyList",
             "historySubTabs", "historySubTab_combat", "historySubTab_prestige", "historyPane_combat", "historyPane_prestige", "prestigeHistoryList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "playTimeThisLabel", "playTimeTotalRow", "playTimeTotalClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
             "skillsShardSlotProgressWrap", "skillsShardSlotProgressTrack", "skillsShardSlotProgressFill", "skillsShardSlotProgressLabel",

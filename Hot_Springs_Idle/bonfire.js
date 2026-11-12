@@ -224,6 +224,14 @@ var bonfire = {
         return bonfire.retryWithStoredSettings();
     },
 
+    /** Live Bonfire plan, or the last run's density and mana cost, always on mapKey. */
+    startCloneWithTravelRule: function(mapKey) {
+        if (bonfire.shouldUseLiveCloneSettings()) {
+            return bonfire.startCloneCombat(mapKey);
+        }
+        return bonfire.retryWithStoredSettings(mapKey);
+    },
+
     isStartWithFullManaEnabled: function() {
         const bf = data.progress.base && data.progress.base.bonfire;
         return !!(bf && bf.startWithFullManaUnlocked && bf.startWithFullManaEnabled);
@@ -240,6 +248,9 @@ var bonfire = {
 
     tryPostBattleCloneSpawn: function() {
         if (typeof isProcessingOffline !== "undefined" && isProcessingOffline) {
+            return false;
+        }
+        if (typeof engine.isMapTourActive === "function" && engine.isMapTourActive()) {
             return false;
         }
         if (!data.battle || data.battle.state === "running") {
@@ -383,7 +394,7 @@ var bonfire = {
         return true;
     },
 
-    retryWithStoredSettings: function() {
+    retryWithStoredSettings: function(mapKey) {
         const settings = data.battle && data.battle.cloneRunSettings;
         if (!settings) {
             return false;
@@ -397,18 +408,37 @@ var bonfire = {
         if ((mana.amount || 0) < cost) {
             return false;
         }
+        const storedKey = settings.mapKey || data.progress.currentMapKey;
+        const targetKey = mapKey || storedKey;
+        if (mapKey) {
+            const defs = data.progress.mapDefinitions || [];
+            let target = null;
+            for (let i = 0; i < defs.length; i++) {
+                if (defs[i].key === targetKey) {
+                    target = defs[i];
+                    break;
+                }
+            }
+            if (!target || !mapData.isMapUnlocked(target, data.progress) || target.requiredClassKey) {
+                return false;
+            }
+        }
         mana.amount = Math.max(0, (mana.amount || 0) - cost);
         data.progress.currentClassKey = "none";
+        data.progress.currentMapKey = targetKey;
+        data.progress.selectedTravelMapKey = targetKey;
+        const mapChanged = targetKey !== storedKey;
         const currentSeed = data.battle.generatedFromSeed || data.battle.seed || 1337;
-        const nextResetCount = (data.battle.resetCount || 0) + 1;
+        const nextResetCount = mapChanged ? 0 : (data.battle.resetCount || 0) + 1;
+        const travelSeed = mapChanged ? (Math.floor(Math.random() * 0x7fffffff) + 1) : currentSeed;
         initialize.resetSkillRunProgress();
-        initialize.startFreshBattle(currentSeed, settings.mapKey || data.progress.currentMapKey);
+        initialize.startFreshBattle(travelSeed, targetKey);
         data.battle.bonfireModifiers = {};
         data.battle.cloneDensity = density;
         initialize.calcPlayerStats(true);
         data.battle.cloneRunSettings = {
             classKey: "none",
-            mapKey: settings.mapKey || data.progress.currentMapKey,
+            mapKey: targetKey,
             manaCost: cost,
             cloneDensity: density
         };

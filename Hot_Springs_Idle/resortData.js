@@ -757,7 +757,7 @@ var resortData = {
 
     buildings: {
         path: {
-            upgradesOrder: ["removeRocks", "addRailing", "addStairs", "addLanterns"],
+            upgradesOrder: ["removeRocks", "addRailing", "addStairs", "addLanterns", "reinforcedStairs"],
             upgrades: {
                 removeRocks: {
                     key: "remove_rocks",
@@ -1000,6 +1000,67 @@ var resortData = {
                         }
                         return "";
                     }
+                },
+                reinforcedStairs: {
+                    key: "reinforced_stairs",
+                    name: "Reinforced Stairs",
+                    description: "Reinforce the stairs so pebbles, the Okami, and carriers move 20% faster along this path section. Droplets are unchanged. The Okami moves 50% slower coming, to carry the resources.",
+                    getCost: function() {
+                        return { hardwood: 20, wood: 40 };
+                    },
+                    weavingTime: 60,
+                    weavingTimeIncrease: 1,
+                    canBuy: function() {
+                        const idx = data.progress.selectedPathSegmentIndex;
+                        if (idx === undefined || idx === null) {
+                            return false;
+                        }
+                        if (!engine.isGrowHardwoodBought() || !engine.isPathSegmentAccessible(idx)) {
+                            return false;
+                        }
+                        const seg = engine.getPathSegmentData(idx);
+                        if (!seg || seg.state !== "Clear" || !seg.hasLanterns || seg.hasReinforcedStairs) {
+                            return false;
+                        }
+                        const job = engine.getOkamiPathJob();
+                        if (job && job.segmentIndex === idx && !job.paused) {
+                            return false;
+                        }
+                        return resortData.canAffordCost(this.getCost());
+                    },
+                    upgradeSoldOut: function() {
+                        const idx = data.progress.selectedPathSegmentIndex;
+                        const seg = idx === undefined || idx === null ? null : engine.getPathSegmentData(idx);
+                        return !!(seg && seg.hasReinforcedStairs);
+                    },
+                    soldOutButtonLabel: "Stairs reinforced",
+                    onBuy: function() {
+                        return true;
+                    },
+                    rowVisible: function() {
+                        const idx = data.progress.selectedPathSegmentIndex;
+                        if (idx === undefined || idx === null || !engine.isGrowHardwoodBought()) {
+                            return false;
+                        }
+                        return engine.getNextPathUpgradeKey(idx) === "reinforcedStairs";
+                    },
+                    extraInfo: function() {
+                        const idx = data.progress.selectedPathSegmentIndex;
+                        const job = engine.getOkamiPathJob();
+                        if (!job || job.segmentIndex !== idx || job.jobType !== "reinforcedStairs") {
+                            return "";
+                        }
+                        if (job.paused && (job.pausedPhase === "travelingTo" || job.pausedPhase === "returning")) {
+                            return "Paused en route";
+                        }
+                        if (!job.paused && job.phase === "travelingTo") {
+                            return "Traveling to section";
+                        }
+                        if (!job.paused && job.phase === "returning") {
+                            return "Returning";
+                        }
+                        return "";
+                    }
                 }
             }
         },
@@ -1009,7 +1070,7 @@ var resortData = {
             description: "Welcome guests to the resort.",
             mapSlot: { left: 334, top: 662 },
             constructionCost: { wood: 2, stone: 2 },
-            upgradesOrder: ["callForAlly", "growPlantSpirit", "addQueuePosts", "createEnticingLights", "shinyService", "drinkingBowl", "fillMana"],
+            upgradesOrder: ["callForAlly", "growPlantSpirit", "addQueuePosts", "addBenches", "createEnticingLights", "shinyService", "drinkingBowl", "fillMana"],
             upgrades: {
                 callForAlly: {
                     key: "call_for_ally",
@@ -1055,7 +1116,7 @@ var resortData = {
                     canBuy: function() {
                         const rh = data.progress.base.foxDen;
                         const torii = data.progress.base.torii;
-                        const max = resortData.bambooForestConfig.plantSpiritMax || 4;
+                        const max = engine.getNurturePlantSpiritMax();
                         return !!(rh && rh.unlocks && rh.unlocks.inn)
                             && (torii.plantSpiritsBought || 0) < max;
                     },
@@ -1063,7 +1124,7 @@ var resortData = {
                         engine.assemblePlantSpiritFromPurchase();
                     },
                     getMaxPurchases: function() {
-                        return resortData.bambooForestConfig.plantSpiritMax || 4;
+                        return engine.getNurturePlantSpiritMax();
                     },
                     soldOutButtonLabel: "Max spirits"
                 },
@@ -1092,6 +1153,32 @@ var resortData = {
                         torii.maxVisitors = (torii.maxVisitors || 2) + 1;
                     },
                     soldOutButtonLabel: "Max posts"
+                },
+                addBenches: {
+                    key: "add_benches",
+                    name: "Add Benches",
+                    description: "Add benches so 5 more visitors can wait at the gate.",
+                    getCost: function() {
+                        return { hardwood: 500 };
+                    },
+                    weavingTime: 300,
+                    maxPurchases: 1,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.torii && data.progress.base.torii.addBenchesBought) || 0;
+                    },
+                    canBuy: function() {
+                        const torii = data.progress.base.torii;
+                        return engine.isGrowHardwoodBought() && ((torii && torii.addBenchesBought) || 0) < 1;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        const torii = data.progress.base.torii;
+                        torii.addBenchesBought = (torii.addBenchesBought || 0) + 1;
+                        torii.maxVisitors = (torii.maxVisitors || 2) + 5;
+                    },
+                    soldOutButtonLabel: "Benches added"
                 },
                 createEnticingLights: {
                     key: "create_enticing_lights",
@@ -1214,9 +1301,11 @@ var resortData = {
                 manaCapacity: 40000,
                 allowCarriersBringMana: false,
                 kilnSubTab: "clone",
-                charcoalPitProgressMs: 0
+                charcoalPitProgressMs: 0,
+                buildUponCloneFoundationBought: 0,
+                contemplateSturdinessBought: 0
             },
-            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "fillMana"],
+            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "buildUponCloneFoundation", "contemplateSturdiness", "fillMana"],
             upgrades: {
                 tendTheFlame: {
                     key: "tend_the_flame",
@@ -1372,7 +1461,8 @@ var resortData = {
                     cost: { coins: 1000 },
                     weavingTime: 200,
                     canBuy: function() {
-                        return !data.progress.base.bonfire.plannedGrowthBlessingUnlocked;
+                        const bf = data.progress.base.bonfire;
+                        return !!(bf && bf.growthBlessingUnlocked && !bf.plannedGrowthBlessingUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.bonfire.plannedGrowthBlessingUnlocked = true;
@@ -1431,6 +1521,66 @@ var resortData = {
                         return !!data.progress.base.bonfire.startWithFullManaUnlocked;
                     },
                     soldOutButtonLabel: "Unlocked"
+                },
+                buildUponCloneFoundation: {
+                    key: "build_upon_clone_foundation",
+                    name: "Build upon Clone Foundation",
+                    description: "Each purchase adds +5 base Audacity.",
+                    getCost: function() {
+                        const n = (data.progress.base.bonfire && data.progress.base.bonfire.buildUponCloneFoundationBought) || 0;
+                        return { hardwood: 250 * Math.pow(2, n) };
+                    },
+                    weavingTime: 600,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.bonfire && data.progress.base.bonfire.buildUponCloneFoundationBought) || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        const b = data.progress.base.bonfire;
+                        b.buildUponCloneFoundationBought = (b.buildUponCloneFoundationBought || 0) + 1;
+                        initialize.calcPlayerStats(false);
+                    },
+                    extraInfo: function() {
+                        const n = (data.progress.base.bonfire && data.progress.base.bonfire.buildUponCloneFoundationBought) || 0;
+                        return `Base Audacity: +${n * 5}`;
+                    }
+                },
+                contemplateSturdiness: {
+                    key: "contemplate_sturdiness",
+                    name: "Contemplate Sturdiness",
+                    description: "Each purchase multiplies base Audacity by x1.1. Skill Audacity is unchanged.",
+                    getCost: function() {
+                        const n = (data.progress.base.bonfire && data.progress.base.bonfire.contemplateSturdinessBought) || 0;
+                        return { hardwood: 1500 * Math.pow(2, n) };
+                    },
+                    weavingTime: 2000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.bonfire && data.progress.base.bonfire.contemplateSturdinessBought) || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        const b = data.progress.base.bonfire;
+                        b.contemplateSturdinessBought = (b.contemplateSturdinessBought || 0) + 1;
+                        initialize.calcPlayerStats(false);
+                    },
+                    extraInfo: function() {
+                        const n = (data.progress.base.bonfire && data.progress.base.bonfire.contemplateSturdinessBought) || 0;
+                        return `Base Audacity: x${round2(Math.pow(1.1, n))}`;
+                    }
                 },
                 fillMana: {
                     key: "fill_mana",
@@ -1542,12 +1692,15 @@ var resortData = {
                 growHardwood: {
                     key: "grow_hardwood",
                     name: "Grow Hardwood",
-                    description: "The grove can grow hardwood. Each column can switch between bamboo and hardwood. Hardwood grows at 1/4 speed, has twice the base chips, and 20 chips become 1 hardwood.",
-                    cost: { ore: 6000, essence: 10000 },
-                    weavingTime: 8000,
+                    description: "Each column can be switched to grow Hardwood, which has 5 times the chips per segment but takes 5 minutes to fill one segment. 50 chips become 1 hardwood.",
+                    cost: { ore: 200, starBeads: 8000 },
+                    weavingTime: 300,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return !engine.isGrowHardwoodBought();
+                        return engine.isHardenBambooBought() && !engine.isGrowHardwoodBought();
+                    },
+                    rowVisible: function() {
+                        return engine.isHardenBambooBought() && !engine.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         data.progress.base.bambooForest.growHardwoodBought = 1;
@@ -1846,9 +1999,10 @@ var resortData = {
             constructionCost: { wood: 400, stone: 300 },
             progressDefaults: {
                 waterVolume: 0,
-                wishingWellBought: 0
+                wishingWellBought: 0,
+                wetlandBoardwalkBought: 0
             },
-            upgradesOrder: ["buildWishingWell"],
+            upgradesOrder: ["buildWishingWell", "wetlandBoardwalk"],
             upgrades: {
                 buildWishingWell: {
                     key: "build_wishing_well",
@@ -1879,6 +2033,41 @@ var resortData = {
                         return 2;
                     },
                     soldOutButtonLabel: "Pump built",
+                },
+                wetlandBoardwalk: {
+                    key: "wetland_boardwalk",
+                    name: "Wetland Boardwalk",
+                    description: "Each purchase grants guests +5 restfulness per second while they watch water spirits play.",
+                    getCost: function() {
+                        const n = (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
+                        return {
+                            hardwood: 300 * Math.pow(3, n),
+                            wood: 500 * Math.pow(3, n)
+                        };
+                    },
+                    weavingTime: 600,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    maxPurchases: 4,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
+                    },
+                    canBuy: function() {
+                        const bought = (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
+                        return engine.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen() && bought < 4;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen();
+                    },
+                    onBuy: function() {
+                        const pond = data.progress.base.pond;
+                        pond.wetlandBoardwalkBought = (pond.wetlandBoardwalkBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
+                        return `Watching restfulness: +${n * 5}/s`;
+                    },
+                    soldOutButtonLabel: "Boardwalk built"
                 }
             }
         },
@@ -1928,7 +2117,7 @@ var resortData = {
                     },
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return (hs.earthSpiritsBought || 0) > 0
+                        return engine.hasFirstEarthSpirit()
                             && (hs.pebbleCapacityBought || 0) < 2;
                     },
                     onBuy: function() {
@@ -1952,7 +2141,7 @@ var resortData = {
                     weavingTime: 90,
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.earthSpiritsBought || 0) >= 1 && !hs.learnTheBestStonesUnlocked);
+                        return !!(hs && engine.hasFirstEarthSpirit() && !hs.learnTheBestStonesUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.hiddenSpring.learnTheBestStonesUnlocked = true;
@@ -2152,7 +2341,7 @@ var resortData = {
                     description: "Timber bracing in the mine. Earth spirits assigned there gain +20% spirit power per purchase.",
                     getCost: function() {
                         const n = engine.getMineshaftBeamsBought();
-                        return { wood: Math.round(400 * Math.pow(1.5, n)) };
+                        return { wood: Math.round(200 * Math.pow(1.5, n)), coins: Math.round(2000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 240,
                     weavingTimeIncreaseAdd: 120,
@@ -2494,8 +2683,6 @@ var resortData = {
                 unlockedSkills: {},
                 assignedWorkers: 0,
                 researchPerWorkerPerSecond: 1,
-                researchTaskRequired: 20,
-                researchTaskProgress: 0,
                 researchPaused: false,
                 researchesToChoose: 0,
                 finishWeaveCostQueue: [],
@@ -2503,9 +2690,11 @@ var resortData = {
                 selectedResearchChoice: "",
                 collectShardsLevel: 0,
                 sturdyShelvesBought: 0,
+                workspaceFurnitureBought: 0,
+                infuseScribingsBought: 0,
                 lockedSkillKeys: []
             },
-            upgradesOrder: ["finishResearch", "collectShards", "sturdyShelves"],
+            upgradesOrder: ["finishResearch", "collectShards", "sturdyShelves", "workspaceFurniture", "infuseScribings"],
             upgrades: {
                 finishResearch: {
                     key: "finish_research",
@@ -2562,10 +2751,10 @@ var resortData = {
                     description: "Each purchase multiplies all scribing output by x1.3.",
                     getCost: function() {
                         const n = engine.getSturdyShelvesBought();
-                        return { hardwood: Math.round(7500 * Math.pow(2, n)) };
+                        return { hardwood: Math.round(50 * Math.pow(1.5, n)) };
                     },
-                    weavingTime: 6000,
-                    weavingTimeIncreaseAdd: 3000,
+                    weavingTime: 200,
+                    weavingTimeIncrease: 1.4,
                     getWeavingPurchaseIndex: function() {
                         return engine.getSturdyShelvesBought();
                     },
@@ -2581,6 +2770,69 @@ var resortData = {
                     extraInfo: function() {
                         const n = engine.getSturdyShelvesBought();
                         return `Scribing output: x${round2(Math.pow(1.3, n))}`;
+                    }
+                },
+                workspaceFurniture: {
+                    key: "workspace_furniture",
+                    name: "Workspace Furniture",
+                    description: "Each purchase reduces inscription costs by 10%, the same way a Bronze Star does.",
+                    getCost: function() {
+                        const n = (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
+                        return {
+                            hardwood: 100 * Math.pow(2, n),
+                            wood: 200 * Math.pow(2, n)
+                        };
+                    },
+                    weavingTime: 300,
+                    weavingTimeIncreaseAdd: 200,
+                    maxPurchases: 6,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
+                    },
+                    canBuy: function() {
+                        const n = (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
+                        return engine.isGrowHardwoodBought() && n < 6;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        const lib = data.progress.base.scrollArchives;
+                        lib.workspaceFurnitureBought = (lib.workspaceFurnitureBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
+                        return `Inscription cost: ${round1Fixed(Math.pow(0.9, n) * 100)}%`;
+                    },
+                    soldOutButtonLabel: "Furnished"
+                },
+                infuseScribings: {
+                    key: "infuse_scribings",
+                    name: "Infuse Scribings",
+                    description: "Each purchase multiplies Scribings gained by x1.5.",
+                    getCost: function() {
+                        const n = engine.getInfuseScribingsBought();
+                        return { mana: Math.round(5000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 100,
+                    weavingTimeIncrease: 1.2,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getInfuseScribingsBought();
+                    },
+                    canBuy: function() {
+                        return engine.isScribingInfusionsBought();
+                    },
+                    rowVisible: function() {
+                        return engine.isScribingInfusionsBought();
+                    },
+                    onBuy: function() {
+                        const lib = data.progress.base.scrollArchives;
+                        lib.infuseScribingsBought = engine.getInfuseScribingsBought() + 1;
+                    },
+                    extraInfo: function() {
+                        const n = engine.getInfuseScribingsBought();
+                        return `Strokes output: x${round2(Math.pow(1.5, n))}`;
                     }
                 }
             },
@@ -3045,6 +3297,11 @@ var resortData = {
                 arrangementOfOrbGrowthUnlocked: false,
                 arrangementOfManaCurrentsUnlocked: false,
                 arrangementOfManaReserveUnlocked: false,
+                arrangementOfResourceProtectionUnlocked: false,
+                arrangementOfNavigationUnlocked: false,
+                arrangementOfGoldenNavigationUnlocked: false,
+                arrangementOfCyclicNavigationUnlocked: false,
+                arrangementOfGoldenRestUnlocked: false,
                 reserveCloneManaForAutobuy: false,
                 autoWeaveOnGatherComplete: true,
                 autoWeaveCheapestReady: true,
@@ -3058,7 +3315,9 @@ var resortData = {
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
                 "arrangementOfPaperMoney", "arrangementOfHeatTargeting",
-                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents", "arrangementOfManaReserve"],
+                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents", "arrangementOfManaReserve",
+                "arrangementOfResourceProtection", "arrangementOfNavigation", "arrangementOfGoldenNavigation",
+                "arrangementOfCyclicNavigation", "arrangementOfGoldenRest"],
             upgrades: {
                 arrangementOfRotation: {
                     key: "arrangement_of_rotation",
@@ -3616,8 +3875,8 @@ var resortData = {
                     key: "arrangement_of_spelunking",
                     name: "Arrangement of Spelunking",
                     description: "Reveal a Mine checkbox. When checked, depth increases automatically once the floor is ready.",
-                    cost: { stone: 2000 },
-                    weavingTime: 1000,
+                    cost: { stone: 200 },
+                    weavingTime: 300,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return engine.getArtAppreciationBought() >= 4;
@@ -3639,8 +3898,8 @@ var resortData = {
                     key: "arrangement_of_self_sufficiency",
                     name: "Arrangement of Self-Sufficiency",
                     description: "Assign the Okami to the Hidden Spring to collect stone on repeat, and refill its mana on arrival.",
-                    cost: { stone: 1500 },
-                    weavingTime: 750,
+                    cost: { stone: 80 },
+                    weavingTime: 120,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return engine.getArtAppreciationBought() >= 3;
@@ -3723,6 +3982,101 @@ var resortData = {
                     upgradeSoldOut: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfManaReserveUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfResourceProtection: {
+                    key: "arrangement_of_resource_protection",
+                    name: "Arrangement of Resource Protection",
+                    description: "Reveal a Keep box beside each resource the Market can haul. A kitsune takes a load only when at least that many would remain.",
+                    cost: { stone: 2000 },
+                    weavingTime: 1000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isResourceProtectionBought() && !(g && g.arrangementOfResourceProtectionUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfResourceProtectionUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfResourceProtectionUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfNavigation: {
+                    key: "arrangement_of_navigation",
+                    name: "Arrangement of Navigation",
+                    description: "Reveal Try Every Map Once on the Travel tab.",
+                    cost: { stone: 80 },
+                    weavingTime: 120,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return engine.isSkyAppreciationBought() && !(g && g.arrangementOfNavigationUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfNavigationUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfNavigationUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfGoldenNavigation: {
+                    key: "arrangement_of_golden_navigation",
+                    name: "Arrangement of Golden Navigation",
+                    description: "Reveal Skip Completed Maps on the Travel tab.",
+                    cost: { stone: 1500 },
+                    weavingTime: 1000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfNavigationUnlocked) && !g.arrangementOfGoldenNavigationUnlocked;
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfGoldenNavigationUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfGoldenNavigationUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfCyclicNavigation: {
+                    key: "arrangement_of_cyclic_navigation",
+                    name: "Arrangement of Cyclic Navigation",
+                    description: "Reveal Repeat Cycle on the Travel tab.",
+                    cost: { stone: 2500 },
+                    weavingTime: 1500,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfGoldenNavigationUnlocked) && !g.arrangementOfCyclicNavigationUnlocked;
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfCyclicNavigationUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfCyclicNavigationUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
+                arrangementOfGoldenRest: {
+                    key: "arrangement_of_golden_rest",
+                    name: "Arrangement of Golden Rest",
+                    description: "Reveal End on Last Gold on the Travel tab.",
+                    cost: { stone: 2500 },
+                    weavingTime: 1500,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfGoldenNavigationUnlocked) && !g.arrangementOfGoldenRestUnlocked;
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfGoldenRestUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfGoldenRestUnlocked);
                     },
                     soldOutButtonLabel: "Arranged"
                 }
@@ -4608,11 +4962,12 @@ var resortData = {
                 increaseInnManaCapacityBought: 0,
                 increaseGateManaCapacityBought: 0,
                 increaseStonePileManaCapacityBought: 0,
+                teachFromExperienceBought: 0,
                 assignedWorkers: 0,
                 expandOrbAutobuy: false,
                 spinCurrentsAutobuy: false
             },
-            upgradesOrder: ["expandOrb", "spinCurrents", "buildWalls", "buildStairs", "buildFloor", "increaseInnManaCapacity", "increaseGateManaCapacity", "increaseStonePileManaCapacity"],
+            upgradesOrder: ["expandOrb", "spinCurrents", "buildWalls", "buildStairs", "buildFloor", "increaseInnManaCapacity", "increaseGateManaCapacity", "increaseStonePileManaCapacity", "teachFromExperience"],
             upgrades: {
                 expandOrb: {
                     key: "expand_orb",
@@ -4905,6 +5260,31 @@ var resortData = {
                         const cap = (data.progress.base.stonePile && data.progress.base.stonePile.manaCapacity) || 4000;
                         return `Stone Pile mana capacity: ${intToStringRound(cap)}`;
                     }
+                },
+                teachFromExperience: {
+                    key: "teach_from_experience",
+                    name: "Teach from Experience",
+                    description: "Spirits gain up to 100% more experience based on how far The Orb's level is above theirs. A spirit at half the Orb's level gains 50% more. A spirit at or above the Orb's level gains none.",
+                    getCost: function() {
+                        return { hardwood: 1000, mana: 50000 };
+                    },
+                    weavingTime: 1000,
+                    maxPurchases: 1,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.mage_tower && data.progress.base.mage_tower.teachFromExperienceBought) || 0;
+                    },
+                    canBuy: function() {
+                        const orb = data.progress.base.mage_tower;
+                        return engine.isGrowHardwoodBought() && ((orb && orb.teachFromExperienceBought) || 0) < 1;
+                    },
+                    rowVisible: function() {
+                        return engine.isGrowHardwoodBought();
+                    },
+                    onBuy: function() {
+                        const orb = data.progress.base.mage_tower;
+                        orb.teachFromExperienceBought = (orb.teachFromExperienceBought || 0) + 1;
+                    },
+                    soldOutButtonLabel: "Taught"
                 }
             }
         },
@@ -4944,11 +5324,30 @@ var resortData = {
                 powerfulChopsBought: 0,
                 axeEchoesBought: 0,
                 shelvingEchoesBought: 0,
+                plantAffinityBought: 0,
+                earthAffinityBought: 0,
+                hardenBambooBought: 0,
+                scribingInfusionsBought: 0,
+                shardsFoundBought: 0,
+                tradingContractsBought: 0,
+                resourceProtectionBought: 0,
+                dealMakingBought: 0,
+                orbHeightBought: 0,
+                skyAppreciationBought: 0,
+                haulKeepStone: 0,
+                haulKeepWood: 0,
+                haulKeepHardwood: 0,
+                haulKeepBars: 0,
+                mapTourSkipCompleted: false,
+                mapTourRepeat: false,
+                mapTourEndOnLastGold: false,
                 prepareToWriteLegendBought: false
             },
             upgradesOrder: ["spareSandals", "prepareToWriteLegend", "axeEchoes", "shelvingEchoes", "richerNeighbors", "artAppreciation",
                 "powerfulChops", "spiritWeavingEchoes",  "shardEchoes", "languageEchoes", 
-                "skillEchoes", "karmaStacking"],
+                "skillEchoes", "karmaStacking",
+                "plantAffinity", "earthAffinity", "hardenBamboo", "scribingInfusions", "shardsFound",
+                "tradingContracts", "resourceProtection", "dealMaking", "orbHeight", "skyAppreciation"],
             upgrades: {
                 prepareToWriteLegend: {
                     key: "prepare_to_write_legend",
@@ -5313,6 +5712,269 @@ var resortData = {
                     rowVisible: function() {
                         return engine.getLegendsWritten() >= 1;
                     }
+                },
+                plantAffinity: {
+                    key: "plant_affinity",
+                    name: "Plant Affinity",
+                    description: "Nurture Plant Spirit can be bought 1 more time.",
+                    weavingTime: 1000,
+                    getCost: function() {
+                        return { divinity: 15000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isPlantAffinityBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.plantAffinityBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isPlantAffinityBought();
+                    },
+                    soldOutButtonLabel: "Attuned",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                earthAffinity: {
+                    key: "earth_affinity",
+                    name: "Earth Affinity",
+                    description: "Gain 1 earth spirit. Each future resort starts with 1 earth spirit. The Mine and other first-spirit unlocks are available from the start.",
+                    weavingTime: 400,
+                    getCost: function() {
+                        return { divinity: 15000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isEarthAffinityBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.earthAffinityBought = 1;
+                        engine.grantEarthAffinitySpirit();
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isEarthAffinityBought();
+                    },
+                    soldOutButtonLabel: "Attuned",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                hardenBamboo: {
+                    key: "harden_bamboo",
+                    name: "Harden Bamboo",
+                    description: "Reveals Grow Hardwood in the Bamboo Forest.",
+                    weavingTime: 200,
+                    getCost: function() {
+                        return { divinity: 5000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isHardenBambooBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.hardenBambooBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isHardenBambooBought();
+                    },
+                    soldOutButtonLabel: "Hardened",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                scribingInfusions: {
+                    key: "scribing_infusions",
+                    name: "Scribing Infusions",
+                    description: "Reveals Infuse Scribings in the Scroll Archives, an upgrade that costs mana and gives more Scribings.",
+                    weavingTime: 1000,
+                    getCost: function() {
+                        return { divinity: 15000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isScribingInfusionsBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.scribingInfusionsBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isScribingInfusionsBought();
+                    },
+                    soldOutButtonLabel: "Revealed",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                shardsFound: {
+                    key: "shards_found",
+                    name: "Shards Found",
+                    description: "Multiplies shards gained by x3.",
+                    weavingTime: 800,
+                    getCost: function() {
+                        return { divinity: 20000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isShardsFoundBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.shardsFoundBought = 1;
+                    },
+                    extraInfo: function() {
+                        return engine.isShardsFoundBought() ? "Shard gain: x3" : "";
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isShardsFoundBought();
+                    },
+                    soldOutButtonLabel: "Found",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                tradingContracts: {
+                    key: "trading_contracts",
+                    name: "Trading Contracts",
+                    description: "Doubles the credit paid for each resource hauled to the Market. Market exp rises with the credit.",
+                    weavingTime: 800,
+                    getCost: function() {
+                        return { divinity: 10000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isTradingContractsBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.tradingContractsBought = 1;
+                    },
+                    extraInfo: function() {
+                        return engine.isTradingContractsBought() ? "Trade value: x2" : "";
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isTradingContractsBought();
+                    },
+                    soldOutButtonLabel: "Signed",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                resourceProtection: {
+                    key: "resource_protection",
+                    name: "Resource Protection",
+                    description: "Reveals Arrangement of Resource Protection in the Rock Garden, to keep resources available when trading.",
+                    weavingTime: 800,
+                    getCost: function() {
+                        return { divinity: 10000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isResourceProtectionBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.resourceProtectionBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isResourceProtectionBought();
+                    },
+                    soldOutButtonLabel: "Revealed",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                dealMaking: {
+                    key: "deal_making",
+                    name: "Deal-Making",
+                    description: "Multiplies credit per hauled resource by the Market level. Level 0 stays x1.",
+                    weavingTime: 1500,
+                    getCost: function() {
+                        return { divinity: 15000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isDealMakingBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.dealMakingBought = 1;
+                    },
+                    extraInfo: function() {
+                        if (!engine.isDealMakingBought()) {
+                            return "";
+                        }
+                        const level = engine.getMarketLevel();
+                        return `Trade value: x${Math.max(1, level)}`;
+                    },
+                    upgradeSoldOut: function() {
+                        return false;
+                    },
+                    lockedLabel: function() {
+                        return engine.isDealMakingBought() ? "Dealing" : "";
+                    },
+                    soldOutButtonLabel: "Dealing",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                orbHeight: {
+                    key: "orb_height",
+                    name: "Orb Height",
+                    description: "+1 max Orb floor per purchase.",
+                    weavingTime: 800,
+                    weavingTimeIncreaseAdd: 800,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getOrbHeightBought();
+                    },
+                    getCost: function() {
+                        const bought = engine.getOrbHeightBought();
+                        return { divinity: 10000 + 8000 * bought };
+                    },
+                    getMaxPurchases: function() {
+                        return Math.max(0, engine.getLegendsWritten() - 1);
+                    },
+                    canBuy: function() {
+                        return engine.getOrbHeightBought() < Math.max(0, engine.getLegendsWritten() - 1);
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.orbHeightBought = (shrine.orbHeightBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        return `Max floors: ${engine.getOrbMaxFloors()}`;
+                    },
+                    upgradeSoldOut: function() {
+                        return false;
+                    },
+                    lockedLabel: function() {
+                        if (engine.getOrbHeightBought() >= Math.max(0, engine.getLegendsWritten() - 1)) {
+                            return "Write another Legend";
+                        }
+                        return "";
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                skyAppreciation: {
+                    key: "sky_appreciation",
+                    name: "Sky Appreciation",
+                    description: "Add 4 sequential arrangements for doing Travel across available maps for gold stars.",
+                    weavingTime: 600,
+                    getCost: function() {
+                        return { divinity: 35000 };
+                    },
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        return !engine.isSkyAppreciationBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.skyAppreciationBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isSkyAppreciationBought();
+                    },
+                    soldOutButtonLabel: "Appreciated",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 2;
+                    }
                 }
             }
         }
@@ -5420,7 +6082,8 @@ resortData.getUpgradeWeavingBaseSeconds = function(upgradeDef, scopeKey) {
         return baseTime + purchaseIndex * upgradeDef.weavingTimeIncreaseAdd;
     }
     const increase = upgradeDef.weavingTimeIncrease !== undefined ? upgradeDef.weavingTimeIncrease : resortData.defaultWeavingTimeIncrease;
-    return baseTime * Math.pow(increase, purchaseIndex);
+    const seconds = baseTime * Math.pow(increase, purchaseIndex);
+    return upgradeDef.roundWeavingTime ? Math.round(seconds) : seconds;
 };
 
 resortData.getWeavingThreadsExtra = function(upgradeDef, scopeKey) {

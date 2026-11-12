@@ -1145,6 +1145,10 @@ var shrineCards = {
         {
             text: "Add 10 upgrades to Shrine that cost Divinity.\nx2 divinity/s\nIncrease max density to be the Orb Level/2\nAdd 4 upgrades to Cistern that let you buy more spirits for Essence",
             apply: function() {}
+        },
+        {
+            text: "Add 10 upgrades to Shrine that cost Divinity.\nx1.5 Okami exp gain",
+            apply: function() {}
         }
     ],
     legendStarRequirement: function(legendsWritten) {
@@ -1437,12 +1441,8 @@ var shrineCards = {
         const freeN = card.freeResearchLevelsFlat || 0;
         const archives = progress.base && progress.base.scrollArchives;
         if (archives) {
-            archives.freeResearchCostCredit = freeN;
             if (freeN > 0) {
                 archives.researchesToChoose = (archives.researchesToChoose || 0) + freeN;
-            }
-            if (typeof engine !== "undefined" && engine.syncScrollArchivesResearchCost) {
-                engine.syncScrollArchivesResearchCost(archives);
             }
         }
 

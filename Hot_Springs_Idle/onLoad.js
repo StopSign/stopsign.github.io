@@ -181,6 +181,9 @@ let onLoad = {
         initialize.initializeBonfire();
         initialize.initializeMageTower();
         initialize.initializeShrine();
+        if (typeof engine !== "undefined" && engine.grantEarthAffinitySpirit) {
+            engine.grantEarthAffinitySpirit();
+        }
         initialize.initializeCistern();
         initialize.initializeNoodleBar();
         initialize.initializePond();

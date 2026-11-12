@@ -341,5 +341,6 @@ mapData.getMapShardDropAmount = function(mapDef) {
         : 0;
     const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
         ? (shrineCards.getAggregatedEffects().shardDropAmountAdd || 0) : 0;
-    return base * amountMult * Math.pow(1.2, starCount) * (1 + cardAdd);
+    const shardsFound = (typeof engine !== "undefined" && engine.isShardsFoundBought && engine.isShardsFoundBought()) ? 3 : 1;
+    return base * amountMult * Math.pow(1.2, starCount) * (1 + cardAdd) * shardsFound;
 };
