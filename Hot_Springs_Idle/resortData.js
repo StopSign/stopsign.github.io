@@ -303,8 +303,8 @@ var resortData = {
         if ((c.bars || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.bars, "bars", "bars"));
         if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
         if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
-        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
         if ((c.hardwood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.hardwood, "hardwood", "hardwood"));
+        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
         if ((c.coins || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.coins, "coins", "coins"));
         if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
         if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
@@ -460,13 +460,13 @@ var resortData = {
         if (stoneReq > 0) {
             parts.push(resortData.formatCollectedPartHtml(stoneDel, stoneReq, "stone", "stone"));
         }
-        if (woodReq > 0) {
-            parts.push(resortData.formatCollectedPartHtml(woodDel, woodReq, "wood", "wood"));
-        }
         const hardwoodDel = (delivered && delivered.hardwood) || 0;
         const hardwoodReq = (required && required.hardwood) || 0;
         if (hardwoodReq > 0) {
             parts.push(resortData.formatCollectedPartHtml(hardwoodDel, hardwoodReq, "hardwood", "hardwood"));
+        }
+        if (woodReq > 0) {
+            parts.push(resortData.formatCollectedPartHtml(woodDel, woodReq, "wood", "wood"));
         }
         const barsDel = (delivered && delivered.bars) || 0;
         const barsReq = (required && required.bars) || 0;
@@ -1004,9 +1004,9 @@ var resortData = {
                 reinforcedStairs: {
                     key: "reinforced_stairs",
                     name: "Reinforced Stairs",
-                    description: "Reinforce the stairs so pebbles, the Okami, and carriers move 20% faster along this path section. Droplets are unchanged. The Okami moves 50% slower coming, to carry the resources.",
+                    description: "Reinforce the stairs for heavier units - all non-droplets will move 20% faster along this path section.",
                     getCost: function() {
-                        return { hardwood: 20, wood: 40 };
+                        return { hardwood: 25, wood: 50 };
                     },
                     weavingTime: 60,
                     weavingTimeIncrease: 1,
@@ -1070,7 +1070,7 @@ var resortData = {
             description: "Welcome guests to the resort.",
             mapSlot: { left: 334, top: 662 },
             constructionCost: { wood: 2, stone: 2 },
-            upgradesOrder: ["callForAlly", "growPlantSpirit", "addQueuePosts", "addBenches", "createEnticingLights", "shinyService", "drinkingBowl", "fillMana"],
+            upgradesOrder: ["callForAlly", "growPlantSpirit", "addQueuePosts", "createEnticingLights", "shinyService", "drinkingBowl", "addBenches", "fillMana"],
             upgrades: {
                 callForAlly: {
                     key: "call_for_ally",
@@ -1157,9 +1157,9 @@ var resortData = {
                 addBenches: {
                     key: "add_benches",
                     name: "Add Benches",
-                    description: "Add benches so 5 more visitors can wait at the gate.",
+                    description: "Add benches so 15 more visitors can wait at the gate.",
                     getCost: function() {
-                        return { hardwood: 500 };
+                        return { hardwood: 500, stone:1000 };
                     },
                     weavingTime: 300,
                     maxPurchases: 1,
@@ -1176,7 +1176,7 @@ var resortData = {
                     onBuy: function() {
                         const torii = data.progress.base.torii;
                         torii.addBenchesBought = (torii.addBenchesBought || 0) + 1;
-                        torii.maxVisitors = (torii.maxVisitors || 2) + 5;
+                        torii.maxVisitors = (torii.maxVisitors || 2) + 15;
                     },
                     soldOutButtonLabel: "Benches added"
                 },
@@ -1555,10 +1555,10 @@ var resortData = {
                 contemplateSturdiness: {
                     key: "contemplate_sturdiness",
                     name: "Contemplate Sturdiness",
-                    description: "Each purchase multiplies base Audacity by x1.1. Skill Audacity is unchanged.",
+                    description: "Each purchase multiplies base Audacity by x1.1.",
                     getCost: function() {
                         const n = (data.progress.base.bonfire && data.progress.base.bonfire.contemplateSturdinessBought) || 0;
-                        return { hardwood: 1500 * Math.pow(2, n) };
+                        return { hardwood: 1500 * Math.pow(2, n), stone: 5000 * Math.pow(2, n), bars: 400 * Math.pow(2, n) };
                     },
                     weavingTime: 2000,
                     weavingTimeIncrease: 1.3,
@@ -1692,7 +1692,7 @@ var resortData = {
                 growHardwood: {
                     key: "grow_hardwood",
                     name: "Grow Hardwood",
-                    description: "Each column can be switched to grow Hardwood, which has 5 times the chips per segment but takes 5 minutes to fill one segment. 50 chips become 1 hardwood.",
+                    description: "Each column can be switched to grow Hardwood, which has 5 times the chips per segment and takes 5 minutes to fill one segment. 50 chips become 1 hardwood.",
                     cost: { ore: 200, starBeads: 8000 },
                     weavingTime: 300,
                     maxPurchases: 1,
@@ -1733,9 +1733,10 @@ var resortData = {
                 growPlantSpiritBought: 0,
                 condenseWaterSpiritBought: 0,
                 raiseEarthSpiritBought: 0,
-                spinFireSpiritBought: 0
+                spinFireSpiritBought: 0,
+                energeticDropletsBought: 0
             },
-            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell", "growPlantSpirit", "condenseWaterSpirit", "raiseEarthSpirit", "spinFireSpirit"],
+            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell", "growPlantSpirit", "condenseWaterSpirit", "raiseEarthSpirit", "spinFireSpirit", "energeticDroplets"],
             upgrades: {
                 increaseCapacity: {
                     key: "increase_capacity",
@@ -1988,6 +1989,32 @@ var resortData = {
                         return (data.progress.base.cistern.spinFireSpiritBought || 0) >= 1;
                     },
                     soldOutButtonLabel: "Spun",
+                },
+                energeticDroplets: {
+                    key: "energetic_droplets",
+                    name: "Energetic Droplets",
+                    description: "Droplets carry more water. Each purchase multiplies the water a droplet carries by x1.5.",
+                    getCost: function() {
+                        const n = (data.progress.base.cistern.energeticDropletsBought || 0);
+                        return { essence: Math.round(10000 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 3000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.cistern.energeticDropletsBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.getFireLauncherBuiltCount() >= 3;
+                    },
+                    onBuy: function() {
+                        const cistern = data.progress.base.cistern;
+                        cistern.energeticDropletsBought = (cistern.energeticDropletsBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const mult = engine.getEnergeticDropletsMultiplier();
+                        return `Droplet volume: x${mult}`;
+                    }
                 }
             }
         },
@@ -2502,41 +2529,39 @@ var resortData = {
                 secondFloorRooms: {
                     key: "second_floor_rooms",
                     name: "Second Floor Rooms",
-                    description: "Add another room to the Tatami Onsen.",
+                    description: "Add another room to the Tatami Onsen. Each Reinforce Joints purchase raises it by +1.",
                     getCost: function() {
                         const n = data.progress.base.inn.secondFloorRoomsBought || 0;
                         const mult = Math.pow(2, n);
                         return {
-                            wood: Math.round(10000 * mult),
-                            hardwood: Math.round(10000 * mult)
+                            wood: Math.round(6000 * mult),
+                            hardwood: Math.round(1500 * mult),
+                            bars: Math.round(600 * mult)
                         };
                     },
-                    weavingTime: 6000,
-                    weavingTimeIncreaseAdd: 3000,
+                    weavingTime: 4000,
+                    weavingTimeIncreaseAdd: 2000,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.inn.secondFloorRoomsBought || 0;
                     },
-                    maxPurchases: 6,
                     canBuy: function() {
+                        const inn = data.progress.base.inn;
                         return engine.isGrowHardwoodBought()
-                            && engine.isInnOnsenConverted()
-                            && (data.progress.base.inn.secondFloorRoomsBought || 0) < 6;
+                            && (inn.reinforceJointsBought || 0) > 0
+                            && (inn.secondFloorRoomsBought || 0) < engine.getInnSecondFloorRoomsMaxPurchases();
                     },
                     onBuy: function() {
                         data.progress.base.inn.secondFloorRoomsBought = (data.progress.base.inn.secondFloorRoomsBought || 0) + 1;
                         engine.syncInnRoomCounts();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought() && engine.isInnOnsenConverted();
+                        const inn = data.progress.base.inn;
+                        return engine.isGrowHardwoodBought() && (inn.reinforceJointsBought || 0) > 0;
                     },
-                    upgradeSoldOut: function() {
-                        return (data.progress.base.inn.secondFloorRoomsBought || 0) >= 6;
+                    getMaxPurchases: function() {
+                        return engine.getInnSecondFloorRoomsAbsoluteMaxPurchases();
                     },
                     soldOutButtonLabel: "Max rooms",
-                    extraInfo: function() {
-                        const n = data.progress.base.inn.secondFloorRoomsBought || 0;
-                        return `Second floor rooms: ${n}/6`;
-                    }
                 },
                 buildPathToPond: {
                     key: "build_path_to_pond",
@@ -4008,8 +4033,8 @@ var resortData = {
                     key: "arrangement_of_navigation",
                     name: "Arrangement of Navigation",
                     description: "Reveal Try Every Map Once on the Travel tab.",
-                    cost: { stone: 80 },
-                    weavingTime: 120,
+                    cost: { stone: 300 },
+                    weavingTime: 400,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return engine.isSkyAppreciationBought() && !(g && g.arrangementOfNavigationUnlocked);
@@ -4025,7 +4050,7 @@ var resortData = {
                 },
                 arrangementOfGoldenNavigation: {
                     key: "arrangement_of_golden_navigation",
-                    name: "Arrangement of Golden Navigation",
+                    name: "Arrangement of Golden Navigation", 
                     description: "Reveal Skip Completed Maps on the Travel tab.",
                     cost: { stone: 1500 },
                     weavingTime: 1000,
@@ -4242,11 +4267,11 @@ var resortData = {
                     description: "Each purchase increases the time guests spend at the noodle bar by 2s.",
                     getCost: function() {
                         const n = engine.getNoodleSturdyWallsBought();
-                        return { hardwood: Math.round(6000 * Math.pow(1.5, n)) };
+                        return { hardwood: Math.round(4000 * Math.pow(1.5, n)), bars: Math.round(500 * Math.pow(1.5, n)) };
                     },
-                    weavingTime: 6000,
-                    weavingTimeIncreaseAdd: 3000,
-                    maxPurchases: 4,
+                    weavingTime: 3000,
+                    weavingTimeIncreaseAdd: 1500,
+                    maxPurchases: 5,
                     getWeavingPurchaseIndex: function() {
                         return engine.getNoodleSturdyWallsBought();
                     },
@@ -4719,7 +4744,7 @@ var resortData = {
 
         fireLauncher_pathMid: {
             label: "Long-Range Launcher",
-            upgradesOrder: ["ironSights", "longRangeFirePit", "longRangeWoodPit"],
+            upgradesOrder: ["ironSights", "longRangeFirePit", "longRangeWoodPit", "sturdyFrame"],
             upgrades: {
                 ironSights: {
                     key: "iron_sights",
@@ -4789,13 +4814,37 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "woodPitBought");
                     },
+                },
+                sturdyFrame: {
+                    key: "long_range_sturdy_frame",
+                    name: "Sturdy Frame",
+                    description: "A sturdier frame for the Long-Range Launcher. Each purchase increases attack speed by +15%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathMid", "sturdyFrameBought");
+                        return { hardwood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1500,
+                    weavingTimeIncreaseAdd: 1500,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathMid", "sturdyFrameBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought()
+                            && engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathMid")
+                            && engine.getFireLauncherUpgradeBought("pathMid", "sturdyFrameBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathMid", "sturdyFrameBought");
+                    },
                 }
             }
         },
 
         fireLauncher_pathLower: {
             label: "Ember Launcher",
-            upgradesOrder: ["fireFlingers", "emberFirePit", "emberWoodPit"],
+            upgradesOrder: ["fireFlingers", "emberFirePit", "emberWoodPit", "sturdyFrame"],
             upgrades: {
                 fireFlingers: {
                     key: "fire_flingers",
@@ -4865,13 +4914,37 @@ var resortData = {
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "woodPitBought");
                     },
+                },
+                sturdyFrame: {
+                    key: "ember_sturdy_frame",
+                    name: "Sturdy Frame",
+                    description: "A sturdier frame for the Ember Launcher. Each purchase increases attack speed by +15%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("pathLower", "sturdyFrameBought");
+                        return { hardwood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1500,
+                    weavingTimeIncreaseAdd: 1500,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("pathLower", "sturdyFrameBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought()
+                            && engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathLower")
+                            && engine.getFireLauncherUpgradeBought("pathLower", "sturdyFrameBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("pathLower", "sturdyFrameBought");
+                    },
                 }
             }
         },
 
         fireLauncher_bendTop: {
             label: "Burst Launcher",
-            upgradesOrder: ["hotIrons", "burstFirePit", "burstWoodPit"],
+            upgradesOrder: ["hotIrons", "burstFirePit", "burstWoodPit", "sturdyFrame"],
             upgrades: {
                 hotIrons: {
                     key: "hot_irons",
@@ -4940,6 +5013,30 @@ var resortData = {
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "woodPitBought");
+                    },
+                },
+                sturdyFrame: {
+                    key: "burst_sturdy_frame",
+                    name: "Sturdy Frame",
+                    description: "A sturdier frame for the Burst Launcher. Each purchase increases attack speed by +15%.",
+                    getCost: function() {
+                        const n = engine.getFireLauncherUpgradeBought("bendTop", "sturdyFrameBought");
+                        return { hardwood: Math.round(2000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1500,
+                    weavingTimeIncreaseAdd: 1500,
+                    getWeavingPurchaseIndex: function() {
+                        return engine.getFireLauncherUpgradeBought("bendTop", "sturdyFrameBought");
+                    },
+                    maxPurchases: 4,
+                    canBuy: function() {
+                        return engine.isGrowHardwoodBought()
+                            && engine.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("bendTop")
+                            && engine.getFireLauncherUpgradeBought("bendTop", "sturdyFrameBought") < 4;
+                    },
+                    onBuy: function() {
+                        engine.incrementFireLauncherUpgrade("bendTop", "sturdyFrameBought");
                     },
                 }
             }
@@ -5266,7 +5363,7 @@ var resortData = {
                     name: "Teach from Experience",
                     description: "Spirits gain up to 100% more experience based on how far The Orb's level is above theirs. A spirit at half the Orb's level gains 50% more. A spirit at or above the Orb's level gains none.",
                     getCost: function() {
-                        return { hardwood: 1000, mana: 50000 };
+                        return { hardwood: 3000, mana: 50000 };
                     },
                     weavingTime: 1000,
                     maxPurchases: 1,
@@ -5955,7 +6052,7 @@ var resortData = {
                 },
                 skyAppreciation: {
                     key: "sky_appreciation",
-                    name: "Sky Appreciation",
+                    name: "World Tour",
                     description: "Add 4 sequential arrangements for doing Travel across available maps for gold stars.",
                     weavingTime: 600,
                     getCost: function() {

@@ -58,6 +58,51 @@ const changelog = {
     }
 };
 
+
+changelog.addSection("Legend 2; prestige resets all again", "0.3", 
+    `
+Changes:
+* Many small UI changes
+* Market credit cost to level from x3 to x4
+* Trades get worse the more you do them, decaying back to regular price over time
+* Trades base time reduced to 60s (card effect reducing it doubled)
+* Mana cost of doing a prestige is increased to 200k, and increases by +2000% per reset, decaying over time
+* Change Conversation Topics resets with prestige (reset to 0 on current saves). Cost increased
+* Changed the Okami Stone Bonus card to give % more stone for manual collection in the Hidden Spring
+* Pebble Pay upgrade max increased to 10 (was 5)
+* Buffed Long-Fire Launcher 25% dmg, more spirit exp
+* Retry checkboxes added to clone death screen to change
+* Changed behavior of ! in Cistern to fire less
+* Auto-equips a skill when researched if there is a slot available
+* Added floating text for wood, stone, and water/essence
+* Added a slider for customizing guest rest time 
+* Made rare/epic cards harder to get, since packs come a little easier
+* Added ETAs for Karma and Skill Slots/Shards
+* Moved Mineshaft Beams to Mine, and Mine and Fire Launchers use fox den carriers up the path now. Mineshaft beams wood cost /2, and added a coin cost 
+
+
+Prestige Changes:
+* Prestige now resets more things (most of the resort/resources - not shrine) - check the pros/cons list now.
+* Made Legends cost 9 stars, +3 each Legend.
+* Added prestige history 
+* Re-arranged Art Appreciation's order. Changed unlocked arrangement's costs
+* Changed divinity costs and weaving times for Legend 1
+* Removed the spirit essence upgrades in Cistern. They will come back in a later Legend
+* Added Legend 2, with 10 shrine divinity upgrades, including a new resource Hardwood, with 10 upgrades that use it.
+* As I am trying to balance these things very carefully, it is taking longer than I thought to get content out. I will be trying to make this happen faster. The plan is to get to around Legend 5-7 before I work on the steam-exclusive content for release.
+
+
+Combat changes:
+* Skill Slots base cost has been lowered, but with higher increasing costs per slot. Additionally cost increases again after 12 shards. Stars give x1.2 per star instead of x1.1 and maps have higher shard drop amounts to slightly offset it, but it will result in less slots.
+* One of the research options will be the category that you least have in your library
+* Peer pressure 3% (+2%/lvl) -> 2% (+1%/lvl)
+* Outrage bonus from 50% attack speed/coins to 25% attack speed/coins
+* Brand Recognition 4 (+2/lvl) -> 3 (+1.5/lvl)
+* Rubbernecking 10% (+2%/lvl) -> 5% (+1%/lvl)
+* Study Group 10% (+5%/lvl) -> 8% (+4%/lvl)
+* Echo Chamber 10% (+2%/lvl) -> 6% (+3%/lvl)
+* Maps have been made more difficult yet again`);
+
 changelog.addSection("Big patch; skills rework", "0.2", 
     `Skill/Shard Rework:
 * Skills now have a category, and must be equipped in a limited number of slots.

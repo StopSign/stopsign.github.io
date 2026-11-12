@@ -705,6 +705,38 @@ let createView = {
                 return keys;
             }
         );
+        createView.createInfoButton(
+            "tabPane_cardBonuses",
+            function() {
+                const cost = intToString(shrineCards.buyPackDivinityCost);
+                const odds = shrineCards.buyCardOddsText();
+                const packText = function(rarity, name) {
+                    const def = shrineCards.packDefs[rarity];
+                    const w = def.weights;
+                    let text = `A ${name} pack shows ${def.slots} cards. Each card rolls ${w.common}% Common, ${w.rare}% Rare, and ${w.epic}% Epic.`;
+                    if (def.minRare > 0) {
+                        text += ` At least ${def.minRare} will be Rare.`;
+                    }
+                    if (def.minEpic > 0) {
+                        text += ` At least ${def.minEpic} will be Epic.`;
+                    }
+                    text += def.choose === 1 ? " Choose 1." : ` Choose ${def.choose}.`;
+                    return text;
+                };
+                let html = "<p>Cards are permanent bonuses. Each copy you own adds its effect, and that total applies immediately. Owned cards and unopened packs are kept when you Fade into Legend.</p>";
+                html += `<p><strong>Buy Card</strong> spends ${cost} divinity on one pack. The pack rarity is ${odds}.</p>`;
+                html += "<p><strong>Open Packs</strong> opens Common packs first, then Rare, then Epic. You keep only the cards you choose. A card already at its maximum for that rarity is not offered. If a rolled rarity has none left, that card drops to the next lower rarity. Closing the window keeps the open pack, and the button becomes Resume Opening Packs. Choose as soon as clicked confirms the pack as soon as enough cards are selected.</p>";
+                html += `<p>${packText("common", "Common")}</p>`;
+                html += `<p>${packText("rare", "Rare")}</p>`;
+                html += `<p>${packText("epic", "Epic")}</p>`;
+                html += "<p><strong>Capped milestones</strong> are Total Stars and Okami Level. Each mark grants the pack shown above it, once. Fade into Legend clears those claims, so they can be earned again.</p>";
+                html += "<p><strong>Repeating milestones</strong> are Depth Reached, Orb Level, Max Mana, Total Gold Stars, Market Level, and Essence Made. Reaching the target grants the pack on the bar and raises the next target. Fade into Legend returns these targets to their first value.</p>";
+                html += "<p><strong>One-time milestones</strong> are Shrine Level, Divinity Amount, and Build Shrine. Building the Shrine grants one Epic pack. Shrine Level and Divinity Amount stay claimed, because the Shrine, its level, and your divinity are kept.</p>";
+                html += "<p><strong>Card Bonuses</strong> lists every card you have received. Each rarity shows owned / maximum. ∞ means that rarity has no cap. An empty slot means that card has no version of that rarity. The line under the counts is the total from every copy you own.</p>";
+                return html;
+            },
+            4
+        );
     },
     waveInfoZoneSlotCount: 12,
     createWaveInfoStructure: function() {
@@ -1531,7 +1563,7 @@ let createView = {
                     <div class="base-row">Type: <span id="fireLauncherInfoType"></span></div>
                     <div class="base-row">Embers: <span id="fireLauncherInfoEmbers"></span>/<span id="fireLauncherInfoEmbersCap"></span> <span id="fireLauncherInfoEmbersRequire" style="display:none;font-weight:bold">Requires Fire Spirit to operate</span></div>
                     <div class="base-row">Range: <span id="fireLauncherInfoRange"></span>px<span id="fireLauncherInfoRangeBonus" class="muted-text"></span></div>
-                    <div class="base-row">Attack interval: <span id="fireLauncherInfoInterval"></span>s</div>
+                    <div class="base-row">Attack interval: <span id="fireLauncherInfoInterval"></span>s<span id="fireLauncherInfoIntervalBonus" class="muted-text"></span></div>
                     <div class="base-row">Ember cost: <span id="fireLauncherInfoEmberCost"></span></div>
                     <div class="base-row">Heat per strike: <span id="fireLauncherInfoHeat"></span><span id="fireLauncherInfoHeatBonus" class="muted-text"></span></div>
                     <div class="base-row">Exp per droplet: <span id="fireLauncherInfoExp"></span></div>
@@ -2243,7 +2275,7 @@ let createView = {
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
-            "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoEmbersRequire", "fireLauncherInfoRange", "fireLauncherInfoRangeBonus", "fireLauncherInfoInterval",
+            "fireLauncherInfoTitle", "fireLauncherInfoType", "fireLauncherInfoEmbers", "fireLauncherInfoEmbersCap", "fireLauncherInfoEmbersRequire", "fireLauncherInfoRange", "fireLauncherInfoRangeBonus", "fireLauncherInfoInterval", "fireLauncherInfoIntervalBonus",
             "fireLauncherInfoEmberCost", "fireLauncherInfoHeat", "fireLauncherInfoHeatBonus", "fireLauncherInfoExp", "fireLauncherInfoExpPerSec", "fireLauncherInfoSpirit",
             "fireLauncherUpgrades_pathMid", "fireLauncherUpgrades_pathLower", "fireLauncherUpgrades_bendTop",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",

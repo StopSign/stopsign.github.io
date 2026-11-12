@@ -3738,12 +3738,13 @@ let view = {
             return;
         }
         const attackLabel = def.attackType === "aoe" ? "Burst (AOE)" : "Projectile";
-        const intervalSec = def.intervalMs / 1000;
+        const intervalSec = engine.getFireLauncherIntervalMs(key) / 1000;
         const intervalStr = intervalSec >= 1 ? intervalSec.toFixed(1) : intervalSec.toFixed(2);
         const rangePx = Math.round(engine.getFireLauncherRangePx(key));
         const heatPerStrike = engine.getFireLauncherHeatPerStrike(key);
         const rangeBonusPct = engine.getFireLauncherRangeBonusPct(key);
         const heatBonusPct = engine.getFireLauncherHeatBonusPct(key);
+        const speedBonusPct = engine.getFireLauncherAttackSpeedBonusPct(key);
         view.updateVal("fireLauncherInfoTitle", def.name);
         view.updateVal("fireLauncherInfoType", attackLabel);
         view.updateVal("fireLauncherInfoEmbers", round1Fixed(state ? state.embers || 0 : 0));
@@ -3752,6 +3753,7 @@ let view = {
         view.updateVal("fireLauncherInfoRange", rangePx);
         view.updateVal("fireLauncherInfoRangeBonus", rangeBonusPct > 0 ? ` (+${rangeBonusPct}%)` : "");
         view.updateVal("fireLauncherInfoInterval", intervalStr);
+        view.updateVal("fireLauncherInfoIntervalBonus", speedBonusPct > 0 ? ` (+${speedBonusPct}% speed)` : "");
         view.updateVal("fireLauncherInfoEmberCost", def.emberCost);
         const heatText = def.attackType === "aoe"
             ? `${round2(heatPerStrike)}C (all in range)`
@@ -4146,7 +4148,7 @@ let view = {
                 view.updateVal("spiritInfoFireLauncherEmbers", round1Fixed(embers));
                 view.updateVal("spiritInfoFireLauncherEmbersCap", maxEmbers);
                 if (def) {
-                    const intervalSec = def.intervalMs / 1000;
+                    const intervalSec = engine.getFireLauncherIntervalMs(launcherKey) / 1000;
                     const intervalStr = intervalSec >= 1 ? intervalSec.toFixed(1) : intervalSec.toFixed(2);
                     const attackLabel = def.attackType === "aoe" ? "burst" : "projectile";
                     const rangePx = Math.round(engine.getFireLauncherRangePx(launcherKey));

@@ -3974,11 +3974,22 @@ let engine = {
         const reinforced = inn.reinforceJointsBought || 0;
         return engine.getInnAddRoomBaseMaxPurchases() + reinforced;
     },
+    getInnSecondFloorRoomsBaseMaxPurchases: function() {
+        return 0;
+    },
+    getInnSecondFloorRoomsMaxPurchases: function() {
+        const inn = data.progress.base.inn;
+        const reinforced = inn.reinforceJointsBought || 0;
+        return engine.getInnSecondFloorRoomsBaseMaxPurchases() + reinforced;
+    },
     getInnFurnitureAbsoluteMaxPurchases: function() {
         return engine.getInnFurnitureMaxPurchases();
     },
     getInnAddRoomAbsoluteMaxPurchases: function() {
         return engine.getInnAddRoomMaxPurchases();
+    },
+    getInnSecondFloorRoomsAbsoluteMaxPurchases: function() {
+        return engine.getInnSecondFloorRoomsMaxPurchases();
     },
     isInnOnsenConverted: function() {
         return !!data.progress.base.inn.onsenConverted;
@@ -5741,6 +5752,18 @@ let engine = {
         const base = (def && def.heatPerStrike) || 0;
         return base * (1 + engine.getFireLauncherHeatBonusPct(platformKey) / 100);
     },
+    getFireLauncherAttackSpeedBonusPct: function(platformKey) {
+        return 15 * engine.getFireLauncherUpgradeBought(platformKey, "sturdyFrameBought");
+    },
+    getFireLauncherIntervalMs: function(platformKey) {
+        const def = engine.getFireLauncherPlatformDef(platformKey);
+        const base = (def && def.intervalMs) || 1000;
+        const bonusPct = engine.getFireLauncherAttackSpeedBonusPct(platformKey);
+        if (bonusPct <= 0) {
+            return base;
+        }
+        return base / (1 + bonusPct / 100);
+    },
     getFireLauncherMaxEmbers: function(defOrKey) {
         const key = typeof defOrKey === "string" ? defOrKey
             : (defOrKey && defOrKey.key ? defOrKey.key : null);
@@ -6123,7 +6146,7 @@ let engine = {
             if (!spirit || (state.embers || 0) < (def.emberCost || 0)) {
                 continue;
             }
-            if (state.attackTimerMs < (def.intervalMs || 1000)) {
+            if (state.attackTimerMs < engine.getFireLauncherIntervalMs(pk)) {
                 continue;
             }
             const pos = def.attackType === "aoe"
@@ -6336,8 +6359,15 @@ let engine = {
         const bought = hs ? (hs.carryingCapacityBought || 0) : 0;
         return Math.pow(1.5, bought);
     },
+    getEnergeticDropletsMultiplier: function() {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const bought = cistern ? (cistern.energeticDropletsBought || 0) : 0;
+        return Math.pow(1.5, bought);
+    },
     getWaterDropletVolumeForSpirit: function(spirit) {
-        return Math.ceil((engine.getEffectiveSpiritPower(spirit) || 1) * engine.getWaterDropletCapacityMultiplier() / 2);
+        return Math.ceil((engine.getEffectiveSpiritPower(spirit) || 1)
+            * engine.getWaterDropletCapacityMultiplier()
+            * engine.getEnergeticDropletsMultiplier() / 2);
     },
     findWaterSpiritPlacementSlot: function() {
         const pondMax = engine.getPondWaterSpiritSlotMax();
@@ -6671,8 +6701,7 @@ let engine = {
     },
     /** Assumed continuous exp/s while always firing (one droplet hit per interval). */
     getFireLauncherExpPerSec: function(platformKey) {
-        const def = engine.getFireLauncherPlatformDef(platformKey);
-        const intervalMs = (def && def.intervalMs) || 1000;
+        const intervalMs = engine.getFireLauncherIntervalMs(platformKey);
         if (intervalMs <= 0) {
             return 0;
         }

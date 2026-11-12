@@ -471,15 +471,15 @@ let initials = {
                 platforms: {
                     pathMid: {
                         embers: 0, attackTimerMs: 0, targetMode: "default",
-                        ironSightsBought: 0, firePitBought: 0, woodPitBought: 0
+                        ironSightsBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                     },
                     bendTop: {
                         embers: 0, attackTimerMs: 0, targetMode: "default",
-                        hotIronsBought: 0, firePitBought: 0, woodPitBought: 0
+                        hotIronsBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                     },
                     pathLower: {
                         embers: 0, attackTimerMs: 0, targetMode: "default",
-                        fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0
+                        fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                     }
                 },
                 projectiles: [],
@@ -1098,15 +1098,15 @@ let initialize = {
             platforms: {
                 pathMid: {
                     embers: 0, attackTimerMs: 0, targetMode: "default",
-                    ironSightsBought: 0, firePitBought: 0, woodPitBought: 0
+                    ironSightsBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                 },
                 bendTop: {
                     embers: 0, attackTimerMs: 0, targetMode: "default",
-                    hotIronsBought: 0, firePitBought: 0, woodPitBought: 0
+                    hotIronsBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                 },
                 pathLower: {
                     embers: 0, attackTimerMs: 0, targetMode: "default",
-                    fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0
+                    fireFlingersBought: 0, firePitBought: 0, woodPitBought: 0, sturdyFrameBought: 0
                 }
             },
             projectiles: [],
@@ -1124,9 +1124,9 @@ let initialize = {
             fl.platforms = {};
         }
         const upgradeDefaults = {
-            pathMid: ["ironSightsBought", "firePitBought", "woodPitBought"],
-            bendTop: ["hotIronsBought", "firePitBought", "woodPitBought"],
-            pathLower: ["fireFlingersBought", "firePitBought", "woodPitBought"]
+            pathMid: ["ironSightsBought", "firePitBought", "woodPitBought", "sturdyFrameBought"],
+            bendTop: ["hotIronsBought", "firePitBought", "woodPitBought", "sturdyFrameBought"],
+            pathLower: ["fireFlingersBought", "firePitBought", "woodPitBought", "sturdyFrameBought"]
         };
         const defs = resortData.fireLauncherPlatformDefs || [];
         for (let i = 0; i < defs.length; i++) {
