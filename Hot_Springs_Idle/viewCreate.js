@@ -232,8 +232,8 @@ let createView = {
             function() {
                 const stars = engine.countAchievedMapStarsByType();
                 const bronzeMult = engine.getScrollArchivesBronzeResearchCostMult();
-                const furnitureBought = engine.getWorkspaceFurnitureBought();
-                const furnitureMult = engine.getWorkspaceFurnitureResearchCostMult();
+                const furnitureBought = resortHelper.getWorkspaceFurnitureBought();
+                const furnitureMult = Math.pow(0.9, furnitureBought);
                 const silverMult = engine.getScrollArchivesSilverResearchSpeedMult();
                 const goldMult = engine.getScrollArchivesGoldResearchGainMult();
                 const bronzeStar = `<span class="star-bronze">★</span>`;
@@ -257,7 +257,7 @@ let createView = {
             function() {
                 const pondBuilt = engine.isPondBuiltFromFoxDen();
                 const marketBuilt = engine.isMarketBuilt();
-                const powerfulChops = engine.isPowerfulChopsBought()
+                const powerfulChops = resortHelper.isPowerfulChopsBought()
                     ? "<p>Powerful Chops carries unused chop power to the next segment of the same stalk at 50%, rounded down. It does not continue onto the next stalk. The harvest rate uses that carried chop.</p>"
                     : "";
                 return `<p>Harvest bamboo for construction wood.</p>
@@ -267,7 +267,7 @@ let createView = {
                     ${powerfulChops}
                     ${pondBuilt ? "<p>Bamboo grows twice as fast when water is available. 1L is used for every 1 chip regrown.</p>" : ""}
                     ${marketBuilt ? "<p>Bamboo grows twice as fast when fertilizer is available. 1 is used for every 10 chips regrown.</p>" : ""}
-                    ${engine.isGrowHardwoodBought() ? "<p>Hardwood grows at 2/5 speed and has 5 times the chips per segment. Water and fertilizer still double that growth. 50 Hardwood Chips become 1 Hardwood.</p>" : ""}`;
+                    ${resortHelper.isGrowHardwoodBought() ? "<p>Hardwood grows at 2/5 speed and has 5 times the chips per segment. Water and fertilizer still double that growth. 50 Hardwood Chips become 1 Hardwood.</p>" : ""}`;
             },
             56,
             function() {
@@ -302,7 +302,7 @@ let createView = {
         return false;
     },
     spiritTrainingInfoHtml: function() {
-        if (!engine.isSpiritTrainingSpotBought() || !engine.getSpiritTrainingCardEffects) {
+        if (!resortHelper.isSpiritTrainingSpotBought() || !engine.getSpiritTrainingCardEffects) {
             return "";
         }
         const trainFx = engine.getSpiritTrainingCardEffects();
@@ -468,8 +468,8 @@ let createView = {
             function() {
                 let html = "<p>Exp each second starts at the total level of all spirits. Each assigned kitsune, and the Okami, adds 20%. The Exp gain line is that rate.</p>";
                 html += "<p>Mana per second starts at the Orb's level. Bonfire heat and Spin Currents multiply that rate. While the Okami is assigned here, her inspiration bonus also multiplies mana generation, and does not multiply the worker exp bonus.</p>";
-                const walls = engine.getOrbBuildWallsBought();
-                const stairs = engine.getOrbBuildStairsBought();
+                const walls = resortHelper.getOrbBuildWallsBought();
+                const stairs = resortHelper.getOrbBuildStairsBought();
                 if (walls > 0) {
                     html += `<p>Each Build Walls purchase adds +10% Orb exp. ${walls} bought is +${walls * 10}%.</p>`;
                 }
@@ -481,10 +481,10 @@ let createView = {
             56,
             function() {
                 const keys = ["base"];
-                if (engine.getOrbBuildWallsBought() > 0) {
+                if (resortHelper.getOrbBuildWallsBought() > 0) {
                     keys.push("walls");
                 }
-                if (engine.getOrbBuildStairsBought() > 0) {
+                if (resortHelper.getOrbBuildStairsBought() > 0) {
                     keys.push("stairs");
                 }
                 return keys;
@@ -546,8 +546,8 @@ let createView = {
             function() {
                 let html = "<p>A quiet spring above the resort. Spirits are summoned here and sent out to their work sites.</p>";
                 let collectStone = "<p>Collect Stone sends the Okami to the spring. She gathers for 5 seconds, then that stone is added to the Stone Pile. The button shows the amount. The base is 4. After Learn the Best Stones, the total level of every earth spirit is added. Okami Stone Bonus then adds 10% per rare card and 25% per epic card, and that total is rounded up.";
-                if (engine.getEchoedShelvingBought() > 0) {
-                    const shelvingMult = round2(Math.pow(1.25, engine.getEchoedShelvingBought()));
+                if (resortHelper.getEchoedShelvingBought() > 0) {
+                    const shelvingMult = round2(Math.pow(1.25, resortHelper.getEchoedShelvingBought()));
                     collectStone += ` Echoed Shelving then multiplies that stone by x${shelvingMult} (x1.25 per level), rounded up.`;
                 }
                 collectStone += " This trip uses the Okami, and it pauses her current path job.</p>";
@@ -607,7 +607,7 @@ let createView = {
                 html += "<p>Earth spirits dig with their effective spirit power. Mineshaft Beams add 20% dig power each, which is the bonus on the Spirit power line.</p>";
                 html += "<p>A grid is 25 blocks. Depth 0 has 1 stone, and each 2 depth adds 1 stone, up to 5. Ore starts at depth 3, and each 5 depth adds 1 ore, up to 5. The rest is dirt.</p>";
                 html += "<p>Digging does not grant exp. When the grid is clear, assigned earth spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and split among them as exp. The play line shows that amount.</p>";
-                if (engine.getPlayPitBought() > 0) {
+                if (resortHelper.getPlayPitBought() > 0) {
                     html += "<p>Play Pit increases the dirt spent on each play cycle.</p>";
                 }
                 return html;
@@ -615,7 +615,7 @@ let createView = {
             56,
             function() {
                 const keys = ["base"];
-                if (engine.getPlayPitBought() > 0) {
+                if (resortHelper.getPlayPitBought() > 0) {
                     keys.push("playPit");
                 }
                 return keys;
@@ -630,8 +630,8 @@ let createView = {
                 if (kind === "earth") {
                     html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants dirt, stone, or ore. Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
                     let pebbleInfo = "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) stone or ore, plus 20% per Pebble Pay, rounded up.";
-                    if (engine.getEchoedShelvingBought() > 0) {
-                        const shelvingMult = round2(Math.pow(1.25, engine.getEchoedShelvingBought()));
+                    if (resortHelper.getEchoedShelvingBought() > 0) {
+                        const shelvingMult = round2(Math.pow(1.25, resortHelper.getEchoedShelvingBought()));
                         pebbleInfo += ` Stone that arrives at the Stone Pile is then multiplied by x${shelvingMult} (x1.25 per Echoed Shelving), rounded up. Ore arrives at the Atelier and is not multiplied.`;
                     } else {
                         pebbleInfo += " Stone arrives at the Stone Pile. Ore arrives at the Atelier.";
@@ -658,7 +658,7 @@ let createView = {
                     return ["none"];
                 }
                 const keys = [spirit.kind || "earth"];
-                if (engine.isSpiritTrainingSpotBought()) {
+                if (resortHelper.isSpiritTrainingSpotBought()) {
                     keys.push("training");
                 }
                 return keys;

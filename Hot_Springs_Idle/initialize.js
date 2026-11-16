@@ -104,7 +104,7 @@ function debugAddEarthSpirits(count, startLevel) {
     if (!hs) {
         return;
     }
-    const target = count !== undefined ? count : engine.getHiddenSpringSpiritSlotMax();
+    const target = count !== undefined ? count : resortHelper.getHiddenSpringSpiritSlotMax();
     while ((hs.earthSpiritsBought || 0) < target) {
         if (!engine.assembleEarthSpiritFromPurchase()) {
             break;
@@ -120,7 +120,7 @@ function debugAddWaterSpirits(count, startLevel) {
     if (!hs) {
         return;
     }
-    const target = count !== undefined ? count : engine.getHiddenSpringSpiritSlotMax();
+    const target = count !== undefined ? count : resortHelper.getHiddenSpringSpiritSlotMax();
     while ((hs.waterSpiritsBought || 0) < target) {
         if (!engine.assembleWaterSpiritFromPurchase()) {
             break;
@@ -136,7 +136,7 @@ function debugAddFireSpirits(count, startLevel) {
     if (!hs) {
         return;
     }
-    const target = count !== undefined ? count : engine.getHiddenSpringSpiritSlotMax();
+    const target = count !== undefined ? count : resortHelper.getHiddenSpringSpiritSlotMax();
     while ((hs.fireSpiritsBought || 0) < target) {
         if (!engine.assembleFireSpiritFromPurchase()) {
             break;
@@ -1998,7 +1998,7 @@ let initialize = {
             ? shrineCards.getAggregatedEffects() : {};
         const columnAud = (typeof skills.columnReward === "function") ? (skills.columnReward("defense").value || 0) : 0;
         const columnSlap = (typeof skills.columnReward === "function") ? (skills.columnReward("offense").value || 0) : 0;
-        const denseAud = (gc.baseAudInner + engine.getCloneFoundationAudFlat() + (cardEff.baseAudFlat || 0) + columnAud) * densMult * engine.getContemplateSturdinessMult();
+        const denseAud = (gc.baseAudInner + engine.getCloneFoundationAudFlat() + (cardEff.baseAudFlat || 0) + columnAud) * densMult * Math.pow(1.1, resortHelper.getContemplateSturdinessBought());
         const denseSlap = (gc.baseSlapDamage + (cardEff.baseSlapFlat || 0) + columnSlap) * densMult;
         const conMult = 1 + totalCon / div;
         const bravadoMult = skills.getSkillEffect("bravado").maxAudMultiplier || 1;

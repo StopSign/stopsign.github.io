@@ -1015,7 +1015,7 @@ var resortData = {
                         if (idx === undefined || idx === null) {
                             return false;
                         }
-                        if (!engine.isGrowHardwoodBought() || !engine.isPathSegmentAccessible(idx)) {
+                        if (!resortHelper.isGrowHardwoodBought() || !engine.isPathSegmentAccessible(idx)) {
                             return false;
                         }
                         const seg = engine.getPathSegmentData(idx);
@@ -1039,7 +1039,7 @@ var resortData = {
                     },
                     rowVisible: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
-                        if (idx === undefined || idx === null || !engine.isGrowHardwoodBought()) {
+                        if (idx === undefined || idx === null || !resortHelper.isGrowHardwoodBought()) {
                             return false;
                         }
                         return engine.getNextPathUpgradeKey(idx) === "reinforcedStairs";
@@ -1087,8 +1087,7 @@ var resortData = {
                     },
                     canBuy: function() {
                         const rh = data.progress.base.foxDen;
-                        const torii = data.progress.base.torii;
-                        return !!(rh && rh.unlocks && rh.unlocks.torii) && (torii.callForAllyBought || 0) < 8;
+                        return !!(rh && rh.unlocks && rh.unlocks.torii);
                     },
                     onBuy: function() {
                         data.progress.base.torii.callForAllyBought = (data.progress.base.torii.callForAllyBought || 0) + 1;
@@ -1115,16 +1114,13 @@ var resortData = {
                     },
                     canBuy: function() {
                         const rh = data.progress.base.foxDen;
-                        const torii = data.progress.base.torii;
-                        const max = engine.getNurturePlantSpiritMax();
-                        return !!(rh && rh.unlocks && rh.unlocks.inn)
-                            && (torii.plantSpiritsBought || 0) < max;
+                        return !!(rh && rh.unlocks && rh.unlocks.inn);
                     },
                     onBuy: function() {
                         engine.assemblePlantSpiritFromPurchase();
                     },
                     getMaxPurchases: function() {
-                        return engine.getNurturePlantSpiritMax();
+                        return resortHelper.getNurturePlantSpiritMax();
                     },
                     soldOutButtonLabel: "Max spirits"
                 },
@@ -1144,8 +1140,7 @@ var resortData = {
                     maxPurchases: 3,
                     canBuy: function() {
                         const torii = data.progress.base.torii;
-                        const bought = torii.queuePostsBought || 0;
-                        return !!(torii && torii.enticingLightsUnlocked) && bought < 3;
+                        return !!(torii && torii.enticingLightsUnlocked);
                     },
                     onBuy: function() {
                         const torii = data.progress.base.torii;
@@ -1168,10 +1163,10 @@ var resortData = {
                     },
                     canBuy: function() {
                         const torii = data.progress.base.torii;
-                        return engine.isGrowHardwoodBought() && ((torii && torii.addBenchesBought) || 0) < 1;
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const torii = data.progress.base.torii;
@@ -1215,8 +1210,7 @@ var resortData = {
                         return (data.progress.base.torii && data.progress.base.torii.shinyServiceBought) || 0;
                     },
                     canBuy: function() {
-                        const torii = data.progress.base.torii;
-                        return !!engine.isPondBuiltFromFoxDen() && ((torii && torii.shinyServiceBought) || 0) < 4;
+                        return !!engine.isPondBuiltFromFoxDen();
                     },
                     onBuy: function() {
                         const torii = data.progress.base.torii;
@@ -1313,9 +1307,6 @@ var resortData = {
                     description: "Reveal the Bonfire worker area so Kitsune and the Okami can be assigned to burn wood for mana regen.",
                     cost: { mana: 5000, coins: 1000 },
                     weavingTime: 120,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.tendTheFlameUnlocked;
-                    },
                     onBuy: function() {
                         data.progress.base.bonfire.tendTheFlameUnlocked = true;
                     },
@@ -1336,9 +1327,6 @@ var resortData = {
                         return { stone: 40000, essence: 20000 };
                     },
                     weavingTime: 8000,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.kilnBuilt;
-                    },
                     onBuy: function() {
                         engine.completeBuildKiln();
                     },
@@ -1353,9 +1341,6 @@ var resortData = {
                     description: "Automatically try again after death if you can afford the clone mana cost. Stops after it cannot start a clone again.",
                     cost: { starBeads: 600, coins: 50 },
                     weavingTime: 60,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.autoRetryUnlocked;
-                    },
                     onBuy: function() {
                         const b = data.progress.base.bonfire;
                         b.autoRetryUnlocked = true;
@@ -1378,9 +1363,6 @@ var resortData = {
                     description: "Unlock clone density. Each density level adds 500 mana to the clone's base cost and +10% base Aud and ego damage.",
                     cost: { mana: 3000, starBeads: 2500 },
                     weavingTime: 120,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.denseClonesUnlocked;
-                    },
                     onBuy: function() {
                         data.progress.base.bonfire.denseClonesUnlocked = true;
                     },
@@ -1440,9 +1422,6 @@ var resortData = {
                     description: "Clones gain exp and levels, which give stats. 1% of clone's exp transfers to Okami on death.",
                     cost: { starBeads: 1000, coins: 100 },
                     weavingTime: 60,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.growthBlessingUnlocked;
-                    },
                     onBuy: function() {
                         data.progress.base.bonfire.growthBlessingUnlocked = true;
                     },
@@ -1490,9 +1469,7 @@ var resortData = {
                         return data.progress.base.bonfire.stokeFireSpiritBought || 0;
                     },
                     canBuy: function() {
-                        const bf = data.progress.base.bonfire;
-                        const n = bf && bf.stokeFireSpiritBought ? bf.stokeFireSpiritBought : 0;
-                        return engine.isAtelierForgeBuilt() && n < 2;
+                        return engine.isAtelierForgeBuilt();
                     },
                     onBuy: function() {
                         const bf = data.progress.base.bonfire;
@@ -1508,9 +1485,6 @@ var resortData = {
                     description: "Adds an option to automatically retry creating a clone with the same clone settings whenever mana is full.",
                     cost: { mana: 2000, starBeads: 1000 },
                     weavingTime: 60,
-                    canBuy: function() {
-                        return !data.progress.base.bonfire.startWithFullManaUnlocked;
-                    },
                     onBuy: function() {
                         const b = data.progress.base.bonfire;
                         b.startWithFullManaUnlocked = true;
@@ -1537,10 +1511,10 @@ var resortData = {
                         return (data.progress.base.bonfire && data.progress.base.bonfire.buildUponCloneFoundationBought) || 0;
                     },
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const b = data.progress.base.bonfire;
@@ -1567,10 +1541,10 @@ var resortData = {
                         return (data.progress.base.bonfire && data.progress.base.bonfire.contemplateSturdinessBought) || 0;
                     },
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const b = data.progress.base.bonfire;
@@ -1653,8 +1627,8 @@ var resortData = {
                     extraInfo: function() {
                         const n = data.progress.base.bambooForest.infuseSoilBought || 0;
                         const nextAdd = 20 + n * 5;
-                        const pct = Math.round((engine.getBambooInfuseSoilMultiplier() - 1) * 100);
-                        return `Total chips: +${pct}% (x${round2(engine.getBambooInfuseSoilMultiplier())}). Next: +${nextAdd}%`;
+                        const pct = Math.round((resortHelper.getBambooInfuseSoilMultiplier() - 1) * 100);
+                        return `Total chips: +${pct}% (x${round2(resortHelper.getBambooInfuseSoilMultiplier())}). Next: +${nextAdd}%`;
                     },
                 },
                 echoedAxe: {
@@ -1662,30 +1636,30 @@ var resortData = {
                     name: "Echoed Axes",
                     description: "Each purchase multiplies chop power by x1.5. Chop power is rounded up.",
                     getCost: function() {
-                        const n = engine.getEchoedAxeBought();
+                        const n = resortHelper.getEchoedAxeBought();
                         return { stone: Math.round(20 * Math.pow(1000, n)), mana:n*100000 };
                     },
                     weavingTime: 20,
                     weavingTimeIncrease: 30,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getEchoedAxeBought();
+                        return resortHelper.getEchoedAxeBought();
                     },
                     maxPurchases: 2,
                     canBuy: function() {
-                        return engine.isAxeEchoesBought() && engine.getEchoedAxeBought() < 2;
+                        return resortHelper.isAxeEchoesBought();
                     },
                     onBuy: function() {
-                        data.progress.base.bambooForest.echoedAxeBought = engine.getEchoedAxeBought() + 1;
+                        data.progress.base.bambooForest.echoedAxeBought = resortHelper.getEchoedAxeBought() + 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getEchoedAxeBought();
+                        const n = resortHelper.getEchoedAxeBought();
                         return `Chop power: x${round2(Math.pow(1.5, n))}`;
                     },
                     rowVisible: function() {
-                        return engine.isAxeEchoesBought();
+                        return resortHelper.isAxeEchoesBought();
                     },
                     upgradeSoldOut: function() {
-                        return engine.getEchoedAxeBought() >= 2;
+                        return resortHelper.getEchoedAxeBought() >= 2;
                     },
                     soldOutButtonLabel: "Max echoes"
                 },
@@ -1697,16 +1671,16 @@ var resortData = {
                     weavingTime: 300,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return engine.isHardenBambooBought() && !engine.isGrowHardwoodBought();
+                        return resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isHardenBambooBought() && !engine.isGrowHardwoodBought();
+                        return resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         data.progress.base.bambooForest.growHardwoodBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     soldOutButtonLabel: "Hardwood growing"
                 }
@@ -1753,8 +1727,7 @@ var resortData = {
                         return data.progress.base.cistern.capacityBought || 0;
                     },
                     canBuy: function() {
-                        return (engine.isInnOnsenConverted() || engine.isToriiDrinkingBowlUnlocked())
-                            && (data.progress.base.cistern.capacityBought || 0) < 99;
+                        return (engine.isInnOnsenConverted() || engine.isToriiDrinkingBowlUnlocked());
                     },
                     onBuy: function() {
                         data.progress.base.cistern.capacityBought = (data.progress.base.cistern.capacityBought || 0) + 1;
@@ -1788,8 +1761,7 @@ var resortData = {
                         return data.progress.base.cistern.reinforceToriiCapacityBought || 0;
                     },
                     canBuy: function() {
-                        return engine.isToriiDrinkingBowlUnlocked()
-                            && (data.progress.base.cistern.reinforceToriiCapacityBought || 0) < 4;
+                        return engine.isToriiDrinkingBowlUnlocked();
                     },
                     onBuy: function() {
                         data.progress.base.cistern.reinforceToriiCapacityBought =
@@ -1820,8 +1792,7 @@ var resortData = {
                         return data.progress.base.cistern.reinforceOnsenCapacityBought || 0;
                     },
                     canBuy: function() {
-                        return engine.isInnOnsenConverted()
-                            && (data.progress.base.cistern.reinforceOnsenCapacityBought || 0) < 4;
+                        return engine.isInnOnsenConverted();
                     },
                     onBuy: function() {
                         data.progress.base.cistern.reinforceOnsenCapacityBought =
@@ -1852,8 +1823,7 @@ var resortData = {
                         return data.progress.base.cistern.reinforceNoodleCapacityBought || 0;
                     },
                     canBuy: function() {
-                        return engine.isNoodleBarBuilt()
-                            && (data.progress.base.cistern.reinforceNoodleCapacityBought || 0) < 4;
+                        return engine.isNoodleBarBuilt();
                     },
                     onBuy: function() {
                         data.progress.base.cistern.reinforceNoodleCapacityBought =
@@ -1909,8 +1879,7 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return engine.getLegendsWritten() >= 1
-                            && (data.progress.base.cistern.growPlantSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("plant")) {
@@ -1931,8 +1900,7 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return engine.getLegendsWritten() >= 1
-                            && (data.progress.base.cistern.condenseWaterSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("water")) {
@@ -1953,8 +1921,7 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return engine.getLegendsWritten() >= 1
-                            && (data.progress.base.cistern.raiseEarthSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("earth")) {
@@ -1975,9 +1942,7 @@ var resortData = {
                     cost: { essence: 100000 },
                     weavingTime: 5000,
                     canBuy: function() {
-                        return engine.getLegendsWritten() >= 1
-                            && engine.getFireLauncherBuiltCount() >= 1
-                            && (data.progress.base.cistern.spinFireSpiritBought || 0) < 1;
+                        return engine.getLegendsWritten() >= 1 && engine.getFireLauncherBuiltCount() >= 1;
                     },
                     onBuy: function() {
                         if (engine.assembleExtraSpirit("fire")) {
@@ -2012,7 +1977,8 @@ var resortData = {
                         cistern.energeticDropletsBought = (cistern.energeticDropletsBought || 0) + 1;
                     },
                     extraInfo: function() {
-                        const mult = engine.getEnergeticDropletsMultiplier();
+                        const bought = (data.progress.base.cistern && data.progress.base.cistern.energeticDropletsBought) || 0;
+                        const mult = Math.pow(1.5, bought);
                         return `Droplet volume: x${mult}`;
                     }
                 }
@@ -2048,9 +2014,7 @@ var resortData = {
                         return data.progress.base.pond.wishingWellBought || 0;
                     },
                     canBuy: function() {
-                        const pond = data.progress.base.pond;
-                        const bought = pond.wishingWellBought || 0;
-                        return engine.isPondBuiltFromFoxDen() && bought < 2;
+                        return engine.isPondBuiltFromFoxDen();
                     },
                     onBuy: function() {
                         const pond = data.progress.base.pond;
@@ -2080,11 +2044,10 @@ var resortData = {
                         return (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
                     },
                     canBuy: function() {
-                        const bought = (data.progress.base.pond && data.progress.base.pond.wetlandBoardwalkBought) || 0;
-                        return engine.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen() && bought < 4;
+                        return resortHelper.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen();
+                        return resortHelper.isGrowHardwoodBought() && engine.isPondBuiltFromFoxDen();
                     },
                     onBuy: function() {
                         const pond = data.progress.base.pond;
@@ -2117,15 +2080,11 @@ var resortData = {
                         const bought = data.progress.base.hiddenSpring.earthSpiritsBought || 0;
                         return { starBeads: 500 * Math.pow(10, bought) };
                     },
-                    canBuy: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.earthSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax());
-                    },
                     onBuy: function() {
                         engine.assembleSpiritFromPurchase("earth");
                     },
                     getMaxPurchases: function() {
-                        return engine.getHiddenSpringSpiritSlotMax();
+                        return resortHelper.getHiddenSpringSpiritSlotMax();
                     },
                     soldOutButtonLabel: "Max assembled"
                 },
@@ -2143,9 +2102,7 @@ var resortData = {
                         return data.progress.base.hiddenSpring.pebbleCapacityBought || 0;
                     },
                     canBuy: function() {
-                        const hs = data.progress.base.hiddenSpring;
-                        return engine.hasFirstEarthSpirit()
-                            && (hs.pebbleCapacityBought || 0) < 2;
+                        return engine.hasFirstEarthSpirit();
                     },
                     onBuy: function() {
                         data.progress.base.hiddenSpring.pebbleCapacityBought =
@@ -2156,7 +2113,7 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
-                        const max = engine.getEarthSpiritPebbleMax();
+                        const max = resortHelper.getEarthSpiritPebbleMax();
                         return `Pebble capacity: ${max}`;
                     },
                 },
@@ -2199,14 +2156,13 @@ var resortData = {
                             return false;
                         }
                         const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.waterSpiritsBought || 0) < engine.getHiddenSpringSpiritSlotMax()
-                            && engine.findSpiritPlacementSlot("water"));
+                        return !!(hs && engine.findSpiritPlacementSlot("water"));
                     },
                     onBuy: function() {
                         engine.assembleSpiritFromPurchase("water");
                     },
                     getMaxPurchases: function() {
-                        return engine.getHiddenSpringSpiritSlotMax();
+                        return resortHelper.getHiddenSpringSpiritSlotMax();
                     },
                     soldOutButtonLabel: "Max gathered"
                 },
@@ -2225,8 +2181,7 @@ var resortData = {
                     },
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return !!(hs && (hs.waterSpiritsBought || 0) >= 1
-                            && (hs.carryingCapacityBought || 0) < 4);
+                        return !!(hs && (hs.waterSpiritsBought || 0) >= 1);
                     },
                     onBuy: function() {
                         data.progress.base.hiddenSpring.carryingCapacityBought =
@@ -2237,7 +2192,9 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Max capacity",
                     extraInfo: function() {
-                        const mult = engine.getWaterDropletCapacityMultiplier();
+                        const hs = data.progress.base && data.progress.base.hiddenSpring;
+                        const bought = hs ? (hs.carryingCapacityBought || 0) : 0;
+                        const mult = Math.pow(1.5, bought);
                         return `Droplet capacity: x${mult}`;
                     },
                 },
@@ -2280,7 +2237,6 @@ var resortData = {
                         const hs = data.progress.base.hiddenSpring;
                         return !!(hs && hs.bringOreToAtelierUnlocked
                             && (engine.isAtelierForgeBuilt() || engine.isBonfireTendTheFlameUnlocked())
-                            && (hs.fireSpiritsBought || 0) < 4
                             && engine.findSpiritPlacementSlot("fire"));
                     },
                     onBuy: function() {
@@ -2339,26 +2295,26 @@ var resortData = {
                     name: "Pebble Pay",
                     description: "Earth spirits pack their pebbles tighter. Each purchase raises a pebble's carry capacity by 20%, rounded up.",
                     getCost: function() {
-                        const n = engine.getPebblePayBought();
+                        const n = resortHelper.getPebblePayBought();
                         return { coins: Math.round(4000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 240,
                     weavingTimeIncreaseAdd: 120,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getPebblePayBought();
+                        return resortHelper.getPebblePayBought();
                     },
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2) && engine.getPebblePayBought() < 10;
+                        return !!((hs && hs.earthSpiritsBought) >= 2);
                     },
                     onBuy: function() {
-                        data.progress.base.mine.pebblePayBought = engine.getPebblePayBought() + 1;
+                        data.progress.base.mine.pebblePayBought = resortHelper.getPebblePayBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Pebble stone and ore: +${engine.getPebblePayBought() * 20}%`;
+                        return `Pebble stone and ore: +${resortHelper.getPebblePayBought() * 20}%`;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getPebblePayBought() >= 10;
+                        return resortHelper.getPebblePayBought() >= 10;
                     },
                     soldOutButtonLabel: "Max pay"
                 },
@@ -2367,27 +2323,26 @@ var resortData = {
                     name: "Mineshaft Beams",
                     description: "Timber bracing in the mine. Earth spirits assigned there gain +20% spirit power per purchase.",
                     getCost: function() {
-                        const n = engine.getMineshaftBeamsBought();
+                        const n = resortHelper.getMineshaftBeamsBought();
                         return { wood: Math.round(200 * Math.pow(1.5, n)), coins: Math.round(2000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 240,
                     weavingTimeIncreaseAdd: 120,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getMineshaftBeamsBought();
+                        return resortHelper.getMineshaftBeamsBought();
                     },
                     canBuy: function() {
                         const hs = data.progress.base.hiddenSpring;
-                        return !!((hs && hs.earthSpiritsBought) >= 2)
-                            && engine.getMineshaftBeamsBought() < 5;
+                        return !!((hs && hs.earthSpiritsBought) >= 2);
                     },
                     onBuy: function() {
-                        data.progress.base.mine.mineshaftBeamsBought = engine.getMineshaftBeamsBought() + 1;
+                        data.progress.base.mine.mineshaftBeamsBought = resortHelper.getMineshaftBeamsBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Mine spirit power: +${engine.getMineshaftBeamsBought() * 20}%`;
+                        return `Mine spirit power: +${resortHelper.getMineshaftBeamsBought() * 20}%`;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getMineshaftBeamsBought() >= 5;
+                        return resortHelper.getMineshaftBeamsBought() >= 5;
                     },
                     soldOutButtonLabel: "Max beams"
                 },
@@ -2396,7 +2351,7 @@ var resortData = {
                     name: "Form Play Pit",
                     description: "Shape a play pit in the mine. Earth spirits consume more dirt each play cycle. The first purchase adds +20%. Each further purchase adds 5% more than the last.",
                     getCost: function() {
-                        const n = engine.getPlayPitBought();
+                        const n = resortHelper.getPlayPitBought();
                         const mult = Math.pow(1.5, n);
                         return {
                             mana: Math.round(10000 * mult),
@@ -2406,19 +2361,19 @@ var resortData = {
                     weavingTime: 120,
                     weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getPlayPitBought();
+                        return resortHelper.getPlayPitBought();
                     },
                     canBuy: function() {
                         return engine.isManaUnlocked();
                     },
                     onBuy: function() {
-                        data.progress.base.mine.playPitBought = engine.getPlayPitBought() + 1;
+                        data.progress.base.mine.playPitBought = resortHelper.getPlayPitBought() + 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getPlayPitBought();
+                        const n = resortHelper.getPlayPitBought();
                         const nextAdd = 20 + n * 5;
-                        const pct = Math.round((engine.getPlayPitDirtMultiplier() - 1) * 100);
-                        return `Dirt per play: +${pct}% (x${round2(engine.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
+                        const pct = Math.round((resortHelper.getPlayPitDirtMultiplier() - 1) * 100);
+                        return `Dirt per play: +${pct}% (x${round2(resortHelper.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
                     },
                 }
             }
@@ -2467,14 +2422,11 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.inn.furnitureBought || 0;
                     },
-                    canBuy: function() {
-                        return (data.progress.base.inn.furnitureBought || 0) < engine.getInnFurnitureMaxPurchases();
-                    },
                     onBuy: function() {
                         data.progress.base.inn.furnitureBought = (data.progress.base.inn.furnitureBought || 0) + 1;
                     },
                     getMaxPurchases: function() {
-                        return engine.getInnFurnitureAbsoluteMaxPurchases();
+                        return 5 + (data.progress.base.inn.reinforceJointsBought || 0);
                     },
                     soldOutButtonLabel: "Max furniture",
                 },
@@ -2490,9 +2442,6 @@ var resortData = {
                     weavingTimeIncrease: 2,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.inn.decorationBought;
-                    },
-                    canBuy: function() {
-                        return data.progress.base.inn.decorationBought < 4;
                     },
                     onBuy: function() {
                         data.progress.base.inn.decorationBought++;
@@ -2514,15 +2463,14 @@ var resortData = {
                         return data.progress.base.inn.addRoomBought || 0;
                     },
                     canBuy: function() {
-                        return engine.isInnOnsenConverted()
-                            && (data.progress.base.inn.addRoomBought || 0) < engine.getInnAddRoomMaxPurchases();
+                        return engine.isInnOnsenConverted();
                     },
                     onBuy: function() {
                         data.progress.base.inn.addRoomBought = (data.progress.base.inn.addRoomBought || 0) + 1;
                         engine.syncInnRoomCounts();
                     },
                     getMaxPurchases: function() {
-                        return engine.getInnAddRoomAbsoluteMaxPurchases();
+                        return 2 + (data.progress.base.inn.reinforceJointsBought || 0);
                     },
                     soldOutButtonLabel: "Max rooms",
                 },
@@ -2546,9 +2494,8 @@ var resortData = {
                     },
                     canBuy: function() {
                         const inn = data.progress.base.inn;
-                        return engine.isGrowHardwoodBought()
-                            && (inn.reinforceJointsBought || 0) > 0
-                            && (inn.secondFloorRoomsBought || 0) < engine.getInnSecondFloorRoomsMaxPurchases();
+                        return resortHelper.isGrowHardwoodBought()
+                            && (inn.reinforceJointsBought || 0) > 0;
                     },
                     onBuy: function() {
                         data.progress.base.inn.secondFloorRoomsBought = (data.progress.base.inn.secondFloorRoomsBought || 0) + 1;
@@ -2556,10 +2503,10 @@ var resortData = {
                     },
                     rowVisible: function() {
                         const inn = data.progress.base.inn;
-                        return engine.isGrowHardwoodBought() && (inn.reinforceJointsBought || 0) > 0;
+                        return resortHelper.isGrowHardwoodBought() && (inn.reinforceJointsBought || 0) > 0;
                     },
                     getMaxPurchases: function() {
-                        return engine.getInnSecondFloorRoomsAbsoluteMaxPurchases();
+                        return (data.progress.base.inn.reinforceJointsBought || 0);
                     },
                     soldOutButtonLabel: "Max rooms",
                 },
@@ -2600,15 +2547,12 @@ var resortData = {
                     },
                     canBuy: function() {
                         const inn = data.progress.base.inn;
-                        return !!(inn && inn.onsenConverted && engine.isAtelierForgeBuilt())
-                            && (inn.reinforceJointsBought || 0) < engine.getInnReinforceJointsMaxPurchases();
+                        return !!(inn && inn.onsenConverted && engine.isAtelierForgeBuilt());
                     },
                     onBuy: function() {
                         data.progress.base.inn.reinforceJointsBought = (data.progress.base.inn.reinforceJointsBought || 0) + 1;
                     },
-                    getMaxPurchases: function() {
-                        return engine.getInnReinforceJointsMaxPurchases();
-                    },
+                    maxPurchases: 3,
                     soldOutButtonLabel: "Max reinforced",
                 },
                 convertToOnsen: {
@@ -2667,7 +2611,7 @@ var resortData = {
                     },
                     canBuy: function() {
                         const inn = data.progress.base.inn;
-                        return !!(inn && inn.gentleLightsUnlocked && (inn.shapedLampsBought || 0) < 3);
+                        return !!(inn && inn.gentleLightsUnlocked);
                     },
                     onBuy: function() {
                         const inn = data.progress.base.inn;
@@ -2753,14 +2697,13 @@ var resortData = {
                         return data.progress.base.scrollArchives.collectShardsLevel || 0;
                     },
                     canBuy: function() {
-                        const level = data.progress.base.scrollArchives.collectShardsLevel || 0;
-                        return !!(data.progress && data.progress.showBattle) && level < engine.getCollectShardsMax();
+                        return !!(data.progress && data.progress.showBattle);
                     },
                     onBuy: function() {
                         data.progress.base.scrollArchives.collectShardsLevel = (data.progress.base.scrollArchives.collectShardsLevel || 0) + 1;
                     },
                     getMaxPurchases: function() {
-                        return engine.getCollectShardsMax();
+                        return resortHelper.getCollectShardsMax();
                     },
                     extraInfo: function() {
                         const lv = data.progress.base.scrollArchives.collectShardsLevel || 0;
@@ -2775,25 +2718,25 @@ var resortData = {
                     name: "Sturdy Shelves",
                     description: "Each purchase multiplies all scribing output by x1.3.",
                     getCost: function() {
-                        const n = engine.getSturdyShelvesBought();
+                        const n = resortHelper.getSturdyShelvesBought();
                         return { hardwood: Math.round(50 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 200,
                     weavingTimeIncrease: 1.4,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getSturdyShelvesBought();
+                        return resortHelper.getSturdyShelvesBought();
                     },
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
-                        data.progress.base.scrollArchives.sturdyShelvesBought = engine.getSturdyShelvesBought() + 1;
+                        data.progress.base.scrollArchives.sturdyShelvesBought = resortHelper.getSturdyShelvesBought() + 1;
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     extraInfo: function() {
-                        const n = engine.getSturdyShelvesBought();
+                        const n = resortHelper.getSturdyShelvesBought();
                         return `Scribing output: x${round2(Math.pow(1.3, n))}`;
                     }
                 },
@@ -2815,11 +2758,10 @@ var resortData = {
                         return (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
                     },
                     canBuy: function() {
-                        const n = (data.progress.base.scrollArchives && data.progress.base.scrollArchives.workspaceFurnitureBought) || 0;
-                        return engine.isGrowHardwoodBought() && n < 6;
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const lib = data.progress.base.scrollArchives;
@@ -2836,27 +2778,27 @@ var resortData = {
                     name: "Infuse Scribings",
                     description: "Each purchase multiplies Scribings gained by x1.5.",
                     getCost: function() {
-                        const n = engine.getInfuseScribingsBought();
+                        const n = resortHelper.getInfuseScribingsBought();
                         return { mana: Math.round(5000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 100,
                     weavingTimeIncrease: 1.2,
                     roundWeavingTime: true,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getInfuseScribingsBought();
+                        return resortHelper.getInfuseScribingsBought();
                     },
                     canBuy: function() {
-                        return engine.isScribingInfusionsBought();
+                        return resortHelper.isScribingInfusionsBought();
                     },
                     rowVisible: function() {
-                        return engine.isScribingInfusionsBought();
+                        return resortHelper.isScribingInfusionsBought();
                     },
                     onBuy: function() {
                         const lib = data.progress.base.scrollArchives;
-                        lib.infuseScribingsBought = engine.getInfuseScribingsBought() + 1;
+                        lib.infuseScribingsBought = resortHelper.getInfuseScribingsBought() + 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getInfuseScribingsBought();
+                        const n = resortHelper.getInfuseScribingsBought();
                         return `Strokes output: x${round2(Math.pow(1.5, n))}`;
                     }
                 }
@@ -2922,8 +2864,9 @@ var resortData = {
                         return true;
                     },
                     onBuy: function() {
-                        const oldMult = engine.getMagicLoomSpiritStrandMultiplier();
-                        const newMult = oldMult * 1.1;
+                        const n = data.progress.base.atelier.magicLoomsBought || 0;
+                        const oldMult = Math.pow(1.1, n);
+                        const newMult = Math.pow(1.1, n + 1);
                         engine.applySpiritStrandMultiplierToWeavingTimers(oldMult, newMult);
                         data.progress.base.atelier.magicLoomsBought = (data.progress.base.atelier.magicLoomsBought || 0) + 1;
                     },
@@ -2937,7 +2880,7 @@ var resortData = {
                     key: "add_forge",
                     name: "Add Forge",
                     description: function() {
-                        const n = engine.getLargerForgeBought();
+                        const n = resortHelper.getLargerForgeBought();
                         if (n > 0) {
                             const mult = round2(1 + 0.5 * n);
                             return `Build a forge below the Atelier where fire spirits smelt ceil(√spirit power x ${mult}) ore into bars every 60s, gaining exp equal to bars x 3. Requires Fire Spirit to work.`;
@@ -2965,20 +2908,20 @@ var resortData = {
                     name: "Larger Forge",
                     description: "Widen the forge so fire spirits smelt more ore. Each purchase raises the batch by 50%, rounded up.",
                     getCost: function() {
-                        const n = engine.getLargerForgeBought();
+                        const n = resortHelper.getLargerForgeBought();
                         return { stone: Math.round(4000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 800,
                     weavingTimeIncreaseAdd: 800,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getLargerForgeBought();
+                        return resortHelper.getLargerForgeBought();
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isForgingInstructionsBought() && engine.getLargerForgeBought() < 4;
+                        return resortHelper.isForgingInstructionsBought();
                     },
                     onBuy: function() {
-                        data.progress.base.atelier.largerForgeBought = engine.getLargerForgeBought() + 1;
+                        data.progress.base.atelier.largerForgeBought = resortHelper.getLargerForgeBought() + 1;
                     },
                     soldOutButtonLabel: "Max forge"
                 },
@@ -2999,7 +2942,7 @@ var resortData = {
                     canBuy: function() {
                         const a = data.progress.base.atelier;
                         const n = a && a.fireLaunchersBought ? a.fireLaunchersBought : 0;
-                        return !!(engine.isInnOnsenConverted() && n < 3);
+                        return !!(engine.isInnOnsenConverted());
                     },
                     onBuy: function() {
                         const a = data.progress.base.atelier;
@@ -3045,10 +2988,6 @@ var resortData = {
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.organizeOrdersBought || 0;
                     },
-                    canBuy: function() {
-                        const n = data.progress.base.atelier.organizeOrdersBought || 0;
-                        return n < 3;
-                    },
                     onBuy: function() {
                         data.progress.base.atelier.organizeOrdersBought = (data.progress.base.atelier.organizeOrdersBought || 0) + 1;
                     },
@@ -3069,8 +3008,7 @@ var resortData = {
                     maxPurchases: 9,
                     canBuy: function() {
                         const garden = data.progress.base && data.progress.base.garden;
-                        const n = data.progress.base.atelier.manaStorageCharmsBought || 0;
-                        return !!(garden && garden.arrangementOfManaOrdersUnlocked) && n < 9;
+                        return !!(garden && garden.arrangementOfManaOrdersUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.atelier.manaStorageCharmsBought = (data.progress.base.atelier.manaStorageCharmsBought || 0) + 1;
@@ -3125,8 +3063,7 @@ var resortData = {
                         return data.progress.base.atelier.bucketsBought || 0;
                     },
                     canBuy: function() {
-                        return engine.isInnOnsenConverted()
-                            && (data.progress.base.atelier.bucketsBought || 0) < 4;
+                        return engine.isInnOnsenConverted();
                     },
                     onBuy: function() {
                         data.progress.base.atelier.bucketsBought = (data.progress.base.atelier.bucketsBought || 0) + 1;
@@ -3149,9 +3086,6 @@ var resortData = {
                     weavingTimeIncreaseAdd: 45,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.betterAxesBought || 0;
-                    },
-                    canBuy: function() {
-                        return (data.progress.base.atelier.betterAxesBought || 0) < 6;
                     },
                     onBuy: function() {
                         data.progress.base.atelier.betterAxesBought = (data.progress.base.atelier.betterAxesBought || 0) + 1;
@@ -3249,8 +3183,7 @@ var resortData = {
                         return data.progress.base.atelier.improveDirtRoadsBought || 0;
                     },
                     canBuy: function() {
-                        return !!(data.progress.base.atelier && data.progress.base.atelier.sprinkleOreOnRoadsBought)
-                            && (data.progress.base.atelier.improveDirtRoadsBought || 0) < 5;
+                        return !!(data.progress.base.atelier && data.progress.base.atelier.sprinkleOreOnRoadsBought);
                     },
                     onBuy: function() {
                         const a = data.progress.base.atelier;
@@ -3904,7 +3837,7 @@ var resortData = {
                     weavingTime: 300,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 4;
+                        return resortHelper.getArtAppreciationBought() >= 4;
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfSpelunkingUnlocked = true;
@@ -3927,7 +3860,7 @@ var resortData = {
                     weavingTime: 120,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 3;
+                        return resortHelper.getArtAppreciationBought() >= 3;
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfSelfSufficiencyUnlocked = true;
@@ -3950,7 +3883,7 @@ var resortData = {
                     weavingTime: 90,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 1;
+                        return resortHelper.getArtAppreciationBought() >= 1;
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfOrbGrowthUnlocked = true;
@@ -3973,7 +3906,7 @@ var resortData = {
                     weavingTime: 90,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.getArtAppreciationBought() >= 2;
+                        return resortHelper.getArtAppreciationBought() >= 2;
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfManaCurrentsUnlocked = true;
@@ -4018,7 +3951,7 @@ var resortData = {
                     weavingTime: 1000,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.isResourceProtectionBought() && !(g && g.arrangementOfResourceProtectionUnlocked);
+                        return resortHelper.isResourceProtectionBought() && !(g && g.arrangementOfResourceProtectionUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfResourceProtectionUnlocked = true;
@@ -4037,7 +3970,7 @@ var resortData = {
                     weavingTime: 400,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return engine.isSkyAppreciationBought() && !(g && g.arrangementOfNavigationUnlocked);
+                        return resortHelper.isSkyAppreciationBought() && !(g && g.arrangementOfNavigationUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfNavigationUnlocked = true;
@@ -4141,30 +4074,30 @@ var resortData = {
                     name: "Echoed Shelving",
                     description: "Each purchase multiplies stone a pebble or the Okami delivers to the Stone Pile by x1.25. Stone received is rounded up. Ore and the duplicator are unchanged.",
                     getCost: function() {
-                        const n = engine.getEchoedShelvingBought();
+                        const n = resortHelper.getEchoedShelvingBought();
                         return { wood: Math.round(20 * Math.pow(1000, n)), mana:n*100000 };
                     },
                     weavingTime: 20,
                     weavingTimeIncrease: 30,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getEchoedShelvingBought();
+                        return resortHelper.getEchoedShelvingBought();
                     },
                     maxPurchases: 2,
                     canBuy: function() {
-                        return engine.isShelvingEchoesBought() && engine.getEchoedShelvingBought() < 2;
+                        return resortHelper.isShelvingEchoesBought();
                     },
                     onBuy: function() {
-                        data.progress.base.stonePile.echoedShelvingBought = engine.getEchoedShelvingBought() + 1;
+                        data.progress.base.stonePile.echoedShelvingBought = resortHelper.getEchoedShelvingBought() + 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getEchoedShelvingBought();
+                        const n = resortHelper.getEchoedShelvingBought();
                         return `Stone delivered: x${round2(Math.pow(1.25, n))}`;
                     },
                     rowVisible: function() {
-                        return engine.isShelvingEchoesBought();
+                        return resortHelper.isShelvingEchoesBought();
                     },
                     upgradeSoldOut: function() {
-                        return engine.getEchoedShelvingBought() >= 2;
+                        return resortHelper.getEchoedShelvingBought() >= 2;
                     },
                     soldOutButtonLabel: "Max echoes"
                 },
@@ -4213,7 +4146,7 @@ var resortData = {
                     name: "Cross-Talk",
                     description: "When a tip is earned, there is a chance one of the other offered skills gains a tip too. +10% chance per purchase.",
                     getCost: function() {
-                        const n = engine.getNoodleCrossTalkBought();
+                        const n = resortHelper.getNoodleCrossTalkBought();
                         return {
                             coins: Math.round(80000 * Math.pow(2, n)),
                             starBeads: Math.round(80000 * Math.pow(2, n))
@@ -4223,17 +4156,14 @@ var resortData = {
                     weavingTimeIncreaseAdd: 300,
                     maxPurchases: 5,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getNoodleCrossTalkBought();
-                    },
-                    canBuy: function() {
-                        return engine.getNoodleCrossTalkBought() < 5;
+                        return resortHelper.getNoodleCrossTalkBought();
                     },
                     onBuy: function() {
                         const bar = data.progress.base.noodleBar;
-                        bar.crossTalkBought = engine.getNoodleCrossTalkBought() + 1;
+                        bar.crossTalkBought = resortHelper.getNoodleCrossTalkBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Chance: ${engine.getNoodleCrossTalkBought() * 10}%`;
+                        return `Chance: ${resortHelper.getNoodleCrossTalkBought() * 10}%`;
                     },
                     soldOutButtonLabel: "Max cross-talk"
                 },
@@ -4242,20 +4172,20 @@ var resortData = {
                     name: "Comfy Stools",
                     description: "Softer seats. Guests eating noodles gain +5 restfulness/s per purchase.",
                     getCost: function() {
-                        const n = engine.getNoodleComfyStoolsBought();
+                        const n = resortHelper.getNoodleComfyStoolsBought();
                         return { wood: Math.round(3000 * Math.pow(2, n)) };
                     },
                     weavingTime: 360,
                     weavingTimeIncreaseAdd: 180,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getNoodleComfyStoolsBought();
+                        return resortHelper.getNoodleComfyStoolsBought();
                     },
                     canBuy: function() {
                         return true;
                     },
                     onBuy: function() {
                         const bar = data.progress.base.noodleBar;
-                        bar.comfyStoolsBought = engine.getNoodleComfyStoolsBought() + 1;
+                        bar.comfyStoolsBought = resortHelper.getNoodleComfyStoolsBought() + 1;
                     },
                     extraInfo: function() {
                         return `Noodle restfulness: +${engine.getNoodleEatRestBonus()}/s`;
@@ -4266,27 +4196,27 @@ var resortData = {
                     name: "Sturdy Walls",
                     description: "Each purchase increases the time guests spend at the noodle bar by 2s.",
                     getCost: function() {
-                        const n = engine.getNoodleSturdyWallsBought();
+                        const n = resortHelper.getNoodleSturdyWallsBought();
                         return { hardwood: Math.round(4000 * Math.pow(1.5, n)), bars: Math.round(500 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 3000,
                     weavingTimeIncreaseAdd: 1500,
                     maxPurchases: 5,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getNoodleSturdyWallsBought();
+                        return resortHelper.getNoodleSturdyWallsBought();
                     },
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought() && engine.getNoodleSturdyWallsBought() < 4;
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const bar = data.progress.base.noodleBar;
-                        bar.sturdyWallsBought = engine.getNoodleSturdyWallsBought() + 1;
+                        bar.sturdyWallsBought = resortHelper.getNoodleSturdyWallsBought() + 1;
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     upgradeSoldOut: function() {
-                        return engine.getNoodleSturdyWallsBought() >= 4;
+                        return resortHelper.getNoodleSturdyWallsBought() >= 4;
                     },
                     soldOutButtonLabel: "Max walls",
                     extraInfo: function() {
@@ -4298,20 +4228,20 @@ var resortData = {
                     name: "Trophy Decorations",
                     description: "The walls do the talking. Each purchase halves the coin cost of changing conversation topics.",
                     getCost: function() {
-                        const n = engine.getNoodleTrophyDecorationsBought();
+                        const n = resortHelper.getNoodleTrophyDecorationsBought();
                         return { stone: Math.round(8000 * Math.pow(2, n)) };
                     },
                     weavingTime: 360,
                     weavingTimeIncreaseAdd: 180,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getNoodleTrophyDecorationsBought();
+                        return resortHelper.getNoodleTrophyDecorationsBought();
                     },
                     canBuy: function() {
                         return true;
                     },
                     onBuy: function() {
                         const bar = data.progress.base.noodleBar;
-                        bar.trophyDecorationsBought = engine.getNoodleTrophyDecorationsBought() + 1;
+                        bar.trophyDecorationsBought = resortHelper.getNoodleTrophyDecorationsBought() + 1;
                     },
                 }
             }
@@ -4376,38 +4306,38 @@ var resortData = {
                     name: "Mystical Gloves",
                     description: "Silk gloves that quicken a clone's hands. Each pair reduces created clones' slap cooldown by 100ms. Max buyable increases by 1 per Market Level.",
                     getCost: function() {
-                        const n = engine.getMarketMysticalGlovesBought();
+                        const n = resortHelper.getMarketMysticalGlovesBought();
                         return { credit: Math.round(10000 * Math.pow(10, n)) };
                     },
                     weavingTime: 240,
                     weavingTimeIncrease: 3,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getMarketMysticalGlovesBought();
+                        return resortHelper.getMarketMysticalGlovesBought();
                     },
+                    hardCap: 3,
                     getMaxPurchases: function() {
-                        return engine.getMarketMysticalGlovesMax();
+                        return Math.min(this.hardCap, 1 + engine.getMarketLevel());
                     },
-                    maxPurchases: 3,
                     canBuy: function() {
-                        return engine.getMarketMysticalGlovesBought() < engine.getMarketMysticalGlovesMax();
+                        return resortHelper.getMarketMysticalGlovesBought() < this.getMaxPurchases();
                     },
                     onBuy: function() {
                         const market = data.progress.base.market;
-                        market.mysticalGlovesBought = engine.getMarketMysticalGlovesBought() + 1;
+                        market.mysticalGlovesBought = resortHelper.getMarketMysticalGlovesBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Slap cooldown: -${engine.getMarketMysticalGlovesBought() * 100}ms`;
+                        return `Slap cooldown: -${resortHelper.getMarketMysticalGlovesBought() * 100}ms`;
                     },
                     rowVisible: function() {
                         return true;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getMarketMysticalGlovesBought() >= 3;
+                        return resortHelper.getMarketMysticalGlovesBought() >= this.hardCap;
                     },
                     soldOutButtonLabel: "Max gloves",
                     lockedLabel: function() {
-                        const bought = engine.getMarketMysticalGlovesBought();
-                        if (bought < engine.getMarketMysticalGlovesMax()) {
+                        const bought = resortHelper.getMarketMysticalGlovesBought();
+                        if (bought < this.getMaxPurchases()) {
                             return "";
                         }
                         return `Unlocks at Market level ${bought}`;
@@ -4418,38 +4348,38 @@ var resortData = {
                     name: "Anchoring Ring",
                     description: "A ring that anchors a clone's spirit. Each one grants created clones +1 Soul. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
-                        const n = engine.getMarketAnchoringRingBought();
+                        const n = resortHelper.getMarketAnchoringRingBought();
                         return { credit: Math.round(8000 * Math.pow(2, n)) };
                     },
                     weavingTime: 240,
                     weavingTimeIncrease: 1.5,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getMarketAnchoringRingBought();
+                        return resortHelper.getMarketAnchoringRingBought();
                     },
+                    hardCap: 12,
                     getMaxPurchases: function() {
-                        return engine.getMarketAnchoringRingMax();
+                        return Math.min(this.hardCap, 3 + 3 * engine.getMarketLevel());
                     },
-                    maxPurchases: 12,
                     canBuy: function() {
-                        return engine.getMarketAnchoringRingBought() < engine.getMarketAnchoringRingMax();
+                        return resortHelper.getMarketAnchoringRingBought() < this.getMaxPurchases();
                     },
                     onBuy: function() {
                         const market = data.progress.base.market;
-                        market.anchoringRingBought = engine.getMarketAnchoringRingBought() + 1;
+                        market.anchoringRingBought = resortHelper.getMarketAnchoringRingBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Clone Soul: +${engine.getMarketAnchoringRingBought()}`;
+                        return `Clone Soul: +${resortHelper.getMarketAnchoringRingBought()}`;
                     },
                     rowVisible: function() {
                         return true;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getMarketAnchoringRingBought() >= 12;
+                        return resortHelper.getMarketAnchoringRingBought() >= this.hardCap;
                     },
                     soldOutButtonLabel: "Max rings",
                     lockedLabel: function() {
-                        const bought = engine.getMarketAnchoringRingBought();
-                        if (bought < engine.getMarketAnchoringRingMax()) {
+                        const bought = resortHelper.getMarketAnchoringRingBought();
+                        if (bought < this.getMaxPurchases()) {
                             return "";
                         }
                         return `Unlocks at Market level ${Math.ceil((bought - 2) / 3)}`;
@@ -4463,7 +4393,7 @@ var resortData = {
                     weavingTime: 600,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 1 && !engine.isMarketCookingEquipmentBought();
+                        return engine.getMarketLevel() >= 1 && !resortHelper.isMarketCookingEquipmentBought();
                     },
                     onBuy: function() {
                         data.progress.base.market.cookingEquipmentBought = 1;
@@ -4475,7 +4405,7 @@ var resortData = {
                         return true;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isMarketCookingEquipmentBought();
+                        return resortHelper.isMarketCookingEquipmentBought();
                     },
                     soldOutButtonLabel: "Equipped",
                     lockedLabel: function() {
@@ -4490,7 +4420,7 @@ var resortData = {
                     weavingTime: 400,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 1 && !engine.isMarketTradingExperienceBought();
+                        return engine.getMarketLevel() >= 1 && !resortHelper.isMarketTradingExperienceBought();
                     },
                     onBuy: function() {
                         data.progress.base.market.tradingExperienceBought = 1;
@@ -4502,7 +4432,7 @@ var resortData = {
                         return true;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isMarketTradingExperienceBought();
+                        return resortHelper.isMarketTradingExperienceBought();
                     },
                     soldOutButtonLabel: "Learned",
                     lockedLabel: function() {
@@ -4514,24 +4444,24 @@ var resortData = {
                     name: "Buy Advertising",
                     description: "Post word of the resort along the roads. Each purchase cuts the wait for the next visitor at the Torii Gate by 5%.",
                     getCost: function() {
-                        const n = engine.getMarketBuyAdvertisingBought();
+                        const n = resortHelper.getMarketBuyAdvertisingBought();
                         return { credit: Math.round(15000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 400,
                     weavingTimeIncreaseAdd: 400,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getMarketBuyAdvertisingBought();
+                        return resortHelper.getMarketBuyAdvertisingBought();
                     },
                     maxPurchases: 20,
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 1 && engine.getMarketBuyAdvertisingBought() < 20;
+                        return engine.getMarketLevel() >= 1;
                     },
                     onBuy: function() {
                         const market = data.progress.base.market;
-                        market.buyAdvertisingBought = engine.getMarketBuyAdvertisingBought() + 1;
+                        market.buyAdvertisingBought = resortHelper.getMarketBuyAdvertisingBought() + 1;
                     },
                     extraInfo: function() {
-                        const mult = engine.getMarketAdvertisingIntervalMultiplier();
+                        const mult = Math.pow(0.95, resortHelper.getMarketBuyAdvertisingBought());
                         return `Visitor wait: x${round2(mult)}`;
                     },
                     rowVisible: function() {
@@ -4591,30 +4521,29 @@ var resortData = {
                     name: "Literacy Lessons",
                     description: "Readers keep more of what they study. Each purchase multiplies inscription gained by x1.2. Max buyable increases by 3 per Market Level.",
                     getCost: function() {
-                        const n = engine.getLiteracyLessonsBought();
+                        const n = resortHelper.getLiteracyLessonsBought();
                         return { credit: Math.round(40000 * Math.pow(1.5, n)) };
                     },
                     weavingTime: 600,
                     weavingTimeIncreaseAdd: 400,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getLiteracyLessonsBought();
+                        return resortHelper.getLiteracyLessonsBought();
+                    },
+                    getMaxPurchases: function() {
+                        return 3 + 3 * Math.max(0, engine.getMarketLevel() - 2);
                     },
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 2
-                            && engine.getLiteracyLessonsBought() < engine.getLiteracyLessonsMax();
+                        return engine.getMarketLevel() >= 2;
                     },
                     onBuy: function() {
-                        data.progress.base.market.literacyLessonsBought = engine.getLiteracyLessonsBought() + 1;
+                        data.progress.base.market.literacyLessonsBought = resortHelper.getLiteracyLessonsBought() + 1;
                     },
                     extraInfo: function() {
-                        const mult = round2(engine.getLiteracyResearchMultiplier());
-                        return `Research gained: x${mult}. Max at this level: ${engine.getLiteracyLessonsMax()}`;
+                        const mult = round2(Math.pow(1.2, resortHelper.getLiteracyLessonsBought()));
+                        return `Research gained: x${mult}. Max at this level: ${this.getMaxPurchases()}`;
                     },
                     rowVisible: function() {
                         return engine.getMarketLevel() >= 1;
-                    },
-                    upgradeSoldOut: function() {
-                        return engine.getLiteracyLessonsBought() >= engine.getLiteracyLessonsMax();
                     },
                     soldOutButtonLabel: "Max lessons",
                     lockedLabel: function() {
@@ -4628,7 +4557,7 @@ var resortData = {
                     cost: { credit: 50000 },
                     weavingTime: 800,
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 2 && !engine.isForgingInstructionsBought();
+                        return engine.getMarketLevel() >= 2 && !resortHelper.isForgingInstructionsBought();
                     },
                     onBuy: function() {
                         data.progress.base.market.forgingInstructionsBought = 1;
@@ -4637,7 +4566,7 @@ var resortData = {
                         return engine.getMarketLevel() >= 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isForgingInstructionsBought();
+                        return resortHelper.isForgingInstructionsBought();
                     },
                     soldOutButtonLabel: "Studied",
                     lockedLabel: function() {
@@ -4649,22 +4578,26 @@ var resortData = {
                     name: "Buy Hearth-Tender Journals",
                     description: "Bonfire carriers learn to stack fuel, increasing the amount they carry per trip.",
                     getCost: function() {
-                        const n = engine.getArsonistJournalsBought();
+                        const market = data.progress.base && data.progress.base.market;
+                        const n = (market && market.arsonistJournalsBought) || 0;
                         return { credit: Math.round(60000 * Math.pow(2, n)) };
                     },
                     weavingTime: 1000,
                     weavingTimeIncreaseAdd: 1000,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getArsonistJournalsBought();
+                        const market = data.progress.base && data.progress.base.market;
+                        return (market && market.arsonistJournalsBought) || 0;
                     },
                     canBuy: function() {
                         return engine.getMarketLevel() >= 2;
                     },
                     onBuy: function() {
-                        data.progress.base.market.arsonistJournalsBought = engine.getArsonistJournalsBought() + 1;
+                        const market = data.progress.base.market;
+                        market.arsonistJournalsBought = ((market && market.arsonistJournalsBought) || 0) + 1;
                     },
                     extraInfo: function() {
-                        const bought = engine.getArsonistJournalsBought();
+                        const market = data.progress.base && data.progress.base.market;
+                        const bought = (market && market.arsonistJournalsBought) || 0;
                         const cap = resortData.getKitsuneWoodCarryAmount();
                         return `Burnable carry amount: ${cap} | Next journal: +${fibonacci(bought)}`;
                     },
@@ -4680,24 +4613,23 @@ var resortData = {
                     name: "Lost Scrolls",
                     description: "A scroll that was never catalogued. Each purchase adds one research without raising the scribings cost. Max buyable increases by 1 per Market Level.",
                     getCost: function() {
-                        const n = engine.getLostScrollsBought();
+                        const n = resortHelper.getLostScrollsBought();
                         return { credit: Math.round(100000 * Math.pow(3, n)) };
                     },
                     weavingTime: 1500,
                     weavingTimeIncrease: 2,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getLostScrollsBought();
+                        return resortHelper.getLostScrollsBought();
                     },
                     getMaxPurchases: function() {
-                        return engine.getLostScrollsMax();
+                        return 1 + Math.max(0, engine.getMarketLevel() - 3);
                     },
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 3
-                            && engine.getLostScrollsBought() < engine.getLostScrollsMax();
+                        return engine.getMarketLevel() >= 3;
                     },
                     onBuy: function() {
                         const market = data.progress.base.market;
-                        market.lostScrollsBought = engine.getLostScrollsBought() + 1;
+                        market.lostScrollsBought = resortHelper.getLostScrollsBought() + 1;
                         const lib = data.progress.base.scrollArchives;
                         if (!lib) {
                             return;
@@ -4724,7 +4656,7 @@ var resortData = {
                     weavingTime: 1200,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return engine.getMarketLevel() >= 3 && !engine.isLauncherDesignsBought();
+                        return engine.getMarketLevel() >= 3 && !resortHelper.isLauncherDesignsBought();
                     },
                     onBuy: function() {
                         data.progress.base.market.launcherDesignsBought = 1;
@@ -4733,7 +4665,7 @@ var resortData = {
                         return engine.getMarketLevel() >= 2;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isLauncherDesignsBought();
+                        return resortHelper.isLauncherDesignsBought();
                     },
                     lockedLabel: function() {
                         return engine.getMarketLevel() >= 3 ? "" : "Unlocks at Market level 3";
@@ -4761,9 +4693,7 @@ var resortData = {
                     },
                     maxPurchases: 3,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathMid")
-                            && engine.getFireLauncherUpgradeBought("pathMid", "ironSightsBought") < 3;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "ironSightsBought");
@@ -4784,9 +4714,7 @@ var resortData = {
                     },
                     maxPurchases: 2,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathMid")
-                            && engine.getFireLauncherUpgradeBought("pathMid", "firePitBought") < 2;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "firePitBought");
@@ -4807,9 +4735,7 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathMid")
-                            && engine.getFireLauncherUpgradeBought("pathMid", "woodPitBought") < 4;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathMid");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "woodPitBought");
@@ -4830,10 +4756,9 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought()
-                            && engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathMid")
-                            && engine.getFireLauncherUpgradeBought("pathMid", "sturdyFrameBought") < 4;
+                        return resortHelper.isGrowHardwoodBought()
+                            && resortHelper.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathMid");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathMid", "sturdyFrameBought");
@@ -4861,9 +4786,7 @@ var resortData = {
                     },
                     maxPurchases: 3,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathLower")
-                            && engine.getFireLauncherUpgradeBought("pathLower", "fireFlingersBought") < 3;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "fireFlingersBought");
@@ -4884,9 +4807,7 @@ var resortData = {
                     },
                     maxPurchases: 2,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathLower")
-                            && engine.getFireLauncherUpgradeBought("pathLower", "firePitBought") < 2;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "firePitBought");
@@ -4907,9 +4828,7 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathLower")
-                            && engine.getFireLauncherUpgradeBought("pathLower", "woodPitBought") < 4;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("pathLower");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "woodPitBought");
@@ -4930,10 +4849,9 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought()
-                            && engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("pathLower")
-                            && engine.getFireLauncherUpgradeBought("pathLower", "sturdyFrameBought") < 4;
+                        return resortHelper.isGrowHardwoodBought()
+                            && resortHelper.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("pathLower");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("pathLower", "sturdyFrameBought");
@@ -4961,9 +4879,7 @@ var resortData = {
                     },
                     maxPurchases: 3,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("bendTop")
-                            && engine.getFireLauncherUpgradeBought("bendTop", "hotIronsBought") < 3;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "hotIronsBought");
@@ -4984,9 +4900,7 @@ var resortData = {
                     },
                     maxPurchases: 2,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("bendTop")
-                            && engine.getFireLauncherUpgradeBought("bendTop", "firePitBought") < 2;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "firePitBought");
@@ -5007,9 +4921,7 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("bendTop")
-                            && engine.getFireLauncherUpgradeBought("bendTop", "woodPitBought") < 4;
+                        return resortHelper.isLauncherDesignsBought() && engine.isFireLauncherPlatformBuilt("bendTop");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "woodPitBought");
@@ -5030,10 +4942,9 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     canBuy: function() {
-                        return engine.isGrowHardwoodBought()
-                            && engine.isLauncherDesignsBought()
-                            && engine.isFireLauncherPlatformBuilt("bendTop")
-                            && engine.getFireLauncherUpgradeBought("bendTop", "sturdyFrameBought") < 4;
+                        return resortHelper.isGrowHardwoodBought()
+                            && resortHelper.isLauncherDesignsBought()
+                            && engine.isFireLauncherPlatformBuilt("bendTop");
                     },
                     onBuy: function() {
                         engine.incrementFireLauncherUpgrade("bendTop", "sturdyFrameBought");
@@ -5153,32 +5064,32 @@ var resortData = {
                     name: "Build Walls",
                     description: "Raise walls around the Orb. Each wall increases Orb exp gain by 10%. Every 4 walls unlock another Stairs, and each Floor raises the wall maximum by 4.",
                     getCost: function() {
-                        const n = engine.getOrbBuildWallsBought();
+                        const n = resortHelper.getOrbBuildWallsBought();
                         return { wood: Math.floor(40 * Math.pow(2, Math.floor(n / 4))) };
                     },
                     weavingTime: 30,
                     weavingTimeIncreaseAdd: 30,
                     getWeavingPurchaseIndex: function() {
-                        return Math.floor(engine.getOrbBuildWallsBought() / 4);
+                        return Math.floor(resortHelper.getOrbBuildWallsBought() / 4);
                     },
                     getPurchaseCount: function() {
-                        return engine.getOrbBuildWallsBought();
+                        return resortHelper.getOrbBuildWallsBought();
                     },
                     getMaxPurchases: function() {
-                        return 4 + 4 * engine.getOrbMaxFloors();
+                        return 4 + 4 * resortHelper.getOrbMaxFloors();
                     },
                     canBuy: function() {
-                        return engine.getOrbBuildWallsBought() < engine.getOrbBuildWallsMax();
+                        return resortHelper.getOrbBuildWallsBought() < 4 + 4 * resortHelper.getOrbBuildFloorBought();
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
-                        orb.buildWallsBought = engine.getOrbBuildWallsBought() + 1;
+                        orb.buildWallsBought = resortHelper.getOrbBuildWallsBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Exp bonus: +${engine.getOrbBuildWallsBought() * 10}%`;
+                        return `Exp bonus: +${resortHelper.getOrbBuildWallsBought() * 10}%`;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getOrbBuildWallsBought() >= engine.getOrbBuildWallsMax();
+                        return resortHelper.getOrbBuildWallsBought() >= 4 + 4 * resortHelper.getOrbBuildFloorBought();
                     },
                     soldOutButtonLabel: "Max walls"
                 },
@@ -5187,7 +5098,7 @@ var resortData = {
                     name: "Build Stairs",
                     description: "Build stairs up the Orb. Each stairs increases Orb exp gain by 20%. Each stairs unlocks another Floor.",
                     getCost: function() {
-                        const n = engine.getOrbBuildStairsBought();
+                        const n = resortHelper.getOrbBuildStairsBought();
                         return {
                             wood: Math.floor(200 * Math.pow(1.5, n)),
                             starBeads: Math.floor(1000 * Math.pow(3, n)),
@@ -5197,24 +5108,25 @@ var resortData = {
                     weavingTime: 60,
                     weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getOrbBuildStairsBought();
+                        return resortHelper.getOrbBuildStairsBought();
                     },
                     getMaxPurchases: function() {
-                        return engine.getOrbMaxFloors();
+                        return resortHelper.getOrbMaxFloors();
                     },
                     canBuy: function() {
-                        return engine.getOrbBuildStairsBought() < engine.getOrbBuildStairsMax();
+                        const max = Math.min(Math.floor(resortHelper.getOrbBuildWallsBought() / 4), resortHelper.getOrbMaxFloors());
+                        return resortHelper.getOrbBuildStairsBought() < max;
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
-                        orb.buildStairsBought = engine.getOrbBuildStairsBought() + 1;
+                        orb.buildStairsBought = resortHelper.getOrbBuildStairsBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Exp bonus: +${engine.getOrbBuildStairsBought() * 20}%`;
+                        return `Exp bonus: +${resortHelper.getOrbBuildStairsBought() * 20}%`;
                     },
                     upgradeSoldOut: function() {
-                        const max = engine.getOrbBuildStairsMax();
-                        return max > 0 && engine.getOrbBuildStairsBought() >= max;
+                        const max = Math.min(Math.floor(resortHelper.getOrbBuildWallsBought() / 4), resortHelper.getOrbMaxFloors());
+                        return max > 0 && resortHelper.getOrbBuildStairsBought() >= max;
                     },
                     soldOutButtonLabel: "Max stairs"
                 },
@@ -5223,7 +5135,7 @@ var resortData = {
                     name: "Build Floor",
                     description: "Lay another floor. Each floor increases mana generation and capacity by 10% and raises the Walls maximum by 4.",
                     getCost: function() {
-                        const n = engine.getOrbBuildFloorBought();
+                        const n = resortHelper.getOrbBuildFloorBought();
                         return {
                             wood: Math.floor(500 * Math.pow(2, n)),
                             bars: Math.floor(200 * Math.pow(1.5, n))
@@ -5232,24 +5144,25 @@ var resortData = {
                     weavingTime: 90,
                     weavingTimeIncreaseAdd: 90,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getOrbBuildFloorBought();
+                        return resortHelper.getOrbBuildFloorBought();
                     },
                     getMaxPurchases: function() {
-                        return engine.getOrbMaxFloors();
+                        return resortHelper.getOrbMaxFloors();
                     },
                     canBuy: function() {
-                        return engine.getOrbBuildFloorBought() < engine.getOrbBuildFloorMax();
+                        const max = Math.min(resortHelper.getOrbBuildStairsBought(), resortHelper.getOrbMaxFloors());
+                        return resortHelper.getOrbBuildFloorBought() < max;
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
-                        orb.buildFloorBought = engine.getOrbBuildFloorBought() + 1;
+                        orb.buildFloorBought = resortHelper.getOrbBuildFloorBought() + 1;
                     },
                     extraInfo: function() {
-                        return `Mana gen and cap: +${engine.getOrbBuildFloorBought() * 10}%`;
+                        return `Mana gen and cap: +${resortHelper.getOrbBuildFloorBought() * 10}%`;
                     },
                     upgradeSoldOut: function() {
-                        const max = engine.getOrbBuildFloorMax();
-                        return max > 0 && engine.getOrbBuildFloorBought() >= max;
+                        const max = Math.min(resortHelper.getOrbBuildStairsBought(), resortHelper.getOrbMaxFloors());
+                        return max > 0 && resortHelper.getOrbBuildFloorBought() >= max;
                     },
                     soldOutButtonLabel: "Max floors"
                 },
@@ -5270,8 +5183,7 @@ var resortData = {
                     maxPurchases: 4,
                     canBuy: function() {
                         const inn = data.progress.base && data.progress.base.inn;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseInnManaCapacityBought) || 0;
-                        return !!(inn && inn.gentleLightsUnlocked) && n < 4;
+                        return !!(inn && inn.gentleLightsUnlocked);
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5305,8 +5217,7 @@ var resortData = {
                     maxPurchases: 4,
                     canBuy: function() {
                         const torii = data.progress.base && data.progress.base.torii;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseGateManaCapacityBought) || 0;
-                        return !!(torii && torii.enticingLightsUnlocked) && n < 4;
+                        return !!(torii && torii.enticingLightsUnlocked);
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5340,8 +5251,7 @@ var resortData = {
                     maxPurchases: 4,
                     canBuy: function() {
                         const pile = data.progress.base && data.progress.base.stonePile;
-                        const n = (data.progress.base.mage_tower && data.progress.base.mage_tower.increaseStonePileManaCapacityBought) || 0;
-                        return !!(pile && pile.stoneDuplicatorUnlocked) && n < 4;
+                        return !!(pile && pile.stoneDuplicatorUnlocked);
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5371,11 +5281,10 @@ var resortData = {
                         return (data.progress.base.mage_tower && data.progress.base.mage_tower.teachFromExperienceBought) || 0;
                     },
                     canBuy: function() {
-                        const orb = data.progress.base.mage_tower;
-                        return engine.isGrowHardwoodBought() && ((orb && orb.teachFromExperienceBought) || 0) < 1;
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return engine.isGrowHardwoodBought();
+                        return resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         const orb = data.progress.base.mage_tower;
@@ -5512,17 +5421,17 @@ var resortData = {
                     weavingTime: 600,
                     weavingTimeIncreaseAdd: 300,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getShardEchoesBought();
+                        return resortHelper.getShardEchoesBought();
                     },
                     getCost: function() {
-                        const bought = engine.getShardEchoesBought();
+                        const bought = resortHelper.getShardEchoesBought();
                         return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
                     },
                     canBuy: function() {
-                        return engine.getShardEchoesBought() < engine.getLegendsWritten();
+                        return resortHelper.getShardEchoesBought() < engine.getLegendsWritten();
                     },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
@@ -5533,7 +5442,7 @@ var resortData = {
                         return false;
                     },
                     lockedLabel: function() {
-                        if (engine.getShardEchoesBought() >= engine.getLegendsWritten()) {
+                        if (resortHelper.getShardEchoesBought() >= engine.getLegendsWritten()) {
                             return "Write another Legend";
                         }
                         return "";
@@ -5548,15 +5457,12 @@ var resortData = {
                     description: "Each level unlocks a new Rock Garden Arrangement to buy. 1&2) Autobuy Orb mana upgrades 3) Okami Hidden Spring Stone & Refill Mana 4) Auto-Depth",
                     weavingTime: 300,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getArtAppreciationBought();
+                        return resortHelper.getArtAppreciationBought();
                     },
                     getCost: function() {
                         return { divinity: 10000 };
                     },
                     maxPurchases: 4,
-                    canBuy: function() {
-                        return engine.getArtAppreciationBought() < 4;
-                    },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.artAppreciationBought = (shrine.artAppreciationBought || 0) + 1;
@@ -5573,10 +5479,10 @@ var resortData = {
                     weavingTime: 120,
                     weavingTimeIncreaseAdd: 60,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getShrineUpgradeBought("richerNeighborsBought");
+                        return resortHelper.getShrineUpgradeBought("richerNeighborsBought");
                     },
                     getCost: function() {
-                        const bought = engine.getShrineUpgradeBought("richerNeighborsBought");
+                        const bought = resortHelper.getShrineUpgradeBought("richerNeighborsBought");
                         return { divinity: Math.round(12000 * Math.pow(1.3, bought)) };
                     },
                     canBuy: function() {
@@ -5590,7 +5496,7 @@ var resortData = {
                         return engine.getLegendsWritten() >= 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getShrineUpgradeBought("richerNeighborsBought");
+                        const n = resortHelper.getShrineUpgradeBought("richerNeighborsBought");
                         return `Coin multiplier: x${round2(Math.pow(1.1, n))}`;
                     }
                 },
@@ -5601,32 +5507,32 @@ var resortData = {
                     weavingTime: 600,
                     weavingTimeIncreaseAdd: 300,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getLanguageEchoesBought();
+                        return resortHelper.getLanguageEchoesBought();
                     },
                     getCost: function() {
-                        const bought = engine.getLanguageEchoesBought();
+                        const bought = resortHelper.getLanguageEchoesBought();
                         return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
-                        return engine.getLanguageEchoesMax();
+                        return Math.min(10, engine.getLegendsWritten());
                     },
                     canBuy: function() {
-                        return engine.getLanguageEchoesBought() < engine.getLanguageEchoesMax();
+                        return resortHelper.getLanguageEchoesBought() < this.getMaxPurchases();
                     },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.languageEchoesBought = (shrine.languageEchoesBought || 0) + 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.getLanguageEchoesBought() >= 10;
+                        return resortHelper.getLanguageEchoesBought() >= 10;
                     },
                     soldOutButtonLabel: "Max echoes",
                     lockedLabel: function() {
-                        const bought = engine.getLanguageEchoesBought();
+                        const bought = resortHelper.getLanguageEchoesBought();
                         if (bought >= 10) {
                             return "";
                         }
-                        if (bought >= engine.getLanguageEchoesMax()) {
+                        if (bought >= this.getMaxPurchases()) {
                             return "Write another Legend";
                         }
                         return "";
@@ -5642,17 +5548,17 @@ var resortData = {
                     weavingTime: 600,
                     weavingTimeIncreaseAdd: 300,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getSkillEchoesBought();
+                        return resortHelper.getSkillEchoesBought();
                     },
                     getCost: function() {
-                        const bought = engine.getSkillEchoesBought();
+                        const bought = resortHelper.getSkillEchoesBought();
                         return { divinity: 20000 + 10000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
                     },
                     canBuy: function() {
-                        return engine.getSkillEchoesBought() < engine.getLegendsWritten();
+                        return resortHelper.getSkillEchoesBought() < engine.getLegendsWritten();
                     },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
@@ -5663,7 +5569,7 @@ var resortData = {
                         return false;
                     },
                     lockedLabel: function() {
-                        if (engine.getSkillEchoesBought() >= engine.getLegendsWritten()) {
+                        if (resortHelper.getSkillEchoesBought() >= engine.getLegendsWritten()) {
                             return "Write another Legend";
                         }
                         return "";
@@ -5679,31 +5585,31 @@ var resortData = {
                     weavingTime: 150,
                     weavingTimeIncreaseAdd: 150,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getSpiritWeavingEchoesBought();
+                        return resortHelper.getSpiritWeavingEchoesBought();
                     },
                     getCost: function() {
-                        const bought = engine.getSpiritWeavingEchoesBought();
+                        const bought = resortHelper.getSpiritWeavingEchoesBought();
                         return { divinity: 16000 + 8000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
                     },
                     canBuy: function() {
-                        return engine.getSpiritWeavingEchoesBought() < engine.getLegendsWritten();
+                        return resortHelper.getSpiritWeavingEchoesBought() < engine.getLegendsWritten();
                     },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.spiritWeavingEchoesBought = (shrine.spiritWeavingEchoesBought || 0) + 1;
                     },
                     extraInfo: function() {
-                        const n = engine.getSpiritWeavingEchoesBought();
+                        const n = resortHelper.getSpiritWeavingEchoesBought();
                         return `Spirit strands: x${round2(Math.pow(1.3, n))}`;
                     },
                     upgradeSoldOut: function() {
                         return false;
                     },
                     lockedLabel: function() {
-                        if (engine.getSpiritWeavingEchoesBought() >= engine.getLegendsWritten()) {
+                        if (resortHelper.getSpiritWeavingEchoesBought() >= engine.getLegendsWritten()) {
                             return "Write another Legend";
                         }
                         return "";
@@ -5721,20 +5627,17 @@ var resortData = {
                         return { divinity: 30000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isKarmaStackingBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.karmaStackingBought = 1;
                     },
                     extraInfo: function() {
-                        const mult = engine.isKarmaStackingBought()
+                        const mult = resortHelper.isKarmaStackingBought()
                             ? Math.pow(2, engine.getLegendsWritten())
                             : 1;
                         return `Karma: x${mult}`;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isKarmaStackingBought();
+                        return resortHelper.isKarmaStackingBought();
                     },
                     soldOutButtonLabel: "Stacked",
                     rowVisible: function() {
@@ -5750,14 +5653,11 @@ var resortData = {
                         return { divinity: 15000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isPowerfulChopsBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.powerfulChopsBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isPowerfulChopsBought();
+                        return resortHelper.isPowerfulChopsBought();
                     },
                     soldOutButtonLabel: "Chopping",
                     rowVisible: function() {
@@ -5773,14 +5673,11 @@ var resortData = {
                         return { divinity: 4000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isAxeEchoesBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.axeEchoesBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isAxeEchoesBought();
+                        return resortHelper.isAxeEchoesBought();
                     },
                     soldOutButtonLabel: "Revealed",
                     rowVisible: function() {
@@ -5796,14 +5693,11 @@ var resortData = {
                         return { divinity: 4000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isShelvingEchoesBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.shelvingEchoesBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isShelvingEchoesBought();
+                        return resortHelper.isShelvingEchoesBought();
                     },
                     soldOutButtonLabel: "Revealed",
                     rowVisible: function() {
@@ -5819,14 +5713,11 @@ var resortData = {
                         return { divinity: 15000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isPlantAffinityBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.plantAffinityBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isPlantAffinityBought();
+                        return resortHelper.isPlantAffinityBought();
                     },
                     soldOutButtonLabel: "Attuned",
                     rowVisible: function() {
@@ -5842,15 +5733,13 @@ var resortData = {
                         return { divinity: 15000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isEarthAffinityBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.earthAffinityBought = 1;
                         engine.grantEarthAffinitySpirit();
                     },
                     upgradeSoldOut: function() {
-                        return engine.isEarthAffinityBought();
+                        const shrine = data.progress.base && data.progress.base.shrine;
+                        return !!((shrine && shrine.earthAffinityBought) || 0);
                     },
                     soldOutButtonLabel: "Attuned",
                     rowVisible: function() {
@@ -5866,14 +5755,11 @@ var resortData = {
                         return { divinity: 5000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isHardenBambooBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.hardenBambooBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isHardenBambooBought();
+                        return resortHelper.isHardenBambooBought();
                     },
                     soldOutButtonLabel: "Hardened",
                     rowVisible: function() {
@@ -5889,14 +5775,11 @@ var resortData = {
                         return { divinity: 15000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isScribingInfusionsBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.scribingInfusionsBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isScribingInfusionsBought();
+                        return resortHelper.isScribingInfusionsBought();
                     },
                     soldOutButtonLabel: "Revealed",
                     rowVisible: function() {
@@ -5912,17 +5795,14 @@ var resortData = {
                         return { divinity: 20000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isShardsFoundBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.shardsFoundBought = 1;
                     },
                     extraInfo: function() {
-                        return engine.isShardsFoundBought() ? "Shard gain: x3" : "";
+                        return resortHelper.isShardsFoundBought() ? "Shard gain: x3" : "";
                     },
                     upgradeSoldOut: function() {
-                        return engine.isShardsFoundBought();
+                        return resortHelper.isShardsFoundBought();
                     },
                     soldOutButtonLabel: "Found",
                     rowVisible: function() {
@@ -5938,17 +5818,14 @@ var resortData = {
                         return { divinity: 10000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isTradingContractsBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.tradingContractsBought = 1;
                     },
                     extraInfo: function() {
-                        return engine.isTradingContractsBought() ? "Trade value: x2" : "";
+                        return resortHelper.isTradingContractsBought() ? "Trade value: x2" : "";
                     },
                     upgradeSoldOut: function() {
-                        return engine.isTradingContractsBought();
+                        return resortHelper.isTradingContractsBought();
                     },
                     soldOutButtonLabel: "Signed",
                     rowVisible: function() {
@@ -5964,14 +5841,11 @@ var resortData = {
                         return { divinity: 10000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isResourceProtectionBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.resourceProtectionBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isResourceProtectionBought();
+                        return resortHelper.isResourceProtectionBought();
                     },
                     soldOutButtonLabel: "Revealed",
                     rowVisible: function() {
@@ -5988,13 +5862,13 @@ var resortData = {
                     },
                     maxPurchases: 1,
                     canBuy: function() {
-                        return !engine.isDealMakingBought();
+                        return !resortHelper.isDealMakingBought();
                     },
                     onBuy: function() {
                         data.progress.base.shrine.dealMakingBought = 1;
                     },
                     extraInfo: function() {
-                        if (!engine.isDealMakingBought()) {
+                        if (!resortHelper.isDealMakingBought()) {
                             return "";
                         }
                         const level = engine.getMarketLevel();
@@ -6004,7 +5878,7 @@ var resortData = {
                         return false;
                     },
                     lockedLabel: function() {
-                        return engine.isDealMakingBought() ? "Dealing" : "";
+                        return resortHelper.isDealMakingBought() ? "Dealing" : "";
                     },
                     soldOutButtonLabel: "Dealing",
                     rowVisible: function() {
@@ -6018,30 +5892,30 @@ var resortData = {
                     weavingTime: 800,
                     weavingTimeIncreaseAdd: 800,
                     getWeavingPurchaseIndex: function() {
-                        return engine.getOrbHeightBought();
+                        return resortHelper.getOrbHeightBought();
                     },
                     getCost: function() {
-                        const bought = engine.getOrbHeightBought();
+                        const bought = resortHelper.getOrbHeightBought();
                         return { divinity: 10000 + 8000 * bought };
                     },
                     getMaxPurchases: function() {
                         return Math.max(0, engine.getLegendsWritten() - 1);
                     },
                     canBuy: function() {
-                        return engine.getOrbHeightBought() < Math.max(0, engine.getLegendsWritten() - 1);
+                        return resortHelper.getOrbHeightBought() < Math.max(0, engine.getLegendsWritten() - 1);
                     },
                     onBuy: function() {
                         const shrine = data.progress.base.shrine;
                         shrine.orbHeightBought = (shrine.orbHeightBought || 0) + 1;
                     },
                     extraInfo: function() {
-                        return `Max floors: ${engine.getOrbMaxFloors()}`;
+                        return `Max floors: ${resortHelper.getOrbMaxFloors()}`;
                     },
                     upgradeSoldOut: function() {
                         return false;
                     },
                     lockedLabel: function() {
-                        if (engine.getOrbHeightBought() >= Math.max(0, engine.getLegendsWritten() - 1)) {
+                        if (resortHelper.getOrbHeightBought() >= Math.max(0, engine.getLegendsWritten() - 1)) {
                             return "Write another Legend";
                         }
                         return "";
@@ -6059,14 +5933,11 @@ var resortData = {
                         return { divinity: 35000 };
                     },
                     maxPurchases: 1,
-                    canBuy: function() {
-                        return !engine.isSkyAppreciationBought();
-                    },
                     onBuy: function() {
                         data.progress.base.shrine.skyAppreciationBought = 1;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isSkyAppreciationBought();
+                        return resortHelper.isSkyAppreciationBought();
                     },
                     soldOutButtonLabel: "Appreciated",
                     rowVisible: function() {

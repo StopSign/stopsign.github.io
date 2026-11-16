@@ -123,7 +123,7 @@ let events = {
                 const optIx = preTabs.indexOf("options");
                 if (optIx >= 0) {
                     preTabs.splice(optIx, 0, "cardBonuses");
-                    if (engine.isPrepareToWriteLegendBought && engine.isPrepareToWriteLegendBought()) {
+                    if (resortHelper.isPrepareToWriteLegendBought && resortHelper.isPrepareToWriteLegendBought()) {
                         preTabs.splice(optIx + 1, 0, "prestige");
                     }
                 }
@@ -146,7 +146,7 @@ let events = {
             const optIx = tabs.indexOf("options");
             if (optIx >= 0) {
                 tabs.splice(optIx, 0, "cardBonuses");
-                if (engine.isPrepareToWriteLegendBought && engine.isPrepareToWriteLegendBought()) {
+                if (resortHelper.isPrepareToWriteLegendBought && resortHelper.isPrepareToWriteLegendBought()) {
                     tabs.splice(optIx + 1, 0, "prestige");
                 }
             }
@@ -1539,7 +1539,7 @@ let events = {
                 return;
             }
             const up = engine.getUpgradeDef("path", upgradeKey);
-            if (!up || (up.canBuy && !up.canBuy())) {
+            if (!up || resortData.isUpgradeSoldOut(up) || (up.canBuy && !up.canBuy())) {
                 return;
             }
             if (upgradeKey !== "removeRocks") {
@@ -1579,7 +1579,7 @@ let events = {
             return;
         }
         if (up.instantPurchase) {
-            if (up.canBuy && !up.canBuy()) {
+            if (resortData.isUpgradeSoldOut(up) || (up.canBuy && !up.canBuy())) {
                 return;
             }
             const cost = resortData.resolveCost(up, scopeKey);
@@ -1749,7 +1749,7 @@ let events = {
         const idx = lib.lockedSkillKeys.indexOf(skillKey);
         if (idx >= 0) {
             lib.lockedSkillKeys.splice(idx, 1);
-        } else if (lib.lockedSkillKeys.length < engine.getSkillEchoesBought()) {
+        } else if (lib.lockedSkillKeys.length < resortHelper.getSkillEchoesBought()) {
             lib.lockedSkillKeys.push(skillKey);
         }
         view.updateLibrarySkillInfoPanel();
@@ -1813,7 +1813,7 @@ let events = {
         if (events.consumeSpiritDragClickSuppress()) {
             return;
         }
-        if (!engine.isSpiritTrainingSpotBought()) {
+        if (!resortHelper.isSpiritTrainingSpotBought()) {
             return;
         }
         const selected = engine.getSpiritById(data.progress.selectedSpiritId);

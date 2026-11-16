@@ -891,7 +891,7 @@ let engine = {
     getEffectiveSlapCooldownMs: function() {
         const cd = gameData.battle.cooldowns;
         const alacrity = skillEngine.getAlacrityCooldownReductionMs() * cd.alacritySlapReductionPerLevelMs;
-        const gloves = engine.getMarketMysticalGlovesBought() * 100;
+        const gloves = resortHelper.getMarketMysticalGlovesBought() * 100;
         return Math.max(cd.slapFloorMs, cd.slapBaseMs - alacrity - gloves);
     },
     getEffectiveSandalCooldownMs: function() {
@@ -1630,7 +1630,7 @@ let engine = {
             ? (skills.getSkillEffect("soulSearching").bonusSoul || 0) : 0;
         const vicarious = (typeof skills !== "undefined")
             ? (skills.getSkillEffect("vicarious").bonusSoul || 0) : 0;
-        return assigned + engine.getMarketAnchoringRingBought() + soulSearching + vicarious;
+        return assigned + resortHelper.getMarketAnchoringRingBought() + soulSearching + vicarious;
     },
     getPendingOkamiExpWithSoul: function() {
         return (data.battle && data.battle.pendingOkamiExp) || 0;
@@ -3955,42 +3955,6 @@ let engine = {
         }
         return Math.max(5, Math.min(cap, Math.round(saved)));
     },
-    getInnReinforceJointsMaxPurchases: function() {
-        return 3;
-    },
-    getInnFurnitureBaseMaxPurchases: function() {
-        return 5;
-    },
-    getInnAddRoomBaseMaxPurchases: function() {
-        return 2;
-    },
-    getInnFurnitureMaxPurchases: function() {
-        const inn = data.progress.base.inn;
-        const reinforced = inn.reinforceJointsBought || 0;
-        return engine.getInnFurnitureBaseMaxPurchases() + reinforced;
-    },
-    getInnAddRoomMaxPurchases: function() {
-        const inn = data.progress.base.inn;
-        const reinforced = inn.reinforceJointsBought || 0;
-        return engine.getInnAddRoomBaseMaxPurchases() + reinforced;
-    },
-    getInnSecondFloorRoomsBaseMaxPurchases: function() {
-        return 0;
-    },
-    getInnSecondFloorRoomsMaxPurchases: function() {
-        const inn = data.progress.base.inn;
-        const reinforced = inn.reinforceJointsBought || 0;
-        return engine.getInnSecondFloorRoomsBaseMaxPurchases() + reinforced;
-    },
-    getInnFurnitureAbsoluteMaxPurchases: function() {
-        return engine.getInnFurnitureMaxPurchases();
-    },
-    getInnAddRoomAbsoluteMaxPurchases: function() {
-        return engine.getInnAddRoomMaxPurchases();
-    },
-    getInnSecondFloorRoomsAbsoluteMaxPurchases: function() {
-        return engine.getInnSecondFloorRoomsMaxPurchases();
-    },
     isInnOnsenConverted: function() {
         return !!data.progress.base.inn.onsenConverted;
     },
@@ -4687,7 +4651,7 @@ let engine = {
         if (!torii) {
             return 60000;
         }
-        const adMult = engine.getMarketAdvertisingIntervalMultiplier();
+        const adMult = Math.pow(0.95, resortHelper.getMarketBuyAdvertisingBought());
         let interval = torii.visitorIntervalMs || 60000;
         if (torii.enticingLightsUnlocked && (torii.mana || 0) > 0) {
             interval = 30000;
@@ -5523,7 +5487,7 @@ let engine = {
         return (a.id || 0) - (b.id || 0);
     },
     getEarthSpiritPebbleTaskInfo: function(spirit) {
-        const pebbleMax = engine.getEarthSpiritPebbleMax();
+        const pebbleMax = resortHelper.getEarthSpiritPebbleMax();
         const active = engine.countPebblesForSpirit(spirit.id);
         if (active >= pebbleMax) {
             return { text: "Pebbles Moving", pct: 0 };
@@ -5552,7 +5516,7 @@ let engine = {
         if (!hs || !hs.spirits) {
             return [];
         }
-        const pebbleMax = engine.getEarthSpiritPebbleMax();
+        const pebbleMax = resortHelper.getEarthSpiritPebbleMax();
         const ready = [];
         for (let i = 0; i < hs.spirits.length; i++) {
             const spirit = hs.spirits[i];
@@ -5637,11 +5601,6 @@ let engine = {
         ready.sort(engine.compareSpiritSpawnPriority);
         return ready;
     },
-    getBambooSprinkleOreMultiplier: function() {
-        const atelier = data.progress.base && data.progress.base.atelier;
-        const bought = atelier && atelier.sprinkleOreBought ? atelier.sprinkleOreBought : 0;
-        return Math.pow(1.1, bought);
-    },
     getBambooForestBaseChips: function() {
         const cfg = resortData.bambooForestConfig;
         const base = cfg.defaultBaseWood || 10;
@@ -5649,21 +5608,15 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().bambooBaseChipsFlat || 0) : 0;
         return base + cardAdd;
     },
-    getBambooInfuseSoilMultiplier: function() {
-        const bf = data.progress.base.bambooForest;
-        const n = bf.infuseSoilBought || 0;
-        if (n <= 0) {
-            return 1;
-        }
-        return 1 + 0.2 * n + 0.025 * n * (n - 1);
-    },
     getBambooStalkComputedBaseChips: function(stalkIndex) {
         let chips = engine.getBambooForestBaseChips();
         const spirit = engine.getBambooStalkSpirit(stalkIndex);
         if (spirit) {
             chips += Math.ceil(engine.getEffectiveSpiritPower(spirit) || 1);
         }
-        let result = Math.floor(chips * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        const atelier = data.progress.base && data.progress.base.atelier;
+        const sprinkleBought = (atelier && atelier.sprinkleOreBought) || 0;
+        let result = Math.floor(chips * resortHelper.getBambooInfuseSoilMultiplier() * Math.pow(1.1, sprinkleBought));
         const bf = data.progress.base && data.progress.base.bambooForest;
         const stalk = bf && bf.stalks && bf.stalks[stalkIndex];
         if (stalk && stalk.type === "hardwood") {
@@ -5680,11 +5633,6 @@ let engine = {
             bf.stalks[si].baseWood = engine.getBambooStalkComputedBaseChips(si);
             engine.refreshBambooStalkCapacities(bf.stalks[si]);
         }
-    },
-    getMagicLoomSpiritStrandMultiplier: function() {
-        const atelier = data.progress.base && data.progress.base.atelier;
-        const bought = atelier && atelier.magicLoomsBought ? atelier.magicLoomsBought : 0;
-        return Math.pow(1.1, bought);
     },
     getFireLauncherPlatformDefs: function() {
         return resortData.fireLauncherPlatformDefs || [];
@@ -6307,31 +6255,15 @@ let engine = {
         const palette = stalk && stalk.type === "hardwood" ? engine.hardwoodCellColors : engine.bambooCellColors;
         return palette[Math.floor(Math.random() * palette.length)];
     },
-    isGrowHardwoodBought: function() {
-        const bf = data.progress.base && data.progress.base.bambooForest;
-        return !!((bf && bf.growHardwoodBought) || 0);
-    },
     getBambooForestDisplayName: function() {
-        return engine.isGrowHardwoodBought() ? "Forest" : "Bamboo Forest";
-    },
-    getHiddenSpringSpiritSlotMax: function() {
-        const hs = data.progress.base && data.progress.base.hiddenSpring;
-        return hs ? (hs.spiritMax || 3) : 3;
-    },
-    getPebblePayBought: function() {
-        const mine = data.progress.base && data.progress.base.mine;
-        return (mine && mine.pebblePayBought) || 0;
+        return resortHelper.isGrowHardwoodBought() ? "Forest" : "Bamboo Forest";
     },
     applyPebblePay: function(amount) {
-        const n = engine.getPebblePayBought();
+        const n = resortHelper.getPebblePayBought();
         if (n <= 0 || amount <= 0) {
             return amount;
         }
         return Math.ceil(amount * (1 + 0.2 * n));
-    },
-    getMineshaftBeamsBought: function() {
-        const mine = data.progress.base && data.progress.base.mine;
-        return (mine && mine.mineshaftBeamsBought) || 0;
     },
     getEarthSpiritPebbleCarryAmount: function(spirit) {
         const power = engine.getEffectiveSpiritPower(spirit);
@@ -6346,28 +6278,17 @@ let engine = {
         }
         return stone + " stone / " + raw + " ore";
     },
-    getEarthSpiritPebbleMax: function() {
-        const hs = data.progress.base && data.progress.base.hiddenSpring;
-        const bought = hs ? (hs.pebbleCapacityBought || 0) : 0;
-        return 1 + bought;
-    },
     getPondWaterSpiritSlotMax: function() {
         return 3;
     },
-    getWaterDropletCapacityMultiplier: function() {
-        const hs = data.progress.base && data.progress.base.hiddenSpring;
-        const bought = hs ? (hs.carryingCapacityBought || 0) : 0;
-        return Math.pow(1.5, bought);
-    },
-    getEnergeticDropletsMultiplier: function() {
-        const cistern = data.progress.base && data.progress.base.cistern;
-        const bought = cistern ? (cistern.energeticDropletsBought || 0) : 0;
-        return Math.pow(1.5, bought);
-    },
     getWaterDropletVolumeForSpirit: function(spirit) {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const carryBought = hs ? (hs.carryingCapacityBought || 0) : 0;
+        const energyBought = cistern ? (cistern.energeticDropletsBought || 0) : 0;
         return Math.ceil((engine.getEffectiveSpiritPower(spirit) || 1)
-            * engine.getWaterDropletCapacityMultiplier()
-            * engine.getEnergeticDropletsMultiplier() / 2);
+            * Math.pow(1.5, carryBought)
+            * Math.pow(1.5, energyBought) / 2);
     },
     findWaterSpiritPlacementSlot: function() {
         const pondMax = engine.getPondWaterSpiritSlotMax();
@@ -6378,7 +6299,7 @@ let engine = {
                 }
             }
         }
-        const slotMax = engine.getHiddenSpringSpiritSlotMax();
+        const slotMax = resortHelper.getHiddenSpringSpiritSlotMax();
         for (let si = 0; si < slotMax; si++) {
             if (!engine.getSpiritAtLocation("hiddenSpring", si, "water")) {
                 return { location: "hiddenSpring", slot: si };
@@ -6427,7 +6348,7 @@ let engine = {
         return true;
     },
     findSpiritPlacementSlot: function(kind) {
-        const slotMax = engine.getHiddenSpringSpiritSlotMax();
+        const slotMax = resortHelper.getHiddenSpringSpiritSlotMax();
         if (kind === "earth") {
             for (let si = 0; si < 3; si++) {
                 if (!engine.getSpiritAtLocation("mine", si, "earth")) {
@@ -6487,7 +6408,7 @@ let engine = {
             return false;
         }
         const boughtKey = kind + "SpiritsBought";
-        const max = kind === "fire" ? 4 : engine.getHiddenSpringSpiritSlotMax();
+        const max = kind === "fire" ? 4 : resortHelper.getHiddenSpringSpiritSlotMax();
         if ((hs[boughtKey] || 0) >= max) {
             return false;
         }
@@ -6621,7 +6542,7 @@ let engine = {
     assemblePlantSpiritFromPurchase: function() {
         const hs = data.progress.base && data.progress.base.hiddenSpring;
         const torii = data.progress.base && data.progress.base.torii;
-        const purchaseMax = engine.getNurturePlantSpiritMax();
+        const purchaseMax = resortHelper.getNurturePlantSpiritMax();
         if (!hs || !torii || (torii.plantSpiritsBought || 0) >= purchaseMax) {
             return false;
         }
@@ -6666,7 +6587,7 @@ let engine = {
         const upgradeKey = kind === "earth" ? "assembleEarthSpirit"
             : (kind === "water" ? "gatherWaterSpirit" : "sparkFireSpirit");
         const up = resortData.buildings.hiddenSpring.upgrades[upgradeKey];
-        if (!up || (up.canBuy && !up.canBuy())) {
+        if (!up || resortData.isUpgradeSoldOut(up) || (up.canBuy && !up.canBuy())) {
             return false;
         }
         const cost = up.getCost();
@@ -6762,7 +6683,7 @@ let engine = {
         return engine.getSpiritTrainingCardEffects().durationMs;
     },
     canSpiritTrain: function(spirit) {
-        if (!engine.isSpiritAtTrainingSpot(spirit) || !engine.isSpiritTrainingSpotBought()) {
+        if (!engine.isSpiritAtTrainingSpot(spirit) || !resortHelper.isSpiritTrainingSpotBought()) {
             return false;
         }
         const hs = data.progress.base.hiddenSpring;
@@ -6773,7 +6694,7 @@ let engine = {
         return true;
     },
     updateSpiritTraining: function(tickMs) {
-        if (!engine.isSpiritTrainingSpotBought()) {
+        if (!resortHelper.isSpiritTrainingSpotBought()) {
             return;
         }
         const spirit = engine.getSpiritAtLocation("spiritTraining", 0);
@@ -6860,7 +6781,7 @@ let engine = {
             return false;
         }
         if (location === "spiritTraining") {
-            if (slotIndex !== 0 || !engine.isSpiritTrainingSpotBought()) {
+            if (slotIndex !== 0 || !resortHelper.isSpiritTrainingSpotBought()) {
                 return false;
             }
             const trainingOccupant = engine.getSpiritAtLocation("spiritTraining", 0);
@@ -6929,7 +6850,7 @@ let engine = {
                 return false;
             }
         } else if (location === "spiritTraining") {
-            if (slotIndex !== 0 || !engine.isSpiritTrainingSpotBought()) {
+            if (slotIndex !== 0 || !resortHelper.isSpiritTrainingSpotBought()) {
                 return false;
             }
         } else {
@@ -6967,12 +6888,12 @@ let engine = {
                 return false;
             }
         } else if (location === "spiritTraining") {
-            if (slotIndex !== 0 || !engine.isSpiritTrainingSpotBought()) {
+            if (slotIndex !== 0 || !resortHelper.isSpiritTrainingSpotBought()) {
                 return false;
             }
         } else if (location !== "hiddenSpring") {
             return false;
-        } else if (slotIndex >= engine.getHiddenSpringSpiritSlotMax()) {
+        } else if (slotIndex >= resortHelper.getHiddenSpringSpiritSlotMax()) {
             return false;
         }
         const oldLocation = selected.location || "hiddenSpring";
@@ -7002,7 +6923,7 @@ let engine = {
             return false;
         }
         if (location === "spiritTraining") {
-            if (slotIndex !== 0 || !engine.isSpiritTrainingSpotBought()) {
+            if (slotIndex !== 0 || !resortHelper.isSpiritTrainingSpotBought()) {
                 return false;
             }
         } else if (location !== "bambooForest" || slotIndex < 0 || slotIndex >= resortData.bambooForestConfig.stalkCount) {
@@ -7080,19 +7001,8 @@ let engine = {
         const bonus = Math.max(0, Math.min(1, (orbLevel - spiritLevel) / orbLevel));
         return 1 + bonus;
     },
-    getBuildUponCloneFoundationBought: function() {
-        const bonfire = data.progress.base && data.progress.base.bonfire;
-        return (bonfire && bonfire.buildUponCloneFoundationBought) || 0;
-    },
     getCloneFoundationAudFlat: function() {
-        return engine.getBuildUponCloneFoundationBought() * 5;
-    },
-    getContemplateSturdinessBought: function() {
-        const bonfire = data.progress.base && data.progress.base.bonfire;
-        return (bonfire && bonfire.contemplateSturdinessBought) || 0;
-    },
-    getContemplateSturdinessMult: function() {
-        return Math.pow(1.1, engine.getContemplateSturdinessBought());
+        return resortHelper.getBuildUponCloneFoundationBought() * 5;
     },
     getSpiritPowerForLevel: function(level) {
         const n = Math.max(1, Math.floor(level || 1));
@@ -7103,7 +7013,7 @@ let engine = {
     },
     updateEarthSpirits: function(tickMs) {
         const hs = data.progress.base.hiddenSpring;
-        const pebbleMax = engine.getEarthSpiritPebbleMax();
+        const pebbleMax = resortHelper.getEarthSpiritPebbleMax();
         const formMs = engine.earthPebbleFormMs;
         hs.pebbleGlobalCooldownMs = Math.max(0, hs.pebbleGlobalCooldownMs - tickMs);
         for (let i = 0; i < hs.spirits.length; i++) {
@@ -7179,7 +7089,7 @@ let engine = {
         const base = data.progress.base;
         const spirit = engine.getSpiritById(spiritId);
         const capacity = engine.getEarthSpiritPebbleCarryAmount(spirit);
-        if (engine.countPebblesForSpirit(spiritId) >= engine.getEarthSpiritPebbleMax()) {
+        if (engine.countPebblesForSpirit(spiritId) >= resortHelper.getEarthSpiritPebbleMax()) {
             return false;
         }
         if (!base.mine || !base.mine.resources) {
@@ -8061,10 +7971,6 @@ let engine = {
         const okami = engine.getOkami();
         return okami.pausedManaCloneJob || null;
     },
-    isSpiritTrainingSpotBought: function() {
-        const hs = data.progress.base && data.progress.base.hiddenSpring;
-        return !!(hs && hs.spiritTrainingSpotBought);
-    },
     snapshotManaCloneJob: function(job) {
         if (!engine.isManaCloneJob(job)) {
             return null;
@@ -8325,7 +8231,7 @@ let engine = {
         return true;
     },
     refillHiddenSpringManaFromCollectStone: function() {
-        if (!engine.isArrangementOfSelfSufficiencyUnlocked() || !engine.isSpiritTrainingSpotBought()) {
+        if (!engine.isArrangementOfSelfSufficiencyUnlocked() || !resortHelper.isSpiritTrainingSpotBought()) {
             return;
         }
         const hs = data.progress.base && data.progress.base.hiddenSpring;
@@ -9316,7 +9222,7 @@ let engine = {
         if (!up) {
             return false;
         }
-        if (up.canBuy && !up.canBuy()) {
+        if (resortData.isUpgradeSoldOut(up) || (up.canBuy && !up.canBuy())) {
             return false;
         }
         const rh = data.progress.base.foxDen;
@@ -9434,7 +9340,7 @@ let engine = {
                 }
                 let job = engine.getUpgradeGatherJob(scopeKey, upgradeKey);
                 if (!job) {
-                    if (up.canBuy && !up.canBuy()) {
+                    if (resortData.isUpgradeSoldOut(up) || (up.canBuy && !up.canBuy())) {
                         continue;
                     }
                     const cost = resortData.resolveCost(up, scopeKey);
@@ -10557,7 +10463,7 @@ let engine = {
             return engine.isInnOnsenConverted();
         }
         if (unlockKey === "noodleBar") {
-            return engine.isMarketCookingEquipmentBought();
+            return resortHelper.isMarketCookingEquipmentBought();
         }
         if (unlockKey === "laundry") {
             return false;
@@ -11504,7 +11410,7 @@ let engine = {
                 : rt === "hardwood" ? "allowHardwood"
                 : rt === "bars" ? "allowBars"
                 : null;
-            if (rt === "hardwood" && !engine.isGrowHardwoodBought()) {
+            if (rt === "hardwood" && !resortHelper.isGrowHardwoodBought()) {
                 continue;
             }
             if (field && market[field]) {
@@ -11516,10 +11422,10 @@ let engine = {
     getMarketCreditPerUnit: function(resourceType) {
         const rates = resortData.marketCreditPerResource || {};
         let rate = rates[resourceType] || 0;
-        if (engine.isTradingContractsBought()) {
+        if (resortHelper.isTradingContractsBought()) {
             rate *= 2;
         }
-        if (engine.isDealMakingBought()) {
+        if (resortHelper.isDealMakingBought()) {
             rate *= Math.max(1, engine.getMarketLevel());
         }
         return rate;
@@ -11953,7 +11859,7 @@ let engine = {
             return false;
         }
         resortData.deductCost(cost);
-        if (engine.isMarketTradingExperienceBought()) {
+        if (resortHelper.isMarketTradingExperienceBought()) {
             engine.grantMarketExp(creditCost);
         }
         const totalMs = engine.getMarketTradeDurationMs(tradeKey);
@@ -12512,7 +12418,7 @@ let engine = {
         const cutters = kitsune + (okamiHere ? 1 : 0);
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().chopPowerAdd || 0) : 0;
-        const echoed = Math.pow(1.5, engine.getEchoedAxeBought());
+        const echoed = Math.pow(1.5, resortHelper.getEchoedAxeBought());
         const raw = cutters * (1 + axeBonus) * (1 + 0.5 * sharperBonus) * (1 + cardAdd) * echoed;
         return Math.ceil(raw - 1e-9);
     },
@@ -12560,7 +12466,7 @@ let engine = {
         }
     },
     switchBambooStalkType: function(stalkIndex) {
-        if (!engine.isGrowHardwoodBought()) {
+        if (!resortHelper.isGrowHardwoodBought()) {
             return;
         }
         const bf = data.progress.base && data.progress.base.bambooForest;
@@ -12595,7 +12501,9 @@ let engine = {
             return;
         }
         const stalk = bf.stalks[stalkIndex];
-        let baseWood = Math.floor(engine.getBambooForestBaseChips() * engine.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleOreMultiplier());
+        const atelier = data.progress.base && data.progress.base.atelier;
+        const sprinkleBought = (atelier && atelier.sprinkleOreBought) || 0;
+        let baseWood = Math.floor(engine.getBambooForestBaseChips() * resortHelper.getBambooInfuseSoilMultiplier() * Math.pow(1.1, sprinkleBought));
         if (stalk.type === "hardwood") {
             baseWood *= 5;
         }
@@ -12720,7 +12628,7 @@ let engine = {
         if (power <= 0) {
             return 0;
         }
-        const carry = engine.isPowerfulChopsBought();
+        const carry = resortHelper.isPowerfulChopsBought();
         let ri = engine.getBambooCutTopCellIndex(stalk);
         let chips = 0;
         while (ri >= 0 && power > 0) {
@@ -12754,7 +12662,7 @@ let engine = {
     },
     getBambooChipsPerChop: function() {
         const power = engine.getBambooChopPower();
-        if (!engine.isPowerfulChopsBought()) {
+        if (!resortHelper.isPowerfulChopsBought()) {
             return power;
         }
         const bf = data.progress.base && data.progress.base.bambooForest;
@@ -13134,7 +13042,7 @@ let engine = {
         for (let i = 0; i < spirits.length; i++) {
             total += engine.getEffectiveSpiritPower(spirits[i]) || 1;
         }
-        return total * (1 + 0.2 * engine.getMineshaftBeamsBought());
+        return total * (1 + 0.2 * resortHelper.getMineshaftBeamsBought());
     },
     getMineRemainingAud: function() {
         const mine = data.progress.base && data.progress.base.mine;
@@ -13162,21 +13070,8 @@ let engine = {
             total += spirits[i].level || 1;
         }
         return total;
-    },
-    getPlayPitBought: function() {
-        const mine = data.progress.base && data.progress.base.mine;
-        return (mine && mine.playPitBought) || 0;
-    },
-    /** Same growth as Infuse Soil: +20%, then each purchase adds 5% more than the last. */
-    getPlayPitDirtMultiplier: function() {
-        const n = engine.getPlayPitBought();
-        if (n <= 0) {
-            return 1;
-        }
-        return 1 + 0.2 * n + 0.025 * n * (n - 1);
-    },
-    getMinePlayDirtPerCycle: function() {
-        return engine.getMineSpiritLevelTotal() * engine.getPlayPitDirtMultiplier();
+    },    getMinePlayDirtPerCycle: function() {
+        return engine.getMineSpiritLevelTotal() * resortHelper.getPlayPitDirtMultiplier();
     },
     getMineFirstActiveBlock: function() {
         const mine = data.progress.base.mine;
@@ -13355,35 +13250,6 @@ let engine = {
         }
         return engine.getManaCapacity() >= need;
     },
-    getOrbBuildWallsBought: function() {
-        const orb = data.progress.base && data.progress.base.mage_tower;
-        return (orb && orb.buildWallsBought) || 0;
-    },
-    getOrbBuildStairsBought: function() {
-        const orb = data.progress.base && data.progress.base.mage_tower;
-        return (orb && orb.buildStairsBought) || 0;
-    },
-    getOrbBuildFloorBought: function() {
-        const orb = data.progress.base && data.progress.base.mage_tower;
-        return (orb && orb.buildFloorBought) || 0;
-    },
-    getOrbMaxFloors: function() {
-        const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
-            ? (shrineCards.getAggregatedEffects().higherMaxOrbFloorsFlat || 0) : 0;
-        return 2 + cardAdd + engine.getOrbHeightBought();
-    },
-    getOrbBuildWallsMax: function() {
-        return 4 + 4 * engine.getOrbBuildFloorBought();
-    },
-    getOrbBuildStairsMax: function() {
-        return Math.min(Math.floor(engine.getOrbBuildWallsBought() / 4), engine.getOrbMaxFloors());
-    },
-    getOrbBuildFloorMax: function() {
-        return Math.min(engine.getOrbBuildStairsBought(), engine.getOrbMaxFloors());
-    },
-    getOrbFloorBonusMultiplier: function() {
-        return 1 + 0.1 * engine.getOrbBuildFloorBought();
-    },
     getManaCapacityBonusPerCloneDispersal: function(aliveMsOpt) {
         const base = (resortData.manaCapacityBonusPerCloneDispersal !== undefined)
             ? resortData.manaCapacityBonusPerCloneDispersal : 10;
@@ -13428,7 +13294,7 @@ let engine = {
         const expandBought = (orb && orb.expandOrbBought) || 0;
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().manaCapacityAdd || 0) : 0;
-        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * engine.getOrbFloorBonusMultiplier() * (1 + cardAdd);
+        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * resortHelper.getOrbFloorBonusMultiplier() * (1 + cardAdd);
     },
     isManaUnlocked: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -13449,10 +13315,6 @@ let engine = {
     isShrineBuilt: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
         return !!(rh && rh.unlocks && rh.unlocks.shrine);
-    },
-    isPrepareToWriteLegendBought: function() {
-        const shrine = data.progress.base && data.progress.base.shrine;
-        return !!(shrine && shrine.prepareToWriteLegendBought);
     },
     isMarketBuilt: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -13476,35 +13338,19 @@ let engine = {
         }
         return (bar.hotWater || 0) >= engine.getNoodleBarHotWaterCapacity();
     },
-    getNoodleCrossTalkBought: function() {
-        const bar = data.progress.base && data.progress.base.noodleBar;
-        return (bar && bar.crossTalkBought) || 0;
-    },
     getNoodleCrossTalkChance: function() {
-        return engine.getNoodleCrossTalkBought() * 0.1;
-    },
-    getNoodleComfyStoolsBought: function() {
-        const bar = data.progress.base && data.progress.base.noodleBar;
-        return (bar && bar.comfyStoolsBought) || 0;
+        return resortHelper.getNoodleCrossTalkBought() * 0.1;
     },
     getNoodleEatRestBonus: function() {
-        return 10 + 5 * engine.getNoodleComfyStoolsBought();
-    },
-    getNoodleSturdyWallsBought: function() {
-        const bar = data.progress.base && data.progress.base.noodleBar;
-        return (bar && bar.sturdyWallsBought) || 0;
+        return 10 + 5 * resortHelper.getNoodleComfyStoolsBought();
     },
     getNoodleEatDurationSeconds: function() {
-        return 10 + 2 * engine.getNoodleSturdyWallsBought();
-    },
-    getNoodleTrophyDecorationsBought: function() {
-        const bar = data.progress.base && data.progress.base.noodleBar;
-        return (bar && bar.trophyDecorationsBought) || 0;
+        return 10 + 2 * resortHelper.getNoodleSturdyWallsBought();
     },
     getNoodleTopicCost: function() {
         const bar = data.progress.base && data.progress.base.noodleBar;
         const presses = (bar && bar.topicPresses) || 0;
-        const div = Math.pow(2, engine.getNoodleTrophyDecorationsBought());
+        const div = Math.pow(2, resortHelper.getNoodleTrophyDecorationsBought());
         return round2(presses * 50000 / div);
     },
     canGuestEatNoodles: function() {
@@ -13675,38 +13521,7 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().marketExpAdd || 0) : 0;
         market.exp = (market.exp || 0) + amount * (1 + cardAdd);
         engine.applyMarketLevelUps();
-    },
-    getMarketMysticalGlovesBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.mysticalGlovesBought) || 0;
-    },
-    /** One pair to start, one more per Market level, hard capped at 3. */
-    getMarketMysticalGlovesMax: function() {
-        return Math.min(3, 1 + engine.getMarketLevel());
-    },
-    getMarketAnchoringRingBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.anchoringRingBought) || 0;
-    },
-    /** Three to start, three more per Market level, hard capped at 12. */
-    getMarketAnchoringRingMax: function() {
-        return Math.min(12, 3 + 3 * engine.getMarketLevel());
-    },
-    isMarketCookingEquipmentBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return !!(market && market.cookingEquipmentBought);
-    },
-    isMarketTradingExperienceBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return !!(market && market.tradingExperienceBought);
-    },
-    getMarketBuyAdvertisingBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.buyAdvertisingBought) || 0;
-    },
-    getMarketAdvertisingIntervalMultiplier: function() {
-        return Math.pow(0.95, engine.getMarketBuyAdvertisingBought());
-    },
+    },    /** Three to start, three more per Market level, hard capped at 12. */
     canStartExchangeCredit: function() {
         if (!engine.isMarketBuilt()) {
             return false;
@@ -13745,43 +13560,10 @@ let engine = {
         market.credit = (market.credit || 0) + 1000;
         engine.grantMarketExp(1000);
     },
-    getLiteracyLessonsBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.literacyLessonsBought) || 0;
-    },
-    getLiteracyLessonsMax: function() {
-        return 3 + 3 * Math.max(0, engine.getMarketLevel() - 2);
-    },
-    getLiteracyResearchMultiplier: function() {
-        return Math.pow(1.2, engine.getLiteracyLessonsBought());
-    },
-    isForgingInstructionsBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return !!(market && market.forgingInstructionsBought);
-    },
-    isLauncherDesignsBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return !!(market && market.launcherDesignsBought);
-    },
-    getArsonistJournalsBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.arsonistJournalsBought) || 0;
-    },
-    getLostScrollsBought: function() {
-        const market = data.progress.base && data.progress.base.market;
-        return (market && market.lostScrollsBought) || 0;
-    },
-    getLostScrollsMax: function() {
-        return 1 + Math.max(0, engine.getMarketLevel() - 3);
-    },
-    getLargerForgeBought: function() {
-        const atelier = data.progress.base && data.progress.base.atelier;
-        return (atelier && atelier.largerForgeBought) || 0;
-    },
     getForgeSmeltBatch: function(spirit) {
         const power = engine.getEffectiveSpiritPower(spirit) || 1;
         const root = Math.sqrt(power);
-        const n = engine.getLargerForgeBought();
+        const n = resortHelper.getLargerForgeBought();
         if (n <= 0) {
             return Math.floor(root);
         }
@@ -14033,7 +13815,7 @@ let engine = {
         const okamiLevel = (okami && okami.level) || 0;
         const tails = engine.getOkamiTails(okamiLevel);
         let rate = (engine.getTotalTalentLevels() * engine.getShrineStarScore() * engine.getSpiritTotalLevels() * okamiLevel * tails) / 10000000;
-        if (engine.isKarmaStackingBought()) {
+        if (resortHelper.isKarmaStackingBought()) {
             rate *= Math.pow(2, engine.getLegendsWritten());
         }
         return rate;
@@ -14299,67 +14081,6 @@ let engine = {
     getLegendOkamiExpMultiplier: function() {
         return engine.getLegendsWritten() >= 2 ? 1.5 : 1;
     },
-    getShrineUpgradeBought: function(field) {
-        const shrine = data.progress.base && data.progress.base.shrine;
-        return (shrine && shrine[field]) || 0;
-    },
-    getShardEchoesBought: function() {
-        return engine.getShrineUpgradeBought("shardEchoesBought");
-    },
-    getArtAppreciationBought: function() {
-        return engine.getShrineUpgradeBought("artAppreciationBought");
-    },
-    getLanguageEchoesBought: function() {
-        return engine.getShrineUpgradeBought("languageEchoesBought");
-    },
-    getSkillEchoesBought: function() {
-        return engine.getShrineUpgradeBought("skillEchoesBought");
-    },
-    getSpiritWeavingEchoesBought: function() {
-        return engine.getShrineUpgradeBought("spiritWeavingEchoesBought");
-    },
-    isKarmaStackingBought: function() {
-        return engine.getShrineUpgradeBought("karmaStackingBought") > 0;
-    },
-    isPowerfulChopsBought: function() {
-        return engine.getShrineUpgradeBought("powerfulChopsBought") > 0;
-    },
-    isAxeEchoesBought: function() {
-        return engine.getShrineUpgradeBought("axeEchoesBought") > 0;
-    },
-    isShelvingEchoesBought: function() {
-        return engine.getShrineUpgradeBought("shelvingEchoesBought") > 0;
-    },
-    isPlantAffinityBought: function() {
-        return engine.getShrineUpgradeBought("plantAffinityBought") > 0;
-    },
-    isEarthAffinityBought: function() {
-        return engine.getShrineUpgradeBought("earthAffinityBought") > 0;
-    },
-    isHardenBambooBought: function() {
-        return engine.getShrineUpgradeBought("hardenBambooBought") > 0;
-    },
-    isScribingInfusionsBought: function() {
-        return engine.getShrineUpgradeBought("scribingInfusionsBought") > 0;
-    },
-    isShardsFoundBought: function() {
-        return engine.getShrineUpgradeBought("shardsFoundBought") > 0;
-    },
-    isTradingContractsBought: function() {
-        return engine.getShrineUpgradeBought("tradingContractsBought") > 0;
-    },
-    isResourceProtectionBought: function() {
-        return engine.getShrineUpgradeBought("resourceProtectionBought") > 0;
-    },
-    isDealMakingBought: function() {
-        return engine.getShrineUpgradeBought("dealMakingBought") > 0;
-    },
-    getOrbHeightBought: function() {
-        return engine.getShrineUpgradeBought("orbHeightBought");
-    },
-    isSkyAppreciationBought: function() {
-        return engine.getShrineUpgradeBought("skyAppreciationBought") > 0;
-    },
     getShrineHaulKeep: function(resourceType) {
         const shrine = data.progress.base && data.progress.base.shrine;
         const field = resourceType === "stone" ? "haulKeepStone"
@@ -14400,15 +14121,6 @@ let engine = {
         }
         return n;
     },
-    getNurturePlantSpiritMax: function() {
-        const cfg = resortData.bambooForestConfig || {};
-        const base = (cfg.plantSpiritMax || 3) + (engine.isPlantAffinityBought() ? 1 : 0);
-        const torii = data.progress.base && data.progress.base.torii;
-        const bought = (torii && torii.plantSpiritsBought) || 0;
-        const slots = cfg.stalkCount || 4;
-        const free = Math.max(0, slots - engine.countPlantSpirits());
-        return Math.min(base, bought + free);
-    },
     hasFirstEarthSpirit: function() {
         const hs = data.progress.base && data.progress.base.hiddenSpring;
         if (!hs) {
@@ -14427,34 +14139,13 @@ let engine = {
         }
         hs.earthAffinityGranted = true;
     },
-    getInfuseScribingsBought: function() {
-        const lib = data.progress.base && data.progress.base.scrollArchives;
-        return (lib && lib.infuseScribingsBought) || 0;
-    },
-    getInfuseScribingsMultiplier: function() {
-        return Math.pow(1.5, engine.getInfuseScribingsBought());
-    },
-    getEchoedAxeBought: function() {
-        const bf = data.progress.base && data.progress.base.bambooForest;
-        return (bf && bf.echoedAxeBought) || 0;
-    },
-    getEchoedShelvingBought: function() {
-        const pile = data.progress.base && data.progress.base.stonePile;
-        return (pile && pile.echoedShelvingBought) || 0;
-    },
     applyEchoedShelving: function(amount) {
         const n = Math.max(0, amount || 0);
-        const bought = engine.getEchoedShelvingBought();
+        const bought = resortHelper.getEchoedShelvingBought();
         if (bought <= 0) {
             return n;
         }
         return Math.ceil(n * Math.pow(1.25, bought) - 1e-9);
-    },
-    getCollectShardsMax: function() {
-        return 5 + engine.getShardEchoesBought();
-    },
-    getLanguageEchoesMax: function() {
-        return Math.min(10, engine.getLegendsWritten());
     },
     collectShardsPurchaseInProgress: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -14496,7 +14187,7 @@ let engine = {
         if (!lib) {
             return;
         }
-        const max = engine.getCollectShardsMax();
+        const max = resortHelper.getCollectShardsMax();
         const refundIndex = function(n) {
             const mult = Math.pow(2, n);
             data.progress.coins = (data.progress.coins || 0) + 800 * mult;
@@ -14588,16 +14279,11 @@ let engine = {
         }
         const base = engine.getSpiritTotalLevels();
         const units = engine.getOrbWorkerUnits();
-        const walls = engine.getOrbBuildWallsBought();
-        const stairs = engine.getOrbBuildStairsBought();
+        const walls = resortHelper.getOrbBuildWallsBought();
+        const stairs = resortHelper.getOrbBuildStairsBought();
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().orbExpAdd || 0) : 0;
         return base * (1 + 0.2 * units) * (1 + 0.1 * walls) * (1 + 0.2 * stairs) * (1 + cardAdd);
-    },
-    getOrbSpinCurrentsMultiplier: function() {
-        const orb = data.progress.base && data.progress.base.mage_tower;
-        const n = (orb && orb.spinCurrentsBought) || 0;
-        return Math.pow(1.05, n);
     },
     getEffectiveManaRatePerSecond: function() {
         if (!engine.isManaUnlocked()) {
@@ -14605,7 +14291,7 @@ let engine = {
         }
         const orb = data.progress.base && data.progress.base.mage_tower;
         let rate = (orb && orb.level) || 0;
-        rate *= engine.getOrbSpinCurrentsMultiplier();
+        rate *= Math.pow(1.05, (orb && orb.spinCurrentsBought) || 0);
         if (typeof bonfire !== "undefined") {
             const bf = data.progress.base.bonfire;
             rate *= bonfire.getManaGainBonusMultiplier((bf && bf.heat) || 0);
@@ -14614,7 +14300,7 @@ let engine = {
         if (okami.assignedBuildingKey === "mage_tower") {
             rate *= engine.getOkamiInspirationBonus();
         }
-        rate *= engine.getOrbFloorBonusMultiplier();
+        rate *= resortHelper.getOrbFloorBonusMultiplier();
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().manaRegenAdd || 0) : 0;
         rate *= (1 + cardAdd);
@@ -14699,8 +14385,10 @@ let engine = {
         const levelMult = 1 + 0.2 * (lvl || 0);
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().spiritStrandsAdd || 0) : 0;
-        const echoMult = Math.pow(1.3, engine.getSpiritWeavingEchoesBought());
-        return tailMult * levelMult * engine.getMagicLoomSpiritStrandMultiplier() * (1 + cardAdd) * echoMult;
+        const echoMult = Math.pow(1.3, resortHelper.getSpiritWeavingEchoesBought());
+        const atelier = data.progress.base && data.progress.base.atelier;
+        const looms = atelier && atelier.magicLoomsBought ? atelier.magicLoomsBought : 0;
+        return tailMult * levelMult * Math.pow(1.1, looms) * (1 + cardAdd) * echoMult;
     },
     getOkamiExpToLevel: function(level) {
         const cfg = resortData.okamiConfig;
@@ -15152,13 +14840,6 @@ let engine = {
     getScrollArchivesGoldResearchGainMult: function() {
         return Math.pow(1.1, engine.countAchievedMapStarsByType().gold);
     },
-    getWorkspaceFurnitureBought: function() {
-        const lib = data.progress.base && data.progress.base.scrollArchives;
-        return (lib && lib.workspaceFurnitureBought) || 0;
-    },
-    getWorkspaceFurnitureResearchCostMult: function() {
-        return Math.pow(0.9, engine.getWorkspaceFurnitureBought());
-    },
     getScrollArchivesFinishWeaveSeconds: function() {
         const lib = data.progress.base.scrollArchives;
         const unlocked = onLoad.countUnlockedSkills(lib.unlockedSkills);
@@ -15607,7 +15288,7 @@ let engine = {
         const freeN = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().freeResearchLevelsFlat || 0)
             : 0;
-        const lost = engine.getLostScrollsBought();
+        const lost = resortHelper.getLostScrollsBought();
         const newSystem = (lib.scribingsCompleted || 0) + freeN + lost;
         if (newSystem > owned) {
             lib.researchesToChoose = (lib.researchesToChoose || 0) + (newSystem - owned);
@@ -15644,7 +15325,7 @@ let engine = {
         return defs[0];
     },
     getInscriptionUnitCost: function(def) {
-        const mult = engine.getScrollArchivesBronzeResearchCostMult() * engine.getWorkspaceFurnitureResearchCostMult();
+        const mult = engine.getScrollArchivesBronzeResearchCostMult() * Math.pow(0.9, resortHelper.getWorkspaceFurnitureBought());
         return {
             coins: def.coins * mult,
             beads: def.beads * mult,
@@ -15663,7 +15344,7 @@ let engine = {
     },
     getInscriptionProgressPerSecond: function() {
         return engine.getScrollArchivesResearchRate()
-            * engine.getLiteracyResearchMultiplier()
+            * Math.pow(1.2, resortHelper.getLiteracyLessonsBought())
             * engine.getScrollArchivesGoldResearchGainMult();
     },
     resetInscriptionsForPrestige: function(lib) {
@@ -15672,7 +15353,7 @@ let engine = {
         }
         engine.ensureInscriptionState();
         const defs = engine.INSCRIPTION_ROWS;
-        const keepN = Math.max(0, Math.min(defs.length, engine.getLanguageEchoesBought()));
+        const keepN = Math.max(0, Math.min(defs.length, resortHelper.getLanguageEchoesBought()));
         const kept = [];
         for (let i = 0; i < keepN; i++) {
             const row = lib.inscriptions[defs[i].key];
@@ -15766,21 +15447,14 @@ let engine = {
         }
         engine.refreshInscriptionUnlock(lib);
     },
-    getSturdyShelvesBought: function() {
-        const lib = data.progress.base && data.progress.base.scrollArchives;
-        return (lib && lib.sturdyShelvesBought) || 0;
-    },
-    getSturdyShelvesOutputMultiplier: function() {
-        return Math.pow(1.3, engine.getSturdyShelvesBought());
-    },
     scribingsGainedAfterTicks: function(lib, ticks) {
         const defs = engine.INSCRIPTION_ROWS;
         const M = Math.floor(ticks);
         if (!lib || !lib.inscriptions || !defs.length || M <= 0) {
             return 0;
         }
-        const mult = engine.getSturdyShelvesOutputMultiplier();
-        const strokeMult = engine.getInfuseScribingsMultiplier();
+        const mult = Math.pow(1.3, resortHelper.getSturdyShelvesBought());
+        const strokeMult = Math.pow(1.5, resortHelper.getInfuseScribingsBought());
         let term = engine.inscriptionRate(defs[0]) * M * mult;
         const first = lib.inscriptions[defs[0].key];
         let gain = ((first && first.actual) || 0) * term * strokeMult;
@@ -15845,8 +15519,8 @@ let engine = {
         for (let i = 0; i < rowCount; i++) {
             snap.push(lib.inscriptions[defs[i].key].actual || 0);
         }
-        const shelfMult = engine.getSturdyShelvesOutputMultiplier();
-        const strokeMult = engine.getInfuseScribingsMultiplier();
+        const shelfMult = Math.pow(1.3, resortHelper.getSturdyShelvesBought());
+        const strokeMult = Math.pow(1.5, resortHelper.getInfuseScribingsBought());
         lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]) * shelfMult * strokeMult;
         for (let i = 1; i < rowCount; i++) {
             const above = lib.inscriptions[defs[i - 1].key];

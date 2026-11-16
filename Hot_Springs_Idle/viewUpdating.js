@@ -561,7 +561,7 @@ let view = {
         view.updateVal("chaStatTip", `Charisma - enemies move 5% faster towards you per point.<br>+5% coins per point, multiplied with other coin bonuses.<br>+5% Clout gain per point.<br>Each point leaves 95% of the remaining time until a wave, and 95% of the spacing inside a wave.<br>Current: enemies +${chaPts * 5}% speed, coins x${roundNearestDecimals(chaCoinFactor, 2)}, Clout gain +${cloutGainPct}% (with Confidence), waves x${roundNearestDecimals(chaWaveFactor, 2)}.`, "innerHTML");
         view.updateVal("soulText", engine.getCloneSoulLevel(), "textContent", 1);
         const soulLv = engine.getCloneSoulLevel();
-        const ringSoul = engine.getMarketAnchoringRingBought();
+        const ringSoul = resortHelper.getMarketAnchoringRingBought();
         let soulStatTip = `Soul - +3% skill exp per level (additive) and +10% character exp per level (additive).<br>Anchoring Ring: +${ringSoul} Soul.`;
         if (skills.isSkillEquipped("soulSearching")) {
             const soulSearchingSoul = skills.getSkillEffect("soulSearching").bonusSoul || 0;
@@ -630,7 +630,7 @@ let view = {
         const columnSlap = (typeof skills.columnReward === "function") ? (skills.columnReward("offense").value || 0) : 0;
         // Tip mirrors ((base + foundation + cards + column) x density x sturdiness + skill Aud) x Confidence x Bravado
         const foundationAud = engine.getCloneFoundationAudFlat();
-        const sturdinessMult = engine.getContemplateSturdinessMult();
+        const sturdinessMult = Math.pow(1.1, resortHelper.getContemplateSturdinessBought());
         const audBaseLines = [];
         let densBaseSum = gc.baseAudInner + foundationAud + cardAud + columnAud;
         audBaseLines.push(`Base Audacity: +${intToString(gc.baseAudInner, 2, true)}`);
@@ -840,7 +840,7 @@ let view = {
         if (alacrityEquipped) {
             slapTip += `<br>Alacrity reduction: ${intToString(alaLv * cdCfg.alacritySlapReductionPerLevelMs, 2, true)} ms`;
         }
-        const glovesMs = engine.getMarketMysticalGlovesBought() * 100;
+        const glovesMs = resortHelper.getMarketMysticalGlovesBought() * 100;
         slapTip += `<br>Mystical Gloves: -${intToString(glovesMs, 2, true)} ms`;
         slapTip += `<br>Floor: ${intToString(cdCfg.slapFloorMs / 1000, 2, true)}s`;
         view.updateVal("statsSlapTip", slapTip, "innerHTML");
@@ -1793,9 +1793,9 @@ let view = {
             view.updateVal(`inscriptionActual_${def.key}`, row.actual || 0, "textContent", 3);
             view.updateVal(`inscriptionBought_${def.key}`, row.bought || 0, "textContent", 2);
             view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product} each`);
-            let inscriptionOut = engine.inscriptionRate(def) * (row.actual || 0) * engine.getSturdyShelvesOutputMultiplier();
+            let inscriptionOut = engine.inscriptionRate(def) * (row.actual || 0) * Math.pow(1.3, resortHelper.getSturdyShelvesBought());
             if (def.key === "strokes") {
-                inscriptionOut *= engine.getInfuseScribingsMultiplier();
+                inscriptionOut *= Math.pow(1.5, resortHelper.getInfuseScribingsBought());
             }
             view.updateVal(`inscriptionOutput_${def.key}`, `+${intToString(inscriptionOut, 3)}/s`);
             view.updateVal(`inscriptionReq_${def.key}`, need, "textContent", 3);
@@ -2259,7 +2259,7 @@ let view = {
         const earthBought = engine.hasFirstEarthSpirit();
         view.updateVal("spiritSlots_earth", (slotsRevealed && earthBought) ? "" : "none", "style.display");
         view.updateVal("spiritSlots_water", (slotsRevealed && waterBought) ? "" : "none", "style.display");
-        view.updateVal("spiritSlots_spiritTraining", engine.isSpiritTrainingSpotBought() ? "" : "none", "style.display");
+        view.updateVal("spiritSlots_spiritTraining", resortHelper.isSpiritTrainingSpotBought() ? "" : "none", "style.display");
         const mineEarthGrid = document.getElementById("spiritSlots_mine_earth");
         if (mineEarthGrid) {
             mineEarthGrid.style.display = mineRevealed ? "" : "none";
@@ -3296,7 +3296,7 @@ let view = {
         setChk("marketAllowWood_chk", market.allowWood);
         setChk("marketAllowHardwood_chk", market.allowHardwood);
         setChk("marketAllowBars_chk", market.allowBars);
-        view.updateVal("marketAllowHardwood_wrap", engine.isGrowHardwoodBought() ? "" : "none", "style.display");
+        view.updateVal("marketAllowHardwood_wrap", resortHelper.isGrowHardwoodBought() ? "" : "none", "style.display");
         const haulOrder = resortData.marketHaulResourceOrder || [];
         const keepOn = !!(data.progress.base.garden && data.progress.base.garden.arrangementOfResourceProtectionUnlocked);
         for (let hi = 0; hi < haulOrder.length; hi++) {
@@ -3485,7 +3485,7 @@ let view = {
         view.updateVal("bambooForestInfoChips", bf.chips || 0, "textContent", "floor");
         view.updateVal("bambooForestInfoWood", bf.wood || 0, "textContent", "floor");
         view.updateVal("bambooForestInfoTitle", engine.getBambooForestDisplayName());
-        const hardwoodOn = engine.isGrowHardwoodBought();
+        const hardwoodOn = resortHelper.isGrowHardwoodBought();
         view.updateVal("bambooForestHardwood_row", hardwoodOn ? "" : "none", "style.display");
         view.updateVal("bambooSwitchRow", hardwoodOn ? "" : "none", "style.display");
         view.updateVal("bambooTypeRow", hardwoodOn ? "" : "none", "style.display");
@@ -3575,7 +3575,7 @@ let view = {
     updateResortMapTokens: function() {
         const base = data.progress.base || {};
         const selectedSpiritId = data.progress.selectedSpiritId;
-        const springSlotMax = engine.getHiddenSpringSpiritSlotMax();
+        const springSlotMax = resortHelper.getHiddenSpringSpiritSlotMax();
         const trainingSpirit = engine.getSpiritAtLocation("spiritTraining", 0);
         view.updateSpiritSlotAppearance("spiritSlot_spiritTraining_any_0", trainingSpirit, selectedSpiritId);
         for (let ki = 0; ki < 2; ki++) {
@@ -4006,7 +4006,7 @@ let view = {
         view.updateVal("spiritInfoPower", round2(spirit.spiritPower || 1));
         const nextPowerInc = engine.getSpiritPowerNextIncrease(spirit.level || 1);
         view.updateVal("spiritInfoPowerNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? `(+${nextPowerInc} on lvl)` : "", "textContent");
-        const trainingBought = engine.isSpiritTrainingSpotBought();
+        const trainingBought = resortHelper.isSpiritTrainingSpotBought();
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
@@ -4027,7 +4027,7 @@ let view = {
         view.updateVal("spiritInfoPlantExtras", kind === "plant" ? "" : "none", "style.display");
         view.updateVal("spiritInfoTaskWrap", (kind === "plant") ? "none" : "", "style.display");
         if (kind === "earth") {
-            const pebbleMax = engine.getEarthSpiritPebbleMax();
+            const pebbleMax = resortHelper.getEarthSpiritPebbleMax();
             view.updateVal("spiritInfoPebbles", engine.countPebblesForSpirit(spirit.id));
             view.updateVal("spiritInfoPebblesMax", pebbleMax);
             view.updateVal("spiritInfoPebbleCarry", engine.formatEarthSpiritPebbleCarry(spirit));
@@ -4252,7 +4252,7 @@ let view = {
         }
         view.updateVal("minePrioritizeOreRow", "none", "style.display");
         view.updateVal("mineAssignedLevelText", engine.getMineSpiritLevelTotal());
-        const beamBonus = engine.getMineshaftBeamsBought() * 20;
+        const beamBonus = resortHelper.getMineshaftBeamsBought() * 20;
         const powerText = beamBonus > 0
             ? `${round2(engine.getMineSpiritPower())} (+${beamBonus}%)`
             : `${round2(engine.getMineSpiritPower())}`;
@@ -4264,7 +4264,7 @@ let view = {
             const playSpirits = engine.getMineSpiritList();
             const dirtSpent = Math.min(mine.resources.dirt || 0, engine.getMinePlayDirtPerCycle());
             const xpEach = playSpirits.length > 0 ? dirtSpent / playSpirits.length : 0;
-            const playBonusPct = Math.round((engine.getPlayPitDirtMultiplier() - 1) * 100);
+            const playBonusPct = Math.round((resortHelper.getPlayPitDirtMultiplier() - 1) * 100);
             const playBonusText = playBonusPct > 0 ? ` (+${playBonusPct}%)` : "";
             view.updateVal("minePlayProgressDetail", `${round2(dirtSpent)} dirt every 5s${playBonusText}, ${round2(xpEach)} exp per earth spirit`);
         }
@@ -4384,7 +4384,7 @@ let view = {
                 view.updateVal("hiddenSpringAssignOkami_btn", okamiHere ? "Unassign Okami" : "Assign Okami");
                 view.updateVal("hiddenSpringAssignOkami_btn", okamiHere, "classList.toggle", "assign-okami-btn-active");
             }
-            const showAutoRefill = selfSufficient && engine.isSpiritTrainingSpotBought();
+            const showAutoRefill = selfSufficient && resortHelper.isSpiritTrainingSpotBought();
             view.updateVal("hiddenSpringAutoRefill_row", showAutoRefill ? "" : "none", "style.display");
             if (showAutoRefill) {
                 const refillChk = viewData.cached.hiddenSpringAutoRefill_chk;
@@ -4710,7 +4710,7 @@ let view = {
             : "", "innerHTML");
         const forest = base.bambooForest || {};
         const woodMap = `${resortData.resourceIconHtml("wood")} ${intToStringRound(forest.wood || 0)}`;
-        view.updateVal("bambooForestMapDisplay", engine.isGrowHardwoodBought()
+        view.updateVal("bambooForestMapDisplay", resortHelper.isGrowHardwoodBought()
             ? `${woodMap} | ${resortData.resourceIconHtml("hardwood")} ${intToStringRound(forest.hardwood || 0)}`
             : woodMap, "innerHTML");
         const bonfire = base.bonfire || {};
@@ -5832,7 +5832,7 @@ let view = {
         view.updateVal("libSkillInfo_tips_row", tipsVal > 0 ? "" : "none", "style.display");
         view.updateVal("libSkillInfo_tips_text", `${tipsVal}, Tip Exp Bonus: x${parts.tipsMult.toFixed(2)}`);
         view.updateVal("libSkillInfo_unequipBtn", skills.isSkillEquipped(skillKey) ? "" : "none", "style.display");
-        const echoesBought = engine.getSkillEchoesBought();
+        const echoesBought = resortHelper.getSkillEchoesBought();
         const lib = data.progress.base && data.progress.base.scrollArchives;
         const lockedKeys = (lib && lib.lockedSkillKeys) || [];
         const isLocked = lockedKeys.indexOf(skillKey) >= 0;
