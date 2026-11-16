@@ -852,20 +852,8 @@ let initialize = {
         if (typeof engine.ensureInscriptionState === "function") {
             engine.ensureInscriptionState();
         }
-        if ((lib.researchesToChoose || 0) > 0) {
-            const choices = lib.researchChoices || [];
-            let choicesValid = choices.length > 0;
-            const seenChoice = {};
-            for (let ci = 0; ci < choices.length && choicesValid; ci++) {
-                const choiceKey = choices[ci];
-                if (!engine.isScrollArchivesSkillViable(choiceKey) || seenChoice[choiceKey]) {
-                    choicesValid = false;
-                }
-                seenChoice[choiceKey] = true;
-            }
-            if (!choicesValid) {
-                engine.rollScrollArchivesResearchChoices();
-            }
+        if (typeof engine.ensureScrollArchivesResearchChoices === "function") {
+            engine.ensureScrollArchivesResearchChoices();
         }
     },
     initializeInn: function() {

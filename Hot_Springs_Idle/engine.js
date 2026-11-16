@@ -15208,20 +15208,112 @@ let engine = {
         }
         return out;
     },
-    /** True if player has at least one unlocked skill in the given slotCategory. */
+    /**
+     * True if a researched skill in this category is unlocked.
+     * Locked echoes stay unlocked across prestige, but they do not count:
+     * the opening researches are still Offense, then Defense, then Utility.
+     */
     hasUnlockedSkillInSlotCategory: function(slotCategory) {
-        const unlocked = data.progress.base && data.progress.base.scrollArchives
-            && data.progress.base.scrollArchives.unlockedSkills;
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        const unlocked = lib && lib.unlockedSkills;
         if (!unlocked || !slotCategory) {
             return false;
         }
+        const lockedList = lib.lockedSkillKeys || [];
+        const locked = {};
+        for (let li = 0; li < lockedList.length; li++) {
+            locked[lockedList[li]] = true;
+        }
         const keys = Object.keys(unlocked);
         for (let i = 0; i < keys.length; i++) {
-            if (unlocked[keys[i]] && skills.getSlotCategory(keys[i]) === slotCategory) {
+            if (!unlocked[keys[i]] || locked[keys[i]]) {
+                continue;
+            }
+            if (skills.getSlotCategory(keys[i]) === slotCategory) {
                 return true;
             }
         }
         return false;
+    },
+    /** Category whose next research should be three choices of that category, or "". */
+    getOpeningForcedResearchCategory: function(viable) {
+        const pool = viable || engine.getScrollArchivesViableSkillPool();
+        const forceCats = ["offense", "defense", "utility"];
+        for (let fi = 0; fi < forceCats.length; fi++) {
+            const cat = forceCats[fi];
+            if (engine.hasUnlockedSkillInSlotCategory(cat)) {
+                continue;
+            }
+            for (let vi = 0; vi < pool.length; vi++) {
+                if (skills.getSlotCategory(pool[vi]) === cat) {
+                    return cat;
+                }
+            }
+        }
+        return "";
+    },
+    isScrollArchivesFinishResearchWeaving: function() {
+        const weaving = data.progress && data.progress.weaving;
+        if (!weaving) {
+            return false;
+        }
+        const entries = [];
+        if (weaving.active) {
+            entries.push(weaving.active);
+        }
+        const paused = weaving.paused;
+        if (paused && typeof paused === "object") {
+            if (paused.scopeKey !== undefined) {
+                entries.push(paused);
+            } else {
+                const pausedKeys = Object.keys(paused);
+                for (let pi = 0; pi < pausedKeys.length; pi++) {
+                    if (paused[pausedKeys[pi]]) {
+                        entries.push(paused[pausedKeys[pi]]);
+                    }
+                }
+            }
+        }
+        for (let ei = 0; ei < entries.length; ei++) {
+            const entry = entries[ei];
+            if (entry.scopeKey === "scrollArchives" && entry.upgradeKey === "finishResearch") {
+                return true;
+            }
+        }
+        return false;
+    },
+    ensureScrollArchivesResearchChoices: function() {
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib || !((lib.researchesToChoose || 0) > 0)) {
+            return;
+        }
+        if (engine.isScrollArchivesFinishResearchWeaving()) {
+            return;
+        }
+        const choices = lib.researchChoices || [];
+        let choicesValid = choices.length > 0;
+        const seenChoice = {};
+        for (let ci = 0; ci < choices.length && choicesValid; ci++) {
+            const choiceKey = choices[ci];
+            if (!engine.isScrollArchivesSkillViable(choiceKey) || seenChoice[choiceKey]) {
+                choicesValid = false;
+            }
+            seenChoice[choiceKey] = true;
+        }
+        if (choicesValid) {
+            const forced = engine.getOpeningForcedResearchCategory();
+            if (forced) {
+                for (let fi = 0; fi < choices.length; fi++) {
+                    if (skills.getSlotCategory(choices[fi]) !== forced) {
+                        choicesValid = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!choicesValid) {
+            engine.rollScrollArchivesResearchChoices();
+        }
     },
     deriveStableSeed: function(salt) {
         const p = data.progress || {};
@@ -15299,26 +15391,21 @@ let engine = {
             return engine.nextSeededFloat(lib, "researchSeed");
         };
         const viable = engine.getScrollArchivesViableSkillPool();
+        const forcedCat = engine.getOpeningForcedResearchCategory(viable);
         let pool = viable;
         const forceCats = ["offense", "defense", "utility"];
         let forcingOpeningCategory = false;
-        for (let fi = 0; fi < forceCats.length; fi++) {
-            const cat = forceCats[fi];
-            if (engine.hasUnlockedSkillInSlotCategory(cat)) {
-                continue;
-            }
+        if (forcedCat) {
             const catPool = [];
             for (let vi = 0; vi < viable.length; vi++) {
-                if (skills.getSlotCategory(viable[vi]) === cat) {
+                if (skills.getSlotCategory(viable[vi]) === forcedCat) {
                     catPool.push(viable[vi]);
                 }
             }
             if (catPool.length > 0) {
                 pool = catPool;
                 forcingOpeningCategory = true;
-                break;
             }
-            // No remaining skills in this category to research - treat as satisfied and continue.
         }
         const choices = [];
         if (!forcingOpeningCategory) {

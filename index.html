@@ -1,213 +1,842 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-tab="games">
 <head>
     <meta charset="UTF-8">
-    <title>StopSigns github</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0d1517">
+    <title>StopSign</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,620&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            var theme = 'dark';
+            try {
+                var stored = localStorage.getItem('theme');
+                if (stored === 'light' || stored === 'dark') theme = stored;
+            } catch (e) {}
+            document.documentElement.setAttribute('data-theme', theme);
+
+            var hash = location.hash.slice(1);
+            var tab = 'games';
+            if (hash === 'about') tab = 'about';
+            else if (hash === 'devlog' || hash.indexOf('devlog-') === 0) tab = 'devlog';
+            document.documentElement.setAttribute('data-tab', tab);
+        })();
+    </script>
+    <script>
+        const gaScript = document.createElement('script');
+        gaScript.async = true;
+        gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-E10C6H16MH';
+        document.head.appendChild(gaScript);
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-E10C6H16MH');
+    </script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body style="font-family:Arial;text-align:center;background-color:teal">
-    <div class='centerTextArea' >
-        <br>
-        My other online handles are Phurple (Kongregate) or Stop_Sign (Reddit/Discord).<br>
-        Links are top to bottom for how worthwhile it is to click them.<br>
-        My discord to discuss everything is <a href="https://discord.gg/EmRuWPp">here</a>.
+<body>
+    <div class="wrap">
+        <header class="site-header">
+            <h1>StopSign's Github</h1>
+            <button type="button" class="theme-toggle" id="theme-toggle" aria-pressed="false">
+                <span class="when-dark">Light mode</span>
+                <span class="when-light">Dark mode</span>
+            </button>
+        </header>
 
-        <h3>Games to Play</h3>
-        <div class="gameDescription">
-            <a href="https://stopsign.github.io/KTL/">Kill the Lich</a><br>
-            My 14th game, with about 2 months playtime available.<br>
-            Won 3rd in "Best New Web Games" on /r/incremental_games, 2025.<br>
-            My most ambitious project, created after a lot of thinking about what I like in idle games and the games I've played and created. This game is in-between Idle Loops and Nanospread in design, with a core idea as well that I wanted to visually see the progress, without a ton of submenus to switch between. The compression of each loop is also heavily inspired by Increlution.<br>
-            This game is now published on Steam as well as a free to play game - search Kill the Lich Idle on the Steam store!
-        </div>
-        <div class="gameDescription">
-            <a href="https://omsi6.github.io/loops/">Idle Loops</a><br>
-            My 13th and my most playable and popular game.<br>
-            About 4 weeks playtime available.<br>
-            This link is to Omsi6's version, which extended mine. Use that one. If you want to see my version, check it out here <a href="idleLoops/"></a>
-            <br>
-            ~150 hours development time.<br>
-            After scripting ItRtG and NGU so much, I wanted to capture that feeling of small tweaks to a complicated process rather than actually playing the complicated process.<br>
-            This game is substantially different than my others in number flow as a result, as it's a different perspective on idle games.<br>
-            I was far more ambitious with the autogeneration code this time, making it very easy to add actions.<br>
-            This is the first time I created a discord community, which ended up being a *massive* deal and taught me a lot.<br>
-            It took me a long time to realize, but one of the major draws of this game is the story element.<br>
-            I won the 2018 Most Interesting New Mechanic award in /r/incremental_games for this one.
-        </div>
-        <div class="gameDescription">
-            <a href="Nanospread/">Nanospread</a><br>
-            My 11th attempt at a game<br>
-            Has about 1 week of playtime, enjoy!<br>
-            <br>
-            ~80 hours development time. Inspired by the failures of Progress Bar Quest v2.<br>
-            Abandoned because the next set of changes require a deep refactoring.<br>
-            My first time coding with someone else - there are a few pull requests in the history made by him, and stats is 100% him.<br>
-            Got 30k pageviews according to Google Analytics.
-        </div>
-        <div class="gameDescription">
-            <a href="KPWBeta/">King's Perfect War</a><br>
-            14th game.<br>
-            No longer in development, just an idea.<br>
-            <br>
-            ~160 hours development time.<br>
-            I took all the feedback I got about Loops and made a game trying to address everything. Unfortunately, I made it a little too complicated. It doesn't quite feel like an idle game, even if it still has its merits.<br>
-            This is a closed-system game, like Nanospread, where I want additional content to be heavily based on level design. It achieves that very well, but getting to that point takes a bit.<br>
-            Easily the best code I've written though, coming off of the feedback/help I got with Loops.
-        </div>
-        <div class="gameDescription">
-            <a href="Dyson_Light/">Dyson Light</a><br>
-            15th game.<br>
-            Created for an incremental game jam with the them of Light.<br>
-            This is a quick playthrough, maybe 2-3 days worth.<br>
-            <br>
-            ~50 hours development time.<br>
-            Coming off of playing Dyson Sphere Project, I had to make an incremental around it.<br>
-            It has performance issues - don't launch too many sails at once at the end.<br>
-            I think it came out well for the amount of time I spent on it.
-        </div>
-        <div class="gameDescription">
-            <a href="Terrafold/">Terrafold</a><br>
-            My 12th game attempt.<br>
-            Has a few days of playtime, but is a bit more confusing than my other games.<br>
-            <br>
-            ~100 hours development time.<br>
-            My attempt to make an idle game with a much longer rebirth cycle.<br>
-            It was so long, in fact, that I got bored of coding it before I got to the rebirth cycle.<br>
-            Balance issues are also a pain in this game. I just have too many variables.<br>
-            The flow of numbers comes from liking the fundamental formula of Nanospread so much that I wanted to experiment with it<br>
-            I wanted to add logarithmic-based dynamic graphics in the background, which is why things are so spread out.<br>
-            The code is clean, and the idea is ~40 hours away from being wrapped up, so maybe someday.<br>
-            EDIT: the code is not clean. This game is the reason I abandoned OOP, preferring data-driven programming instead. It's super painful to try to change the code now.
-        </div>
-        <div class="gameDescription">
-            <a href="progressBarQuest3/">Progress Bar Quest v2</a><br>
-            Fun with progress bars.<br>
-            <br>
-            ~35 hours of work or so. This is my sixth game.<br>
-            It uses angular.js for the two-way binding.<br>
-            Color changes based on the level of each progress bar.<br>
-            This is a better attempt at visualizing propagation.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="Pull_of_War/">Pull of War</a><br>
-            When you load, you'll be on "Unit Spawning" - click Barracks, then Battle to start the game.<br>
-            This game has saving, but no offline progress. It works at full speed in another tab.<br>
-            <br>
-            I've spent ~100 hours on this total. It is my fourth attempt at a game. <br>
-            The idea came from Desert Strike, a custom game in SC2, and other such Tug of War games. <br>
-            It uses angular.js, but only for two-way binding - I'm not a fan of the organization that angular brings.<br>
-            Many of the graphics are "placeholder". This game is a statement of what I can and cannot do, and I'm no graphics artist.<br>
-            The aspect of idle games that I'm focusing on is needing to watch the game in order to know where to spend your money.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="progressBarQuest/">Progress Bar Quest v1</a><br>
-            Fun with progress bars, the first attempt.<br>
-            This game no saving, and sort-of works in another tab.<br>
-            It goes too fast to make sense of things eventually, but doesn't crash.<br>
-            <br>
-            ~20 hours of work or so. This is my fifth game.<br>
-            I saved this because I enjoy the color progression better than the v2.<br>
-            It uses angular.js for the two-way binding. This was also my first attempt at passing functions as parameters.<br>
-            Colors change based on how much boost a progress bar has. Give 'em more boost for pretty colors.<br>
-            This was my attempt at visualizing propagation. It turns out it's terrible at that, but it's a fascinating result regardless.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="square/">Square</a><br>
-            A simple idle game with pretty colors.<br>
-            This game no saving, and doesn't have any words.<br>
-            It lasts infinitely.<br>
-            <br>
-            ~10 hours of work or so. This is my seventh game.<br>
-            I got frustrated with how much work these games take, so I experimented with what the minimum means.<br>
-            This is a game with a single button and no numbers.<br>
-            I learned a lot about patterns and colors with this. A 5x5 grid works *far* better than a 4x4 or 6x6.<br>
-            I've watched this run for longer than I spent time on it. It was a success from that perspective.<br>
-            My most "art"-like game. I think it's pretty. No plans for changing it in the future.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="old1/">Incremental Quest</a><br>
-            A clicker game.<br>
-            This game has saving, and the idle elements work in another tab.<br>
-            <br>
-            ~40 hours of work or so. This is my first game attempt.<br>
-            Using a single .html file and a single .js file, with no libraries whatsoever.<br>
-            This was my attempt at creating elements I hadn't seen before in existing games.<br>
-            The main goal of coding it was to keep numbers low - costs less than 6 digits - for the duration of play.<br>
-            The UI is modeled off of Cookie Clicker.<br>
-            I abandoned it because it was too much work to add another piece for not a lot of play.<br>
-            I wanted to create guide-rails for play, like Cookie Clicker or AdCap, but I got bored of how much coding that required.<br>
-            I learned a *lot* about game making from this.<br>
-            Feel free to use an auto-clicker on it. I know I am.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="old2/">Feature Quest</a><br>
-            A slow clicker game.<br>
-            This game has saving, and the idle elements work in another tab.<br>
-            <br>
-            ~30 hours of work or so. This is my second game attempt.<br>
-            The first upgrade costs 500 resource1_1, so keep clicking "Exert Yourself". More unlocks with more resource1_1.<br>
-            The game picks up a lot on the 15000 costing upgrade to unlock Stroll. It has the upgrade price reduction carryover from the first attempt.<br>
-            I actually split my javascript into multiple files! I did it poorly though.<br>
-            For this game, I wanted to make a clicker that you only needed to click every few seconds, instead of with an auto-clicker.<br>
-            This was also an experiment with polynomial growth, and showing less elements to start.<br>
-            I wanted it to be a choice between getting X, X^2, or a lesser amount of both. Practice vs Application, if you will.<br>
-            Instead I learned that balance is kind of hard to maintain unless the balance is built-in to the game.<br>
-            A different lesson I learned here was to build around a theme - my unnamed resources aren't interesting.<br>
-            Another lesson is that good pacing takes planning. This game has terrible pacing - it's much too slow.<br>
-            Yet another is that explanations might be important: The block that contains Exert Yourself is active play, the block that contains Take it Easy is idle play.<br>
-            I abandoned it because it was too much work to add another piece for not a lot of play. Again.<br>
-            Feel free to open the console and type resource1_1 += 100000
+        <div class="tabs" role="tablist" aria-label="Site">
+            <button type="button" role="tab" id="tab-games" data-tab="games" aria-controls="panel-games" aria-selected="true" tabindex="0">Game Links</button>
+            <button type="button" role="tab" id="tab-devlog" data-tab="devlog" aria-controls="panel-devlog" aria-selected="false" tabindex="-1">Dev Log</button>
+            <button type="button" role="tab" id="tab-about" data-tab="about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About Me</button>
         </div>
 
+        <main>
+            <section role="tabpanel" id="panel-games" class="panel" aria-labelledby="tab-games">
+                <p class="lede">Links are top to bottom for how worthwhile it is to click them.</p>
 
-        <h3>Game Fragments (not playable)</h3>
-        <div class="gameDescription">
-            <a href="Scheduling3/">Reap and Sow</a><br>
-            ~40 hours.<br>
-            My ninth game attempt.<br>
-            I like the name, and I like the concept (forced resets), but the execution isn't balanced right. I did lots of experimentation with this concept that I used in future games.
-            <br>
-        </div>
-        <div class="gameDescription">
-            <a href="miner/">Miner</a><br>
-            ~30 hours.<br>
-            My eighth game attempt. It doesn't have anything worth playing.<br>
-            I had a few goals with this one, the biggest being collaboration.
-            I recognized that there were a few parts in my games where I didn't need to know anything about the larger game, and could hand it off to someone else.
-            So, I got some friends to say they'd try it, and one immediately refactored all the code to look nicer to them. The other made a list of mineral words to incorporate in the far future.
-            I didn't like the first guys changes, and the second wasn't very helpful, so I got discouraged and it died. Lesson learned.<br>
-            I wanted to make a game with two and only two resources, both visually represented.<br>
-            I also wanted to incorporate story elements via upgrades. This never got added.<br>
-            It needs to be more complicated in some parts, less complicated in others, so it was off-balance from the start.<br>
-            I still like the vision it was supposed to be, but it requires some heavy updates and refactoring to be useful again.<br>
-            I'm rather disappointed with how the development of this went.<br>
-        </div>
-        <div class="gameDescription">
-            <a href="Idiot Quest/">Idiot Quest</a><br>
-            ~5 hours.<br>
-            My third game attempt. It doesn't have anything worth playing.<br>
-            I started this with the goal of using a javascript library - jquery. As it turns out, a single new language isn't enough to make a game.<br>
-            I also started arranging my coding to use dynamic creations of graphic elements here.<br>
-            I recognized where it was going - too much work to add another piece for not a lot of play. I abandoned it quickly.<br>
-        </div>
+                <h2>Games to Play</h2>
 
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="https://stopsign.github.io/Hot_Springs_Idle/">Hot Springs Idle</a></h3>
+                        <p class="game-meta"><span>Game 16</span><span>Playtime: about 1 week (Work in progress)</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Hot Springs Idle is an unfolding/idle game where you play as a fox spirit that builds out a hot spring resort for the visitors to rest, while slapping the audacity out of any intruders who come to ruin the peace. With many resources, many upgrades, and foxes, it is meant for new players to the genre to be able to experience the curiosity and yearning that define the genre.</p>
+                            <p>This game is currently a work in progress, being built out and discussed by the community, and is intended to be on Steam by early 2027.</p>
+                            <p>I am using AI to assist in coding this game. None of the art assets or gameplay decisions come from AI.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>Foxes are cute. (I'll write more later)</p>
+                        </section>
+                    </div>
+                </article>
 
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="https://stopsign.github.io/KTL/">Kill the Lich</a></h3>
+                        <p class="game-meta"><span>Game 15</span><span>Playtime: about 3 months, with a NG+ to repeat further</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Won 3rd in "Best New Web Games" on /r/incremental_games, 2025.</p>
+                            <p>Kill the Lich is a minimalist incremental game centered around time compression and resource propagation. Your resources build automatically over time, but their growth accelerates when you optimize their downstream flow ratios, and you can manually push them along to go even faster. Each action grants attributes that reduce the requirements of other actions, allowing you to push further. Eventually, you can head north to Fight the Lich's Forces in an automated Phase 2, gathering three vital resources that make your next loop faster and unlock new goals.</p>
+                            <p>This game is now published on Steam as a free game (<a href="https://store.steampowered.com/app/4522510/Kill_the_Lich_Idle/">link here</a>), while remaining on the website link as well. The game is the same beetween versions and the savefile can be exported/imported between them, though the steam has the premium currency and premium upgrades.</p>
+                            <p>No AI was used in this game, or any of the earlier ones.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>My most ambitious project (at this time), created after a lot of thinking about what I like in idle games and the games I've played and created, while focused on the concept of propagation. This game is in-between Idle Loops and Nanospread in design, with a core idea as well that I wanted to visually see the progress, without a ton of submenus to switch between. The compression of each loop is also heavily inspired by Increlution.</p>
+                            <p>Releasing the game on Steam was an incredible achievement for me, though the reactions weren't quite as I wanted, they were about what I expected. The game ultimately is not very beginner friendly. Still, I am proud of it.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="https://stopsign.github.io/idleLoops/">Idle Loops</a></h3>
+                        <p class="game-meta"><span>Game 13</span><span>Playtime: about 4 weeks (more with dmchurch's version)</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Idle Loops is a game where you are in a time loop, and you have to go further and further each time in the time loop, keeping knowledge gained and talent between loops, to permanently get a little further every single repeat.</p>
+                            <p>The link is to the original game that I created, but I have had multiple developers extend the base game and continue it on their own, with significantly updated content and features. The best version to play is <a href="https://dmchurch.github.io/omsi-loops/">dmchurch's Loops</a>, and then a shorter but different experience at <a href="https://mopatissier.github.io/IdleLoopsReworked/">Squirrel Loops</a></p>
+                            <p>This game turned into a subgenre of over 15 games that were inspired by it. Some of my favorites are <a href="https://store.steampowered.com/app/1814010/Stuck_In_Time/">Stuck in Time</a> and <a href="https://store.steampowered.com/app/1593350/Increlution/">Increlution</a> on Steam.</p>
+                            <p>I won the 2018 Most Interesting New Mechanic award in /r/incremental_games for this one.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>I was inspired to this game from doing Autohotkey scripting of the idle games ItRtG and NGU, and I wanted to capture that feeling of small tweaks to a complicated yet idle process rather than actually playing the complicated process manually.</p>
+                            <p>This game was a huge step in my idle game skills and reputation, and continued to be different than my other games, as what I like to do is create idle games exclusively using features and mechanics that I haven't seen in any other idle games. I stil think that there is an enourmous amount of interesting formulas to discover in idle games, as it is a unique genre set aside from other gaming.</p>
+                            <p>This game drastically improved my coding ability in creating idle games, as I was figuring out data-driven development to separate the game data from the game engine, creating a system of code that made it very easy to add new actions.</p>
+                            <p>This is the first time I created a discord community, which ended up being a *massive* deal and taught me a lot. The outpouring from the community was incredible, and I am so thankful to all the players who debugged, who gave me code and suggestions, and the legendary developers who continued the game after I put it down.</p>
+                            <p>It took me a long time to realize, but one of the major draws of this game is the story element. The story itself is heavily inspired by the book <a href="https://www.royalroad.com/fiction/21220/mother-of-learning">Mother of Learning</a>, an extremely well-written time loop fiction.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="Nanospread/">Nanospread</a></h3>
+                        <p class="game-meta"><span>Game 11</span><span>Playtime: about 1 week</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>~80 hours development time.</p>
+                            <p>Abandoned because the next set of changes require a deep refactoring.</p>
+                            <p>My first time coding with someone else - there are a few pull requests in the history made by him, and stats is 100% him.</p>
+                            <p>Got 30k pageviews according to Google Analytics.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>Inspired by the failures of Progress Bar Quest v2.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="KPWBeta/">King's Perfect War</a></h3>
+                        <p class="game-meta"><span>Game 14</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>No longer in development, just an idea.</p>
+                            <p>~160 hours development time.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>I took all the feedback I got about Loops and made a game trying to address everything. Unfortunately, I made it a little too complicated. It doesn't quite feel like an idle game, even if it still has its merits.</p>
+                            <p>This is a closed-system game, like Nanospread, where I want additional content to be heavily based on level design. It achieves that very well, but getting to that point takes a bit.</p>
+                            <p>Easily the best code I've written though, coming off of the feedback/help I got with Loops.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="Dyson_Light/">Dyson Light</a></h3>
+                        <p class="game-meta"><span>Game 15</span><span>Playtime: 2–3 days</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Created for an incremental game jam with the them of Light.</p>
+                            <p>~50 hours development time.</p>
+                            <p>It has performance issues - don't launch too many sails at once at the end.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>Coming off of playing Dyson Sphere Project, I had to make an incremental around it.</p>
+                            <p>I think it came out well for the amount of time I spent on it.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="Terrafold/">Terrafold</a></h3>
+                        <p class="game-meta"><span>Game 12</span><span>Playtime: a few days</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>~100 hours development time.</p>
+                            <p>A bit more confusing than my other games.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>My attempt to make an idle game with a much longer rebirth cycle.</p>
+                            <p>It was so long, in fact, that I got bored of coding it before I got to the rebirth cycle.</p>
+                            <p>Balance issues are also a pain in this game. I just have too many variables.</p>
+                            <p>The flow of numbers comes from liking the fundamental formula of Nanospread so much that I wanted to experiment with it</p>
+                            <p>I wanted to add logarithmic-based dynamic graphics in the background, which is why things are so spread out.</p>
+                            <p>The code is clean, and the idea is ~40 hours away from being wrapped up, so maybe someday.</p>
+                            <p>EDIT: the code is not clean. This game is the reason I abandoned OOP, preferring data-driven programming instead. It's super painful to try to change the code now.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="progressBarQuest3/">Progress Bar Quest v2</a></h3>
+                        <p class="game-meta"><span>Game 6</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Fun with progress bars.</p>
+                            <p>~35 hours of work or so.</p>
+                            <p>It uses angular.js for the two-way binding.</p>
+                            <p>Color changes based on the level of each progress bar.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>This is a better attempt at visualizing propagation.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="Pull_of_War/">Pull of War</a></h3>
+                        <p class="game-meta"><span>Game 4</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>When you load, you'll be on "Unit Spawning" - click Barracks, then Battle to start the game.</p>
+                            <p>This game has saving, but no offline progress. It works at full speed in another tab.</p>
+                            <p>I've spent ~100 hours on this total.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>The idea came from Desert Strike, a custom game in SC2, and other such Tug of War games.</p>
+                            <p>It uses angular.js, but only for two-way binding - I'm not a fan of the organization that angular brings.</p>
+                            <p>Many of the graphics are "placeholder". This game is a statement of what I can and cannot do, and I'm no graphics artist.</p>
+                            <p>The aspect of idle games that I'm focusing on is needing to watch the game in order to know where to spend your money.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="progressBarQuest/">Progress Bar Quest v1</a></h3>
+                        <p class="game-meta"><span>Game 5</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>Fun with progress bars, the first attempt.</p>
+                            <p>This game no saving, and sort-of works in another tab.</p>
+                            <p>It goes too fast to make sense of things eventually, but doesn't crash.</p>
+                            <p>~20 hours of work or so.</p>
+                            <p>It uses angular.js for the two-way binding.</p>
+                            <p>Colors change based on how much boost a progress bar has. Give 'em more boost for pretty colors.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>I saved this because I enjoy the color progression better than the v2.</p>
+                            <p>This was also my first attempt at passing functions as parameters.</p>
+                            <p>This was my attempt at visualizing propagation. It turns out it's terrible at that, but it's a fascinating result regardless.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="square/">Square</a></h3>
+                        <p class="game-meta"><span>Game 7</span><span>Playtime: infinite</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>A simple idle game with pretty colors.</p>
+                            <p>This game no saving, and doesn't have any words.</p>
+                            <p>~10 hours of work or so.</p>
+                            <p>This is a game with a single button and no numbers.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>I got frustrated with how much work these games take, so I experimented with what the minimum means.</p>
+                            <p>I learned a lot about patterns and colors with this. A 5x5 grid works *far* better than a 4x4 or 6x6.</p>
+                            <p>I've watched this run for longer than I spent time on it. It was a success from that perspective.</p>
+                            <p>My most "art"-like game. I think it's pretty. No plans for changing it in the future.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="old1/">Incremental Quest</a></h3>
+                        <p class="game-meta"><span>Game 1</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>A clicker game.</p>
+                            <p>This game has saving, and the idle elements work in another tab.</p>
+                            <p>~40 hours of work or so.</p>
+                            <p>Using a single .html file and a single .js file, with no libraries whatsoever.</p>
+                            <p>The UI is modeled off of Cookie Clicker.</p>
+                            <p>Feel free to use an auto-clicker on it. I know I am.</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>This was my attempt at creating elements I hadn't seen before in existing games.</p>
+                            <p>The main goal of coding it was to keep numbers low - costs less than 6 digits - for the duration of play.</p>
+                            <p>I abandoned it because it was too much work to add another piece for not a lot of play.</p>
+                            <p>I wanted to create guide-rails for play, like Cookie Clicker or AdCap, but I got bored of how much coding that required.</p>
+                            <p>I learned a *lot* about game making from this.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <article class="game">
+                    <header class="game-head">
+                        <h3><a href="old2/">Feature Quest</a></h3>
+                        <p class="game-meta"><span>Game 2</span></p>
+                    </header>
+                    <div class="game-sections">
+                        <section>
+                            <h4>About</h4>
+                            <p>A slow clicker game.</p>
+                            <p>This game has saving, and the idle elements work in another tab.</p>
+                            <p>~30 hours of work or so.</p>
+                            <p>The first upgrade costs 500 resource1_1, so keep clicking "Exert Yourself". More unlocks with more resource1_1.</p>
+                            <p>The game picks up a lot on the 15000 costing upgrade to unlock Stroll. It has the upgrade price reduction carryover from the first attempt.</p>
+                            <p>Feel free to open the console and type resource1_1 += 100000</p>
+                        </section>
+                        <section>
+                            <h4>Thoughts</h4>
+                            <p>I actually split my javascript into multiple files! I did it poorly though.</p>
+                            <p>For this game, I wanted to make a clicker that you only needed to click every few seconds, instead of with an auto-clicker.</p>
+                            <p>This was also an experiment with polynomial growth, and showing less elements to start.</p>
+                            <p>I wanted it to be a choice between getting X, X^2, or a lesser amount of both. Practice vs Application, if you will.</p>
+                            <p>Instead I learned that balance is kind of hard to maintain unless the balance is built-in to the game.</p>
+                            <p>A different lesson I learned here was to build around a theme - my unnamed resources aren't interesting.</p>
+                            <p>Another lesson is that good pacing takes planning. This game has terrible pacing - it's much too slow.</p>
+                            <p>Yet another is that explanations might be important: The block that contains Exert Yourself is active play, the block that contains Take it Easy is idle play.</p>
+                            <p>I abandoned it because it was too much work to add another piece for not a lot of play. Again.</p>
+                        </section>
+                    </div>
+                </article>
+
+                <div class="fragments">
+                    <h2>Game Fragments (not playable)</h2>
+
+                    <article class="game">
+                        <header class="game-head">
+                            <h3><a href="Scheduling3/">Reap and Sow</a></h3>
+                            <p class="game-meta"><span>Game 9</span></p>
+                        </header>
+                        <div class="game-sections">
+                            <section>
+                                <h4>About</h4>
+                                <p>~40 hours.</p>
+                            </section>
+                            <section>
+                                <h4>Thoughts</h4>
+                                <p>I like the name, and I like the concept (forced resets), but the execution isn't balanced right. I did lots of experimentation with this concept that I used in future games.</p>
+                            </section>
+                        </div>
+                    </article>
+
+                    <article class="game">
+                        <header class="game-head">
+                            <h3><a href="miner/">Miner</a></h3>
+                            <p class="game-meta"><span>Game 8</span></p>
+                        </header>
+                        <div class="game-sections">
+                            <section>
+                                <h4>About</h4>
+                                <p>~30 hours.</p>
+                                <p>It doesn't have anything worth playing.</p>
+                            </section>
+                            <section>
+                                <h4>Thoughts</h4>
+                                <p>I had a few goals with this one, the biggest being collaboration. I recognized that there were a few parts in my games where I didn't need to know anything about the larger game, and could hand it off to someone else. So, I got some friends to say they'd try it, and one immediately refactored all the code to look nicer to them. The other made a list of mineral words to incorporate in the far future. I didn't like the first guys changes, and the second wasn't very helpful, so I got discouraged and it died. Lesson learned.</p>
+                                <p>I wanted to make a game with two and only two resources, both visually represented.</p>
+                                <p>I also wanted to incorporate story elements via upgrades. This never got added.</p>
+                                <p>It needs to be more complicated in some parts, less complicated in others, so it was off-balance from the start.</p>
+                                <p>I still like the vision it was supposed to be, but it requires some heavy updates and refactoring to be useful again.</p>
+                                <p>I'm rather disappointed with how the development of this went.</p>
+                            </section>
+                        </div>
+                    </article>
+
+                    <article class="game">
+                        <header class="game-head">
+                            <h3><a href="Idiot Quest/">Idiot Quest</a></h3>
+                            <p class="game-meta"><span>Game 3</span></p>
+                        </header>
+                        <div class="game-sections">
+                            <section>
+                                <h4>About</h4>
+                                <p>~5 hours.</p>
+                                <p>It doesn't have anything worth playing.</p>
+                            </section>
+                            <section>
+                                <h4>Thoughts</h4>
+                                <p>I started this with the goal of using a javascript library - jquery. As it turns out, a single new language isn't enough to make a game.</p>
+                                <p>I also started arranging my coding to use dynamic creations of graphic elements here.</p>
+                                <p>I recognized where it was going - too much work to add another piece for not a lot of play. I abandoned it quickly.</p>
+                            </section>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <section role="tabpanel" id="panel-devlog" class="panel" aria-labelledby="tab-devlog">
+                <h2>Dev Log</h2>
+                <div class="tag-filters" role="group" aria-label="Filter posts by tag">
+                    <button type="button" class="tag-filter" data-tag="thoughts" aria-pressed="true">Thoughts</button>
+                    <button type="button" class="tag-filter" data-tag="game dev updates" aria-pressed="true">Game dev updates</button>
+                    <p class="tag-hint">Click the tags to unselect their type.</p>
+                </div>
+                <div class="devlog-layout">
+                    <nav id="devlog-index" class="devlog-index" aria-label="Dev log index" hidden></nav>
+                    <div class="devlog-reader">
+                        <p id="devlog-empty" class="status" hidden>No posts with the selected tags.</p>
+                        <div id="devlog-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section role="tabpanel" id="panel-about" class="panel" aria-labelledby="tab-about">
+                <h2>About Me</h2>
+                <p>My other online handles are Stop_Sign (Reddit/Discord), or an older username is Phurple (Kongregate).</p>
+                <p>My discord is Stop_Sign Gaming, and it is where all the discussions happen. Link is <a href="https://discord.gg/EmRuWPp">here</a>.</p>
+                <p>I graduated 2013 as a Compsci major, and have been working professionally between SDE and SDET roles throughout my career, with idle games as an aside that drastically improved my coding ability. More recently I have published the first game Kill the Lich to Steam, and have been working full-time on creating idle games.</p>
+            </section>
+        </main>
     </div>
+
+    <script>
+        (function () {
+            var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+            var activeTab = null;
+            var devlogReady = false;
+            var list = document.getElementById('devlog-list');
+            var devlogEmpty = document.getElementById('devlog-empty');
+            var devlogIndex = document.getElementById('devlog-index');
+            var selectedTags = { 'thoughts': true, 'game dev updates': true };
+            var themeButton = document.getElementById('theme-toggle');
+            var themeMeta = document.querySelector('meta[name="theme-color"]');
+
+            function syncThemeControls() {
+                var light = document.documentElement.getAttribute('data-theme') === 'light';
+                themeButton.setAttribute('aria-pressed', light ? 'true' : 'false');
+                themeButton.setAttribute('aria-label', light ? 'Switch to dark mode' : 'Switch to light mode');
+                if (themeMeta) themeMeta.setAttribute('content', light ? '#e7f0f0' : '#0d1517');
+            }
+
+            themeButton.addEventListener('click', function () {
+                var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', next);
+                try {
+                    localStorage.setItem('theme', next);
+                } catch (e) {}
+                syncThemeControls();
+            });
+            syncThemeControls();
+
+            function tabFromHash() {
+                var hash = location.hash.slice(1);
+                if (hash === 'about') return 'about';
+                if (hash === 'devlog' || hash.indexOf('devlog-') === 0) return 'devlog';
+                return 'games';
+            }
+
+            function scrollToDevlogPost() {
+                if (document.documentElement.getAttribute('data-tab') !== 'devlog' || !devlogReady) return;
+                showSelected(choosePostId());
+            }
+
+            function applyTab(name) {
+                var enteringDevlog = name === 'devlog' && activeTab !== 'devlog';
+                activeTab = name;
+                document.documentElement.setAttribute('data-tab', name);
+                tabs.forEach(function (tab) {
+                    var selected = tab.getAttribute('data-tab') === name;
+                    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+                    tab.tabIndex = selected ? 0 : -1;
+                });
+                if (enteringDevlog && typeof gtag === 'function') {
+                    gtag('event', 'open_devlog');
+                }
+                if (name === 'devlog') scrollToDevlogPost();
+            }
+
+            function selectTab(name) {
+                var nextHash = '#' + name;
+                if (location.hash === nextHash) {
+                    applyTab(name);
+                    return;
+                }
+                location.hash = nextHash;
+            }
+
+            tabs.forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    selectTab(tab.getAttribute('data-tab'));
+                });
+            });
+
+            document.querySelector('[role="tablist"]').addEventListener('keydown', function (event) {
+                var keys = ['ArrowRight', 'ArrowLeft', 'Home', 'End'];
+                if (keys.indexOf(event.key) === -1) return;
+                var current = tabs.indexOf(document.activeElement);
+                if (current === -1) return;
+                event.preventDefault();
+                var index = current;
+                if (event.key === 'ArrowRight') index = (current + 1) % tabs.length;
+                if (event.key === 'ArrowLeft') index = (current - 1 + tabs.length) % tabs.length;
+                if (event.key === 'Home') index = 0;
+                if (event.key === 'End') index = tabs.length - 1;
+                tabs[index].focus();
+                selectTab(tabs[index].getAttribute('data-tab'));
+            });
+
+            window.addEventListener('hashchange', function () {
+                applyTab(tabFromHash());
+            });
+
+            function setStatus(message) {
+                var p = document.createElement('p');
+                p.className = 'status';
+                p.textContent = message;
+                list.replaceChildren(p);
+            }
+
+            function escapeHtml(value) {
+                return value
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
+
+            function escapeAttr(value) {
+                return value
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+            }
+
+            function safeUrl(url) {
+                var trimmed = url.trim();
+                if (!trimmed || /[\u0000-\u001f\s<>"]/.test(trimmed)) return null;
+                if (/^(https?:\/\/|mailto:)/i.test(trimmed)) return trimmed;
+                if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return null;
+                if (trimmed.indexOf('//') === 0 || trimmed.indexOf('\\') === 0) return null;
+                return trimmed;
+            }
+
+            function renderInline(escaped) {
+                var codes = [];
+                var text = escaped.replace(/`([^`]+)`/g, function (_, code) {
+                    var token = '\uE000' + codes.length + '\uE001';
+                    codes.push(code);
+                    return token;
+                });
+                text = text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (full, label, url) {
+                    var raw = url.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+                    var safe = safeUrl(raw);
+                    if (!safe) return full;
+                    return '<a href="' + escapeAttr(safe) + '">' + label + '</a>';
+                });
+                text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+                text = text.replace(/\uE000(\d+)\uE001/g, function (_, index) {
+                    return '<code>' + codes[Number(index)] + '</code>';
+                });
+                return text;
+            }
+
+            function renderBody(raw) {
+                return raw.split(/\n{2,}/).map(function (block) {
+                    var trimmed = block.trim();
+                    if (!trimmed) return '';
+                    return '<p>' + renderInline(escapeHtml(trimmed)).replace(/\n/g, '<br>') + '</p>';
+                }).join('');
+            }
+
+            function formatDate(iso) {
+                var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+                if (!match) return iso;
+                var year = Number(match[1]);
+                var month = Number(match[2]);
+                var day = Number(match[3]);
+                var date = new Date(Date.UTC(year, month - 1, day));
+                if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+                    return iso;
+                }
+                return new Intl.DateTimeFormat('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'UTC'
+                }).format(date);
+            }
+
+            function parseHeading(heading) {
+                var match = heading.match(/^(\d{4}-\d{2}-\d{2})(?:\s+[—–-]\s+(.+))?$/);
+                if (!match) return { date: null, title: heading };
+                return { date: match[1], title: match[2] ? match[2].trim() : '' };
+            }
+
+            function normalizeTag(value) {
+                var text = value.trim().toLowerCase().replace(/\s+/g, ' ');
+                if (text === 'thought' || text === 'thoughts') return 'thoughts';
+                if (text === 'game dev' || text === 'game dev update' || text === 'game dev updates') return 'game dev updates';
+                return null;
+            }
+
+            function tagLabel(tag) {
+                if (tag === 'thoughts') return 'Thoughts';
+                if (tag === 'game dev updates') return 'Game dev updates';
+                return tag;
+            }
+
+            function extractTags(body) {
+                var match = /^(?:tag|tags):\s*(.+)\s*(?:\n|$)/i.exec(body);
+                if (!match) return { tags: [], body: body };
+                var tags = [];
+                match[1].split(',').forEach(function (part) {
+                    var tag = normalizeTag(part);
+                    if (tag && tags.indexOf(tag) === -1) tags.push(tag);
+                });
+                return { tags: tags, body: body.slice(match[0].length).trim() };
+            }
+
+            function parseDevlog(markdown) {
+                var stripped = markdown.replace(/\r\n/g, '\n').replace(/<!--[\s\S]*?-->/g, '');
+                var headings = Array.from(stripped.matchAll(/^##\s+(.+)$/gm));
+                var used = new Set();
+                return headings.map(function (match, index) {
+                    var parsed = parseHeading(match[1].trim());
+                    var start = match.index + match[0].length;
+                    var end = index + 1 < headings.length ? headings[index + 1].index : stripped.length;
+                    var idBase = parsed.date ? 'post-' + parsed.date : 'post-' + (index + 1);
+                    var id = idBase;
+                    var n = 2;
+                    while (used.has(id)) {
+                        id = idBase + '-' + n;
+                        n += 1;
+                    }
+                    used.add(id);
+                    var tagged = extractTags(stripped.slice(start, end).trim());
+                    return {
+                        id: id,
+                        date: parsed.date,
+                        title: parsed.title,
+                        tags: tagged.tags,
+                        body: tagged.body
+                    };
+                });
+            }
+
+            function tagMarkup(tags) {
+                if (!tags.length) return '';
+                return '<span class="post-tag">' + tags.map(function (tag) {
+                    return escapeHtml(tagLabel(tag));
+                }).join(', ') + '</span>';
+            }
+
+            function postPermalink(post) {
+                return '#devlog-' + post.id.slice('post-'.length);
+            }
+
+            function postLabel(post) {
+                if (post.title) return post.title;
+                if (post.date) return formatDate(post.date);
+                return 'Note';
+            }
+
+            function tagsVisible(tags) {
+                return !tags.length || tags.some(function (tag) { return selectedTags[tag]; });
+            }
+
+            function formatIndexDate(iso) {
+                var match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+                if (!match) return iso;
+                var year = Number(match[1]);
+                var month = Number(match[2]);
+                var day = Number(match[3]);
+                var date = new Date(Date.UTC(year, month - 1, day));
+                if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+                    return iso;
+                }
+                return new Intl.DateTimeFormat('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'UTC'
+                }).format(date);
+            }
+
+            function renderIndex(posts) {
+                devlogIndex.innerHTML = '<ol>' + posts.map(function (post) {
+                    var date = post.date
+                        ? '<time datetime="' + post.date + '">' + formatIndexDate(post.date) + '</time>'
+                        : '';
+                    var tag = post.tags.length
+                        ? '<span class="index-tag">' + post.tags.map(function (item) { return escapeHtml(tagLabel(item)); }).join(', ') + '</span>'
+                        : '';
+                    var meta = (date || tag) ? '<span class="index-meta">' + date + tag + '</span>' : '';
+                    return '<li data-tags="' + escapeAttr(post.tags.join(',')) + '"><a class="index-link" data-id="' + post.id + '" href="' + postPermalink(post) + '"><span class="index-line"><span class="index-num">' + post.index + '.</span> ' + escapeHtml(postLabel(post)) + '</span>' + meta + '</a></li>';
+                }).join('') + '</ol>';
+                devlogIndex.hidden = !posts.length;
+            }
+
+            function postIdFromHash() {
+                var match = /^#devlog-(.+)$/.exec(location.hash);
+                if (!match) return null;
+                var id = 'post-' + match[1];
+                return document.getElementById(id) ? id : null;
+            }
+
+            function firstVisiblePostId() {
+                var items = devlogIndex.querySelectorAll('li');
+                for (var i = 0; i < items.length; i++) {
+                    if (!items[i].hidden) return items[i].querySelector('a').getAttribute('data-id');
+                }
+                return null;
+            }
+
+            function choosePostId() {
+                var hashed = postIdFromHash();
+                if (hashed) {
+                    var el = document.getElementById(hashed);
+                    if (el && el.getAttribute('data-tag-hidden') !== 'true') return hashed;
+                }
+                return firstVisiblePostId();
+            }
+
+            function showSelected(id) {
+                list.querySelectorAll('.post').forEach(function (article) {
+                    var tagHidden = article.getAttribute('data-tag-hidden') === 'true';
+                    article.hidden = tagHidden || !id || article.id !== id;
+                });
+                devlogIndex.querySelectorAll('.index-link').forEach(function (link) {
+                    if (id && link.getAttribute('data-id') === id) link.setAttribute('aria-current', 'page');
+                    else link.removeAttribute('aria-current');
+                });
+            }
+
+            function renderPost(post) {
+                var permalink = postPermalink(post);
+                var tags = tagMarkup(post.tags);
+                var heading;
+                if (post.date && post.title) {
+                    heading =
+                        '<p class="post-kicker"><a class="post-date" href="' + permalink + '"><time datetime="' + post.date + '">' + formatDate(post.date) + '</time></a>' + tags + '</p>' +
+                        '<h3>' + escapeHtml(post.title) + '</h3>';
+                } else if (post.date) {
+                    heading = '<h3><a class="post-date" href="' + permalink + '"><time datetime="' + post.date + '">' + formatDate(post.date) + '</time></a>' + tags + '</h3>';
+                } else {
+                    heading = '<h3><a class="post-date" href="' + permalink + '">' + escapeHtml(post.title) + '</a>' + tags + '</h3>';
+                }
+                return '<article class="post" id="' + post.id + '" data-tags="' + escapeAttr(post.tags.join(',')) + '">' + heading + '<div class="post-body">' + renderBody(post.body) + '</div></article>';
+            }
+
+            function applyTagFilter() {
+                var shown = 0;
+                list.querySelectorAll('.post').forEach(function (article) {
+                    var tags = (article.getAttribute('data-tags') || '').split(',').filter(Boolean);
+                    var visible = tagsVisible(tags);
+                    article.setAttribute('data-tag-hidden', visible ? 'false' : 'true');
+                    if (visible) shown += 1;
+                });
+                var indexShown = 0;
+                devlogIndex.querySelectorAll('li').forEach(function (item) {
+                    var tags = (item.getAttribute('data-tags') || '').split(',').filter(Boolean);
+                    var visible = tagsVisible(tags);
+                    item.hidden = !visible;
+                    if (visible) indexShown += 1;
+                });
+                devlogIndex.hidden = indexShown === 0;
+                devlogEmpty.hidden = shown !== 0 || !list.querySelector('.post');
+                return shown;
+            }
+
+            function hashForPost(id) {
+                return id ? '#devlog-' + id.slice('post-'.length) : '#devlog';
+            }
+
+            document.querySelectorAll('.tag-filter').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var tag = button.getAttribute('data-tag');
+                    var next = button.getAttribute('aria-pressed') !== 'true';
+                    button.setAttribute('aria-pressed', next ? 'true' : 'false');
+                    selectedTags[tag] = next;
+                    applyTagFilter();
+                    var nextId = choosePostId();
+                    var nextHash = hashForPost(nextId);
+                    if (location.hash !== nextHash) location.hash = nextHash;
+                    else showSelected(nextId);
+                });
+            });
+
+            setStatus('Loading…');
+            fetch('devlog.md')
+                .then(function (response) {
+                    if (!response.ok) throw new Error(String(response.status));
+                    return response.text();
+                })
+                .then(function (markdown) {
+                    var posts = parseDevlog(markdown);
+                    devlogReady = true;
+                    if (!posts.length) {
+                        setStatus('No posts yet.');
+                        return;
+                    }
+                    posts.forEach(function (post, index) {
+                        post.index = index + 1;
+                    });
+                    renderIndex(posts);
+                    list.innerHTML = posts.map(renderPost).join('');
+                    applyTagFilter();
+                    scrollToDevlogPost();
+                })
+                .catch(function () {
+                    devlogReady = true;
+                    setStatus('Could not load the dev log.');
+                });
+
+            applyTab(tabFromHash());
+        })();
+    </script>
 </body>
 </html>
-<style>
-    .centerTextArea {
-        display:inline-block;
-        width:50%;
-        margin-top:20px;
-        border:2px solid black;
-        background-color: #cbcdcb;
-    }
-    .gameDescription {
-        border:1px solid black;
-        background-color:white;
-        text-align:left;
-        width:90%;
-        padding:5px;
-        margin:10px auto;
-    }
-</style>

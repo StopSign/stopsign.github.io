@@ -1808,6 +1808,9 @@ let view = {
     },
     updateBasePanelScrollArchives: function(base, t) {
         const lib = engine.ensureInscriptionState() || base.scrollArchives;
+        if (engine.ensureScrollArchivesResearchChoices) {
+            engine.ensureScrollArchivesResearchChoices();
+        }
         this.updateResortWorkerControls("scrollArchives", engine.getScrollArchivesResearchRate() > 0);
         view.updateScrollArchivesInscriptions();
         const mapStars = engine.countAchievedMapStarsByType();

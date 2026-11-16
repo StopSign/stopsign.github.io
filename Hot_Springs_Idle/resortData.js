@@ -3923,7 +3923,7 @@ var resortData = {
                     key: "arrangement_of_self_sufficiency",
                     name: "Arrangement of Self-Sufficiency",
                     description: "Assign the Okami to the Hidden Spring to collect stone on repeat, and refill its mana on arrival.",
-                    cost: { stone: 80 },
+                    cost: { stone: 60 },
                     weavingTime: 120,
                     canBuy: function() {
                         const g = data.progress.base.garden;
