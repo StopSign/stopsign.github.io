@@ -260,6 +260,9 @@ var resortData = {
         if (key === "bars") {
             return (base.atelier && base.atelier.bars) || 0;
         }
+        if (key === "ash") {
+            return (base.bonfire && base.bonfire.ash) || 0;
+        }
         if (key === "credit") {
             const credit = (base.market && base.market.credit) || 0;
             return credit + (resortData.coinsCountForCredit() ? (data.progress.coins || 0) : 0);
@@ -282,7 +285,7 @@ var resortData = {
         if (key === "mana" && typeof engine !== "undefined" && engine.getManaCapacity && amount > engine.getManaCapacity()) {
             cls = " cost-amt-unaffordable";
         }
-        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
+        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `<span class="cost-amt${cls}">${intToStringRound(amount)}</span>${icon} ${label}`;
@@ -291,7 +294,7 @@ var resortData = {
         const remaining = Math.max(0, required - delivered);
         const owned = resortData.ownedAmountForCostKey(key);
         const cls = owned >= remaining ? " cost-amt-affordable" : "";
-        const icon = (key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars")
+        const icon = (key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `${intToStringRound(delivered)}/<span class="cost-amt${cls}">${intToStringRound(required)}</span>${icon} ${label}`;
@@ -302,6 +305,7 @@ var resortData = {
         const parts = [];
         if ((c.bars || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.bars, "bars", "bars"));
         if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
+        if ((c.ash || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ash, "ash", "ash"));
         if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
         if ((c.hardwood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.hardwood, "hardwood", "hardwood"));
         if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
@@ -386,7 +390,7 @@ var resortData = {
         return `Buy for [${parts.join(", ")}]`;
     },
 
-    gatherResourceKeys: ["wood", "hardwood", "stone", "bars", "ore"],
+    gatherResourceKeys: ["wood", "hardwood", "stone", "bars", "ore", "ash"],
 
     emptyGatherDelivered: function() {
         const out = {};
@@ -477,6 +481,11 @@ var resortData = {
         const oreReq = (required && required.ore) || 0;
         if (oreReq > 0) {
             parts.push(resortData.formatCollectedPartHtml(oreDel, oreReq, "ore", "ore"));
+        }
+        const ashDel = (delivered && delivered.ash) || 0;
+        const ashReq = (required && required.ash) || 0;
+        if (ashReq > 0) {
+            parts.push(resortData.formatCollectedPartHtml(ashDel, ashReq, "ash", "ash"));
         }
         if (parts.length === 0) {
             return "Ready for Weave";
@@ -659,6 +668,7 @@ var resortData = {
         if ((c.stone || 0) > engine.getTotalStone()) return false;
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) return false;
         if ((c.bars || 0) > ((base.atelier && base.atelier.bars) || 0)) return false;
+        if ((c.ash || 0) > ((base.bonfire && base.bonfire.ash) || 0)) return false;
         return true;
     },
 
@@ -702,6 +712,9 @@ var resortData = {
         }
         if ((c.bars || 0) > 0 && base.atelier) {
             base.atelier.bars = Math.max(0, (base.atelier.bars || 0) - (c.bars || 0));
+        }
+        if ((c.ash || 0) > 0 && base.bonfire) {
+            base.bonfire.ash = Math.max(0, (base.bonfire.ash || 0) - (c.ash || 0));
         }
     },
 
@@ -843,7 +856,7 @@ var resortData = {
                         if (job && job.segmentIndex === idx && !job.paused) {
                             return false;
                         }
-                        return resortData.canAffordCost(this.getCost());
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
@@ -904,7 +917,7 @@ var resortData = {
                         if (job && job.segmentIndex === idx && !job.paused) {
                             return false;
                         }
-                        return resortData.canAffordCost(this.getCost());
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
@@ -965,7 +978,7 @@ var resortData = {
                         if (job && job.segmentIndex === idx && !job.paused) {
                             return false;
                         }
-                        return resortData.canAffordCost(this.getCost());
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
@@ -1026,7 +1039,7 @@ var resortData = {
                         if (job && job.segmentIndex === idx && !job.paused) {
                             return false;
                         }
-                        return resortData.canAffordCost(this.getCost());
+                        return true;
                     },
                     upgradeSoldOut: function() {
                         const idx = data.progress.selectedPathSegmentIndex;
@@ -1287,6 +1300,8 @@ var resortData = {
                 startWithFullManaUnlocked: false,
                 startWithFullManaEnabled: false,
                 kilnBuilt: false,
+                kilnHeatLimitEnabled: true,
+                feedCharcoalToHeat: true,
                 kilnHardwood: 0,
                 charcoalPitWood: 0,
                 charcoal: 0,
@@ -1322,11 +1337,10 @@ var resortData = {
                     key: "build_kiln",
                     name: "Build Kiln",
                     description: "Build a kiln beside the bonfire. Opens Clone Management and Kiln, and workers follow a fuel priority list.",
-                    revealLater: true,
                     getCost: function() {
-                        return { stone: 40000, essence: 20000 };
+                        return { stone: 2000 };
                     },
-                    weavingTime: 8000,
+                    weavingTime: 1500,
                     onBuy: function() {
                         engine.completeBuildKiln();
                     },
@@ -1601,9 +1615,11 @@ var resortData = {
                 water: 0,
                 infuseSoilBought: 0,
                 echoedAxeBought: 0,
-                growHardwoodBought: 0
+                growHardwoodBought: 0,
+                sprinkleOreBought: 0,
+                sprinkleAshBought: 0
             },
-            upgradesOrder: ["infuseSoil", "echoedAxe", "growHardwood"],
+            upgradesOrder: ["infuseSoil", "sprinkleOre", "sprinkleAsh", "echoedAxe", "growHardwood"],
             upgrades: {
                 infuseSoil: {
                     key: "infuse_soil",
@@ -1683,6 +1699,59 @@ var resortData = {
                         return resortHelper.isGrowHardwoodBought();
                     },
                     soldOutButtonLabel: "Hardwood growing"
+                },
+                sprinkleOre: {
+                    key: "sprinkle_ore",
+                    name: "Sprinkle Ore on Bamboo",
+                    description: "Scatter ore dust through the bamboo forest, multiplying total chips by x1.1 per purchase (compounding), including base chips and plant spirit bonuses.",
+                    getCost: function() {
+                        const n = data.progress.base.bambooForest.sprinkleOreBought || 0;
+                        const mult = Math.pow(2, n);
+                        return { ore: 50 * mult, starBeads: 1000 * mult };
+                    },
+                    weavingTime: 180,
+                    weavingTimeIncreaseAdd: 90,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.bambooForest.sprinkleOreBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isBringOreToAtelierUnlocked();
+                    },
+                    onBuy: function() {
+                        data.progress.base.bambooForest.sprinkleOreBought = (data.progress.base.bambooForest.sprinkleOreBought || 0) + 1;
+                        engine.refreshBambooForestBaseChips();
+                    },
+                    extraInfo: function() {
+                        const n = data.progress.base.bambooForest.sprinkleOreBought || 0;
+                        return `Total chips: x${round2(Math.pow(1.1, n))}`;
+                    }
+                },
+                sprinkleAsh: {
+                    key: "sprinkle_ash",
+                    name: "Sprinkle Ash on Soil",
+                    description: "Scatter ash on the soil, multiplying total chips by x1.1 per purchase (compounding), including base chips and plant spirit bonuses.",
+                    getCost: function() {
+                        const n = data.progress.base.bambooForest.sprinkleAshBought || 0;
+                        return { ash: Math.round(10 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 500,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.bambooForest.sprinkleAshBought || 0;
+                    },
+                    canBuy: function() {
+                        const bonfire = data.progress.base && data.progress.base.bonfire;
+                        return !!(bonfire && bonfire.kilnBuilt);
+                    },
+                    onBuy: function() {
+                        data.progress.base.bambooForest.sprinkleAshBought = (data.progress.base.bambooForest.sprinkleAshBought || 0) + 1;
+                        engine.refreshBambooForestBaseChips();
+                    },
+                    extraInfo: function() {
+                        const n = data.progress.base.bambooForest.sprinkleAshBought || 0;
+                        return `Total chips: x${round2(Math.pow(1.1, n))}`;
+                    }
                 }
             }
         },
@@ -2407,7 +2476,7 @@ var resortData = {
                 gentleLightsUnlocked: false,
                 shapedLampsBought: 0
             },
-            upgradesOrder: ["addFurniture", "addDecoration", "addRoom", "secondFloorRooms", "buildPathToPond", "convertToOnsen", "reinforceJoints", "createGentleLights", "shapedLamps", "fillMana"],
+            upgradesOrder: ["addFurniture", "addDecoration", "addRoom", "buildPathToPond", "convertToOnsen", "reinforceJoints", "secondFloorRooms", "createGentleLights", "shapedLamps", "fillMana"],
             upgrades: {
                 addFurniture: {
                     key: "add_furniture",
@@ -2716,7 +2785,7 @@ var resortData = {
                 sturdyShelves: {
                     key: "sturdy_shelves",
                     name: "Sturdy Shelves",
-                    description: "Each purchase multiplies all scribing output by x1.3.",
+                    description: "Each purchase multiplies all scribing row's output by x1.2.",
                     getCost: function() {
                         const n = resortHelper.getSturdyShelvesBought();
                         return { hardwood: Math.round(50 * Math.pow(1.5, n)) };
@@ -2737,7 +2806,7 @@ var resortData = {
                     },
                     extraInfo: function() {
                         const n = resortHelper.getSturdyShelvesBought();
-                        return `Scribing output: x${round2(Math.pow(1.3, n))}`;
+                        return `Scribing output: x${round2(Math.pow(1.2, n))}`;
                     }
                 },
                 workspaceFurniture: {
@@ -2832,7 +2901,6 @@ var resortData = {
                 betterAxesBought: 0,
                 sharperAxesBought: 0,
                 magicLoomsBought: 0,
-                sprinkleOreBought: 0,
                 sprinkleOreOnRoadsBought: 0,
                 improveDirtRoadsBought: 0,
                 mineshaftBeamsBought: 0,
@@ -2844,7 +2912,7 @@ var resortData = {
                 ore: 0,
                 bars: 0
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOre", "sprinkleOreOnRoads", "improveDirtRoads", "unlockDrophammer"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "unlockDrophammer"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -3122,32 +3190,6 @@ var resortData = {
                         return `+${n * 50}% chop power per kitsune`;
                     },
                 },
-                sprinkleOre: {
-                    key: "sprinkle_ore",
-                    name: "Sprinkle Ore on Bamboo",
-                    description: "Scatter ore dust through the bamboo forest, multiplying total chips by x1.1 per purchase (compounding), including base chips and plant spirit bonuses.",
-                    getCost: function() {
-                        const n = data.progress.base.atelier.sprinkleOreBought || 0;
-                        const mult = Math.pow(2, n);
-                        return { ore: 50 * mult, starBeads: 1000 * mult };
-                    },
-                    weavingTime: 180,
-                    weavingTimeIncreaseAdd: 90,
-                    getWeavingPurchaseIndex: function() {
-                        return data.progress.base.atelier.sprinkleOreBought || 0;
-                    },
-                    canBuy: function() {
-                        return engine.isBringOreToAtelierUnlocked();
-                    },
-                    onBuy: function() {
-                        data.progress.base.atelier.sprinkleOreBought = (data.progress.base.atelier.sprinkleOreBought || 0) + 1;
-                        engine.refreshBambooForestBaseChips();
-                    },
-                    extraInfo: function() {
-                        const n = data.progress.base.atelier.sprinkleOreBought || 0;
-                        return `Total chips: x${round2(Math.pow(1.1, n))}`;
-                    }
-                },
                 sprinkleOreOnRoads: {
                     key: "sprinkle_ore_on_roads",
                     name: "Sprinkle Ore on Roads",
@@ -3204,11 +3246,11 @@ var resortData = {
                     cost: { wood: 100, stone: 50 },
                     weavingTime: 60,
                     rowVisible: function() {
-                        return typeof showDrophammer !== "undefined" && !!showDrophammer;
+                        return true;
                     },
                     canBuy: function() {
                         const atelier = data.progress.base.atelier;
-                        return typeof showDrophammer !== "undefined" && !!showDrophammer && !(atelier && atelier.drophammerUnlocked);
+                        return !(atelier && atelier.drophammerUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.atelier.drophammerUnlocked = true;
@@ -3951,7 +3993,9 @@ var resortData = {
                     weavingTime: 1000,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return resortHelper.isResourceProtectionBought() && !(g && g.arrangementOfResourceProtectionUnlocked);
+                        return engine.isMarketBuilt()
+                            && resortHelper.isResourceProtectionBought()
+                            && !(g && g.arrangementOfResourceProtectionUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfResourceProtectionUnlocked = true;

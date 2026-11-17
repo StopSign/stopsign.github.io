@@ -5450,13 +5450,9 @@ let engine = {
         const atelier = data.progress.base && data.progress.base.atelier;
         return !!(atelier && atelier.forgeBuilt);
     },
-    isDrophammerDebugEnabled: function() {
-        return typeof showDrophammer !== "undefined" && !!showDrophammer;
-    },
     isDrophammerUnlocked: function() {
         const atelier = data.progress.base && data.progress.base.atelier;
-        // return !!(engine.isDrophammerDebugEnabled() && atelier && atelier.drophammerUnlocked);
-        return !!(engine.isDrophammerDebugEnabled());
+        return !!(atelier && atelier.drophammerUnlocked);
     },
     getBonfireFireSpiritSlotMax: function() {
         return 3;
@@ -5614,15 +5610,19 @@ let engine = {
         if (spirit) {
             chips += Math.ceil(engine.getEffectiveSpiritPower(spirit) || 1);
         }
-        const atelier = data.progress.base && data.progress.base.atelier;
-        const sprinkleBought = (atelier && atelier.sprinkleOreBought) || 0;
-        let result = Math.floor(chips * resortHelper.getBambooInfuseSoilMultiplier() * Math.pow(1.1, sprinkleBought));
+        let result = Math.floor(chips * resortHelper.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleChipMultiplier());
         const bf = data.progress.base && data.progress.base.bambooForest;
         const stalk = bf && bf.stalks && bf.stalks[stalkIndex];
         if (stalk && stalk.type === "hardwood") {
             result *= 5;
         }
         return result;
+    },
+    getBambooSprinkleChipMultiplier: function() {
+        const bf = data.progress.base && data.progress.base.bambooForest;
+        const oreBought = (bf && bf.sprinkleOreBought) || 0;
+        const ashBought = (bf && bf.sprinkleAshBought) || 0;
+        return Math.pow(1.1, oreBought + ashBought);
     },
     refreshBambooForestBaseChips: function() {
         const bf = data.progress.base && data.progress.base.bambooForest;
@@ -5733,7 +5733,7 @@ let engine = {
             return 0;
         }
         const platformKey = engine.parseFireLauncherScopeKey(scopeKey);
-        const fromBottom = platformKey === "pathLower" ? 6 : platformKey === "pathMid" ? 21 : platformKey === "bendTop" ? 45 : 0;
+        const fromBottom = platformKey === "pathLower" ? 6 : platformKey === "pathMid" ? 21 : platformKey === "bendTop" ? 44 : 0;
         if (!fromBottom) {
             return 0;
         }
@@ -8691,6 +8691,9 @@ let engine = {
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) {
             missing.push("ore");
         }
+        if ((c.ash || 0) > ((base.bonfire && base.bonfire.ash) || 0)) {
+            missing.push("ash");
+        }
         if ((c.coins || 0) > (data.progress.coins || 0)) {
             missing.push("coins");
         }
@@ -9864,6 +9867,9 @@ let engine = {
         if (resourceType === "bars" || resourceType === "ore") {
             return "atelier";
         }
+        if (resourceType === "ash") {
+            return "bonfire";
+        }
         if (resourceType === "mana") {
             return "mage_tower";
         }
@@ -9972,6 +9978,9 @@ let engine = {
         if (resourceType === "ore") {
             return (base.atelier && base.atelier.ore) || 0;
         }
+        if (resourceType === "ash") {
+            return (base.bonfire && base.bonfire.ash) || 0;
+        }
         if (resourceType === "mana") {
             return (data.progress.mana && data.progress.mana.amount) || 0;
         }
@@ -10003,6 +10012,10 @@ let engine = {
             base.atelier.ore = Math.max(0, (base.atelier.ore || 0) - amt);
             return null;
         }
+        if (resourceType === "ash" && base.bonfire) {
+            base.bonfire.ash = Math.max(0, (base.bonfire.ash || 0) - amt);
+            return null;
+        }
         if (resourceType === "mana" && data.progress.mana) {
             data.progress.mana.amount = Math.max(0, (data.progress.mana.amount || 0) - amt);
             return null;
@@ -10022,6 +10035,8 @@ let engine = {
             base.atelier.bars = (base.atelier.bars || 0) + amt;
         } else if (resourceType === "ore" && base.atelier) {
             base.atelier.ore = (base.atelier.ore || 0) + amt;
+        } else if (resourceType === "ash" && base.bonfire) {
+            base.bonfire.ash = (base.bonfire.ash || 0) + amt;
         } else if (resourceType === "mana" && data.progress.mana) {
             data.progress.mana.amount = (data.progress.mana.amount || 0) + amt;
         }
@@ -10492,6 +10507,9 @@ let engine = {
         if (resourceType === "ore") {
             return engine.getMapBuildingPosition("atelier");
         }
+        if (resourceType === "ash") {
+            return engine.getMapBuildingPosition("bonfire");
+        }
         if (resourceType === "mana") {
             return engine.getMapBuildingPosition("mage_tower");
         }
@@ -10713,7 +10731,7 @@ let engine = {
         engine.tryFoxDenOkamiAutoPathJobs();
         engine.updateArrangementOfReview(tickMs);
         const minGap = (resortData.foxDenCarrierSpawnMinMs !== undefined) ? resortData.foxDenCarrierSpawnMinMs : 500;
-        const soloKeys = ["stone", "bars", "ore"];
+        const soloKeys = ["stone", "bars", "ore", "ash"];
         if (!rh._carrierGapMsByResource) {
             rh._carrierGapMsByResource = {};
         }
@@ -10947,6 +10965,12 @@ let engine = {
         if (bf.ash === undefined || bf.ash === null) {
             bf.ash = 0;
         }
+        if (bf.kilnHeatLimitEnabled === undefined || bf.kilnHeatLimitEnabled === null) {
+            bf.kilnHeatLimitEnabled = bf.fireTendingEnabled !== false;
+        }
+        if (bf.feedCharcoalToHeat === undefined || bf.feedCharcoalToHeat === null) {
+            bf.feedCharcoalToHeat = true;
+        }
         if (bf.fireTendingEnabled === false) {
             bf.kilnHeatCap = null;
         } else if (bf.kilnHeatCap === undefined) {
@@ -10966,8 +10990,14 @@ let engine = {
         }
         return n;
     },
+    bonfireActiveHeatCap: function(bf) {
+        if (!bf || bf.kilnHeatLimitEnabled === false) {
+            return null;
+        }
+        return engine.bonfireKilnNumber(bf.kilnHeatCap);
+    },
     bonfireKilnHeatBlocksFuel: function(bf) {
-        const cap = engine.bonfireKilnNumber(bf && bf.kilnHeatCap);
+        const cap = engine.bonfireActiveHeatCap(bf);
         if (cap === null) {
             return false;
         }
@@ -11067,17 +11097,23 @@ let engine = {
         }
         return 5000;
     },
+    getCharcoalPitHardwoodBatch: function() {
+        return Math.max(0, 2 * engine.getBonfireCarrierCapacity() * resortData.getKitsuneWoodCarryAmount());
+    },
     getCharcoalProductionAmount: function(bf) {
         if (!bf) {
             return 0;
         }
-        const pit = Math.max(0, bf.charcoalPitWood || 0);
-        const woodPull = Math.floor(Math.sqrt(pit));
-        const made = Math.floor(woodPull / 10);
-        if (made < 1 || pit < made * 10) {
+        if ((bf.heat || 0) < 400 || (bf.mana || 0) < 100) {
             return 0;
         }
-        if ((bf.heat || 0) < 400 || (bf.mana || 0) < 100) {
+        const pit = Math.max(0, bf.charcoalPitWood || 0);
+        const byWood = Math.floor(pit / 10);
+        if (byWood < 1) {
+            return 0;
+        }
+        const made = Math.min(byWood, Math.ceil(Math.sqrt(pit / 10)));
+        if (made < 1) {
             return 0;
         }
         return made;
@@ -11090,10 +11126,13 @@ let engine = {
             bf.ash = (bf.ash || 0) + made;
             bf.mana = Math.max(0, (bf.mana || 0) - 100);
         }
+        if (bf.feedCharcoalToHeat === false) {
+            return;
+        }
         const heatPer = 50 * engine.getBonfireHeatCardMultiplier();
-        const cap = engine.bonfireKilnNumber(bf.kilnHeatCap);
+        const cap = engine.bonfireActiveHeatCap(bf);
         let burned = 0;
-        while (burned < 5 && (bf.charcoal || 0) >= 1) {
+        while (burned < 1 && (bf.charcoal || 0) >= 1) {
             if (cap !== null && (bf.heat || 0) >= cap) {
                 break;
             }
@@ -11114,8 +11153,8 @@ let engine = {
             let pitGuard = 0;
             while (bf.charcoalPitProgressMs >= dur && pitGuard < 100000) {
                 bf.charcoalPitProgressMs -= dur;
-                const batch = resortData.getKitsuneWoodCarryAmount() * engine.getBonfireCarrierCapacity();
-                const moved = Math.min(bf.kilnHardwood || 0, Math.max(0, batch));
+                const batch = engine.getCharcoalPitHardwoodBatch();
+                const moved = Math.min(bf.kilnHardwood || 0, batch);
                 if (moved <= 0) {
                     bf.charcoalPitProgressMs = 0;
                     break;
@@ -12501,9 +12540,7 @@ let engine = {
             return;
         }
         const stalk = bf.stalks[stalkIndex];
-        const atelier = data.progress.base && data.progress.base.atelier;
-        const sprinkleBought = (atelier && atelier.sprinkleOreBought) || 0;
-        let baseWood = Math.floor(engine.getBambooForestBaseChips() * resortHelper.getBambooInfuseSoilMultiplier() * Math.pow(1.1, sprinkleBought));
+        let baseWood = Math.floor(engine.getBambooForestBaseChips() * resortHelper.getBambooInfuseSoilMultiplier() * engine.getBambooSprinkleChipMultiplier());
         if (stalk.type === "hardwood") {
             baseWood *= 5;
         }
@@ -15453,7 +15490,7 @@ let engine = {
         if (!lib || !lib.inscriptions || !defs.length || M <= 0) {
             return 0;
         }
-        const mult = Math.pow(1.3, resortHelper.getSturdyShelvesBought());
+        const mult = Math.pow(1.2, resortHelper.getSturdyShelvesBought());
         const strokeMult = Math.pow(1.5, resortHelper.getInfuseScribingsBought());
         let term = engine.inscriptionRate(defs[0]) * M * mult;
         const first = lib.inscriptions[defs[0].key];
@@ -15519,7 +15556,7 @@ let engine = {
         for (let i = 0; i < rowCount; i++) {
             snap.push(lib.inscriptions[defs[i].key].actual || 0);
         }
-        const shelfMult = Math.pow(1.3, resortHelper.getSturdyShelvesBought());
+        const shelfMult = Math.pow(1.2, resortHelper.getSturdyShelvesBought());
         const strokeMult = Math.pow(1.5, resortHelper.getInfuseScribingsBought());
         lib.scribings = (lib.scribings || 0) + snap[0] * engine.inscriptionRate(defs[0]) * shelfMult * strokeMult;
         for (let i = 1; i < rowCount; i++) {

@@ -24,11 +24,10 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-let isDebug = false; //SET FOR COMMIT
-// let isDebug = true;
+// let isDebug = false; //SET FOR COMMIT
+let isDebug = true;
 let showPathDebug = false;
 let debugPondStreamMaxWidth = false;
-let showDrophammer = false;
 let debugLevel = 0; //To start at different parts of the game
 let debugAtelierUpgradesFree = false;
 function debug() {
@@ -269,7 +268,7 @@ function debugBuyAtelierUpgrades() {
     // debugBuyAtelierUpgrade("createMetalFireLauncher", 3);
     // debugBuyAtelierUpgrade("collectShards", 1); // moved to Scroll Archives
     // debugBuyAtelierUpgrade("spareSandals", 1);
-    // debugBuyAtelierUpgrade("sprinkleOre", 1);
+    // debugBuyAtelierUpgrade("sprinkleOre", 1); // moved to Bamboo Forest
     debugAtelierUpgradesFree = false;
 }
 
@@ -813,6 +812,15 @@ let initialize = {
         if (bf.echoedAxeBought === undefined || bf.echoedAxeBought === null) {
             bf.echoedAxeBought = 0;
         }
+        if (bf.sprinkleOreBought === undefined || bf.sprinkleOreBought === null) {
+            bf.sprinkleOreBought = (base.atelier && base.atelier.sprinkleOreBought) || 0;
+        }
+        if (base.atelier && base.atelier.sprinkleOreBought !== undefined) {
+            delete base.atelier.sprinkleOreBought;
+        }
+        if (bf.sprinkleAshBought === undefined || bf.sprinkleAshBought === null) {
+            bf.sprinkleAshBought = 0;
+        }
     },
     initializeScrollArchives: function() {
         const base = data.progress.base;
@@ -1272,12 +1280,69 @@ let initialize = {
                 c.jobKey = engine.getBuildingJobKey(c.unlockKey);
             }
         }
+        initialize.migrateSprinkleOreUpgrade(base, rh);
         const siteKeys = Object.keys(rh.constructionSites);
         for (let si = 0; si < siteKeys.length; si++) {
             const site = rh.constructionSites[siteKeys[si]];
             if (site && site.paused === undefined) {
                 site.paused = false;
             }
+        }
+    },
+    migrateSprinkleOreUpgrade: function(base, rh) {
+        const oldJob = "upgrade:atelier:sprinkleOre";
+        const newJob = "upgrade:bambooForest:sprinkleOre";
+        if (rh && rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJob]) {
+            const job = rh.upgradeGatherJobs[oldJob];
+            job.scopeKey = "bambooForest";
+            if (!rh.upgradeGatherJobs[newJob]) {
+                rh.upgradeGatherJobs[newJob] = job;
+            }
+            delete rh.upgradeGatherJobs[oldJob];
+        }
+        if (rh && rh.jobQueue) {
+            for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                if (rh.jobQueue[qi] === oldJob) {
+                    rh.jobQueue[qi] = newJob;
+                }
+            }
+        }
+        const carriers = rh && rh.constructionCarriers;
+        if (carriers) {
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci] && carriers[ci].jobKey === oldJob) {
+                    carriers[ci].jobKey = newJob;
+                    if (carriers[ci].unlockKey === "atelier") {
+                        carriers[ci].unlockKey = "bambooForest";
+                    }
+                }
+            }
+        }
+        const weaving = data.progress && data.progress.weaving;
+        if (!weaving) {
+            return;
+        }
+        if (weaving.active && weaving.active.scopeKey === "atelier" && weaving.active.upgradeKey === "sprinkleOre") {
+            weaving.active.scopeKey = "bambooForest";
+            weaving.active.buildingName = "Bamboo Forest";
+        }
+        const paused = weaving.paused;
+        if (paused && paused.scopeKey === "atelier" && paused.upgradeKey === "sprinkleOre") {
+            paused.scopeKey = "bambooForest";
+            paused.buildingName = "Bamboo Forest";
+        } else if (paused && paused["atelier:sprinkleOre"]) {
+            const entry = paused["atelier:sprinkleOre"];
+            entry.scopeKey = "bambooForest";
+            entry.buildingName = "Bamboo Forest";
+            if (!paused["bambooForest:sprinkleOre"]) {
+                paused["bambooForest:sprinkleOre"] = entry;
+            }
+            delete paused["atelier:sprinkleOre"];
+        }
+        const notify = base && base.baseContentNotify;
+        if (notify && notify.upgradeSeen && notify.upgradeSeen["atelier:sprinkleOre"]) {
+            notify.upgradeSeen["bambooForest:sprinkleOre"] = true;
+            delete notify.upgradeSeen["atelier:sprinkleOre"];
         }
     },
     initializeMapRevealed: function() {

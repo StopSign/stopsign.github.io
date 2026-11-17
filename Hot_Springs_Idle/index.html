@@ -53,16 +53,18 @@
                 </div>
             </div>
         </div>
-        <div id="manaProgressBar" class="game-progress-bar" style="display:none">
-            <div class="prog-track game-progress-track mana-progress-track">
-                <div id="manaFill" class="prog-fill prog-fill-mana"></div>
-                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">-</span></div>
+        <div id="resourceProgressRow" class="resource-progress-row" style="display:none">
+            <div id="manaProgressBar" class="game-progress-bar" style="display:none">
+                <div class="prog-track game-progress-track mana-progress-track">
+                    <div id="manaFill" class="prog-fill prog-fill-mana"></div>
+                    <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">-</span></div>
+                </div>
             </div>
-        </div>
-        <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
-            <div class="prog-track game-progress-track divinity-progress-track">
-                <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
-                <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/divinity.svg" alt="" draggable="false">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
+            <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
+                <div class="prog-track game-progress-track divinity-progress-track">
+                    <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
+                    <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/divinity.svg" alt="" draggable="false">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
+                </div>
             </div>
         </div>
     </div>
@@ -72,7 +74,9 @@
     </div>
     <div id="gameColumnsRow" class="game-columns-row">
     <div id="menuColumn" class="game-column">
-        <div id="menuTabs">
+        <div id="menuTabsWrap" class="menu-tabs-wrap">
+            <button type="button" id="menuTabsScrollLeft" class="menu-tabs-scroll menu-tabs-scroll--hidden" aria-label="Scroll tabs left">&lt;</button>
+            <div id="menuTabs">
             <button id="tabButton_base" class="tab-button" onclick="events.switchTab('base')">Resort</button>
             <button id="tabButton_guests" class="tab-button" onclick="events.switchTab('guests')">Guests</button>
             <button id="tabButton_leveling" class="tab-button" onclick="events.switchTab('leveling')">Leveling</button>
@@ -83,6 +87,8 @@
             <button id="tabButton_cardBonuses" class="tab-button" onclick="events.switchTab('cardBonuses')" style="display:none">Cards</button>
             <button id="tabButton_prestige" class="tab-button" onclick="events.switchTab('prestige')" style="display:none">Prestige</button>
             <button id="tabButton_options" class="tab-button" onclick="events.switchTab('options')">Options</button>
+            </div>
+            <button type="button" id="menuTabsScrollRight" class="menu-tabs-scroll menu-tabs-scroll--hidden" aria-label="Scroll tabs right">&gt;</button>
         </div>
         <div id="menuContent">
             <div id="tabPane_base" class="tab-pane">
@@ -407,14 +413,17 @@
                     <button type="button" id="cardsSubTab_bonuses" class="tab-button" onclick="events.switchCardsSubTab('bonuses')">Card Bonuses</button>
                 </div>
                 <div id="cardsPane_get">
-                    <div class="base-scrollArchives-row base-upgrade-row">
-                        <div class="base-upgrade-text">
-                            <div class="base-upgrade-name">Buy Card</div>
-                            <div id="shrineBuyCardOdds" class="muted-text base-skill-short">100% Common / 0% Rare / 0% Epic</div>
+                    <div class="cards-acquire">
+                        <div class="cards-acquire-buy">
+                            <div class="cards-acquire-buy-text">
+                                <div class="cards-acquire-title">Buy Card</div>
+                                <div id="shrineBuyCardOdds" class="muted-text">100% Common / 0% Rare / 0% Epic</div>
+                            </div>
+                            <button type="button" id="shrineBuyCardBtn" class="tab-button" onclick="events.buyShrineCard()" disabled>Buy for</button>
                         </div>
-                        <button type="button" id="shrineBuyCardBtn" class="tab-button" onclick="events.buyShrineCard()" disabled>Buy for</button>
+                        <div id="cardsPacksMount"></div>
                     </div>
-                    <div id="cardsPacksMount"></div>
+                    <div id="cardsMilestonesMount"></div>
                 </div>
                 <div id="cardsPane_bonuses" style="display:none">
                     <div id="cardBonusesEmpty" class="muted-text">No cards received yet.</div>

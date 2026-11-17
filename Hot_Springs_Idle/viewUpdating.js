@@ -128,7 +128,8 @@ let view = {
             stone: "img/foxWorker_stone.svg",
             water: "img/foxWorker_water.svg",
             bars: "img/foxWorker_bars.svg",
-            coal: "img/foxWorker_coal.svg"
+            coal: "img/foxWorker_coal.svg",
+            ash: "img/foxWorker_ash.svg"
         };
         const resourceType = (carrier && carrier.resourceType) || fallbackResource;
         return sprites[resourceType] || "img/foxWorker.svg";
@@ -1518,6 +1519,19 @@ let view = {
         if (!showKiln) {
             return;
         }
+        const heatLimitOn = bf.kilnHeatLimitEnabled !== false;
+        const heatRow = viewData.cached.bonfireKilnHeat_row;
+        if (heatRow) {
+            heatRow.classList.toggle("kiln-heat-row--off", !heatLimitOn);
+        }
+        const heatChk = viewData.cached.bonfireKilnHeatCap_chk;
+        if (heatChk) {
+            heatChk.checked = heatLimitOn;
+        }
+        const feedChk = viewData.cached.bonfireFeedCharcoal_chk;
+        if (feedChk) {
+            feedChk.checked = bf.feedCharcoalToHeat !== false;
+        }
         const heatCapEl = viewData.cached.bonfireKilnHeatCap;
         if (heatCapEl && document.activeElement !== heatCapEl) {
             const cap = engine.bonfireKilnNumber(bf.kilnHeatCap);
@@ -1574,11 +1588,14 @@ let view = {
         }
         const action = engine.pickBonfireKilnAction(bf);
         const pitActive = !!(action && action.type === "charcoalPit") || (bf.charcoalPitProgressMs || 0) > 0;
-        view.updateVal("bonfireCharcoalPitProg", pitActive ? "" : "none", "style.display");
+        const dur = engine.getCharcoalPitDurationMs();
+        const pct = pitActive && dur > 0 ? Math.max(0, Math.min(100, ((bf.charcoalPitProgressMs || 0) / dur) * 100)) : 0;
+        view.updateVal("bonfireCharcoalPitFill", pct + "%", "style.width");
+        view.updateVal("bonfireCharcoalPitLabel", pitActive ? "" : "none", "style.display");
         if (pitActive) {
-            const dur = engine.getCharcoalPitDurationMs();
-            const pct = dur > 0 ? Math.max(0, Math.min(100, ((bf.charcoalPitProgressMs || 0) / dur) * 100)) : 0;
-            view.updateVal("bonfireCharcoalPitFill", pct + "%", "style.width");
+            const batch = engine.getCharcoalPitHardwoodBatch();
+            const moving = Math.min(bf.kilnHardwood || 0, batch);
+            view.updateVal("bonfireCharcoalPitAmount", intToStringRound(moving));
         }
         view.updateVal("bonfirePitWood", intToStringRound(bf.charcoalPitWood || 0));
         view.updateVal("bonfireCharcoalRate", intToStringRound(engine.getCharcoalProductionAmount(bf)));
@@ -1610,11 +1627,11 @@ let view = {
         const flameTended = !!bf.tendTheFlameUnlocked;
         const marketBuilt = engine.isMarketBuilt();
         view.updateVal("bonfireWoodCarry_row", flameTended ? "" : "none", "style.display");
+        view.updateVal("bonfireWoodCarryPitNote", (flameTended && kiln) ? "" : "none", "style.display");
         if (flameTended) {
-            view.updateVal("bonfireWoodCarryLabel", marketBuilt ? "Burnable Resource Carry" : "Wood Carry");
             view.updateVal("bonfireWoodCarry", resortData.getKitsuneWoodCarryAmount());
         }
-        view.updateVal("bonfireHeatPerFuel_row", flameTended ? "" : "none", "style.display");
+        view.updateVal("bonfireHeatPerFuel_row", (flameTended && !kiln) ? "" : "none", "style.display");
         if (flameTended) {
             const heatMult = engine.getBonfireHeatCardMultiplier ? engine.getBonfireHeatCardMultiplier() : 1;
             const heatWood = bonfireConfig.heatPerWood * heatMult;
@@ -1634,18 +1651,13 @@ let view = {
         if (kiln) {
             view.updateVal("bonfireAshText", intToStringRound(bf.ash || 0));
         }
-        const hs = data.progress.base && data.progress.base.hiddenSpring;
-        const sparkBought = ((hs && hs.fireSpiritsBought) || 0) >= 1;
-        view.updateVal("bonfireFireSpiritPower_row", sparkBought ? "" : "none", "style.display");
-        if (sparkBought) {
-            view.updateVal("bonfireFireSpiritPower", engine.getBonfireAssignedFireSpiritPowerTotal());
-        }
         const t = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         t.refreshOrderedPurchasables("bonfire", resortData.buildings.bonfire.upgradesOrder, { hideMaxed: t.hideMaxed });
         this.updateResortWorkerControls("bonfire", (bf.assignedWorkers || 0) > 0 || engine.getOkami().assignedBuildingKey === "bonfire");
         if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
             createView.refreshInfoButtonPanel("resortInfo_bonfire");
         }
+        view.updateWorkerDockVisibility();
     },
 
     updateBasePanelShrine: function() {
@@ -1701,7 +1713,7 @@ let view = {
             view.updateVal(`shrineMs_${id}_progress`, `${intToStringRound(cur)} / ${intToStringRound(need)}`);
             const completed = engine.getShrineRepeatingCompletedCount(id);
             const timesWord = completed === 1 ? "time" : "times";
-            view.updateVal(`shrineMs_${id}_completed`, ` · completed ${intToStringRound(completed)} ${timesWord}`);
+            view.updateVal(`shrineMs_${id}_completed`, `completed ${intToStringRound(completed)} ${timesWord}`);
             const rarity = engine.getShrineEscalatingRarity(id, need);
             view.updateVal(`shrineMs_${id}_icon`, `img/${rarity}.svg`, "src");
         };
@@ -1793,7 +1805,7 @@ let view = {
             view.updateVal(`inscriptionActual_${def.key}`, row.actual || 0, "textContent", 3);
             view.updateVal(`inscriptionBought_${def.key}`, row.bought || 0, "textContent", 2);
             view.updateVal(`inscriptionRate_${def.key}`, `+${intToStringRound(def.rateNum)}/${intToStringRound(def.rateDen)}s ${def.product} each`);
-            let inscriptionOut = engine.inscriptionRate(def) * (row.actual || 0) * Math.pow(1.3, resortHelper.getSturdyShelvesBought());
+            let inscriptionOut = engine.inscriptionRate(def) * (row.actual || 0) * Math.pow(1.2, resortHelper.getSturdyShelvesBought());
             if (def.key === "strokes") {
                 inscriptionOut *= Math.pow(1.5, resortHelper.getInfuseScribingsBought());
             }
@@ -1908,9 +1920,6 @@ let view = {
         view.updateVal("atelierInfoOre", atelier.ore || 0, "textContent", "floor");
         view.updateVal("atelierInfoBars", atelier.bars || 0, "textContent", "floor");
         t.refreshOrderedPurchasables("atelier", resortData.buildings.atelier.upgradesOrder, t.soldOutUpgradeRowOpts(t.hideMaxed, "atelier"));
-        if (!engine.isDrophammerDebugEnabled()) {
-            view.updateVal("base_atelier_unlock_drophammer_row", "none", "style.display");
-        }
         const tabsOn = engine.isDrophammerUnlocked();
         let sub = data.progress.selectedAtelierSubTab || "atelier";
         if (!tabsOn || (sub !== "atelier" && sub !== "dropHammer")) {
@@ -2153,6 +2162,12 @@ let view = {
             view.updateVal(`${wpt}_heat`, round1(heatDisp.heat));
             view.updateVal(`${wpt}_heat_next`, round1(heatDisp.nextThreshold));
             view.updateVal(`${wpt}_heat_bonus`, heatDisp.bonusLabel);
+            const hsBonfire = data.progress.base && data.progress.base.hiddenSpring;
+            const sparkBought = ((hsBonfire && hsBonfire.fireSpiritsBought) || 0) >= 1;
+            view.updateVal(`${wpt}_fire_spirit_wrap`, sparkBought ? "" : "none", "style.display");
+            if (sparkBought) {
+                view.updateVal(`${wpt}_fire_spirit`, engine.getBonfireAssignedFireSpiritPowerTotal());
+            }
             view.updateVal(`base_${siteKey}_worker_prod_wrap`, "", "style.display");
             view.updateVal(`base_${siteKey}_worker_prog_fill`, `${heatPct}%`, "style.width");
             return;
@@ -2535,7 +2550,12 @@ let view = {
         view.updateManaBar();
         view.updateDivinityBar();
     },
+    updateResourceProgressRow: function() {
+        const show = engine.isManaUnlocked() || engine.isShrineBuilt();
+        view.updateVal("resourceProgressRow", show ? "grid" : "none", "style.display");
+    },
     updateManaBar: function() {
+        view.updateResourceProgressRow();
         const unlocked = engine.isManaUnlocked();
         view.updateVal("manaProgressBar", unlocked ? "" : "none", "style.display");
         if (!unlocked) {
@@ -2560,6 +2580,7 @@ let view = {
         view.updateEtaText("manaEtaText", remainMana, netRate);
     },
     updateDivinityBar: function() {
+        view.updateResourceProgressRow();
         const unlocked = engine.isShrineBuilt();
         view.updateVal("divinityProgressBar", unlocked ? "" : "none", "style.display");
         if (!unlocked) {
@@ -4714,6 +4735,7 @@ let view = {
             ? `${woodMap} | ${resortData.resourceIconHtml("hardwood")} ${intToStringRound(forest.hardwood || 0)}`
             : woodMap, "innerHTML");
         const bonfire = base.bonfire || {};
+        view.updateVal("baseBuilding_bonfire", !!bonfire.kilnBuilt, "classList.toggle", "has-kiln");
         view.updateVal("bonfireMapDisplay", bonfire.kilnBuilt
             ? `${resortData.resourceIconHtml("ash")} ${intToStringRound(bonfire.ash || 0)}`
             : "", "innerHTML");
@@ -5125,7 +5147,7 @@ let view = {
             if (run.starCleared === "bronze" || run.starCleared === "silver" || run.starCleared === "gold") {
                 starHtml = ` <span class="history-duration-star skill-star-${run.starCleared} skill-star-filled">★</span>`;
             }
-            html += `<div class="history-entry"><div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s${starHtml}</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${round1(run.shardsGained || 0)}</span><span>${round2(okamiExp)}</span><span>${density}</span></div>`;
+            html += `<div class="history-entry"><div class="history-row"><span title="${mapName}">${mapName}</span><span>${round1(run.survivedSeconds)}s${starHtml}</span><span>${lvl}</span><span>${kills}</span><span>${intToStringRound(run.coinsGained)}</span><span>${intToStringRound(run.shardsGained || 0)}</span><span>${intToStringRound(okamiExp)}</span><span>${density}</span></div>`;
             const talents = run.talentRows || [];
             if (talents.length > 0) {
                 const talentText = talents.map(function(row) {
@@ -6185,6 +6207,9 @@ let view = {
             }
         }
         view.setTabButtonLabel("skills", skillsLabel);
+        if (typeof events.noteMenuTabScrollContent === "function") {
+            events.noteMenuTabScrollContent();
+        }
     },
     setTabButtonLabel: function(tabKey, text) {
         const btn = viewData.cached["tabButton_" + tabKey] || document.getElementById("tabButton_" + tabKey);
@@ -6252,8 +6277,13 @@ let view = {
             if (sk === "inn" && !engine.isInnOnsenConverted()) {
                 show = false;
             }
-            if (sk === "bonfire" && !engine.isBonfireTendTheFlameUnlocked()) {
-                show = false;
+            if (sk === "bonfire") {
+                const bfDock = data.progress.base && data.progress.base.bonfire;
+                if (!engine.isBonfireTendTheFlameUnlocked()) {
+                    show = false;
+                } else if (bfDock && bfDock.kilnBuilt && bfDock.kilnSubTab !== "kiln") {
+                    show = false;
+                }
             }
             if (sk === "market" && !engine.isMarketBuilt()) {
                 show = false;

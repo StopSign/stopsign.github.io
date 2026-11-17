@@ -24,6 +24,7 @@ let createView = {
         createView.createInfoButtons();
         createView.showCurrentTab();
         createView.setAllCaches(); //happens after generation
+        events.bindMenuTabScroll();
     },
     /**
      * Adds a ? info button to the top-right of the element with the given id.
@@ -378,7 +379,8 @@ let createView = {
                 }
                 if (bf && bf.kilnBuilt) {
                     html += "<p>The Kiln priority list decides what assigned workers do, from the top. Unchecked rows are skipped. Bring Wood and Bring Hardwood can keep a reserve at the source. Hardwood hauled to the kiln uses the Fox Den carry amount.</p>";
-                    html += "<p>Build Charcoal Pit moves hardwood into the pit. Ten pit wood makes one charcoal when heat is at least 400 and the kiln has at least 100 mana. That spends 100 mana and gives one Ash. Stored charcoal feeds the fire while heat is under the heat box, up to 5 a second, at 50 heat each before the heat card.</p>";
+                    html += "<p>Build Charcoal Pit moves hardwood into the pit. Ten pit wood makes one charcoal when heat is at least 400 and the kiln has at least 100 mana. That spends 100 mana and gives one Ash. Bring resources when heat is below does not stop charcoal from being made.</p>";
+                    html += "<p>Feed charcoal to bonfire for heat burns stored charcoal, up to 1 a second, at 50 heat each before the heat card, until heat reaches that number. If that check is off, charcoal keeps feeding until it runs out.</p>";
                 } else if (bf && bf.tendTheFlameUnlocked) {
                     html += "<p>Fire tending: assigned carriers skip wood and coal trips once heat reaches the number beside Only bring wood or coal while heat is below.</p>";
                 }
@@ -832,7 +834,7 @@ let createView = {
                 return `<span id="${id}_worker_prod_text">Inscribers: <span id="${id}_wpt_researchers"></span> | Inscribe Speed: <span id="${id}_wpt_speed"></span>/s | next <span id="${id}_wpt_next_name"></span> ETA: <span id="${id}_wpt_next_eta"></span><span id="${id}_wpt_okami_wrap" class="muted-text" style="display:none"> (<span id="${id}_wpt_okami"></span>x from inspiration)</span><br><span id="${id}_wpt_cost_line" class="muted-text">(<span id="${id}_wpt_cost_coins"></span> ${coinIcon} coins/s, <span id="${id}_wpt_cost_beads"></span> ${beadIcon} star beads/s, <span id="${id}_wpt_cost_mana"></span> ${manaIcon} mana/s)</span><span id="${id}_wpt_paused" class="muted-text" style="display:none"><br>Paused - need more ${coinIcon} coins, ${beadIcon} star beads, or ${manaIcon} mana</span></span>`;
             }
             if (siteKey === "bonfire") {
-                return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span> | Okami speed: <span id="${id}_wpt_okami_speed"></span><br>Heat: <span id="${id}_wpt_heat"></span> / <span id="${id}_wpt_heat_next"></span> | Mana Gain Bonus: <span id="${id}_wpt_heat_bonus"></span></span>`;
+                return `<span id="${id}_worker_prod_text">Carriers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span> | Okami speed: <span id="${id}_wpt_okami_speed"></span><br>Heat: <span id="${id}_wpt_heat"></span> / <span id="${id}_wpt_heat_next"></span> | Mana Gain Bonus: <span id="${id}_wpt_heat_bonus"></span><span id="${id}_wpt_fire_spirit_wrap" style="display:none"><br>Assigned fire spirit power (base + training): <span id="${id}_wpt_fire_spirit">0</span></span></span>`;
             }
             if (siteKey === "market") {
                 return `<span id="${id}_worker_prod_text">Haulers assigned: <span id="${id}_wpt_carriers"></span> | Carrier speed: <span id="${id}_wpt_speed"></span><span id="${id}_wpt_okami_wrap" style="display:none"> | Okami speed: <span id="${id}_wpt_okami_speed"></span></span><br><span id="${id}_wpt_haul_list_wrap">Hauling: <span id="${id}_wpt_haul_list"></span></span><span id="${id}_wpt_haul_empty" class="muted-text" style="display:none">No resources allowed - check a box to start hauling</span> | ${creditIcon} Credit rate: <span id="${id}_wpt_credit"></span>/s</span>`;
@@ -973,35 +975,46 @@ let createView = {
                 </div>
                 <div id="bonfireKilnPane">
                 <div id="bonfireKilnControls" style="display:none">
-                    <div id="bonfireKilnHeat_row" class="base-row">Bring resources when heat is below <input type="number" id="bonfireKilnHeatCap" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireKilnHeatCap(this.value)"></div>
+                    ${buildingManaRowHtml("bonfire")}
+                    <div id="bonfireKilnHeat_row" class="base-row"><label><input type="checkbox" id="bonfireKilnHeatCap_chk" checked onchange="events.toggleBonfireKilnHeatCap(this.checked)"> Bring resources when heat is below</label> <input type="number" id="bonfireKilnHeatCap" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireKilnHeatCap(this.value)"></div>
                     <div id="bonfirePriorityList">
                         ${htmlBonfirePriorityRow("coal", "Bring Coal")}
                         ${htmlBonfirePriorityRow("wood", "Bring Wood", htmlBonfireKeepInput("wood"))}
                         ${htmlBonfirePriorityRow("hardwood", "Bring Hardwood for Charcoal", htmlBonfireKeepInput("hardwood"))}
                         ${htmlBonfirePriorityRow("charcoalPit", "Build Charcoal Pit")}
                     </div>
-                    <div id="bonfireKilnHardwood_row" class="base-row">Hardwood: <span id="bonfireKilnHardwood">0</span> <label class="kiln-priority-keep">Stop at: <input type="number" id="bonfireHardwoodStop" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireHardwoodStop(this.value)"></label></div>
-                    <div id="bonfireCharcoalPitProg" class="prog-track game-progress-track" style="display:none"><div id="bonfireCharcoalPitFill" class="prog-fill"></div></div>
-                    <div id="bonfireCharcoalLine" class="base-row">Charcoal Pit Wood: <span id="bonfirePitWood">0</span> | Charcoal produced: <span id="bonfireCharcoalRate">0</span>/s | Charcoal: <span id="bonfireCharcoalStock">0</span></div>
+                    <div id="bonfireKilnHardwood_row" class="base-row bonfire-hardwood-row">
+                        <div class="bonfire-hardwood-stats">
+                            <span>Hardwood: <span id="bonfireKilnHardwood">0</span></span>
+                            <label class="kiln-priority-keep">Stop at: <input type="number" id="bonfireHardwoodStop" class="bonfire-fire-tending-cap" min="0" step="1" onchange="events.setBonfireHardwoodStop(this.value)"></label>
+                        </div>
+                        <div id="bonfireCharcoalPitProg" class="prog-track game-progress-track bonfire-charcoal-pit-prog">
+                            <div id="bonfireCharcoalPitFill" class="prog-fill"></div>
+                            <div id="bonfireCharcoalPitLabel" class="game-progress-bar-label" style="display:none">Building charcoal pit with <span id="bonfireCharcoalPitAmount">0</span> hardwood</div>
+                        </div>
+                    </div>
+                    <div id="bonfireCharcoalLine" class="base-row">Charcoal Pit Wood: <span id="bonfirePitWood">0</span> | Charcoal rate is ceil(√(pit wood/10)): <span id="bonfireCharcoalRate">0</span>/s | Charcoal: <span id="bonfireCharcoalStock">0</span></div>
+                    <div id="bonfireFeedCharcoal_row" class="base-row"><label><input type="checkbox" id="bonfireFeedCharcoal_chk" checked onchange="events.toggleBonfireFeedCharcoal(this.checked)"> Feed charcoal to bonfire for heat</label></div>
                     <div id="bonfireCharcoalRequire" class="base-row muted-text">Requires a heat of 400 and 100 mana to burn charcoal</div>
-                    ${buildingManaRowHtml("bonfire")}
                 </div>
                 <div id="bonfireFireTending_row" class="base-row" style="display:none">
                     <label><input type="checkbox" id="bonfireFireTending_chk" checked onchange="events.toggleBonfireFireTending(this.checked)"> Only bring wood or coal while heat is below</label>
                     <input type="number" id="bonfireFireTending_cap" class="bonfire-fire-tending-cap" min="0" step="1" value="55" onchange="events.setBonfireFireTendingCap(this.value)">
                 </div>
-                <div id="bonfireFireSpiritPower_row" class="base-row" style="display:none">Assigned fire spirit power (base + training): <span id="bonfireFireSpiritPower">0</span></div>
-                <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Wood carry</span>: <span id="bonfireWoodCarry"></span> per trip</div>
+                <div id="bonfireWoodCarry_row" class="base-row" style="display:none"><span id="bonfireWoodCarryLabel">Burnable Resource Carry</span>: <span id="bonfireWoodCarry"></span> per trip<span id="bonfireWoodCarryPitNote" class="muted-text bonfire-ash-note" style="display:none"> (also affects the charcoal pit hardwood above)</span></div>
                 <div id="bonfireHeatPerFuel_row" class="base-row" style="display:none">1 wood gives <span id="bonfireHeatPerWood"></span> heat<span id="bonfireHeatPerCoalPart" style="display:none"> | 1 coal gives <span id="bonfireHeatPerCoal"></span> heat</span></div>
-                <div id="bonfireCoal_row" class="base-row" style="display:none"><span id="bonfireCoalPart">Coal: <span id="bonfireCoalText">0</span></span><span id="bonfireAshSep" style="display:none"> | </span><span id="bonfireAshPart" style="display:none">${resortData.resourceIconHtml("ash")} Ash: <span id="bonfireAshText">0</span></span></div>
+                <div id="bonfireCoal_row" class="base-row" style="display:none"><span id="bonfireCoalPart">Coal: <span id="bonfireCoalText">0</span></span><span id="bonfireAshSep" style="display:none"> | </span><span id="bonfireAshPart" style="display:none">${resortData.resourceIconHtml("ash")} Ash: <span id="bonfireAshText">0</span><span class="muted-text bonfire-ash-note"> (1 ash is gained per 1 charcoal created)</span></span></div>
                 </div>
                 <div id="bonfireUpgradesPane">
                 ${resortUpgradeRowsHtml("bonfire")}
                 </div>
             `;
         };
-        const htmlShrineMilestoneHeading = function(text, split) {
-            return `<div class="shrine-milestone-heading${split ? " shrine-milestone-heading--split" : ""}">${text}</div>`;
+        const htmlShrineMilestoneHeading = function(text) {
+            return `<div class="shrine-milestone-heading">${text}</div>`;
+        };
+        const htmlShrineMilestoneGroup = function(title, body) {
+            return `<div class="shrine-milestone-group">${htmlShrineMilestoneHeading(title)}${body}</div>`;
         };
         const htmlShrineFixedMilestone = function(id, name, thresholds, packImgs) {
             let markers = "";
@@ -1015,25 +1028,30 @@ let createView = {
                 values += `<div class="shrine-milestone-value" style="left:${left}%">${thresholds[i]}</div>`;
             }
             return `<div class="shrine-milestone shrine-milestone-capped" id="shrineMs_${id}_wrap">
-                <div class="shrine-milestone-name">${name} <span id="shrineMs_${id}_check" class="shrine-milestone-check" style="visibility:hidden">&#10003;</span></div>
-                <div class="shrine-milestone-markers">${markers}</div>
-                <div class="shrine-milestone-bar">
-                    <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
-                    <div class="shrine-milestone-ticks">${ticks}</div>
+                <div class="shrine-milestone-name"><span class="shrine-milestone-label">${name}</span><span id="shrineMs_${id}_check" class="shrine-milestone-check" style="visibility:hidden">&#10003;</span></div>
+                <div class="shrine-milestone-scale">
+                    <div class="shrine-milestone-bar">
+                        <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+                        <div class="shrine-milestone-ticks">${ticks}</div>
+                        <div class="shrine-milestone-markers">${markers}</div>
+                    </div>
+                    <div class="shrine-milestone-values">${values}</div>
                 </div>
-                <div class="shrine-milestone-values">${values}</div>
             </div>`;
         };
         const htmlShrineEscalatingMilestone = function(id, name, packImg) {
-            return `<div class="shrine-milestone" id="shrineMs_${id}_wrap">
-                <div class="shrine-milestone-name">${name} <span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span><span class="muted-text" id="shrineMs_${id}_completed"></span></div>
-                <div class="shrine-milestone-markers"><div class="shrine-milestone-marker" style="left:100%"><img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false"></div></div>
-                <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+            return `<div class="shrine-milestone shrine-milestone-repeating" id="shrineMs_${id}_wrap">
+                <div class="shrine-milestone-name"><span class="shrine-milestone-label">${name}</span><span class="muted-text" id="shrineMs_${id}_progress">0 / 0</span></div>
+                <div class="shrine-milestone-repeat-row">
+                    <div class="prog-track shrine-milestone-track"><div id="shrineMs_${id}_fill" class="prog-fill prog-fill-milestone"></div></div>
+                    <img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false">
+                </div>
+                <div class="muted-text shrine-milestone-completed" id="shrineMs_${id}_completed"></div>
             </div>`;
         };
         const htmlShrineOnceMilestone = function(id, name, packImg) {
             return `<div class="shrine-milestone shrine-milestone-once" id="shrineMs_${id}_wrap">
-                <div class="shrine-milestone-name">${name}</div>
+                <span class="shrine-milestone-label">${name}</span>
                 <div class="shrine-milestone-once-reward">
                     <img id="shrineMs_${id}_icon" class="shrine-pack-icon shrine-milestone-pack-icon" src="${packImg}" alt="" draggable="false">
                     <span id="shrineMs_${id}_check" class="shrine-milestone-check" style="visibility:hidden">&#10003;</span>
@@ -1050,7 +1068,22 @@ let createView = {
                 ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
             `;
         };
-        const htmlCardsPackSection = function() {
+        const htmlCardsPackInventory = function() {
+            const tile = function(img, name, countId) {
+                return `<div class="shrine-pack-tile"><img class="shrine-pack-icon" src="${img}" alt="" draggable="false"><div class="shrine-pack-tile-name">${name}</div><div id="${countId}" class="shrine-pack-tile-count">0</div></div>`;
+            };
+            return `
+                <div id="shrinePacksSection">
+                    <div id="shrinePackStrip" class="shrine-pack-strip">
+                        ${tile("img/common.svg", "Common", "shrinePackCommonCount")}
+                        ${tile("img/rare.svg", "Rare", "shrinePackRareCount")}
+                        ${tile("img/epic.svg", "Epic", "shrinePackEpicCount")}
+                    </div>
+                    <button type="button" id="shrineOpenPacksBtn" class="tab-button shrine-open-packs-btn" onclick="events.openOrResumePacks()" disabled>Open Packs</button>
+                </div>
+            `;
+        };
+        const htmlCardsMilestones = function() {
             const commonImg = "img/common.svg";
             const rareImg = "img/rare.svg";
             const epicImg = "img/epic.svg";
@@ -1058,31 +1091,24 @@ let createView = {
             const starPacks = [commonImg, commonImg, commonImg, rareImg, rareImg, epicImg];
             const okamiPacks = [commonImg, commonImg, rareImg, rareImg, epicImg, epicImg, epicImg, epicImg];
             return `
-                <div id="shrinePacksSection" class="shrine-packs-section">
-                    <div id="shrinePackStrip" class="shrine-pack-strip">
-                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${commonImg}" alt="" draggable="false"> Common Packs: <span id="shrinePackCommonCount">0</span></span>
-                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${rareImg}" alt="" draggable="false"> Rare Packs: <span id="shrinePackRareCount">0</span></span>
-                        <span class="shrine-pack-strip-item"><img class="shrine-pack-icon" src="${epicImg}" alt="" draggable="false"> Epic Packs: <span id="shrinePackEpicCount">0</span></span>
-                    </div>
-                    <div class="base-row shrine-open-packs-row">
-                        <button type="button" id="shrineOpenPacksBtn" class="tab-button" onclick="events.openOrResumePacks()" disabled>Open Packs</button>
-                    </div>
-                    <div id="shrineMilestonesList" class="shrine-milestones-list">
-                        ${htmlShrineMilestoneHeading("Capped Milestones", false)}
-                        ${htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)}
-                        ${htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)}
-                        ${htmlShrineMilestoneHeading("Repeating Milestones", true)}
-                        ${htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)}
-                        ${htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)}
-                        ${htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)}
-                        ${htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)}
-                        ${htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)}
-                        ${htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)}
-                        ${htmlShrineMilestoneHeading("One Time Milestones", true)}
-                        ${htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)}
-                        ${htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)}
-                        ${htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)}
-                    </div>
+                <div id="shrineMilestonesList" class="shrine-milestones-list">
+                    ${htmlShrineMilestoneGroup("Capped Milestones",
+                        htmlShrineFixedMilestone("totalStars", "Total Stars", [5, 10, 15, 20, 25, 30], starPacks)
+                        + htmlShrineFixedMilestone("okamiLevel", "Okami Level", [10, 20, 30, 40, 50, 60, 70, 80], okamiPacks)
+                    )}
+                    ${htmlShrineMilestoneGroup("Repeating Milestones",
+                        htmlShrineEscalatingMilestone("depthReached", "Depth Reached", commonImg)
+                        + htmlShrineEscalatingMilestone("orbLevel", "Orb Level", rareImg)
+                        + htmlShrineEscalatingMilestone("maxMana", "Max Mana", rareImg)
+                        + htmlShrineEscalatingMilestone("totalGoldStars", "Total Gold Stars", rareImg)
+                        + htmlShrineEscalatingMilestone("marketLevel", "Market Level", commonImg)
+                        + htmlShrineEscalatingMilestone("essenceMade", "Essence Made in this Resort", rareImg)
+                    )}
+                    ${htmlShrineMilestoneGroup("One Time Milestones",
+                        htmlShrineFixedMilestone("shrineLevel", "Shrine Level", engine.shrineLevelMilestoneThresholds, shrineLevelPacks)
+                        + htmlShrineEscalatingMilestone("divinityAmount", "Divinity Amount", commonImg)
+                        + htmlShrineOnceMilestone("buildShrine", "Build Shrine", epicImg)
+                    )}
                 </div>
             `;
         };
@@ -1473,10 +1499,7 @@ let createView = {
                     </div>
                     <div id="atelierPane_atelier">
                         <div class="base-row muted-text">Upgrades for the different buildings.</div>
-                        <div id="atelierOreBars_row" style="display:none">
-                            <div class="base-row">${resortData.resourceIconHtml("ore")} Ore: <span id="atelierInfoOre"></span></div>
-                            <div class="base-row">${resortData.resourceIconHtml("bars")} Bars: <span id="atelierInfoBars"></span></div>
-                        </div>
+                        <div id="atelierOreBars_row" class="base-row" style="display:none">${resortData.resourceIconHtml("ore")} Ore: <span id="atelierInfoOre"></span> | ${resortData.resourceIconHtml("bars")} Bars: <span id="atelierInfoBars"></span></div>
                         ${resortUpgradeRowsHtml("atelier")}
                     </div>
                     <div id="atelierPane_dropHammer" style="display:none"></div>
@@ -1755,7 +1778,11 @@ let createView = {
         }
         const cardsPacksMount = document.getElementById("cardsPacksMount");
         if (cardsPacksMount) {
-            cardsPacksMount.innerHTML = htmlCardsPackSection();
+            cardsPacksMount.innerHTML = htmlCardsPackInventory();
+        }
+        const cardsMilestonesMount = document.getElementById("cardsMilestonesMount");
+        if (cardsMilestonesMount) {
+            cardsMilestonesMount.innerHTML = htmlCardsMilestones();
         }
         const cardsPrestigeMount = document.getElementById("cardsPrestigeMount");
         if (cardsPrestigeMount) {
@@ -2200,7 +2227,7 @@ let createView = {
         //uses createView.queueCache("<element ID>") for elements created in index.html
 
         createView.queueCache(
-            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
+            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "resourceProgressRow", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
             "divinityProgressBar", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
             "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerTokenBarrierLayer", "playerTokenBarrierFill", "playerStatCloutLine", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
@@ -2312,13 +2339,13 @@ let createView = {
             "bonfireAutoRetry_row", "bonfireAutoRetry_chk",
             "bonfireStartWithFullMana_row", "bonfireStartWithFullMana_chk",
             "bonfireSubTabs", "bonfireSubTab_clone", "bonfireSubTab_kiln", "bonfireClonePane", "bonfireKilnPane", "bonfireKilnControls", "bonfireUpgradesPane",
-            "bonfireKilnHeatCap", "bonfirePriorityList",
+            "bonfireKilnHeat_row", "bonfireKilnHeatCap", "bonfireKilnHeatCap_chk", "bonfirePriorityList",
             "bonfirePriority_coal", "bonfirePriority_wood", "bonfirePriority_hardwood", "bonfirePriority_charcoalPit",
             "bonfirePriorityUse_coal", "bonfirePriorityUse_wood", "bonfirePriorityUse_hardwood", "bonfirePriorityUse_charcoalPit",
             "bonfirePriorityHeat_coal", "bonfirePriorityHeat_wood", "bonfirePriorityHeat_hardwood", "bonfirePriorityHeat_charcoalPit",
             "bonfireKeep_wood", "bonfireKeep_hardwood", "bonfireKilnHardwood", "bonfireHardwoodStop",
-            "bonfireCharcoalPitProg", "bonfireCharcoalPitFill", "bonfireCharcoalLine", "bonfirePitWood", "bonfireCharcoalRate", "bonfireCharcoalStock", "bonfireCharcoalRequire",
-            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireFireSpiritPower_row", "bonfireFireSpiritPower", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalPart", "bonfireCoalText", "bonfireAshSep", "bonfireAshPart", "bonfireAshText",
+            "bonfireCharcoalPitProg", "bonfireCharcoalPitFill", "bonfireCharcoalPitLabel", "bonfireCharcoalPitAmount", "bonfireCharcoalLine", "bonfireFeedCharcoal_row", "bonfireFeedCharcoal_chk", "bonfirePitWood", "bonfireCharcoalRate", "bonfireCharcoalStock", "bonfireCharcoalRequire",
+            "bonfireFireTending_row", "bonfireFireTending_cap", "bonfireWoodCarry_row", "bonfireWoodCarryLabel", "bonfireWoodCarry", "bonfireWoodCarryPitNote", "bonfireHeatPerFuel_row", "bonfireHeatPerWood", "bonfireHeatPerCoalPart", "bonfireHeatPerCoal", "bonfireCoal_row", "bonfireCoalPart", "bonfireCoalText", "bonfireAshSep", "bonfireAshPart", "bonfireAshText",
             "bonfireManaRow", "bonfireFillMana_btn", "bonfireManaProgressWrap", "bonfireManaFill", "bonfireManaAmount", "bonfireManaCap", "bonfireAllowCarriersMana_row", "bonfireAllowCarriersMana_chk",
             "base_bonfire_growth_row", "base_bonfire_growth_btn", "base_bonfire_growth_extra",
             "base_bonfire_retry_row", "base_bonfire_retry_btn", "base_bonfire_retry_extra",

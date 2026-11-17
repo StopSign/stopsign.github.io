@@ -52,6 +52,24 @@ body {
     width: 100%;
 }
 
+.resource-progress-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+}
+
+#manaProgressBar {
+    grid-column: 1;
+    min-width: 0;
+}
+
+#divinityProgressBar {
+    grid-column: 2;
+    min-width: 0;
+}
+
 .game-progress-track {
     position: relative;
 }
@@ -299,18 +317,78 @@ body {
     min-height: 0;
 }
 
+.menu-tabs-wrap {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu-tabs-scroll {
+    flex: 0 0 18px;
+    width: 18px;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: #162033;
+    color: var(--text-primary);
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#menuTabsScrollLeft {
+    border-right: 1px solid var(--border-color);
+}
+
+#menuTabsScrollRight {
+    border-left: 1px solid var(--border-color);
+}
+
+.menu-tabs-scroll:hover:not(.menu-tabs-scroll--end) {
+    background: #2d4e7a;
+}
+
+.menu-tabs-scroll--end {
+    color: #4b5168;
+    cursor: default;
+}
+
+.menu-tabs-scroll--hidden {
+    display: none;
+}
+
 #menuTabs {
     display: flex;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
     gap: 6px;
-    padding: 8px;
-    border-bottom: 1px solid var(--border-color);
+    padding: 8px 4px;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+#menuTabs::-webkit-scrollbar {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+#menuTabs > .tab-button {
+    flex: 0 0 auto;
+    white-space: nowrap;
 }
 
 .tab-button {
     background: #1f2b3e;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 6px 8px;
+    padding: 5px 5px;
     cursor: pointer;
 }
 
@@ -2779,7 +2857,8 @@ button {
 .resort-building-bonfire.has-kiln {
     display: flex;
     width: 80px;
-    bottom: 63px;
+    bottom: 70px;
+    left:565px;
 }
 
 .resort-building-bonfire.has-kiln .bonfire-map-art-row {
@@ -2804,6 +2883,42 @@ button {
 
 .kiln-priority-row--off {
     opacity: 0.5;
+}
+
+#bonfireKilnHeat_row.kiln-heat-row--off {
+    opacity: 0.5;
+}
+
+#bonfireCharcoalPitFill {
+    background-color: #36454F;
+}
+
+.bonfire-hardwood-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 8px;
+}
+
+.bonfire-hardwood-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.bonfire-charcoal-pit-prog {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.bonfire-charcoal-pit-prog .game-progress-bar-label {
+    line-height: 24px;
+}
+
+.bonfire-ash-note {
+    margin-top: 0;
 }
 
 .kiln-priority-handle {
@@ -3043,20 +3158,75 @@ button {
     min-width: 160px;
 }
 
-.shrine-packs-section {
-    margin: 12px 0 16px;
+.cards-acquire,
+.shrine-milestone-group {
+    background: #121a26;
+    border: 1px solid #3a4f6a;
+    border-radius: 6px;
+    padding: 10px;
 }
 
-.shrine-pack-strip {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
-    align-items: center;
+.cards-acquire {
     margin-bottom: 12px;
 }
 
-.shrine-open-packs-row {
-    margin: 0 0 12px;
+.cards-acquire-buy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.cards-acquire-buy-text {
+    min-width: 0;
+    flex: 1 1 180px;
+}
+
+.cards-acquire-title {
+    font-weight: 600;
+}
+
+.cards-acquire-buy-text .muted-text {
+    margin-top: 2px;
+}
+
+#cardsPacksMount {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.shrine-pack-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.shrine-pack-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: #171e30;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.shrine-pack-tile-count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+}
+
+.shrine-open-packs-btn {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#shrineBuyCardBtn {
+    flex-shrink: 0;
 }
 
 #shrineBuyCardBtn:disabled,
@@ -3071,13 +3241,6 @@ button {
 #shrineMoveMountainBtn:disabled:hover {
     background: #1f2b3e !important;
     cursor: default;
-}
-
-.shrine-pack-strip-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
 }
 
 .shrine-pack-icon {
@@ -3099,67 +3262,109 @@ button {
 .shrine-milestones-list {
     display: flex;
     flex-direction: column;
+    gap: 12px;
+}
+
+.shrine-milestone-group {
+    display: flex;
+    flex-direction: column;
     gap: 14px;
-    width: calc(100% - 14px);
 }
 
 .shrine-milestone-heading {
     font-weight: 600;
 }
 
-.shrine-milestone-heading--split {
-    margin-top: 4px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.shrine-milestone-capped {
-    padding-right: 16px;
-}
-
 .shrine-milestone-name {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
     margin-bottom: 4px;
+}
+
+.shrine-milestone-name .muted-text {
+    margin-top: 0;
+    font-variant-numeric: tabular-nums;
 }
 
 .shrine-milestone-check {
     color: #22c55e;
     font-weight: 700;
-    margin-left: 4px;
+    margin-left: auto;
+}
+
+.shrine-milestone-completed {
+    margin-top: 2px;
+    font-size: 12px;
+}
+
+.shrine-milestone-repeat-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shrine-milestone-repeat-row .shrine-milestone-track {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin-top: 0;
+}
+
+.shrine-milestone-once {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
 }
 
 .shrine-milestone-once-reward {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
+}
+
+.shrine-milestone-scale {
+    padding: 2px 11px 0;
+}
+
+.shrine-milestone-bar {
+    position: relative;
+    height: 22px;
+    display: flex;
+    align-items: center;
+}
+
+.shrine-milestone-bar .shrine-milestone-track {
+    width: 100%;
+    margin-top: 0;
 }
 
 .shrine-milestone-markers {
-    position: relative;
-    height: 26px;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .shrine-milestone-marker {
     position: absolute;
-    top: 0;
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .shrine-milestone-pack-icon {
     display: block;
 }
 
-.shrine-milestone-bar {
-    position: relative;
-    margin-top: 2px;
-}
-
-.shrine-milestone-bar .shrine-milestone-track {
-    margin-top: 0;
-}
-
 .shrine-milestone-ticks {
     position: absolute;
-    inset: 0;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 12px;
+    transform: translateY(-50%);
     pointer-events: none;
     z-index: 1;
 }
@@ -4030,8 +4235,8 @@ button {
 }
 
 .resort-map-progress-bonfire-mana {
-    bottom: 25px;
-    left: 586px;
+    bottom: 32px;
+    left: 570px;
 }
 
 .resort-map-progress-inn-water {

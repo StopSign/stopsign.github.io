@@ -160,9 +160,151 @@ let events = {
         createView.showCurrentTab();
         view.updateCompactLayout();
         createView.updateLayoutMeasurements();
+        events.scrollActiveMenuTabIntoView();
         if (typeof view !== "undefined" && view.updateMenuNumbers) {
             view.updateMenuNumbers();
         }
+    },
+    bindMenuTabScroll: function() {
+        if (events._menuTabScrollBound) {
+            return;
+        }
+        const scroller = document.getElementById("menuTabs");
+        const left = document.getElementById("menuTabsScrollLeft");
+        const right = document.getElementById("menuTabsScrollRight");
+        if (!scroller || !left || !right) {
+            return;
+        }
+        events._menuTabScrollBound = true;
+        const hoverPxPerSec = 100;
+        const clickJumpPx = 200;
+        let dir = 0;
+        let raf = 0;
+        let last = 0;
+
+        function tick(now) {
+            if (!dir) {
+                raf = 0;
+                last = 0;
+                return;
+            }
+            if (!last) {
+                last = now;
+            }
+            const dt = Math.min(50, now - last);
+            last = now;
+            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+            const next = Math.max(0, Math.min(max, scroller.scrollLeft + dir * hoverPxPerSec * dt / 1000));
+            if (next !== scroller.scrollLeft) {
+                scroller.scrollLeft = next;
+            }
+            events.syncMenuTabScrollAffordances();
+            if ((dir < 0 && next <= 0) || (dir > 0 && next >= max - 0.5)) {
+                dir = 0;
+                raf = 0;
+                last = 0;
+                return;
+            }
+            raf = requestAnimationFrame(tick);
+        }
+        function start(direction, btn) {
+            if (btn.classList.contains("menu-tabs-scroll--end") || btn.classList.contains("menu-tabs-scroll--hidden")) {
+                return;
+            }
+            dir = direction;
+            last = 0;
+            if (!raf) {
+                raf = requestAnimationFrame(tick);
+            }
+        }
+        function stop() {
+            dir = 0;
+            last = 0;
+        }
+        function jump(direction) {
+            const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+            const next = Math.max(0, Math.min(max, scroller.scrollLeft + direction * clickJumpPx));
+            scroller.scrollLeft = next;
+            events.syncMenuTabScrollAffordances();
+        }
+        left.addEventListener("pointerenter", function() { start(-1, left); });
+        left.addEventListener("pointerleave", stop);
+        right.addEventListener("pointerenter", function() { start(1, right); });
+        right.addEventListener("pointerleave", stop);
+        left.addEventListener("click", function() { jump(-1); });
+        right.addEventListener("click", function() { jump(1); });
+        window.addEventListener("resize", function() {
+            events.syncMenuTabScrollAffordances();
+        });
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function() {
+                events.syncMenuTabScrollAffordances();
+            });
+        }
+        events.syncMenuTabScrollAffordances();
+        events.scrollActiveMenuTabIntoView();
+    },
+    syncMenuTabScrollAffordances: function() {
+        const scroller = document.getElementById("menuTabs");
+        const left = document.getElementById("menuTabsScrollLeft");
+        const right = document.getElementById("menuTabsScrollRight");
+        if (!scroller || !left || !right) {
+            return;
+        }
+        const buttonsHidden = left.classList.contains("menu-tabs-scroll--hidden");
+        const buttonSpace = buttonsHidden ? 0 : left.offsetWidth + right.offsetWidth;
+        const availableWithoutButtons = scroller.clientWidth + buttonSpace;
+        const needed = scroller.scrollWidth > availableWithoutButtons + 0.5;
+        left.classList.toggle("menu-tabs-scroll--hidden", !needed);
+        right.classList.toggle("menu-tabs-scroll--hidden", !needed);
+        if (!needed) {
+            if (scroller.scrollLeft !== 0) {
+                scroller.scrollLeft = 0;
+            }
+            left.classList.add("menu-tabs-scroll--end");
+            right.classList.add("menu-tabs-scroll--end");
+            return;
+        }
+        const max = Math.max(0, scroller.scrollWidth - scroller.clientWidth);
+        const atStart = scroller.scrollLeft <= 0.5;
+        const atEnd = scroller.scrollLeft >= max - 0.5;
+        left.classList.toggle("menu-tabs-scroll--end", atStart);
+        right.classList.toggle("menu-tabs-scroll--end", atEnd);
+    },
+    noteMenuTabScrollContent: function() {
+        const scroller = document.getElementById("menuTabs");
+        if (!scroller || !events._menuTabScrollBound) {
+            return;
+        }
+        let sig = "";
+        const kids = scroller.children;
+        for (let i = 0; i < kids.length; i++) {
+            sig += kids[i].style.display + "\n" + kids[i].textContent + "\n";
+        }
+        if (sig === events._menuTabScrollSig) {
+            return;
+        }
+        events._menuTabScrollSig = sig;
+        events.syncMenuTabScrollAffordances();
+    },
+    scrollActiveMenuTabIntoView: function() {
+        const scroller = document.getElementById("menuTabs");
+        if (!scroller || !data.battle) {
+            return;
+        }
+        const tabKey = data.battle.currentTab || "base";
+        const btn = document.getElementById("tabButton_" + tabKey);
+        if (!btn || btn.style.display === "none") {
+            return;
+        }
+        const sRect = scroller.getBoundingClientRect();
+        const bRect = btn.getBoundingClientRect();
+        if (bRect.left < sRect.left - 1) {
+            scroller.scrollLeft -= (sRect.left - bRect.left);
+        } else if (bRect.right > sRect.right + 1) {
+            scroller.scrollLeft += (bRect.right - sRect.right);
+        }
+        events.syncMenuTabScrollAffordances();
     },
     markNewBaseContent: function(buildingKey, optionalFoxDenSubtab) {
         const notify = data.progress.baseContentNotify;
@@ -362,6 +504,23 @@ let events = {
         }
         const n = parseInt(trimmed, 10);
         bf.kilnHeatCap = isNaN(n) || n < 0 ? null : n;
+    },
+    toggleBonfireKilnHeatCap: function(checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        bf.kilnHeatLimitEnabled = !!checked;
+        if (typeof view !== "undefined" && view.updateBasePanelBonfire) {
+            view.updateBasePanelBonfire();
+        }
+    },
+    toggleBonfireFeedCharcoal: function(checked) {
+        const bf = data.progress.base && data.progress.base.bonfire;
+        if (!bf) {
+            return;
+        }
+        bf.feedCharcoalToHeat = !!checked;
     },
     setBonfirePriorityKeep: function(key, value) {
         const bf = data.progress.base && data.progress.base.bonfire;
