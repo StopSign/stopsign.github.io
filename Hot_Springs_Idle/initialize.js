@@ -1529,6 +1529,9 @@ let initialize = {
                 shrine.packs[r] = 0;
             }
         });
+        if (typeof engine !== "undefined" && engine.ensurePrayerState) {
+            engine.ensurePrayerState(shrine);
+        }
         if (!shrine.cards || typeof shrine.cards !== "object") {
             shrine.cards = (typeof shrineCards !== "undefined" && shrineCards.createFreshCardsState)
                 ? shrineCards.createFreshCardsState()
@@ -2157,7 +2160,8 @@ let initialize = {
         // ((base + foundation + cards + column) x density x sturdiness + skill Aud) x Confidence x Bravado
         // Skill Aud is max only; "additionally recover" heals are applied as current, not max.
         const skillAud = fortLvl + tenInner + validationAud + paddingAud + mountingAud;
-        const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult * bravadoMult));
+        const prayerAud = engine.getPrayerEffect("audacity");
+        const maxAud = Math.max(1, Math.ceil((denseAud + skillAud) * conMult * bravadoMult * prayerAud));
         data.battle.player.maxAud = maxAud;
         if (fullHeal) {
             data.battle.player.aud = data.battle.player.maxAud;

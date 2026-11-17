@@ -279,6 +279,12 @@ var resortData = {
         if (key === "limestone") {
             return (base.atelier && base.atelier.limestone) || 0;
         }
+        if (key === "quicklime") {
+            return (base.atelier && base.atelier.quicklime) || 0;
+        }
+        if (key === "paper") {
+            return (data.progress && data.progress.paper) || 0;
+        }
         return 0;
     },
     /** Coins never cover a Credit cost. */
@@ -291,7 +297,7 @@ var resortData = {
         if (key === "mana" && typeof engine !== "undefined" && engine.getManaCapacity && amount > engine.getManaCapacity()) {
             cls = " cost-amt-unaffordable";
         }
-        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash" || key === "mana" || key === "credit" || key === "essence" || key === "divinity" || key === "limestone")
+        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash" || key === "mana" || key === "credit" || key === "essence" || key === "divinity" || key === "limestone" || key === "quicklime" || key === "paper")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `<span class="cost-amt${cls}">${intToStringRound(amount)}</span>${icon} ${label}`;
@@ -322,6 +328,8 @@ var resortData = {
         if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
         if ((c.essence || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.essence, "essence", "essence"));
         if ((c.limestone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.limestone, "limestone", "limestone"));
+        if ((c.quicklime || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.quicklime, "quicklime", "quicklime"));
+        if ((c.paper || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.paper, "paper", "paper"));
         return parts;
     },
 
@@ -424,7 +432,9 @@ var resortData = {
                 credit: c.credit || 0,
                 divinity: c.divinity || 0,
                 essence: c.essence || 0,
-                limestone: c.limestone || 0
+                limestone: c.limestone || 0,
+                quicklime: c.quicklime || 0,
+                paper: c.paper || 0
             }
         };
     },
@@ -433,7 +443,7 @@ var resortData = {
         const w = weaveCost || {};
         return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0
             || (w.credit || 0) > 0 || (w.divinity || 0) > 0 || (w.essence || 0) > 0
-            || (w.limestone || 0) > 0;
+            || (w.limestone || 0) > 0 || (w.quicklime || 0) > 0 || (w.paper || 0) > 0;
     },
 
     hasGatherCost: function(gatherCost) {
@@ -602,7 +612,7 @@ var resortData = {
         } else {
             show = true;
         }
-        if (show && resortData.getUpgradePurchaseCount(upgradeDef) <= 0) {
+        if (show && !upgradeDef.ignoreManaCapacityGate && resortData.getUpgradePurchaseCount(upgradeDef) <= 0) {
             const cost = resortData.upgradeCost(upgradeDef);
             if (cost && cost.mana > 0 && !engine.hasManaCapacityForCost(cost)) {
                 show = false;
@@ -673,6 +683,8 @@ var resortData = {
         if ((c.divinity || 0) > ((data.progress.divinity && data.progress.divinity.amount) || 0)) return false;
         if ((c.essence || 0) > ((base.cistern && base.cistern.essence) || 0)) return false;
         if ((c.limestone || 0) > ((base.atelier && base.atelier.limestone) || 0)) return false;
+        if ((c.quicklime || 0) > ((base.atelier && base.atelier.quicklime) || 0)) return false;
+        if ((c.paper || 0) > ((data.progress && data.progress.paper) || 0)) return false;
         if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) return false;
         if ((c.hardwood || 0) > ((base.bambooForest && base.bambooForest.hardwood) || 0)) return false;
         if ((c.stone || 0) > engine.getTotalStone()) return false;
@@ -710,6 +722,12 @@ var resortData = {
         }
         if ((c.limestone || 0) > 0 && base.atelier) {
             base.atelier.limestone = Math.max(0, (base.atelier.limestone || 0) - (c.limestone || 0));
+        }
+        if ((c.quicklime || 0) > 0 && base.atelier) {
+            base.atelier.quicklime = Math.max(0, (base.atelier.quicklime || 0) - (c.quicklime || 0));
+        }
+        if ((c.paper || 0) > 0 && data.progress) {
+            data.progress.paper = Math.max(0, (data.progress.paper || 0) - (c.paper || 0));
         }
         if ((c.wood || 0) > 0 && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - (c.wood || 0));
@@ -5464,7 +5482,9 @@ var resortData = {
                 okamiIconographyBought: 0,
                 elementalResonanceBought: 0,
                 divineGiftsBought: 0,
-                goddessIconographyBought: 0
+                goddessIconographyBought: 0,
+                prayerStatues: {},
+                prayerDonations: {}
             },
             upgradesOrder: ["spareSandals", "prepareToWriteLegend", "axeEchoes", "shelvingEchoes", "richerNeighbors", "artAppreciation",
                 "powerfulChops", "spiritWeavingEchoes",  "shardEchoes", "languageEchoes", 
@@ -6203,6 +6223,64 @@ var resortData = {
         }
     },
 
+    /**
+     * Prayer statues. Left column is the first four, top to bottom; right column is the rest.
+     * Clone Exp spends star beads: that is the only bead stock.
+     */
+    prayerStatueCatalog: [
+        { id: "maxMana", upgradeKey: "maxManaStatue", key: "max_mana_statue", name: "Max Mana Statue", effectName: "Max Mana", column: "left", weavingTime: 10000, cost: { mana: 500000, wood: 50000 }, ignoreManaCapacityGate: true, prayerBase: 20000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "audacity", upgradeKey: "audacityStatue", key: "audacity_statue", name: "Audacity Statue", effectName: "Audacity", column: "left", weavingTime: 15000, cost: { limestone: 10000, bars: 10000 }, prayerBase: 40000, prayerGrowth: 1.3, effectMult: 1.05 },
+        { id: "cloneExp", upgradeKey: "cloneExpStatue", key: "clone_exp_statue", name: "Clone Exp Statue", effectName: "Clone Exp", column: "left", weavingTime: 15000, cost: { mana: 1000000, starBeads: 2000000 }, ignoreManaCapacityGate: true, prayerBase: 40000, prayerGrowth: 1.3, effectMult: 1.1 },
+        { id: "talent", upgradeKey: "talentStatue", key: "talent_statue", name: "Talent Statue", effectName: "Talent Exp", column: "left", weavingTime: 20000, cost: { essence: 500000, stone: 100000 }, prayerBase: 60000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "manaGain", upgradeKey: "manaGainStatue", key: "mana_gain_statue", name: "Mana Gain Statue", effectName: "Mana Gain", column: "right", weavingTime: 10000, cost: { mana: 800000, bars: 10000 }, ignoreManaCapacityGate: true, prayerBase: 30000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "ego", upgradeKey: "egoStatue", key: "ego_statue", name: "Ego Statue", effectName: "Ego", column: "right", weavingTime: 15000, cost: { quicklime: 10000, ore: 10000 }, prayerBase: 40000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "paper", upgradeKey: "paperStatue", key: "paper_statue", name: "Paper Statue", effectName: "Paper", column: "right", weavingTime: 20000, cost: { paper: 1000, essence: 300000 }, prayerBase: 50000, prayerGrowth: 1.3, effectMult: 1.05 },
+        { id: "starPower", upgradeKey: "starPowerStatue", key: "star_power_statue", name: "Star Power Statue", effectName: "Star Power", column: "right", weavingTime: 25000, cost: { coins: 30000000, hardwood: 10000 }, prayerBase: 100000, prayerGrowth: 2, additive: 0.1 }
+    ],
+    prayerDonationCatalog: [
+        { id: "mana", upgradeKey: "donateMana", key: "donate_mana", name: "Donate Mana", cost: { mana: 200000 }, ignoreManaCapacityGate: true },
+        { id: "stone", upgradeKey: "donateStone", key: "donate_stone", name: "Donate Stone", cost: { stone: 10000 } },
+        { id: "wood", upgradeKey: "donateWood", key: "donate_wood", name: "Donate Wood", cost: { wood: 10000 } },
+        { id: "hardwood", upgradeKey: "donateHardwood", key: "donate_hardwood", name: "Donate Hardwood", cost: { hardwood: 5000 } },
+        { id: "ore", upgradeKey: "donateOre", key: "donate_ore", name: "Donate Ore", cost: { ore: 10000 } },
+        { id: "bars", upgradeKey: "donateBars", key: "donate_bars", name: "Donate Bars", cost: { bars: 5000 } },
+        { id: "coins", upgradeKey: "donateCoins", key: "donate_coins", name: "Donate Coins", cost: { coins: 500000 } },
+        { id: "starBeads", upgradeKey: "donateStarBeads", key: "donate_star_beads", name: "Donate Star Beads", cost: { starBeads: 300000 } },
+        { id: "limestone", upgradeKey: "donateLimestone", key: "donate_limestone", name: "Donate Limestone", cost: { limestone: 10000 } },
+        { id: "quicklime", upgradeKey: "donateQuicklime", key: "donate_quicklime", name: "Donate Quicklime", cost: { quicklime: 10000 } },
+        { id: "essence", upgradeKey: "donateEssence", key: "donate_essence", name: "Donate Essence", cost: { essence: 10000 } }
+    ],
+    getPrayerStatueDef: function(id) {
+        const list = resortData.prayerStatueCatalog || [];
+        for (let i = 0; i < list.length; i++) {
+            if (list[i].id === id) {
+                return list[i];
+            }
+        }
+        return null;
+    },
+    getPrayerUiUpgradeKeys: function() {
+        const keys = [];
+        const statues = resortData.prayerStatueCatalog || [];
+        const donations = resortData.prayerDonationCatalog || [];
+        for (let i = 0; i < statues.length; i++) {
+            keys.push(statues[i].upgradeKey);
+        }
+        for (let j = 0; j < donations.length; j++) {
+            keys.push(donations[j].upgradeKey);
+        }
+        return keys;
+    },
+    isPrayerDonationUpgradeKey: function(upgradeKey) {
+        const donations = resortData.prayerDonationCatalog || [];
+        for (let i = 0; i < donations.length; i++) {
+            if (donations[i].upgradeKey === upgradeKey) {
+                return true;
+            }
+        }
+        return false;
+    },
+
     foxDenUnlockGetDef: function(unlockKey) {
         const th = data.progress.base.foxDen;
         const bdef = resortData.buildings[unlockKey];
@@ -6325,3 +6403,106 @@ resortData.iterWorkerAssignmentSites = function(callback) {
         callback(keys[i], data.progress.base && data.progress.base[keys[i]]);
     }
 };
+
+resortData.scaledPrayerCost = function(baseCost, bought) {
+    const cost = {};
+    const src = baseCost || {};
+    const keys = Object.keys(src);
+    const mult = Math.pow(1.3, bought || 0);
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        cost[key] = Math.round((src[key] || 0) * mult);
+    }
+    return cost;
+};
+
+resortData.installPrayerUpgrades = function() {
+    const shrine = resortData.buildings && resortData.buildings.shrine;
+    if (!shrine || !shrine.upgrades || shrine._prayerUpgradesInstalled) {
+        return;
+    }
+    shrine._prayerUpgradesInstalled = true;
+    const statues = resortData.prayerStatueCatalog || [];
+    for (let i = 0; i < statues.length; i++) {
+        const spec = statues[i];
+        const statueId = spec.id;
+        const effectText = spec.additive
+            ? `Each completion adds +${spec.additive} to the exp each star gives a skill. Half of that applies now, and the full amount applies after prestige.`
+            : `Each completion multiplies ${spec.effectName} by x${spec.effectMult}. Half of that increase applies now, and the full increase applies after prestige.`;
+        shrine.upgrades[spec.upgradeKey] = {
+            key: spec.key,
+            name: spec.name,
+            description: `Pray at this statue. The first completion needs ${spec.prayerBase} prayer, and each completion multiplies the next prayer need by x${spec.prayerGrowth}. ${effectText}`,
+            weavingTime: spec.weavingTime,
+            ignoreManaCapacityGate: !!spec.ignoreManaCapacityGate,
+            maxPurchases: 1,
+            getCost: function() {
+                return Object.assign({}, spec.cost);
+            },
+            getPurchaseCount: function() {
+                const st = engine.getPrayerStatueState(statueId);
+                return (st && st.bought) || 0;
+            },
+            getWeavingPurchaseIndex: function() {
+                const st = engine.getPrayerStatueState(statueId);
+                return (st && st.bought) || 0;
+            },
+            onBuy: function() {
+                const st = engine.getPrayerStatueState(statueId);
+                if (st) {
+                    st.bought = 1;
+                }
+            },
+            rowVisible: function() {
+                return engine.isTempleUnlocked();
+            },
+            soldOutButtonLabel: "Built"
+        };
+        shrine.upgradesOrder.push(spec.upgradeKey);
+    }
+    const donations = resortData.prayerDonationCatalog || [];
+    for (let d = 0; d < donations.length; d++) {
+        const spec = donations[d];
+        const donationId = spec.id;
+        const baseCost = spec.cost;
+        shrine.upgrades[spec.upgradeKey] = {
+            key: spec.key,
+            name: spec.name,
+            description: "Multiply prayer per worker by x1.1. The cost, the weaving time, and the bonus reset on prestige.",
+            weavingTime: 2000,
+            weavingTimeIncrease: 1.2,
+            ignoreManaCapacityGate: !!spec.ignoreManaCapacityGate,
+            getCost: function() {
+                const shrineState = engine.ensurePrayerState();
+                const bought = (shrineState && shrineState.prayerDonations && shrineState.prayerDonations[donationId]) || 0;
+                return resortData.scaledPrayerCost(baseCost, bought);
+            },
+            getPurchaseCount: function() {
+                const shrineState = engine.ensurePrayerState();
+                return (shrineState && shrineState.prayerDonations && shrineState.prayerDonations[donationId]) || 0;
+            },
+            getWeavingPurchaseIndex: function() {
+                const shrineState = engine.ensurePrayerState();
+                return (shrineState && shrineState.prayerDonations && shrineState.prayerDonations[donationId]) || 0;
+            },
+            onBuy: function() {
+                const shrineState = engine.ensurePrayerState();
+                if (!shrineState.prayerDonations) {
+                    shrineState.prayerDonations = {};
+                }
+                shrineState.prayerDonations[donationId] = (shrineState.prayerDonations[donationId] || 0) + 1;
+            },
+            extraInfo: function() {
+                const shrineState = engine.ensurePrayerState();
+                const n = (shrineState && shrineState.prayerDonations && shrineState.prayerDonations[donationId]) || 0;
+                return `Donated: ${n} | Prayer power from this: x${round2(Math.pow(1.1, n))}`;
+            },
+            rowVisible: function() {
+                return engine.isTempleUnlocked();
+            }
+        };
+        shrine.upgradesOrder.push(spec.upgradeKey);
+    }
+};
+
+resortData.installPrayerUpgrades();

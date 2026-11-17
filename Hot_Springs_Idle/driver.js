@@ -197,6 +197,9 @@ let driver = {
         if (typeof engine.updateShrineKarmaPerSecond === "function") {
             engine.updateShrineKarmaPerSecond();
         }
+        if (typeof engine.tickPrayerStatues === "function") {
+            engine.tickPrayerStatues();
+        }
         if (typeof engine.updateShrineMilestones === "function") {
             engine.updateShrineMilestones();
         }

@@ -443,6 +443,9 @@ let engine = {
         for (let ji = 0; ji < oldJobKeys.length; ji++) {
             const job = oldJobs[oldJobKeys[ji]];
             if (job && engine.isKeptPrestigeWorkScope(job.scopeKey)) {
+                if (job.scopeKey === "shrine" && engine.isPrayerDonationUpgradeKey(job.upgradeKey)) {
+                    continue;
+                }
                 keptJobs[oldJobKeys[ji]] = structuredClone(job);
             }
         }
@@ -458,6 +461,9 @@ let engine = {
             }
             const parsed = engine.parseUpgradeGatherJobKey(key);
             if (parsed && engine.isKeptPrestigeWorkScope(parsed.scopeKey) && keptJobs[key]) {
+                if (parsed.scopeKey === "shrine" && engine.isPrayerDonationUpgradeKey(parsed.upgradeKey)) {
+                    continue;
+                }
                 keptQueue.push(key);
             }
         }
@@ -494,20 +500,25 @@ let engine = {
         const weaving = progress.weaving || {};
         let keptActive = null;
         if (weaving.active && engine.isKeptPrestigeWorkScope(weaving.active.scopeKey)) {
-            keptActive = structuredClone(weaving.active);
+            const dropDonation = weaving.active.scopeKey === "shrine" && engine.isPrayerDonationUpgradeKey(weaving.active.upgradeKey);
+            if (!dropDonation) {
+                keptActive = structuredClone(weaving.active);
+            }
         }
         const keptPaused = {};
         const pausedWeaves = weaving.paused;
         if (pausedWeaves && typeof pausedWeaves === "object" && !Array.isArray(pausedWeaves)) {
             if (pausedWeaves.scopeKey !== undefined && pausedWeaves.upgradeKey !== undefined) {
-                if (engine.isKeptPrestigeWorkScope(pausedWeaves.scopeKey)) {
+                if (engine.isKeptPrestigeWorkScope(pausedWeaves.scopeKey)
+                    && !(pausedWeaves.scopeKey === "shrine" && engine.isPrayerDonationUpgradeKey(pausedWeaves.upgradeKey))) {
                     keptPaused[pausedWeaves.scopeKey + ":" + pausedWeaves.upgradeKey] = structuredClone(pausedWeaves);
                 }
             } else {
                 const weaveKeys = Object.keys(pausedWeaves);
                 for (let wi = 0; wi < weaveKeys.length; wi++) {
                     const entry = pausedWeaves[weaveKeys[wi]];
-                    if (entry && engine.isKeptPrestigeWorkScope(entry.scopeKey)) {
+                    if (entry && engine.isKeptPrestigeWorkScope(entry.scopeKey)
+                        && !(entry.scopeKey === "shrine" && engine.isPrayerDonationUpgradeKey(entry.upgradeKey))) {
                         keptPaused[weaveKeys[wi]] = structuredClone(entry);
                     }
                 }
@@ -539,7 +550,7 @@ let engine = {
         const autoChoosePackCards = prevOptions.autoChoosePackCards;
         const bonusTime = (data.currentGameState && data.currentGameState.bonusTime) || 0;
         const secondsPlayedTotal = typeof progress.secondsPlayedTotal === "number" ? progress.secondsPlayedTotal : 0;
-        const keptPaper = Math.max(0, Math.floor(progress.paper || 0));
+        const keptPaper = Math.max(0, progress.paper || 0);
 
         data.progress = initials.progress();
         data.battle = initials.battle();
@@ -572,6 +583,7 @@ let engine = {
         data.progress.prestigeRunPacks = { milestone: 0, bought: 0 };
 
         if (shrine) {
+            engine.applyPrayerPrestige(shrine);
             data.progress.base.shrine = shrine;
         }
         const rh = data.progress.base.foxDen;
@@ -1626,7 +1638,8 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().okamiExpAdd || 0) : 0;
         const legendMult = engine.getLegendOkamiExpMultiplier();
         const templeMult = engine.getTempleOkamiExpMultiplier();
-        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01 * (1 + cardAdd) * legendMult * templeMult;
+        const prayerMult = engine.getPrayerEffect("cloneExp");
+        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01 * (1 + cardAdd) * legendMult * templeMult * prayerMult;
     },
     getCloneSoulLevel: function() {
         const assigned = (data.battle && data.battle.levelState && data.battle.levelState.levelSoul) || 0;
@@ -1692,7 +1705,7 @@ let engine = {
         }
         if (typeof view !== "undefined" && view.spawnKillRewardFloater) {
             const pos = engine.getKillFloaterScreenPosition(intruder);
-            const expDisplay = expGain * engine.getLevelingExpCardMultiplier();
+            const expDisplay = expGain * engine.getLevelingExpCardMultiplier() * engine.getPrayerEffect("cloneExp");
             const totalCoins = coinsGain + (splashCoins || 0) + (tabCoins || 0);
             const parts = [
                 `${intToStringRound(totalCoins)} coins`,
@@ -1727,7 +1740,7 @@ let engine = {
     },
     /** Wave/floater display: skill/Soul award x Leveling Exp shrine card (matches `addCloneLevelExp`). */
     expDisplayFromIntruderExpBase: function(expBase) {
-        return engine.expAwardFromIntruderExpBase(expBase) * engine.getLevelingExpCardMultiplier();
+        return engine.expAwardFromIntruderExpBase(expBase) * engine.getLevelingExpCardMultiplier() * engine.getPrayerEffect("cloneExp");
     },
     /** Extortion x intruder-coin cards x Charisma x Utility column. Charisma is +5% per point, multiplied with the other bonuses. Flat bonuses are multiplied by this on a normal drop. */
     intruderCoinMultiplier: function() {
@@ -2160,7 +2173,7 @@ let engine = {
         if (!amount || amount <= 0) {
             return;
         }
-        data.battle.levelState.exp += amount * engine.getLevelingExpCardMultiplier();
+        data.battle.levelState.exp += amount * engine.getLevelingExpCardMultiplier() * engine.getPrayerEffect("cloneExp");
     },
     grantCloneCharacterExp: function(amount) {
         if (!amount || amount <= 0) {
@@ -2486,6 +2499,7 @@ let engine = {
         out = skillEngine.applyCrowdWorkOutgoingMultiplier(out);
         out = skillEngine.applyMarathonEgoOutgoingMultiplier(out);
         out = engine.applyBattleBuffsToOutgoingDamage(out, o);
+        out *= engine.getPrayerEffect("ego");
         return out;
     },
     getCharismaPoints: function() {
@@ -3712,7 +3726,7 @@ let engine = {
         const skillCardAdd = cardEff.skillExpAdd || 0;
         const talentCardAdd = cardEff.talentExpAdd || 0;
         skill.exp += gain * (1 + skillCardAdd);
-        skill.talent += gain * 0.1 * (1 + talentCardAdd);
+        skill.talent += gain * 0.1 * (1 + talentCardAdd) * engine.getPrayerEffect("talent");
         skill.triggerCount += amount;
         const initTal = d.initialTalentToLevel !== undefined ? d.initialTalentToLevel : 10;
         while (skill.exp >= skill.expToLevel && (!skill.maxLevel || skill.level < skill.maxLevel)) {
@@ -5531,7 +5545,7 @@ let engine = {
             if (!data.progress) {
                 break;
             }
-            data.progress.paper = (data.progress.paper || 0) + 1;
+            data.progress.paper = (data.progress.paper || 0) + engine.getPrayerEffect("paper");
             cost = Math.max(1, Math.round(cost * 1.05));
             guard++;
         }
@@ -13722,7 +13736,7 @@ let engine = {
         const expandBought = (orb && orb.expandOrbBought) || 0;
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().manaCapacityAdd || 0) : 0;
-        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * resortHelper.getOrbFloorBonusMultiplier() * (1 + cardAdd);
+        return engine.getManaBaseCapacity() * Math.pow(1.1, expandBought) * resortHelper.getOrbFloorBonusMultiplier() * (1 + cardAdd) * engine.getPrayerEffect("maxMana");
     },
     isManaUnlocked: function() {
         const rh = data.progress.base && data.progress.base.foxDen;
@@ -14235,6 +14249,187 @@ let engine = {
         }
         return 100;
     },
+    freshPrayerStatue: function(spec) {
+        const additive = !!(spec && spec.additive);
+        return {
+            bought: 0,
+            workers: 0,
+            prayer: 0,
+            requirement: spec ? spec.prayerBase : 0,
+            j: additive ? 0 : 1,
+            k: additive ? 0 : 1,
+            l: additive ? 0 : 1
+        };
+    },
+    ensurePrayerState: function(shrineOpt) {
+        const shrine = shrineOpt || (data.progress && data.progress.base && data.progress.base.shrine);
+        if (!shrine || typeof resortData === "undefined") {
+            return null;
+        }
+        const defaults = resortData.buildings && resortData.buildings.shrine && resortData.buildings.shrine.progressDefaults;
+        if (!shrine.prayerStatues || typeof shrine.prayerStatues !== "object" || (defaults && shrine.prayerStatues === defaults.prayerStatues)) {
+            shrine.prayerStatues = {};
+        }
+        if (!shrine.prayerDonations || typeof shrine.prayerDonations !== "object" || (defaults && shrine.prayerDonations === defaults.prayerDonations)) {
+            shrine.prayerDonations = {};
+        }
+        const statues = resortData.prayerStatueCatalog || [];
+        for (let i = 0; i < statues.length; i++) {
+            const spec = statues[i];
+            if (!shrine.prayerStatues[spec.id]) {
+                shrine.prayerStatues[spec.id] = engine.freshPrayerStatue(spec);
+                continue;
+            }
+            const st = shrine.prayerStatues[spec.id];
+            const fresh = engine.freshPrayerStatue(spec);
+            if (st.bought === undefined || st.bought === null) st.bought = 0;
+            if (st.workers === undefined || st.workers === null) st.workers = 0;
+            if (st.prayer === undefined || st.prayer === null) st.prayer = 0;
+            if (!(st.requirement > 0)) st.requirement = spec.prayerBase;
+            if (st.j === undefined || st.j === null) st.j = fresh.j;
+            if (st.k === undefined || st.k === null) st.k = fresh.k;
+            if (st.l === undefined || st.l === null) st.l = fresh.l;
+        }
+        const donations = resortData.prayerDonationCatalog || [];
+        for (let d = 0; d < donations.length; d++) {
+            const id = donations[d].id;
+            if (shrine.prayerDonations[id] === undefined || shrine.prayerDonations[id] === null) {
+                shrine.prayerDonations[id] = 0;
+            }
+        }
+        return shrine;
+    },
+    getPrayerStatueState: function(id) {
+        const shrine = engine.ensurePrayerState();
+        if (!shrine || !shrine.prayerStatues) {
+            return null;
+        }
+        return shrine.prayerStatues[id] || null;
+    },
+    getPrayerDonationCount: function() {
+        const shrine = engine.ensurePrayerState();
+        if (!shrine || !shrine.prayerDonations) {
+            return 0;
+        }
+        const donations = resortData.prayerDonationCatalog || [];
+        let total = 0;
+        for (let i = 0; i < donations.length; i++) {
+            total += shrine.prayerDonations[donations[i].id] || 0;
+        }
+        return total;
+    },
+    getPrayerPerWorker: function() {
+        const shrine = data.progress && data.progress.base && data.progress.base.shrine;
+        const level = (shrine && shrine.level) || 0;
+        return level * Math.pow(1.1, engine.getPrayerDonationCount());
+    },
+    getPrayerAssignedWorkers: function() {
+        const shrine = engine.ensurePrayerState();
+        if (!shrine || !shrine.prayerStatues) {
+            return 0;
+        }
+        const statues = resortData.prayerStatueCatalog || [];
+        let total = 0;
+        for (let i = 0; i < statues.length; i++) {
+            const st = shrine.prayerStatues[statues[i].id];
+            total += (st && st.workers) || 0;
+        }
+        return total;
+    },
+    getPrayerEffect: function(id) {
+        const spec = resortData.getPrayerStatueDef(id);
+        const st = engine.getPrayerStatueState(id);
+        const additive = !!(spec && spec.additive);
+        if (!st || !st.bought) {
+            return additive ? 0 : 1;
+        }
+        if (additive) {
+            return (st.j || 0) + (st.k || 0);
+        }
+        return (st.j || 1) * (st.k || 1);
+    },
+    getStarExpPerStar: function() {
+        return 1.5 + engine.getPrayerEffect("starPower");
+    },
+    getPrayerKarmaMultiplier: function() {
+        return 1 + 0.2 * engine.getPrayerAssignedWorkers();
+    },
+    completePrayerStatue: function(spec, st) {
+        if (!spec || !st) {
+            return;
+        }
+        if (spec.additive) {
+            const step = spec.additive;
+            st.l = (st.l || 0) + step;
+            st.j = (st.j || 0) + step / 2;
+        } else {
+            const mult = spec.effectMult || 1;
+            st.l = (st.l || 1) * mult;
+            st.j = (st.j || 1) * (1 + (mult - 1) / 2);
+        }
+        st.requirement = (st.requirement || spec.prayerBase) * (spec.prayerGrowth || 1);
+    },
+    tickPrayerStatues: function() {
+        if (!engine.isTempleUnlocked()) {
+            return;
+        }
+        const z = engine.getPrayerPerWorker();
+        const statues = resortData.prayerStatueCatalog || [];
+        for (let i = 0; i < statues.length; i++) {
+            const spec = statues[i];
+            const st = engine.getPrayerStatueState(spec.id);
+            if (!st || !st.bought) {
+                continue;
+            }
+            const workers = st.workers || 0;
+            if (workers <= 0 || !(z > 0)) {
+                continue;
+            }
+            st.prayer = (st.prayer || 0) + workers * z;
+            let guard = 0;
+            while ((st.prayer || 0) + 1e-9 >= (st.requirement || spec.prayerBase) && guard < 10000) {
+                st.prayer -= st.requirement || spec.prayerBase;
+                engine.completePrayerStatue(spec, st);
+                guard++;
+            }
+            if (st.prayer < 0) {
+                st.prayer = 0;
+            }
+        }
+    },
+    applyPrayerPrestige: function(shrine) {
+        if (!shrine) {
+            return;
+        }
+        engine.ensurePrayerState(shrine);
+        const statues = resortData.prayerStatueCatalog || [];
+        for (let i = 0; i < statues.length; i++) {
+            const spec = statues[i];
+            const st = shrine.prayerStatues[spec.id];
+            if (!st) {
+                continue;
+            }
+            if (spec.additive) {
+                st.k = (st.k || 0) + (st.l || 0);
+                st.j = 0;
+                st.l = 0;
+            } else {
+                st.k = (st.k || 1) * (st.l || 1);
+                st.j = 1;
+                st.l = 1;
+            }
+            st.prayer = 0;
+            st.requirement = spec.prayerBase;
+            st.workers = 0;
+        }
+        const donations = resortData.prayerDonationCatalog || [];
+        for (let d = 0; d < donations.length; d++) {
+            shrine.prayerDonations[donations[d].id] = 0;
+        }
+    },
+    isPrayerDonationUpgradeKey: function(upgradeKey) {
+        return typeof resortData !== "undefined" && resortData.isPrayerDonationUpgradeKey(upgradeKey);
+    },
     getShrineKarmaRate: function() {
         if (!engine.isShrineBuilt()) {
             return 0;
@@ -14246,6 +14441,7 @@ let engine = {
         if (resortHelper.isKarmaStackingBought()) {
             rate *= Math.pow(2, engine.getLegendsWritten());
         }
+        rate *= engine.getPrayerKarmaMultiplier();
         return rate;
     },
     getShrineEscalatingRarity: function(id, req) {
@@ -14740,6 +14936,7 @@ let engine = {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().manaRegenAdd || 0) : 0;
         rate *= (1 + cardAdd);
+        rate *= engine.getPrayerEffect("manaGain");
         return rate;
     },
     updateOrbExpPerSecond: function() {
@@ -15145,6 +15342,7 @@ let engine = {
         });
         /* Market Traders draw from the same pool but are counted separately from its haulers. */
         total += (b.market && b.market.assignedTraders) || 0;
+        total += engine.getPrayerAssignedWorkers();
         return total;
     },
     getTotalFoundWorkers: function() {
@@ -15158,6 +15356,17 @@ let engine = {
         return Math.max(0, engine.getTotalFoundWorkers() - engine.getTotalAssignedWorkers());
     },
     tryAssignWorker: function(kind) {
+        if (typeof kind === "string" && kind.indexOf("prayer_") === 0) {
+            const st = engine.getPrayerStatueState(kind.slice("prayer_".length));
+            if (!st || !st.bought) {
+                return false;
+            }
+            if (engine.getAvailableWorkers() <= 0) {
+                return false;
+            }
+            st.workers = (st.workers || 0) + 1;
+            return true;
+        }
         if (kind === "market_traders") {
             const market = data.progress.base && data.progress.base.market;
             if (!market || !engine.isMarketBuilt()) return false;
@@ -15184,6 +15393,14 @@ let engine = {
         return true;
     },
     tryUnassignWorker: function(kind) {
+        if (typeof kind === "string" && kind.indexOf("prayer_") === 0) {
+            const st = engine.getPrayerStatueState(kind.slice("prayer_".length));
+            if (!st || (st.workers || 0) <= 0) {
+                return false;
+            }
+            st.workers--;
+            return true;
+        }
         if (kind === "market_traders") {
             const market = data.progress.base && data.progress.base.market;
             if (!market || (market.assignedTraders || 0) <= 0) return false;

@@ -4723,6 +4723,54 @@ button {
     box-sizing: border-box;
 }
 
+.prayer-statues-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.prayer-statues-title,
+.prayer-donations-title,
+.prayer-statue-name {
+    font-weight: bold;
+}
+
+.prayer-donations-title {
+    margin: 8px 0 4px;
+}
+
+.prayer-statue-columns {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.prayer-statue-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.prayer-statue-cell {
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.prayer-statue-track {
+    margin-top: 4px;
+}
+
+.prayer-statue-bonus {
+    margin-top: 4px;
+    font-size: 12px;
+}
+
 .base-worker-assign-row {
     display: flex;
     flex-wrap: wrap;

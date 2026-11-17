@@ -2395,6 +2395,14 @@ let events = {
         if (traders > 0) {
             html += `<div class="kitsune-assign-tip-row">Market Traders: ${traders}</div>`;
         }
+        const prayerStatues = (typeof resortData !== "undefined" && resortData.prayerStatueCatalog) || [];
+        for (let pi = 0; pi < prayerStatues.length; pi++) {
+            const pst = engine.getPrayerStatueState(prayerStatues[pi].id);
+            const pn = pst && pst.workers ? pst.workers : 0;
+            if (pn > 0) {
+                html += `<div class="kitsune-assign-tip-row">${prayerStatues[pi].name}: ${pn}</div>`;
+            }
+        }
         if (!html) {
             html = `<div class="kitsune-assign-tip-row muted-text">None assigned</div>`;
         }

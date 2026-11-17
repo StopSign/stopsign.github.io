@@ -500,6 +500,9 @@ let view = {
             view.applySkillDetailSelectionHighlight();
             view.updateSkillInfoPanel();
         }
+        if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
+            createView.refreshInfoButtonPanel("tabPane_skills");
+        }
     },
     updateLevelingTab: function() {
         const ls = data.battle.levelState;
@@ -690,7 +693,8 @@ let view = {
         } else {
             audBaseLines.push(afterDensityLine);
         }
-        const finalAud = Math.max(1, Math.ceil(preConSum * conMult * bravadoMultUi));
+        const prayerAud = engine.getPrayerEffect("audacity");
+        const finalAud = Math.max(1, Math.ceil(preConSum * conMult * bravadoMultUi * prayerAud));
         const audEffective = preConSum > 0 ? finalAud / preConSum : 1;
         const audMultLines = [];
         if (growthUnlocked || conTotal > 0) {
@@ -698,6 +702,9 @@ let view = {
         }
         if (bravadoMultUi !== 1) {
             audMultLines.push(`Bravado: x${intToString(bravadoMultUi, 3, true)}`);
+        }
+        if (prayerAud !== 1) {
+            audMultLines.push(`Prayer Statue: x${round2(prayerAud).toFixed(2)}`);
         }
         audMultLines.push(`Total multiplier effect: x${intToString(audEffective, 2, true)}`);
         const audTipParts = [audBaseLines.join("<br>")];
@@ -804,6 +811,11 @@ let view = {
             const furyStacks = (furyMult - 1) * 100;
             attackMultLines.push(`Fury: x${intToString(furyMult, 2, true)} from ${intToString(furyStacks, 2, true)} ${furyStacks === 1 ? "stack" : "stacks"})`);
             afterAttack *= furyMult;
+        }
+        const prayerEgo = engine.getPrayerEffect("ego");
+        if (prayerEgo !== 1) {
+            attackMultLines.push(`Prayer Statue: x${round2(prayerEgo).toFixed(2)}`);
+            afterAttack *= prayerEgo;
         }
         const atkEffective = attackPreBru > 0 ? afterAttack / attackPreBru : 1;
         attackMultLines.push(`Total multiplier effect: x${intToString(atkEffective, 2, true)}`);
@@ -1660,6 +1672,61 @@ let view = {
         view.updateWorkerDockVisibility();
     },
 
+    formatPrayerBonus: function(spec, st) {
+        const fmt = function(n) {
+            return round2(n).toFixed(2);
+        };
+        if (spec.additive) {
+            const j = st.j || 0;
+            const k = st.k || 0;
+            const l = st.l || 0;
+            const y = j + k;
+            return `+${fmt(j)} + +${fmt(k)} | +${fmt(l)} next<br>Current Star Power: x${fmt(1.5 + y)}`;
+        }
+        const j = st.j || 1;
+        const k = st.k || 1;
+        const l = st.l || 1;
+        const y = j * k;
+        return `${fmt(j)} x ${fmt(k)} | x${fmt(l)} next<br>Current ${spec.effectName}: x${fmt(y)}`;
+    },
+    updatePrayerStatues: function() {
+        if (typeof resortData === "undefined" || !resortData.prayerStatueCatalog) {
+            return;
+        }
+        const temple = engine.isTempleUnlocked();
+        view.updateVal("prayerWorkersTotal", engine.getPrayerAssignedWorkers());
+        view.updateVal("prayerPerWorker", intToString(engine.getPrayerPerWorker(), 3));
+        const statues = resortData.prayerStatueCatalog;
+        const shrineUpgrades = resortData.buildings.shrine && resortData.buildings.shrine.upgrades;
+        for (let i = 0; i < statues.length; i++) {
+            const spec = statues[i];
+            const st = engine.getPrayerStatueState(spec.id);
+            const up = shrineUpgrades && shrineUpgrades[spec.upgradeKey];
+            const bought = !!(st && st.bought);
+            const rowVisible = !!(up && resortData.isUpgradeRowVisible(up));
+            view.updateVal(`prayerStatue_${spec.id}`, (temple && (bought || rowVisible)) ? "" : "none", "style.display");
+            if (up) {
+                const rowId = resortData.idRow("shrine", resortData.slug(up));
+                if (bought) {
+                    view.updateVal(rowId, "none", "style.display");
+                }
+            }
+            view.updateVal(`prayerStatue_${spec.id}_work`, bought ? "" : "none", "style.display");
+            if (!bought || !st) {
+                continue;
+            }
+            const workers = st.workers || 0;
+            view.updateVal(`prayer_${spec.id}_workers`, `Kitsune: ${workers}`);
+            const req = st.requirement || spec.prayerBase;
+            const prayer = st.prayer || 0;
+            view.updateVal(`prayerProg_${spec.id}`, intToString(prayer, 3));
+            view.updateVal(`prayerNeed_${spec.id}`, intToString(req, 3));
+            const pct = req > 0 ? Math.max(0, Math.min(100, (prayer / req) * 100)) : 0;
+            view.updateVal(`prayerFill_${spec.id}`, `${pct}%`, "style.width");
+            view.updateEtaText(`prayerEta_${spec.id}`, Math.max(0, req - prayer), workers * engine.getPrayerPerWorker());
+            view.updateVal(`prayerBonus_${spec.id}`, view.formatPrayerBonus(spec, st), "innerHTML");
+        }
+    },
     updateBasePanelShrine: function() {
         view.updateCloneCostDisplays();
         view.updateShrineProgressDisplays();
@@ -1670,6 +1737,7 @@ let view = {
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         tShrine.refreshOrderedPurchasables("shrine", (resortData.buildings.shrine && resortData.buildings.shrine.upgradesOrder) || [], { hideMaxed: tShrine.hideMaxed });
+        view.updatePrayerStatues();
         const tabsOn = engine.isTempleUnlocked();
         let sub = data.progress.selectedShrineSubTab || "shrine";
         if (!tabsOn || (sub !== "shrine" && sub !== "temple")) {
@@ -2866,6 +2934,8 @@ let view = {
         view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent", 1);
         view.updateVal("shrineExpFill", `${pct}%`, "style.width");
         view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
+        const karmaKitsune = engine.getPrayerKarmaMultiplier();
+        view.updateVal("shrineKarmaKitsuneMult", karmaKitsune > 1 ? ` (x${round2(karmaKitsune).toFixed(2)} from kitsune)` : "");
         view.updateVal("shrineDivinityMultText", round2(engine.getShrineDivinityMultiplier()));
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
         view.updateEtaText("shrineExpEtaText", Math.max(0, expToLevel - exp), engine.getShrineKarmaRate());
@@ -4455,7 +4525,10 @@ let view = {
         const paperAmt = (data.progress && data.progress.paper) || 0;
         view.updateVal("basePaneTitlePaper", paperAmt > 0 ? "" : "none", "style.display");
         if (paperAmt > 0) {
-            view.updateVal("basePaperText", intToStringRound(paperAmt));
+            const paperText = Math.abs(paperAmt - Math.floor(paperAmt)) < 1e-6
+                ? intToStringRound(paperAmt)
+                : intToString(paperAmt, 3);
+            view.updateVal("basePaperText", paperText);
         }
                 view.updateVal("baseWorkersAssigned", engine.getAvailableWorkers(), "textContent", 1);
         view.updateVal("baseWorkersFound", engine.getTotalFoundWorkers(), "textContent", 1);

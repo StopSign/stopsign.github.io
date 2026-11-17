@@ -2828,8 +2828,10 @@ let skills = {
         if (stars.bronze) starCount++;
         if (stars.silver) starCount++;
         if (stars.gold) starCount++;
-        // Multiplicative star scaling: each star x1.5 (0→1, 1→1.5, 2→2.25, 3→3.375).
-        const starMult = Math.pow(1.5, starCount);
+        const starBase = (typeof engine !== "undefined" && engine.getStarExpPerStar)
+            ? engine.getStarExpPerStar()
+            : 1.5;
+        const starMult = Math.pow(starBase, starCount);
         return {
             talentMult: talentMult,
             levelMult: levelMult,

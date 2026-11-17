@@ -277,12 +277,24 @@ let createView = {
         );
         createView.createInfoButton(
             "tabPane_skills",
-            "<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by x1.5 (stacks multiplicatively).</p>"
-            + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot.</p>"
+            function() {
+                const perStar = (typeof engine !== "undefined" && engine.getStarExpPerStar) ? engine.getStarExpPerStar() : 1.5;
+                const starText = Math.abs(perStar - 1.5) < 1e-9 ? "x1.5" : `x${round2(perStar).toFixed(2)}`;
+                return `<p>Stars are gained by progressing far enough in a map. They can be assigned and unassigned freely. Each star assigned to a skill multiplies that skill's exp gain by ${starText} (stacks multiplicatively).</p>`
+                    + "<p><strong>Equipped / Library:</strong> Skills are Offense (red), Defense (green), or Utility (light blue). Equip them into matching slots, or into an Any slot.</p>"
             + "<p><strong>Drag and drop:</strong> Drag skills between compatible slots to rearrange or swap, if the swap is valid.</p>"
             + "<p><strong>Equip:</strong> From Library skill info, Equip places the skill in the first free matching-category slot, then Any if needed.</p>"
             + "<p><strong>Unequip:</strong> Resets that skill's level and exp to 0, returns assigned stars to your pool, and stops its battle effect immediately. Talent and tips are kept.</p>"
-            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Save stores the current skills and stars. Load replaces the board with that slot. While a saved slot is selected, skills and stars that Load would remove are marked red. Clear empties the selected slot and does not change your current skills or stars.</p>"
+            + "<p><strong>Loadouts:</strong> Buttons 1–5 select a slot. Save stores the current skills and stars. Load replaces the board with that slot. While a saved slot is selected, skills and stars that Load would remove are marked red. Clear empties the selected slot and does not change your current skills or stars.</p>";
+            },
+            null,
+            function() {
+                const keys = ["base"];
+                if (typeof engine !== "undefined" && engine.getPrayerEffect && engine.getPrayerEffect("starPower") !== 0) {
+                    keys.push("starPower");
+                }
+                return keys;
+            }
         );
         createView.createInfoButton(
             "tabPane_stats",
@@ -540,8 +552,21 @@ let createView = {
         );
         createView.createInfoButton(
             "resortInfo_shrine",
-            "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second. Temple iconography multiplies Okami exp and divinity gain, raises the level new spirits start at, and adds a chance that cards bought with divinity are rare.</p>",
-            56
+            function() {
+                let html = "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second. Temple iconography multiplies Okami exp and divinity gain, raises the level new spirits start at, and adds a chance that cards bought with divinity are rare.</p>";
+                if (typeof engine !== "undefined" && engine.isTempleUnlocked && engine.isTempleUnlocked()) {
+                    html += "<p>Prayer Statues take assigned kitsune. Each kitsune adds prayer each second equal to the shrine level, multiplied by donations. A finished prayer applies half of its increase now and banks the full increase. Prestige moves that bank into the carried bonus, resets the prayer and the next requirement, and keeps the statue. Donations reset, including one that is still weaving, and each one multiplies prayer per worker by x1.1. Each kitsune assigned to any statue adds +20% karma, added together.</p>";
+                }
+                return html;
+            },
+            56,
+            function() {
+                const keys = ["base"];
+                if (typeof engine !== "undefined" && engine.isTempleUnlocked && engine.isTempleUnlocked()) {
+                    keys.push("prayerStatues");
+                }
+                return keys;
+            }
         );
         createView.createInfoButton(
             "resortInfo_hiddenSpring",
@@ -897,11 +922,15 @@ let createView = {
             }
             const order = cfg.upgradesOrder || [];
             const exclude = excludeKeys || [];
+            const onlyKeys = opts && opts.onlyKeys;
             let h = "";
             let first = true;
             for (let oi = 0; oi < order.length; oi++) {
                 const pk = order[oi];
                 if (exclude.indexOf(pk) >= 0) {
+                    continue;
+                }
+                if (onlyKeys && onlyKeys.indexOf(pk) < 0) {
                     continue;
                 }
                 const ud = cfg.upgrades[pk];
@@ -1069,13 +1098,83 @@ let createView = {
                 </div>
             </div>`;
         };
+        const htmlPrayerWorkerRow = function(statueId) {
+            const p = `'prayer_${statueId}'`;
+            return `
+                <div class="base-worker-assign-row">
+                    <button id="prayer_${statueId}_unassign_all" class="tab-button" onclick="events.adjustWorkers(${p}, 'all_dec')"><<</button>
+                    <button id="prayer_${statueId}_unassign_ten" class="tab-button" onclick="events.adjustWorkers(${p}, 'ten_dec')">--</button>
+                    <button id="prayer_${statueId}_unassign_one" class="tab-button" onclick="events.adjustWorkers(${p}, 'one_dec')">-</button>
+                    <span class="base-worker-cap-label">Assign ${resortData.resourceIconHtml("kitsune")} Kitsune</span>
+                    <button id="prayer_${statueId}_assign_one" class="tab-button" onclick="events.adjustWorkers(${p}, 'one_inc')">+</button>
+                    <button id="prayer_${statueId}_assign_ten" class="tab-button" onclick="events.adjustWorkers(${p}, 'ten_inc')">++</button>
+                    <button id="prayer_${statueId}_assign_all" class="tab-button" onclick="events.adjustWorkers(${p}, 'all_inc')">>></button>
+                    <span id="prayer_${statueId}_workers" class="base-worker-cap-label muted-text"></span>
+                </div>`;
+        };
+        const htmlPrayerStatueCell = function(spec) {
+            const ud = resortData.buildings.shrine.upgrades[spec.upgradeKey];
+            const slug = resortData.slug(ud);
+            const rowId = resortData.idRow("shrine", slug);
+            const btnId = resortData.idBtn("shrine", slug);
+            const extraId = resortData.idExtra("shrine", slug);
+            const descId = `base_shrine_desc_${slug}`;
+            const descText = ud.description || "";
+            return `
+                <div id="prayerStatue_${spec.id}" class="prayer-statue-cell">
+                    <div id="${rowId}" class="base-scrollArchives-row base-upgrade-row">
+                        <div class="base-upgrade-text">
+                            <div class="base-upgrade-name">${ud.name || ""}</div>
+                            <div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div>
+                            <div id="${extraId}" class="muted-text"></div>
+                        </div>
+                        <button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('shrine','${spec.upgradeKey}')">Buy for</button>
+                    </div>
+                    <div id="prayerStatue_${spec.id}_work" style="display:none">
+                        <div class="prayer-statue-name">${ud.name || ""}</div>
+                        ${htmlPrayerWorkerRow(spec.id)}
+                        <div class="skills-shard-slot-progress-track labeled-progress-track prayer-statue-track">
+                            <div id="prayerFill_${spec.id}" class="skills-shard-slot-progress-fill"></div>
+                            <div class="labeled-progress-text labeled-progress-text--small"><span id="prayerProg_${spec.id}"></span><span class="labeled-progress-sep"> / </span><span id="prayerNeed_${spec.id}"></span></div>
+                        </div>
+                        <div class="muted-text">ETA: <span id="prayerEta_${spec.id}">-</span></div>
+                        <div id="prayerBonus_${spec.id}" class="prayer-statue-bonus"></div>
+                    </div>
+                </div>`;
+        };
+        const htmlPrayerStatues = function() {
+            const statues = resortData.prayerStatueCatalog || [];
+            let left = "";
+            let right = "";
+            for (let i = 0; i < statues.length; i++) {
+                const cell = htmlPrayerStatueCell(statues[i]);
+                if (statues[i].column === "right") {
+                    right += cell;
+                } else {
+                    left += cell;
+                }
+            }
+            return `
+                <div class="prayer-statues-header">
+                    <span class="prayer-statues-title">Prayer Statues</span>
+                    <span>Kitsune: <span id="prayerWorkersTotal">0</span></span>
+                    <span>Prayer per worker: <span id="prayerPerWorker">0</span></span>
+                </div>
+                <div class="prayer-statue-columns">
+                    <div class="prayer-statue-column">${left}</div>
+                    <div class="prayer-statue-column">${right}</div>
+                </div>`;
+        };
         const htmlShrinePanel = function() {
             const templeKeys = ["okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"];
+            const prayerKeys = resortData.getPrayerUiUpgradeKeys();
+            const shrineExclude = templeKeys.concat(prayerKeys);
             const shrineOnly = (resortData.buildings.shrine.upgradesOrder || []).filter(function(k) {
                 return templeKeys.indexOf(k) < 0;
             });
+            const donationKeys = (resortData.prayerDonationCatalog || []).map(function(d) { return d.upgradeKey; });
             return `
-                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
+                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span id="shrineKarmaKitsuneMult" class="muted-text"></span><span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span><span class="game-progress-sep">|</span>ETA: <span id="shrineExpEtaText">-</span></div>
@@ -1085,10 +1184,14 @@ let createView = {
                     <button type="button" id="shrineSubTab_temple" class="tab-button travel-subtab-btn" onclick="events.switchShrineSubTab('temple')">Temple</button>
                 </div>
                 <div id="shrinePane_shrine">
-                    ${resortUpgradeRowsHtml("shrine", templeKeys, { skipDivider: true })}
+                    ${resortUpgradeRowsHtml("shrine", shrineExclude, { skipDivider: true })}
                 </div>
                 <div id="shrinePane_temple" style="display:none">
+                    ${htmlPrayerStatues()}
                     ${resortUpgradeRowsHtml("shrine", shrineOnly, { skipDivider: true })}
+                    <div class="base-upgrade-divider"></div>
+                    <div class="prayer-donations-title">Donations</div>
+                    ${resortUpgradeRowsHtml("shrine", [], { skipDivider: true, onlyKeys: donationKeys })}
                 </div>
             `;
         };
@@ -2385,7 +2488,8 @@ let createView = {
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
             "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPaperKeepNew", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
-            "shrineKarmaRateText", "shrineDivinityMultText", "shrineDivinityRateText",
+            "shrineKarmaRateText", "shrineKarmaKitsuneMult", "shrineDivinityMultText", "shrineDivinityRateText",
+            "prayerWorkersTotal", "prayerPerWorker",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineExpEtaText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",
             "prestigePackOverlay", "prestigePackPanel", "prestigePackTitle", "prestigePackColumns", "prestigePackCounts", "prestigePackPreview", "prestigePackOdds", "prestigePackCards", "prestigePackError", "prestigePackActionBtn", "prestigePackAutoChoose", "prestigePackAutoChoose_chk", "prestigePackSummary", "prestigeFinishBtn",
@@ -2566,6 +2670,17 @@ let createView = {
                 `inscriptionActual_${ik}`, `inscriptionBought_${ik}`, `inscriptionRate_${ik}`, `inscriptionOutput_${ik}`,
                 `inscriptionReq_${ik}`, `inscriptionCoins_${ik}`, `inscriptionBeads_${ik}`, `inscriptionMana_${ik}`,
                 `inscriptionLock_${ik}`
+            );
+        }
+        const prayerStatues = resortData.prayerStatueCatalog || [];
+        for (let psi2 = 0; psi2 < prayerStatues.length; psi2++) {
+            const psid = prayerStatues[psi2].id;
+            createView.queueCache(
+                `prayerStatue_${psid}`, `prayerStatue_${psid}_work`,
+                `prayer_${psid}_unassign_all`, `prayer_${psid}_unassign_ten`, `prayer_${psid}_unassign_one`,
+                `prayer_${psid}_assign_one`, `prayer_${psid}_assign_ten`, `prayer_${psid}_assign_all`,
+                `prayer_${psid}_workers`, `prayerFill_${psid}`, `prayerProg_${psid}`, `prayerNeed_${psid}`,
+                `prayerEta_${psid}`, `prayerBonus_${psid}`
             );
         }
         const resortBuildingKeys = Object.keys(resortData.buildings || {});
