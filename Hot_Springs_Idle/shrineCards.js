@@ -1135,8 +1135,14 @@ var shrineCards = {
 
     buyPackDivinityCost: 30000,
     buyCardOdds: { common: 100, rare: 0, epic: 0 },
+    getBuyCardOdds: function() {
+        const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)
+            ? resortHelper.getShrineUpgradeBought("divineGiftsBought") : 0;
+        const rare = Math.max(0, Math.min(100, Math.floor(bought || 0)));
+        return { common: 100 - rare, rare: rare, epic: 0 };
+    },
     buyCardOddsText: function() {
-        const odds = shrineCards.buyCardOdds || { common: 100, rare: 0, epic: 0 };
+        const odds = shrineCards.getBuyCardOdds();
         return odds.common + "% Common / " + odds.rare + "% Rare / " + odds.epic + "% Epic";
     },
     legendManaCost: 100000,

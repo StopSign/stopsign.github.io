@@ -563,8 +563,9 @@ let offline = {
             const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
                 ? (shrineCards.getAggregatedEffects().okamiExpAdd || 0) : 0;
             const legendMult = engine.getLegendOkamiExpMultiplier ? engine.getLegendOkamiExpMultiplier() : 1;
+            const templeMult = engine.getTempleOkamiExpMultiplier ? engine.getTempleOkamiExpMultiplier() : 1;
             const okami = engine.getOkami();
-            okami.exp = (okami.exp || 0) + charExp * 0.01 * (1 + cardAdd) * legendMult;
+            okami.exp = (okami.exp || 0) + charExp * 0.01 * (1 + cardAdd) * legendMult * templeMult;
             engine.applyOkamiLevelUps();
         }
 

@@ -276,6 +276,9 @@ var resortData = {
         if (key === "essence") {
             return (base.cistern && base.cistern.essence) || 0;
         }
+        if (key === "limestone") {
+            return (base.atelier && base.atelier.limestone) || 0;
+        }
         return 0;
     },
     /** Coins never cover a Credit cost. */
@@ -288,7 +291,7 @@ var resortData = {
         if (key === "mana" && typeof engine !== "undefined" && engine.getManaCapacity && amount > engine.getManaCapacity()) {
             cls = " cost-amt-unaffordable";
         }
-        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash" || key === "mana" || key === "credit" || key === "essence" || key === "divinity")
+        const icon = (key === "coins" || key === "starBeads" || key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash" || key === "mana" || key === "credit" || key === "essence" || key === "divinity" || key === "limestone")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `<span class="cost-amt${cls}">${intToStringRound(amount)}</span>${icon} ${label}`;
@@ -318,6 +321,7 @@ var resortData = {
         if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
         if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
         if ((c.essence || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.essence, "essence", "essence"));
+        if ((c.limestone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.limestone, "limestone", "limestone"));
         return parts;
     },
 
@@ -419,7 +423,8 @@ var resortData = {
                 mana: c.mana || 0,
                 credit: c.credit || 0,
                 divinity: c.divinity || 0,
-                essence: c.essence || 0
+                essence: c.essence || 0,
+                limestone: c.limestone || 0
             }
         };
     },
@@ -427,7 +432,8 @@ var resortData = {
     hasWeaveCost: function(weaveCost) {
         const w = weaveCost || {};
         return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0
-            || (w.credit || 0) > 0 || (w.divinity || 0) > 0 || (w.essence || 0) > 0;
+            || (w.credit || 0) > 0 || (w.divinity || 0) > 0 || (w.essence || 0) > 0
+            || (w.limestone || 0) > 0;
     },
 
     hasGatherCost: function(gatherCost) {
@@ -666,6 +672,7 @@ var resortData = {
         if ((c.mana || 0) > ((data.progress.mana && data.progress.mana.amount) || 0)) return false;
         if ((c.divinity || 0) > ((data.progress.divinity && data.progress.divinity.amount) || 0)) return false;
         if ((c.essence || 0) > ((base.cistern && base.cistern.essence) || 0)) return false;
+        if ((c.limestone || 0) > ((base.atelier && base.atelier.limestone) || 0)) return false;
         if ((c.wood || 0) > ((base.bambooForest && base.bambooForest.wood) || 0)) return false;
         if ((c.hardwood || 0) > ((base.bambooForest && base.bambooForest.hardwood) || 0)) return false;
         if ((c.stone || 0) > engine.getTotalStone()) return false;
@@ -700,6 +707,9 @@ var resortData = {
         }
         if ((c.essence || 0) > 0 && base.cistern) {
             base.cistern.essence = Math.max(0, (base.cistern.essence || 0) - (c.essence || 0));
+        }
+        if ((c.limestone || 0) > 0 && base.atelier) {
+            base.atelier.limestone = Math.max(0, (base.atelier.limestone || 0) - (c.limestone || 0));
         }
         if ((c.wood || 0) > 0 && base.bambooForest) {
             base.bambooForest.wood = Math.max(0, (base.bambooForest.wood || 0) - (c.wood || 0));
@@ -5449,13 +5459,19 @@ var resortData = {
                 mapTourSkipCompleted: false,
                 mapTourRepeat: false,
                 mapTourEndOnLastGold: false,
-                prepareToWriteLegendBought: false
+                prepareToWriteLegendBought: false,
+                templeUnlocked: false,
+                okamiIconographyBought: 0,
+                elementalResonanceBought: 0,
+                divineGiftsBought: 0,
+                goddessIconographyBought: 0
             },
             upgradesOrder: ["spareSandals", "prepareToWriteLegend", "axeEchoes", "shelvingEchoes", "richerNeighbors", "artAppreciation",
                 "powerfulChops", "spiritWeavingEchoes",  "shardEchoes", "languageEchoes", 
                 "skillEchoes", "karmaStacking",
                 "plantAffinity", "earthAffinity", "hardenBamboo", "scribingInfusions", "shardsFound",
-                "tradingContracts", "resourceProtection", "dealMaking", "orbHeight", "skyAppreciation"],
+                "tradingContracts", "resourceProtection", "dealMaking", "orbHeight", "skyAppreciation",
+                "upgradeToTemple", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"],
             upgrades: {
                 prepareToWriteLegend: {
                     key: "prepare_to_write_legend",
@@ -6044,6 +6060,143 @@ var resortData = {
                     soldOutButtonLabel: "Appreciated",
                     rowVisible: function() {
                         return engine.getLegendsWritten() >= 2;
+                    }
+                },
+                upgradeToTemple: {
+                    key: "upgrade_to_temple",
+                    name: "Upgrade to Temple",
+                    description: "Build a temple beside the Shrine.",
+                    weavingTime: 8000,
+                    getCost: function() {
+                        return { limestone: 3000, coins: 500000, starBeads: 500000, essence: 10000 };
+                    },
+                    canBuy: function() {
+                        const shrine = data.progress.base && data.progress.base.shrine;
+                        return !(shrine && shrine.templeUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.shrine.templeUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const shrine = data.progress.base && data.progress.base.shrine;
+                        return !!(shrine && shrine.templeUnlocked);
+                    },
+                    soldOutButtonLabel: "Built",
+                    rowVisible: function() {
+                        return engine.isSearchForLimestoneBought();
+                    }
+                },
+                okamiIconography: {
+                    key: "okami_iconography",
+                    name: "Okami Iconography",
+                    description: "Each purchase multiplies Okami exp gain by x1.2.",
+                    weavingTime: 4000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getShrineUpgradeBought("okamiIconographyBought");
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getShrineUpgradeBought("okamiIconographyBought");
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                    },
+                    maxPurchases: 5,
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.okamiIconographyBought = (shrine.okamiIconographyBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getShrineUpgradeBought("okamiIconographyBought");
+                        return `Okami exp: x${round2(Math.pow(1.2, n))}`;
+                    },
+                    soldOutButtonLabel: "Max iconography",
+                    rowVisible: function() {
+                        return engine.isTempleUnlocked();
+                    }
+                },
+                elementalResonance: {
+                    key: "elemental_resonance",
+                    name: "Elemental Resonance Iconography",
+                    description: "Each purchase raises the starting level of a new spirit by 1. Spirits below that level are raised to it.",
+                    weavingTime: 4000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getShrineUpgradeBought("elementalResonanceBought");
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getShrineUpgradeBought("elementalResonanceBought");
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                    },
+                    maxPurchases: 5,
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.elementalResonanceBought = (shrine.elementalResonanceBought || 0) + 1;
+                        engine.raiseSpiritsToDefaultLevel();
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getShrineUpgradeBought("elementalResonanceBought");
+                        return `Starting level: ${1 + n}`;
+                    },
+                    soldOutButtonLabel: "Max iconography",
+                    rowVisible: function() {
+                        return engine.isTempleUnlocked();
+                    }
+                },
+                divineGifts: {
+                    key: "divine_gifts",
+                    name: "Iconography of Divine Gifts",
+                    description: "Each purchase adds 1% to the chance that a card bought with divinity is rare.",
+                    weavingTime: 4000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getShrineUpgradeBought("divineGiftsBought");
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getShrineUpgradeBought("divineGiftsBought");
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                    },
+                    maxPurchases: 5,
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.divineGiftsBought = (shrine.divineGiftsBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getShrineUpgradeBought("divineGiftsBought");
+                        return `Rare chance: ${n}%`;
+                    },
+                    soldOutButtonLabel: "Max iconography",
+                    rowVisible: function() {
+                        return engine.isTempleUnlocked();
+                    }
+                },
+                goddessIconography: {
+                    key: "goddess_iconography",
+                    name: "Iconography of the Goddess",
+                    description: "Each purchase multiplies divinity gain by x1.1.",
+                    weavingTime: 4000,
+                    weavingTimeIncrease: 1.3,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getShrineUpgradeBought("goddessIconographyBought");
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getShrineUpgradeBought("goddessIconographyBought");
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                    },
+                    maxPurchases: 5,
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.goddessIconographyBought = (shrine.goddessIconographyBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getShrineUpgradeBought("goddessIconographyBought");
+                        return `Divinity: x${round2(Math.pow(1.1, n))}`;
+                    },
+                    soldOutButtonLabel: "Max iconography",
+                    rowVisible: function() {
+                        return engine.isTempleUnlocked();
                     }
                 }
             }

@@ -195,7 +195,10 @@
                     <div id="mapOrbProgressWrap" class="base-mini-progress resort-map-progress resort-map-progress-orb" style="display:none"><div id="mapOrbProgressFill" class="base-mini-progress-fill prog-fill-orb-exp"></div></div>
                     <button id="baseBuilding_shrine" class="base-building-label resort-building-label resort-building-map-btn resort-building-shrine" onclick="events.selectBaseBuilding('shrine')" style="display:none">
                         <img class="okami-site-tail" src="img/foxTail.svg" alt="" draggable="false">
-                        <img class="resort-building-art" src="img/shrine.svg" alt="" draggable="false">
+                        <span class="resort-building-art shrine-map-art-row">
+                            <img class="shrine-map-icon" src="img/shrine.svg" alt="" draggable="false">
+                            <img id="shrineMapTemple" class="shrine-map-icon shrine-map-temple-art" src="img/temple.svg" alt="" draggable="false">
+                        </span>
                         <span class="resort-building-label-text">Shrine</span>
                         <span id="shrineMapDisplay" class="resort-building-display">0</span>
                     </button>

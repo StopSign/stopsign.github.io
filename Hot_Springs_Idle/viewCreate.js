@@ -540,7 +540,7 @@ let createView = {
         );
         createView.createInfoButton(
             "resortInfo_shrine",
-            "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second.</p>",
+            "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second. Temple iconography multiplies Okami exp and divinity gain, raises the level new spirits start at, and adds a chance that cards bought with divinity are rare.</p>",
             56
         );
         createView.createInfoButton(
@@ -1070,13 +1070,26 @@ let createView = {
             </div>`;
         };
         const htmlShrinePanel = function() {
+            const templeKeys = ["okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"];
+            const shrineOnly = (resortData.buildings.shrine.upgradesOrder || []).filter(function(k) {
+                return templeKeys.indexOf(k) < 0;
+            });
             return `
                 <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span><span class="game-progress-sep">|</span>ETA: <span id="shrineExpEtaText">-</span></div>
                 </div>
-                ${resortUpgradeRowsHtml("shrine", null, { skipDivider: true })}
+                <div id="shrineSubTabs" class="travel-subtabs-row" style="display:none">
+                    <button type="button" id="shrineSubTab_shrine" class="tab-button travel-subtab-btn" onclick="events.switchShrineSubTab('shrine')">Shrine</button>
+                    <button type="button" id="shrineSubTab_temple" class="tab-button travel-subtab-btn" onclick="events.switchShrineSubTab('temple')">Temple</button>
+                </div>
+                <div id="shrinePane_shrine">
+                    ${resortUpgradeRowsHtml("shrine", templeKeys, { skipDivider: true })}
+                </div>
+                <div id="shrinePane_temple" style="display:none">
+                    ${resortUpgradeRowsHtml("shrine", shrineOnly, { skipDivider: true })}
+                </div>
             `;
         };
         const htmlCardsPackInventory = function() {
@@ -1145,6 +1158,7 @@ let createView = {
                                 <li>Gain unique bonuses from the next Legend, if you have the star minimum</li>
                                 <li>Increased max divinity based on Total Talent Levels</li>
                                 <li>Keep the Shrine, its upgrades and level, and current and max divinity</li>
+                                <li>Keep the Temple and its upgrades</li>
                                 <li>Keep the Path and its upgrades</li>
                                 <li>Keep Tips on skills</li>
                                 <li>Keep Legend progress and the Legend Penalty</li>
@@ -2343,7 +2357,7 @@ let createView = {
             "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill",
             "guestStarBeadsRange", "guestStarBeadsMin", "guestStarBeadsMax", "guestStarBeadsRangeNote",
             "kitsuneAssignTooltip", "kitsuneAssignTooltipList",
-            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "dropHammerRes_row", "dropHammerLimestoneText", "dropHammerQuicklimeText", "dropHammerProgressTrack", "dropHammerProgressFill", "dropHammerProgressLabel", "dropHammerTask_crush", "dropHammerCrush_chk", "dropHammerCrushFill", "dropHammerCrushProg", "dropHammerCrushNeed", "dropHammerTask_paper", "dropHammerPaper_chk", "dropHammerPaperFill", "dropHammerPaperProg", "dropHammerPaperNeed", "dropHammerPaperCost", "atelierWoodHold_row", "atelierWoodHoldInput", "atelierWoodHeld", "atelierWater_row", "atelierWaterFill", "atelierWaterText", "atelierWaterRequire", "atelierAllowCarriersWater_row", "atelierAllowCarriersWater_chk", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay",
+            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "dropHammerRes_row", "dropHammerLimestoneText", "dropHammerQuicklimeText", "dropHammerProgressTrack", "dropHammerProgressFill", "dropHammerProgressLabel", "dropHammerTask_crush", "dropHammerCrush_chk", "dropHammerCrushFill", "dropHammerCrushProg", "dropHammerCrushNeed", "dropHammerTask_paper", "dropHammerPaper_chk", "dropHammerPaperFill", "dropHammerPaperProg", "dropHammerPaperNeed", "dropHammerPaperCost", "atelierWoodHold_row", "atelierWoodHoldInput", "atelierWoodHeld", "atelierWater_row", "atelierWaterFill", "atelierWaterText", "atelierWaterRequire", "atelierAllowCarriersWater_row", "atelierAllowCarriersWater_chk", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay", "shrineMapTemple", "shrineSubTabs", "shrineSubTab_shrine", "shrineSubTab_temple", "shrinePane_shrine", "shrinePane_temple",
             "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill", "mapShrineProgressWrap", "mapShrineProgressFill",
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",

@@ -2825,6 +2825,44 @@ button {
     transform: translateX(-50%);
 }
 
+.shrine-map-art-row {
+    display: block;
+    width: 40px;
+    height: 40px;
+}
+
+.shrine-map-icon {
+    display: block;
+    width: 40px;
+    height: 40px;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.shrine-map-temple-art {
+    display: none;
+}
+
+.resort-building-shrine.has-temple {
+    display: flex;
+    width: 80px;
+    left: 22px;
+    transform: none;
+}
+
+.resort-building-shrine.has-temple .shrine-map-art-row {
+    display: grid;
+    grid-template-columns: 40px 40px;
+    grid-template-rows: 40px;
+    width: 80px;
+    height: 40px;
+}
+
+.resort-building-shrine.has-temple .shrine-map-temple-art {
+    display: block;
+}
+
 .resort-building-cistern {
     left: 538px;
     bottom: 311px;

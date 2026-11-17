@@ -1625,7 +1625,8 @@ let engine = {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().okamiExpAdd || 0) : 0;
         const legendMult = engine.getLegendOkamiExpMultiplier();
-        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01 * (1 + cardAdd) * legendMult;
+        const templeMult = engine.getTempleOkamiExpMultiplier();
+        data.battle.pendingOkamiExp = (data.battle.pendingOkamiExp || 0) + expGain * 0.01 * (1 + cardAdd) * legendMult * templeMult;
     },
     getCloneSoulLevel: function() {
         const assigned = (data.battle && data.battle.levelState && data.battle.levelState.levelSoul) || 0;
@@ -4217,6 +4218,7 @@ let engine = {
             slot: placement.slot,
             forgeTimerMs: 0
         };
+        engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
         return true;
     },
@@ -6535,6 +6537,7 @@ let engine = {
         if (placement.location === "hiddenSpring") {
             spirit.dropletCooldownMs = 5000;
         }
+        engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
         return true;
     },
@@ -6638,6 +6641,7 @@ let engine = {
         } else if (kind === "fire") {
             spirit.forgeTimerMs = 0;
         }
+        engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
         return true;
     },
@@ -6727,6 +6731,7 @@ let engine = {
         } else if (kind === "fire") {
             spirit.forgeTimerMs = 0;
         }
+        engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
         return true;
     },
@@ -6768,6 +6773,7 @@ let engine = {
             location: "bambooForest",
             slot: slot
         };
+        engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
         return true;
     },
@@ -7198,6 +7204,53 @@ let engine = {
     getSpiritPowerForLevel: function(level) {
         const n = Math.max(1, Math.floor(level || 1));
         return 1 + (n * (n - 1) / 2);
+    },
+    getDefaultSpiritLevel: function() {
+        const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)
+            ? resortHelper.getShrineUpgradeBought("elementalResonanceBought") : 0;
+        return 1 + Math.max(0, Math.floor(bought || 0));
+    },
+    getSpiritExpThreshold: function(level) {
+        let need = 15;
+        const n = Math.max(1, Math.floor(level || 1));
+        for (let i = 1; i < n; i++) {
+            need = Math.round(need * 1.8);
+        }
+        return need;
+    },
+    stampDefaultSpiritLevel: function(spirit) {
+        if (!spirit) {
+            return;
+        }
+        const level = engine.getDefaultSpiritLevel();
+        spirit.level = level;
+        spirit.exp = 0;
+        spirit.expToLevel = engine.getSpiritExpThreshold(level);
+        spirit.spiritPower = engine.getSpiritPowerForLevel(level);
+    },
+    raiseSpiritsToDefaultLevel: function() {
+        const hs = data.progress.base && data.progress.base.hiddenSpring;
+        const spirits = hs && hs.spirits;
+        if (!spirits) {
+            return;
+        }
+        const target = engine.getDefaultSpiritLevel();
+        for (let i = 0; i < spirits.length; i++) {
+            const spirit = spirits[i];
+            if (!spirit || (spirit.level || 1) >= target) {
+                continue;
+            }
+            spirit.level = target;
+            spirit.exp = spirit.exp || 0;
+            spirit.expToLevel = engine.getSpiritExpThreshold(target);
+            spirit.spiritPower = engine.getSpiritPowerForLevel(spirit.level);
+            while (spirit.expToLevel > 0 && spirit.exp >= spirit.expToLevel) {
+                spirit.exp -= spirit.expToLevel;
+                spirit.level += 1;
+                spirit.expToLevel = Math.round(spirit.expToLevel * 1.8);
+                spirit.spiritPower = engine.getSpiritPowerForLevel(spirit.level);
+            }
+        }
     },
     getSpiritPowerNextIncrease: function(level) {
         return Math.max(1, Math.floor(level || 1));
@@ -13316,6 +13369,10 @@ let engine = {
         const mine = data.progress.base && data.progress.base.mine;
         return !!(mine && mine.searchForLimestoneBought);
     },
+    isTempleUnlocked: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        return !!(shrine && shrine.templeUnlocked);
+    },
     getMineLimestoneCount: function(depth) {
         if (!engine.isSearchForLimestoneBought()) {
             return 0;
@@ -14452,6 +14509,11 @@ let engine = {
     getLegendOkamiExpMultiplier: function() {
         return engine.getLegendsWritten() >= 2 ? 1.5 : 1;
     },
+    getTempleOkamiExpMultiplier: function() {
+        const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)
+            ? resortHelper.getShrineUpgradeBought("okamiIconographyBought") : 0;
+        return Math.pow(1.2, Math.max(0, Math.floor(bought || 0)));
+    },
     getShrineHaulKeep: function(resourceType) {
         const shrine = data.progress.base && data.progress.base.shrine;
         const field = resourceType === "stone" ? "haulKeepStone"
@@ -14578,7 +14640,10 @@ let engine = {
         }
     },
     getShrineDivinityMultiplier: function() {
-        return engine.getLegendsWritten() >= 1 ? 2 : 1;
+        const legend = engine.getLegendsWritten() >= 1 ? 2 : 1;
+        const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)
+            ? resortHelper.getShrineUpgradeBought("goddessIconographyBought") : 0;
+        return legend * Math.pow(1.1, Math.max(0, Math.floor(bought || 0)));
     },
     getShrineDivinityRate: function() {
         if (!engine.isShrineBuilt()) {

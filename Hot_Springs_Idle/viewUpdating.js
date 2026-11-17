@@ -1670,6 +1670,16 @@ let view = {
         view.updateShrinePackDisplays();
         const tShrine = view._basePanelPurchasingTools(data.progress.base, null, data.progress.options.hideMaxedUpgrades);
         tShrine.refreshOrderedPurchasables("shrine", (resortData.buildings.shrine && resortData.buildings.shrine.upgradesOrder) || [], { hideMaxed: tShrine.hideMaxed });
+        const tabsOn = engine.isTempleUnlocked();
+        let sub = data.progress.selectedShrineSubTab || "shrine";
+        if (!tabsOn || (sub !== "shrine" && sub !== "temple")) {
+            sub = "shrine";
+        }
+        view.updateVal("shrineSubTabs", tabsOn ? "" : "none", "style.display");
+        view.updateVal("shrineSubTab_shrine", !tabsOn || sub === "shrine" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("shrineSubTab_temple", tabsOn && sub === "temple" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
+        view.updateVal("shrinePane_shrine", !tabsOn || sub === "shrine" ? "" : "none", "style.display");
+        view.updateVal("shrinePane_temple", tabsOn && sub === "temple" ? "" : "none", "style.display");
         if (typeof createView !== "undefined" && createView.refreshInfoButtonPanel) {
             createView.refreshInfoButtonPanel("resortInfo_shrine");
         }
@@ -2856,10 +2866,11 @@ let view = {
         view.updateVal("shrineExpToLevelText", Math.round(expToLevel), "textContent", 1);
         view.updateVal("shrineExpFill", `${pct}%`, "style.width");
         view.updateVal("shrineKarmaRateText", round2(engine.getShrineKarmaRate()));
-        view.updateVal("shrineDivinityMultText", engine.getShrineDivinityMultiplier());
+        view.updateVal("shrineDivinityMultText", round2(engine.getShrineDivinityMultiplier()));
         view.updateVal("shrineDivinityRateText", round2(engine.getShrineDivinityRate()));
         view.updateEtaText("shrineExpEtaText", Math.max(0, expToLevel - exp), engine.getShrineKarmaRate());
         view.updateVal("shrineMapDisplay", `Lvl ${level}`, "textContent");
+        view.updateVal("baseBuilding_shrine", engine.isTempleUnlocked(), "classList.toggle", "has-temple");
         view.updateVal("mapShrineProgressWrap", "", "style.display");
         view.updateVal("mapShrineProgressFill", `${pct}%`, "style.width");
     },

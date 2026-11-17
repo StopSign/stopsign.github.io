@@ -2729,7 +2729,7 @@ let events = {
         }
         resortData.deductCost(cost);
         engine.ensureSavedSeed(shrine, "packSeed", "packOpen");
-        const odds = shrineCards.buyCardOdds || { common: 100, rare: 0, epic: 0 };
+        const odds = shrineCards.getBuyCardOdds ? shrineCards.getBuyCardOdds() : (shrineCards.buyCardOdds || { common: 100, rare: 0, epic: 0 });
         const roll = engine.nextSeededFloat(shrine, "packSeed") * 100;
         let rarity = "epic";
         if (roll < (odds.common || 0)) {
@@ -3139,6 +3139,15 @@ let events = {
             return;
         }
         data.progress.selectedAtelierSubTab = which === "dropHammer" ? "dropHammer" : "atelier";
+        if (typeof view !== "undefined" && view.updateMenuNumbers) {
+            view.updateMenuNumbers();
+        }
+    },
+    switchShrineSubTab: function(which) {
+        if (typeof engine === "undefined" || !engine.isTempleUnlocked()) {
+            return;
+        }
+        data.progress.selectedShrineSubTab = which === "temple" ? "temple" : "shrine";
         if (typeof view !== "undefined" && view.updateMenuNumbers) {
             view.updateMenuNumbers();
         }
