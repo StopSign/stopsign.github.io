@@ -194,6 +194,9 @@ var resortData = {
             : key === "ash" ? "img/ash.svg"
             : key === "stone" ? "img/stone.svg"
             : key === "ore" ? "img/ore.svg"
+            : key === "limestone" ? "img/limestone.svg"
+            : key === "quicklime" ? "img/quicklime.svg"
+            : key === "paper" ? "img/paper.svg"
             : key === "bars" ? "img/bars.svg"
             : key === "mana" ? "img/mana.svg"
             : key === "credit" ? "img/credit.svg"
@@ -2357,7 +2360,7 @@ var resortData = {
 
         mine: {
             label: "Mine",
-            upgradesOrder: ["pebblePay", "mineshaftBeams", "formPlayPit"],
+            upgradesOrder: ["pebblePay", "mineshaftBeams", "formPlayPit", "searchForLimestone"],
             upgrades: {
                 pebblePay: {
                     key: "pebble_pay",
@@ -2444,6 +2447,26 @@ var resortData = {
                         const pct = Math.round((resortHelper.getPlayPitDirtMultiplier() - 1) * 100);
                         return `Dirt per play: +${pct}% (x${round2(resortHelper.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
                     },
+                },
+                searchForLimestone: {
+                    key: "search_for_limestone",
+                    name: "Search for Limestone",
+                    description: "On the next mine grid, replace dirt with limestone. One block at depth 8, two at 12, and three at 16. A limestone block has half an ore block's health. Depth 8 grants 300 limestone, doubling each depth after that.",
+                    cost: { starBeads: 100000, bars: 1500, hardwood: 1000 },
+                    weavingTime: 4000,
+                    rowVisible: function() {
+                        return engine.isBringOreToAtelierUnlocked();
+                    },
+                    canBuy: function() {
+                        return engine.isBringOreToAtelierUnlocked() && !engine.isSearchForLimestoneBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.mine.searchForLimestoneBought = true;
+                    },
+                    upgradeSoldOut: function() {
+                        return engine.isSearchForLimestoneBought();
+                    },
+                    soldOutButtonLabel: "Searched"
                 }
             }
         },
@@ -2910,9 +2933,21 @@ var resortData = {
                 formDirtRoadsUnlocked: false,
                 drophammerUnlocked: false,
                 ore: 0,
-                bars: 0
+                bars: 0,
+                limestone: 0,
+                quicklime: 0,
+                wood: 0,
+                woodHoldTarget: 0,
+                water: 0,
+                hammerProgress: 0,
+                crushLimestoneChecked: true,
+                crushLimestoneProgress: 0,
+                createPaperChecked: false,
+                createPaperProgress: 0,
+                paperPowerCost: 20,
+                crushPaperBought: false
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "unlockDrophammer"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "buildWaterWheelAndDrophammer", "crushPaper"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -3239,12 +3274,12 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Max roads"
                 },
-                unlockDrophammer: {
-                    key: "unlock_drophammer",
-                    name: "Unlock Drophammer",
-                    description: "Build a water wheel beside the Atelier. The stream to the Bamboo Forest turns it.",
-                    cost: { wood: 100, stone: 50 },
-                    weavingTime: 60,
+                buildWaterWheelAndDrophammer: {
+                    key: "build_water_wheel_and_drophammer",
+                    name: "Build Water Wheel and Drophammer",
+                    description: "Build a water wheel and drop hammer beside the Atelier. The stream to the Bamboo Forest turns the wheel.",
+                    cost: { wood: 20000, hardwood: 2000, stone: 40000 },
+                    weavingTime: 6000,
                     rowVisible: function() {
                         return true;
                     },
@@ -3258,7 +3293,30 @@ var resortData = {
                     upgradeSoldOut: function() {
                         return !!(data.progress.base.atelier && data.progress.base.atelier.drophammerUnlocked);
                     },
-                    soldOutButtonLabel: "Unlocked"
+                    soldOutButtonLabel: "Built"
+                },
+                crushPaper: {
+                    key: "crush_paper",
+                    name: "Crush Paper",
+                    description: "Prepare the drop hammer to make paper. Reveals the Atelier water tank, wood hold, and the Create Paper task.",
+                    cost: { stone: 20000, essence: 1000 },
+                    weavingTime: 3000,
+                    rowVisible: function() {
+                        return engine.isDrophammerUnlocked();
+                    },
+                    canBuy: function() {
+                        const atelier = data.progress.base.atelier;
+                        return engine.isDrophammerUnlocked() && !(atelier && atelier.crushPaperBought);
+                    },
+                    onBuy: function() {
+                        const atelier = data.progress.base.atelier;
+                        atelier.crushPaperBought = true;
+                        atelier.createPaperChecked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        return !!(data.progress.base.atelier && data.progress.base.atelier.crushPaperBought);
+                    },
+                    soldOutButtonLabel: "Built"
                 }
             }
         },

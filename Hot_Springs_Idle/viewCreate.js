@@ -608,6 +608,9 @@ let createView = {
                 let html = "<p>Each depth doubles the dirt, stone, and ore from a cleared block, and multiplies block health by 1.9. The depth row's /10 is how many grids you have cleared here. The next depth unlocks at 10.</p>";
                 html += "<p>Earth spirits dig with their effective spirit power. Mineshaft Beams add 20% dig power each, which is the bonus on the Spirit power line.</p>";
                 html += "<p>A grid is 25 blocks. Depth 0 has 1 stone, and each 2 depth adds 1 stone, up to 5. Ore starts at depth 3, and each 5 depth adds 1 ore, up to 5. The rest is dirt.</p>";
+                if (engine.isBringOreToAtelierUnlocked()) {
+                    html += "<p>After Search for Limestone, the next grid adds 1 limestone at depth 8, 2 at 12, and 3 at 16, replacing dirt only. A limestone block has half an ore block's health, and depth 8 grants 300 limestone, doubling each depth after that.</p>";
+                }
                 html += "<p>Digging does not grant exp. When the grid is clear, assigned earth spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and split among them as exp. The play line shows that amount.</p>";
                 if (resortHelper.getPlayPitBought() > 0) {
                     html += "<p>Play Pit increases the dirt spent on each play cycle.</p>";
@@ -620,6 +623,9 @@ let createView = {
                 if (resortHelper.getPlayPitBought() > 0) {
                     keys.push("playPit");
                 }
+                if (engine.isBringOreToAtelierUnlocked()) {
+                    keys.push("limestone");
+                }
                 return keys;
             }
         );
@@ -630,8 +636,10 @@ let createView = {
                 const kind = spirit ? (spirit.kind || "earth") : "";
                 let html = "<p>Exp to the next level is multiplied by 1.8.</p>";
                 if (kind === "earth") {
-                    html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants dirt, stone, or ore. Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
-                    let pebbleInfo = "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) stone or ore, plus 20% per Pebble Pay, rounded up.";
+                    const minedResources = engine.isSearchForLimestoneBought() ? "dirt, stone, ore, or limestone" : "dirt, stone, or ore";
+                    const carriedResources = engine.isSearchForLimestoneBought() ? "stone, ore, or limestone" : "stone or ore";
+                    html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants " + minedResources + ". Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
+                    let pebbleInfo = "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) " + carriedResources + ", plus 20% per Pebble Pay, rounded up.";
                     if (resortHelper.getEchoedShelvingBought() > 0) {
                         const shelvingMult = round2(Math.pow(1.25, resortHelper.getEchoedShelvingBought()));
                         pebbleInfo += ` Stone that arrives at the Stone Pile is then multiplied by x${shelvingMult} (x1.25 per Echoed Shelving), rounded up. Ore arrives at the Atelier and is not multiplied.`;
@@ -662,6 +670,9 @@ let createView = {
                 const keys = [spirit.kind || "earth"];
                 if (resortHelper.isSpiritTrainingSpotBought()) {
                     keys.push("training");
+                }
+                if (engine.isSearchForLimestoneBought()) {
+                    keys.push("limestone");
                 }
                 return keys;
             }
@@ -1138,6 +1149,7 @@ let createView = {
                                 <li>Keep Tips on skills</li>
                                 <li>Keep Legend progress and the Legend Penalty</li>
                                 <li>Keep card bonuses and packs</li>
+                                <li>Keep Paper (Create Paper's power cost resets) <span id="legendPaperKeepNew" class="legend-reset-new">(New!)</span></li>
                             </ul>
                         </div>
                         <div class="legend-reset-col">
@@ -1365,7 +1377,7 @@ let createView = {
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
                         <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span></div>
                         <div id="spiritInfoPebbleEtas" class="base-row" style="display:none"></div>
-                        <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoPrioritizeOre_chk" onchange="events.toggleSpiritPrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
+                        <div id="spiritInfoPrioritizeOreRow" class="base-row" style="display:none"><span>Priority</span> <label><input type="radio" name="spiritResourcePriority" id="spiritInfoPriority_stone" value="stone" onchange="events.setSpiritResourcePriority('stone')"> Stone</label> <label><input type="radio" name="spiritResourcePriority" id="spiritInfoPriority_ore" value="ore" onchange="events.setSpiritResourcePriority('ore')"> Ore</label> <label id="spiritInfoPriorityLimestoneLabel" style="display:none"><input type="radio" name="spiritResourcePriority" id="spiritInfoPriority_limestone" value="limestone" onchange="events.setSpiritResourcePriority('limestone')"> Limestone</label></div>
                         <div id="spiritInfoAutoReturnMineRow" class="base-row" style="display:none"><label><input type="checkbox" id="spiritInfoAutoReturnMine_chk" checked onchange="events.toggleSpiritAutoReturnToMine(this.checked)"> Return to the Mine when there are no resources to send with pebbles</label></div>
                     </div>
                     <div id="spiritInfoWaterExtras" style="display:none">
@@ -1500,9 +1512,49 @@ let createView = {
                     <div id="atelierPane_atelier">
                         <div class="base-row muted-text">Upgrades for the different buildings.</div>
                         <div id="atelierOreBars_row" class="base-row" style="display:none">${resortData.resourceIconHtml("ore")} Ore: <span id="atelierInfoOre"></span> | ${resortData.resourceIconHtml("bars")} Bars: <span id="atelierInfoBars"></span></div>
-                        ${resortUpgradeRowsHtml("atelier")}
+                        ${resortUpgradeRowsHtml("atelier", ["crushPaper"])}
                     </div>
-                    <div id="atelierPane_dropHammer" style="display:none"></div>
+                    <div id="atelierPane_dropHammer" style="display:none">
+                        <div id="atelierWater_row" class="base-row" style="display:none">
+                            <div class="prog-track game-progress-track water-prog-track">
+                                <div id="atelierWaterFill" class="prog-fill prog-fill-water"></div>
+                                <div id="atelierWaterText" class="game-progress-bar-label">Hot Water: 0/4000</div>
+                            </div>
+                            <div id="atelierWaterRequire" class="muted-text">Requires &gt;90C</div>
+                        </div>
+                        <div id="atelierAllowCarriersWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="atelierAllowCarriersWater_chk" onchange="events.toggleBuildingAllowCarriersWater('atelier', this.checked)"> Allow carriers to bring water</label></div>
+                        <div id="dropHammerRes_row" class="base-row">${resortData.resourceIconHtml("limestone")} Limestone: <span id="dropHammerLimestoneText"></span> | ${resortData.resourceIconHtml("quicklime")} Quicklime: <span id="dropHammerQuicklimeText"></span></div>
+                        <div id="dropHammerProgressTrack" class="skills-shard-slot-progress-track labeled-progress-track drop-hammer-progress-track">
+                            <div id="dropHammerProgressFill" class="skills-shard-slot-progress-fill"></div>
+                            <div id="dropHammerProgressLabel" class="labeled-progress-text"></div>
+                        </div>
+                        <div class="base-row muted-text">Drop Hammer progress is √(pond water drained)/s</div>
+                        <div class="base-upgrade-divider"></div>
+                        <div class="base-row">Drop Hammer Tasks</div>
+                        <div id="dropHammerTask_crush" class="drop-hammer-task">
+                            <label class="drop-hammer-task-name"><input type="checkbox" id="dropHammerCrush_chk" checked onchange="events.setDropHammerTask('crush', this.checked)"> Crush Limestone</label>
+                            <div class="drop-hammer-task-progress">
+                                <div class="skills-shard-slot-progress-track labeled-progress-track">
+                                    <div id="dropHammerCrushFill" class="skills-shard-slot-progress-fill"></div>
+                                    <div class="labeled-progress-text labeled-progress-text--small"><span id="dropHammerCrushProg"></span><span class="labeled-progress-sep"> / </span><span id="dropHammerCrushNeed"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dropHammerTask_paper" style="display:none">
+                            <div class="drop-hammer-task">
+                                <label class="drop-hammer-task-name"><input type="checkbox" id="dropHammerPaper_chk" onchange="events.setDropHammerTask('paper', this.checked)"> Create Paper</label>
+                                <div class="drop-hammer-task-progress">
+                                    <div class="skills-shard-slot-progress-track labeled-progress-track">
+                                        <div id="dropHammerPaperFill" class="skills-shard-slot-progress-fill"></div>
+                                        <div class="labeled-progress-text labeled-progress-text--small"><span id="dropHammerPaperProg"></span><span class="labeled-progress-sep"> / </span><span id="dropHammerPaperNeed"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="dropHammerPaperCost" class="base-row muted-text"></div>
+                        </div>
+                        <div id="atelierWoodHold_row" class="base-row" style="display:none">Hold <input type="number" id="atelierWoodHoldInput" class="atelier-wood-hold-input" min="0" step="1" value="0" onchange="events.setAtelierWoodHold(this.value)"> wood <span class="muted-text">Have <span id="atelierWoodHeld"></span></span></div>
+                        ${resortUpgradeRowsHtml("atelier", resortData.buildings.atelier.upgradesOrder.filter(function(k) { return k !== "crushPaper"; }))}
+                    </div>
                 </div>
                 <div id="resortInfo_mage_tower" class="resort-info-section">
                     <div class="base-info-title">The Orb</div>
@@ -1615,9 +1667,10 @@ let createView = {
                             <div id="mineGrid" class="mine-grid"></div>
                             <div class="mine-info-side">
                                 <div class="resort-info-grid mine-resource-grid">
-                                    <div>Dirt: <span id="mineDirtText"></span></div>
-                                    <div>Stone: <span id="mineStoneText"></span></div>
-                                    <div id="mineOreRow" style="display:none">Ore: <span id="mineOreText"></span></div>
+                                    <div>Dirt: <span id="mineDirtText"></span> <span class="muted-text">(+<span id="mineDirtPer"></span> per)</span></div>
+                                    <div>${resortData.resourceIconHtml("stone")} Stone: <span id="mineStoneText"></span> <span class="muted-text">(+<span id="mineStonePer"></span> per)</span></div>
+                                    <div id="mineOreRow" style="display:none">${resortData.resourceIconHtml("ore")} Ore: <span id="mineOreText"></span> <span class="muted-text">(+<span id="mineOrePer"></span> per)</span></div>
+                                    <div id="mineLimestoneRow" style="display:none">${resortData.resourceIconHtml("limestone")} Limestone: <span id="mineLimestoneText"></span> <span class="muted-text">(+<span id="mineLimestonePer"></span> per)</span></div>
                                     <div>Assigned spirit level: <span id="mineAssignedLevelText"></span></div>
                                     <div>Spirit power: <span id="mineSpiritPowerText"></span></div>
                                     <div>Clear time: <span id="mineClearEtaText"></span></div>
@@ -1625,7 +1678,6 @@ let createView = {
                             </div>
                         </div>
                         ${resortUpgradeRowsHtml("mine")}
-                        <div id="minePrioritizeOreRow" class="base-row" style="display:none"><label><input type="checkbox" id="minePrioritizeOre_chk" onchange="events.toggleMinePrioritizeOre(this.checked)"> Prioritize ore over stone</label></div>
                         <div id="minePlayBlock" class="mine-play-block" style="display:none">
                             <div class="mine-play-label">Play in Dirt</div>
                             <div id="minePlayProgressDetail" class="muted-text mine-play-detail"></div>
@@ -2236,7 +2288,7 @@ let createView = {
             "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "deathAutoRetry_row", "deathAutoRetry_chk", "deathStartWithFullMana_row", "deathStartWithFullMana_chk", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
             "cardsSubTab_get", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineBuyCardOdds", "shrineOpenPacksBtn", "shrineClassDebugBlock",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
-            "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
+            "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitlePaper", "basePaperText", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
             "resortInfo_empty", "resortInfo_hiddenSpring", "resortInfo_spirit", "resortInfo_fireLauncher", "resortInfo_torii", "resortInfo_inn", "resortInfo_noodleBar", "resortInfo_laundry", "resortInfo_path", "resortInfo_stonePile", "resortInfo_bambooForest", "resortInfo_garden", "resortInfo_atelier", "resortInfo_mage_tower", "resortInfo_bonfire", "resortInfo_shrine", "resortInfo_scrollArchives", "resortInfo_foxDen", "resortInfo_cistern", "resortInfo_pond", "resortInfo_mine", "resortInfo_market",
             "gardenAppraisalAuto_row", "gardenAppraisalAuto_chk", "gardenReviewAuto_row", "gardenReviewAuto_chk", "gardenReviewPaused_row", "gardenReviewPaused_chk",
             "gardenManaReserve_row", "gardenManaReserve_chk", "gardenManaReserve_label",
@@ -2252,7 +2304,7 @@ let createView = {
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
             "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpBonus",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
-            "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPrioritizeOre_chk", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
+            "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPriority_stone", "spiritInfoPriority_ore", "spiritInfoPriority_limestone", "spiritInfoPriorityLimestoneLabel", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
             "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
@@ -2286,11 +2338,12 @@ let createView = {
             "mapNoodleWaterProgressWrap", "mapNoodleWaterProgressFill",
             "mapToriiManaProgressWrap", "mapToriiManaProgressFill",
             "mapToriiWaterProgressWrap", "mapToriiWaterProgressFill",
+            "mapAtelierWaterProgressWrap", "mapAtelierWaterProgressFill",
             "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill",
             "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill",
             "guestStarBeadsRange", "guestStarBeadsMin", "guestStarBeadsMax", "guestStarBeadsRangeNote",
             "kitsuneAssignTooltip", "kitsuneAssignTooltipList",
-            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay",
+            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "dropHammerRes_row", "dropHammerLimestoneText", "dropHammerQuicklimeText", "dropHammerProgressTrack", "dropHammerProgressFill", "dropHammerProgressLabel", "dropHammerTask_crush", "dropHammerCrush_chk", "dropHammerCrushFill", "dropHammerCrushProg", "dropHammerCrushNeed", "dropHammerTask_paper", "dropHammerPaper_chk", "dropHammerPaperFill", "dropHammerPaperProg", "dropHammerPaperNeed", "dropHammerPaperCost", "atelierWoodHold_row", "atelierWoodHoldInput", "atelierWoodHeld", "atelierWater_row", "atelierWaterFill", "atelierWaterText", "atelierWaterRequire", "atelierAllowCarriersWater_row", "atelierAllowCarriersWater_chk", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay",
             "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill", "mapShrineProgressWrap", "mapShrineProgressFill",
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
@@ -2306,7 +2359,7 @@ let createView = {
             "fireLauncherUpgrades_pathMid", "fireLauncherUpgrades_pathLower", "fireLauncherUpgrades_bendTop",
             "fireLauncherTargetPriority_row", "fireLauncherTarget_default", "fireLauncherTarget_closest", "fireLauncherTarget_furthest",
             "fireLauncherTarget_coldest", "fireLauncherTarget_hottest", "fireLauncherTarget_coldest_label", "fireLauncherTarget_hottest_label",
-            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineStoneText", "mineOreRow", "mineOreText", "minePrioritizeOreRow", "minePrioritizeOre_chk", "mineAutoDepth_row", "mineAutoDepth_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",
+            "mineDepthLeftBtn", "mineDepthRightBtn", "mineDepthText", "mineDepthClears", "mineDepthReady", "mineStatusText", "mineGrid", "mineDirtText", "mineDirtPer", "mineStoneText", "mineStonePer", "mineOreRow", "mineOreText", "mineOrePer", "mineLimestoneRow", "mineLimestoneText", "mineLimestonePer", "mineAutoDepth_row", "mineAutoDepth_chk", "mineAssignedLevelText", "mineSpiritPowerText", "mineClearEtaText", "minePlayBlock", "minePlayProgressDetail", "minePlayProgressWrap", "minePlayProgressFill",
             "base_torii_assign_one_btn", "base_torii_assign_ten_btn", "base_torii_assign_all_btn", "base_torii_unassign_one_btn", "base_torii_unassign_ten_btn", "base_torii_unassign_all_btn", "base_torii_workers_label", "base_torii_worker_prod_text", "base_torii_worker_prod_wrap", "base_torii_worker_prog_fill",
             "base_laundry_assign_one_btn", "base_laundry_assign_ten_btn", "base_laundry_assign_all_btn", "base_laundry_unassign_one_btn", "base_laundry_unassign_ten_btn", "base_laundry_unassign_all_btn", "base_laundry_workers_label", "base_laundry_worker_prod_text", "base_laundry_worker_prod_wrap", "base_laundry_worker_prog_fill",
             "base_resource_strip", "base_res_stone",
@@ -2317,7 +2370,7 @@ let createView = {
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
-            "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
+            "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPaperKeepNew", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
             "shrineKarmaRateText", "shrineDivinityMultText", "shrineDivinityRateText",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineExpEtaText",
             "shrinePacksSection", "shrinePackStrip", "shrinePackCommonCount", "shrinePackRareCount", "shrinePackEpicCount",

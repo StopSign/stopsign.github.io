@@ -2467,11 +2467,47 @@ let events = {
     changeMineDepth: function(delta) {
         engine.changeMineDepth(delta);
     },
-    toggleMinePrioritizeOre: function(checked) {
+    setSpiritResourcePriority: function(priority) {
         if (!engine.isArrangementOfPriorityUnlocked()) {
             return;
         }
-        data.progress.base.mine.prioritizeOre = !!checked;
+        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
+        if (!spirit || spirit.kind !== "earth") {
+            return;
+        }
+        if (priority !== "stone" && priority !== "ore" && priority !== "limestone") {
+            return;
+        }
+        if (priority === "limestone" && !engine.isSearchForLimestoneBought()) {
+            return;
+        }
+        spirit.resourcePriority = priority;
+        spirit.prioritizeOre = priority === "ore";
+    },
+    setDropHammerTask: function(task, checked) {
+        const atelier = data.progress.base && data.progress.base.atelier;
+        if (!atelier || !engine.isDrophammerUnlocked()) {
+            return;
+        }
+        if (task === "crush") {
+            atelier.crushLimestoneChecked = !!checked;
+            return;
+        }
+        if (task === "paper" && engine.isCrushPaperBought()) {
+            atelier.createPaperChecked = !!checked;
+        }
+    },
+    setAtelierWoodHold: function(value) {
+        const atelier = data.progress.base && data.progress.base.atelier;
+        if (!atelier || !engine.isCrushPaperBought()) {
+            return;
+        }
+        const n = Math.max(0, Math.floor(Number(value) || 0));
+        atelier.woodHoldTarget = n;
+        const input = viewData.cached.atelierWoodHoldInput;
+        if (input && document.activeElement !== input && input.value !== String(n)) {
+            input.value = String(n);
+        }
     },
     toggleEqualDropletSpacing: function(checked) {
         if (!engine.isArrangementOfRhythmicDropletsUnlocked()) {
@@ -2482,16 +2518,6 @@ let events = {
             return;
         }
         hs.equalDropletSpacing = !!checked;
-    },
-    toggleSpiritPrioritizeOre: function(checked) {
-        if (!engine.isArrangementOfPriorityUnlocked()) {
-            return;
-        }
-        const spirit = engine.getSpiritById(data.progress.selectedSpiritId);
-        if (!spirit || spirit.kind !== "earth") {
-            return;
-        }
-        spirit.prioritizeOre = !!checked;
     },
     toggleSpiritAutoReturnToMine: function(checked) {
         if (!engine.isArrangementOfDiggingUnlocked()) {

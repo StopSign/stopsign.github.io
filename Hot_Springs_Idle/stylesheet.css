@@ -2402,6 +2402,14 @@ button {
     min-width: 400px;
 }
 
+#baseResortMap > #baseBuyableWrap {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    z-index: 40;
+    margin-left: 0;
+}
+
 #baseBuyableTooltip {
     min-width: 400px;
 }
@@ -3060,6 +3068,11 @@ button {
     color: #2ad15f;
 }
 
+.legend-reset-new {
+    color: orange;
+    font-weight: 600;
+}
+
 .legend-reset-header--cons {
     color: #ef4444;
 }
@@ -3653,6 +3666,10 @@ button {
     transform: translateX(-50%);
     grid-template-columns: repeat(3, 22px);
     grid-template-rows: 22px;
+}
+
+.spirit-slot-grid-atelier-fire.limestone-map-line {
+    bottom: 144px;
 }
 
 .spirit-slot-grid-bonfire-fire {
@@ -4252,6 +4269,11 @@ button {
 .resort-map-progress-noodle-water {
     left: 230px;
     bottom: 207px;
+}
+
+.resort-map-progress-atelier-water {
+    left: 490px;
+    bottom: 176px;
 }
 
 .resort-map-progress-hidden-spring-mana {
@@ -5126,6 +5148,35 @@ button[id^="inscriptionAssign_"]:disabled:hover {
 
 .mine-block-fill.ore {
     background: #1a3a6b;
+}
+
+.mine-block-fill.limestone {
+    background: #c2b280;
+}
+
+.drop-hammer-task {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0;
+}
+
+.drop-hammer-task-name {
+    min-width: 150px;
+}
+
+.drop-hammer-task-progress {
+    flex: 1 1 auto;
+    min-width: 140px;
+}
+
+.drop-hammer-task-progress .skills-shard-slot-progress-track,
+.drop-hammer-progress-track {
+    width: 100%;
+}
+
+.atelier-wood-hold-input {
+    width: 72px;
 }
 
 .mine-play-block {

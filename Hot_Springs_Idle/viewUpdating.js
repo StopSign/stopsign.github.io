@@ -1919,6 +1919,7 @@ let view = {
         view.updateVal("atelierOreBars_row", showOreBars ? "" : "none", "style.display");
         view.updateVal("atelierInfoOre", atelier.ore || 0, "textContent", "floor");
         view.updateVal("atelierInfoBars", atelier.bars || 0, "textContent", "floor");
+        view.updateDropHammerPanel();
         t.refreshOrderedPurchasables("atelier", resortData.buildings.atelier.upgradesOrder, t.soldOutUpgradeRowOpts(t.hideMaxed, "atelier"));
         const tabsOn = engine.isDrophammerUnlocked();
         let sub = data.progress.selectedAtelierSubTab || "atelier";
@@ -1933,6 +1934,55 @@ let view = {
         if (viewData.cached.base_atelier_sandal_row) {
             view.updateVal("base_atelier_sandal_row", "none", "style.display");
         }
+    },
+    updateDropHammerPanel: function() {
+        const atelier = (data.progress.base && data.progress.base.atelier) || {};
+        const paperOn = engine.isCrushPaperBought();
+        view.updateVal("dropHammerLimestoneText", atelier.limestone || 0, "textContent", "floor");
+        view.updateVal("dropHammerQuicklimeText", atelier.quicklime || 0, "textContent", "floor");
+        const y = engine.getDropHammerProgressPerSecond();
+        const x = atelier.hammerProgress || 0;
+        view.updateVal("dropHammerProgressLabel", `${round2(x)}/100 | +${round2(y)}/s for Power 2`);
+        view.updateVal("dropHammerProgressFill", `${Math.max(0, Math.min(100, x))}%`, "style.width");
+        const crushProg = atelier.crushLimestoneProgress || 0;
+        view.updateVal("dropHammerCrushProg", round2(crushProg));
+        view.updateVal("dropHammerCrushNeed", "10");
+        view.updateVal("dropHammerCrushFill", `${Math.max(0, Math.min(100, (crushProg / 10) * 100))}%`, "style.width");
+        const crushChk = viewData.cached.dropHammerCrush_chk;
+        if (crushChk && crushChk.checked !== (atelier.crushLimestoneChecked !== false)) {
+            crushChk.checked = atelier.crushLimestoneChecked !== false;
+        }
+        view.updateVal("atelierWater_row", paperOn ? "" : "none", "style.display");
+        view.syncAllowCarriersWaterCheckbox("atelier", paperOn);
+        if (paperOn) {
+            const cap = engine.getAtelierWaterCapacity();
+            const water = atelier.water || 0;
+            view.updateVal("atelierWaterText", `Hot Water: ${round1Fixed(water)}/${cap}`);
+            view.updateVal("atelierWaterFill", cap > 0 ? `${Math.max(0, Math.min(100, (water / cap) * 100))}%` : "0%", "style.width");
+        }
+        view.updateVal("dropHammerTask_paper", paperOn ? "" : "none", "style.display");
+        view.updateVal("atelierWoodHold_row", paperOn ? "" : "none", "style.display");
+        if (!paperOn) {
+            return;
+        }
+        const cost = atelier.paperPowerCost || 20;
+        const paperProg = atelier.createPaperProgress || 0;
+        view.updateVal("dropHammerPaperProg", round2(paperProg));
+        view.updateVal("dropHammerPaperNeed", String(cost));
+        view.updateVal("dropHammerPaperFill", `${Math.max(0, Math.min(100, cost > 0 ? (paperProg / cost) * 100 : 0))}%`, "style.width");
+        const paperChk = viewData.cached.dropHammerPaper_chk;
+        if (paperChk && paperChk.checked !== !!atelier.createPaperChecked) {
+            paperChk.checked = !!atelier.createPaperChecked;
+        }
+        const holdInput = viewData.cached.atelierWoodHoldInput;
+        if (holdInput && document.activeElement !== holdInput) {
+            const target = String(Math.max(0, Math.floor(atelier.woodHoldTarget || 0)));
+            if (holdInput.value !== target) {
+                holdInput.value = target;
+            }
+        }
+        view.updateVal("atelierWoodHeld", intToStringRound(atelier.wood || 0));
+        view.updateVal("dropHammerPaperCost", `50 wood, 100L water, 20 quicklime per power. Needs ${intToStringRound(cost)} power.`);
     },
     updateAtelierWheel: function() {
         const unlocked = engine.isDrophammerUnlocked();
@@ -3289,6 +3339,8 @@ let view = {
         view.updateMapWaterBar(engine.isInnOnsenConverted(), inn.hotWater || 0, engine.getInnHotWaterCapacity(), "mapInnWaterProgressWrap", "mapInnWaterProgressFill");
         const noodleBar = base.noodleBar || {};
         view.updateMapWaterBar(engine.isNoodleBarBuilt(), noodleBar.hotWater || 0, engine.getNoodleBarHotWaterCapacity(), "mapNoodleWaterProgressWrap", "mapNoodleWaterProgressFill");
+        const atelierWater = (base.atelier && base.atelier.water) || 0;
+        view.updateMapWaterBar(engine.isCrushPaperBought(), atelierWater, engine.getAtelierWaterCapacity(), "mapAtelierWaterProgressWrap", "mapAtelierWaterProgressFill");
         view.updateMapWaterBar(engine.isNoodleBarBuilt(), Math.min(100, noodleBar.tipProgress || 0), 100, "mapNoodleTipProgressWrap", "mapNoodleTipProgressFill");
         view.updateMapBuildingManaBar("stonePile", "mapStonePileManaProgressWrap", "mapStonePileManaProgressFill");
         view.updateMapBuildingManaBar("hiddenSpring", "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill");
@@ -3637,6 +3689,7 @@ let view = {
         }
         const forgeBuilt = engine.isAtelierForgeBuilt();
         view.updateVal("spiritSlots_atelier_fire", forgeBuilt ? "" : "none", "style.display");
+        view.updateVal("spiritSlots_atelier_fire", engine.isSearchForLimestoneBought(), "classList.toggle", "limestone-map-line");
         for (let afi = 0; afi < engine.getAtelierFireSpiritSlotMax(); afi++) {
             const atelierSlotId = `spiritSlot_atelier_fire_${afi}`;
             const aSpirit = engine.getSpiritAtLocation("atelier", afi, "fire");
@@ -4057,9 +4110,20 @@ let view = {
             const diggingUnlocked = engine.isArrangementOfDiggingUnlocked();
             view.updateVal("spiritInfoPrioritizeOreRow", priorityUnlocked && atHiddenSpring ? "" : "none", "style.display");
             if (priorityUnlocked && atHiddenSpring) {
-                const oreChk = viewData.cached.spiritInfoPrioritizeOre_chk;
-                if (oreChk) {
-                    oreChk.checked = !!spirit.prioritizeOre;
+                const priority = engine.getSpiritResourcePriority(spirit);
+                const limeOn = engine.isSearchForLimestoneBought();
+                view.updateVal("spiritInfoPriorityLimestoneLabel", limeOn ? "" : "none", "style.display");
+                const stoneRadio = viewData.cached.spiritInfoPriority_stone;
+                const oreRadio = viewData.cached.spiritInfoPriority_ore;
+                const limeRadio = viewData.cached.spiritInfoPriority_limestone;
+                if (stoneRadio) {
+                    stoneRadio.checked = priority === "stone";
+                }
+                if (oreRadio) {
+                    oreRadio.checked = priority === "ore";
+                }
+                if (limeRadio) {
+                    limeRadio.checked = priority === "limestone";
                 }
             }
             view.updateVal("spiritInfoAutoReturnMineRow", diggingUnlocked ? "" : "none", "style.display");
@@ -4266,12 +4330,20 @@ let view = {
         view.updateVal("mineStatusText", cleared ? "Playing in the Dirt" : "Mining...");
         view.updateVal("mineDirtText", mine.resources.dirt, "textContent", 2);
         view.updateVal("mineStoneText", mine.resources.stone, "textContent", 2);
+        view.updateVal("mineDirtPer", intToStringRound(engine.getMineBlockYield(depth, "dirt")));
+        view.updateVal("mineStonePer", intToStringRound(engine.getMineBlockYield(depth, "stone")));
+        view.updateVal("mineOrePer", intToStringRound(engine.getMineBlockYield(depth, "ore")));
         const oreMined = !!(data.progress.base.hiddenSpring && data.progress.base.hiddenSpring.oreMined);
         view.updateVal("mineOreRow", oreMined ? "" : "none", "style.display");
         if (oreMined) {
             view.updateVal("mineOreText", (mine.resources.ore || 0), "textContent", 2);
         }
-        view.updateVal("minePrioritizeOreRow", "none", "style.display");
+        const limestoneOn = engine.isSearchForLimestoneBought();
+        view.updateVal("mineLimestoneRow", limestoneOn ? "" : "none", "style.display");
+        if (limestoneOn) {
+            view.updateVal("mineLimestoneText", (mine.resources.limestone || 0), "textContent", 2);
+            view.updateVal("mineLimestonePer", intToStringRound(engine.getMineBlockYield(depth, "limestone")));
+        }
         view.updateVal("mineAssignedLevelText", engine.getMineSpiritLevelTotal());
         const beamBonus = resortHelper.getMineshaftBeamsBought() * 20;
         const powerText = beamBonus > 0
@@ -4368,6 +4440,11 @@ let view = {
         view.updateVal("basePaneTitleEssence", essenceAmt > 0 ? "" : "none", "style.display");
         if (essenceAmt > 0) {
             view.updateVal("baseEssenceText", round2(essenceAmt));
+        }
+        const paperAmt = (data.progress && data.progress.paper) || 0;
+        view.updateVal("basePaneTitlePaper", paperAmt > 0 ? "" : "none", "style.display");
+        if (paperAmt > 0) {
+            view.updateVal("basePaperText", intToStringRound(paperAmt));
         }
                 view.updateVal("baseWorkersAssigned", engine.getAvailableWorkers(), "textContent", 1);
         view.updateVal("baseWorkersFound", engine.getTotalFoundWorkers(), "textContent", 1);
@@ -4726,9 +4803,15 @@ let view = {
         const atelier = base.atelier || {};
         const atelierOre = atelier.ore || 0;
         const atelierBars = atelier.bars || 0;
-        view.updateVal("atelierMapDisplay", data.progress.base.hiddenSpring.bringOreToAtelierUnlocked
-            ? `${resortData.resourceIconHtml("ore")} ${intToStringRound(atelierOre)} | ${resortData.resourceIconHtml("bars")} ${intToStringRound(atelierBars)}`
-            : "", "innerHTML");
+        const limestoneSearched = engine.isSearchForLimestoneBought();
+        let atelierMapHtml = "";
+        if (data.progress.base.hiddenSpring.bringOreToAtelierUnlocked) {
+            atelierMapHtml = `${resortData.resourceIconHtml("ore")} ${intToStringRound(atelierOre)} | ${resortData.resourceIconHtml("bars")} ${intToStringRound(atelierBars)}`;
+            if (limestoneSearched) {
+                atelierMapHtml += `<br>${resortData.resourceIconHtml("limestone")} ${intToStringRound(atelier.limestone || 0)} | ${resortData.resourceIconHtml("quicklime")} ${intToStringRound(atelier.quicklime || 0)}`;
+            }
+        }
+        view.updateVal("atelierMapDisplay", atelierMapHtml, "innerHTML");
         const forest = base.bambooForest || {};
         const woodMap = `${resortData.resourceIconHtml("wood")} ${intToStringRound(forest.wood || 0)}`;
         view.updateVal("bambooForestMapDisplay", resortHelper.isGrowHardwoodBought()
@@ -6066,6 +6149,7 @@ let view = {
         view.updateVal("legendCurrentStars", stars < req, "classList.toggle", "legend-current-stars--short");
         view.updateVal("legendStarWarning", stars >= req ? "none" : "", "style.display");
         view.updateVal("legendWipWarning", hasNext ? "none" : "", "style.display");
+        view.updateVal("legendPaperKeepNew", data.progress.hidePaperPrestigeNew ? "none" : "", "style.display");
         const gain = (typeof engine.getCombatPrestigeMaxDivinityGain === "function")
             ? engine.getCombatPrestigeMaxDivinityGain()
             : 0;

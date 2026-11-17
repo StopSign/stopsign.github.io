@@ -367,7 +367,8 @@ let initials = {
                 resources: {
                     dirt: 0,
                     stone: 0,
-                    ore: 0
+                    ore: 0,
+                    limestone: 0
                 },
                 currentDepth: 0,
                 clearsByDepth: { 0: 0 },
@@ -379,7 +380,8 @@ let initials = {
                 pebblePayBought: 0,
                 playPitBought: 0,
                 mineshaftBeamsBought: 0,
-                autoIncreaseDepth: false
+                autoIncreaseDepth: false,
+                searchForLimestoneBought: false
             },
             scrollArchives: pb("scrollArchives"),
             inn: Object.assign(pb("inn"), {
@@ -603,6 +605,7 @@ let initials = {
             },
             divinityCapReduced50k: true,
             essenceMade: 0,
+            paper: 0,
             manaCapacityBonusPerCombatStart: resortData.manaCapacityBonusPerCloneDispersal,
             stars: {
                 bronze: 0,
@@ -1359,6 +1362,64 @@ let initialize = {
             }
         }
     },
+    migrateBuildWaterWheelUpgradeKey: function() {
+        const progress = data.progress;
+        if (!progress) {
+            return;
+        }
+        const oldKeys = ["unlockDrophammer", "unlock_drophammer"];
+        const newKey = "buildWaterWheelAndDrophammer";
+        const weaving = progress.weaving;
+        if (weaving) {
+            if (weaving.active && weaving.active.scopeKey === "atelier" && oldKeys.indexOf(weaving.active.upgradeKey) >= 0) {
+                weaving.active.upgradeKey = newKey;
+            }
+            const paused = weaving.paused;
+            if (paused && typeof paused === "object" && !Array.isArray(paused)) {
+                for (let oi = 0; oi < oldKeys.length; oi++) {
+                    const oldPause = "atelier:" + oldKeys[oi];
+                    if (!paused[oldPause]) {
+                        continue;
+                    }
+                    paused[oldPause].upgradeKey = newKey;
+                    const newPause = "atelier:" + newKey;
+                    if (!paused[newPause]) {
+                        paused[newPause] = paused[oldPause];
+                    }
+                    delete paused[oldPause];
+                }
+            }
+        }
+        const rh = progress.base && progress.base.foxDen;
+        if (!rh) {
+            return;
+        }
+        for (let ji = 0; ji < oldKeys.length; ji++) {
+            const oldJob = "upgrade:atelier:" + oldKeys[ji];
+            const newJob = "upgrade:atelier:" + newKey;
+            if (rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJob]) {
+                const job = rh.upgradeGatherJobs[oldJob];
+                job.upgradeKey = newKey;
+                if (!rh.upgradeGatherJobs[newJob]) {
+                    rh.upgradeGatherJobs[newJob] = job;
+                }
+                delete rh.upgradeGatherJobs[oldJob];
+            }
+            if (rh.jobQueue) {
+                for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                    if (rh.jobQueue[qi] === oldJob) {
+                        rh.jobQueue[qi] = newJob;
+                    }
+                }
+            }
+            const carriers = rh.constructionCarriers || [];
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci].jobKey === oldJob) {
+                    carriers[ci].jobKey = newJob;
+                }
+            }
+        }
+    },
     initializeAtelier: function() {
         const base = data.progress.base;
         const def = resortData.buildings.atelier.progressDefaults;
@@ -1373,6 +1434,7 @@ let initialize = {
                 atelier[k] = def[k];
             }
         }
+        initialize.migrateBuildWaterWheelUpgradeKey();
         if (!base.dirtRoads) {
             base.dirtRoads = [];
         }
@@ -1392,7 +1454,7 @@ let initialize = {
             }
         }
         const waterOn = !!garden.arrangementOfWaterOrdersUnlocked;
-        const waterKeys = ["inn", "torii", "noodleBar"];
+        const waterKeys = ["inn", "torii", "noodleBar", "atelier"];
         for (let wi = 0; wi < waterKeys.length; wi++) {
             const building = base[waterKeys[wi]];
             if (building && building.allowCarriersBringWater === undefined && waterOn) {
@@ -1690,7 +1752,7 @@ let initialize = {
     initializeMine: function() {
         const base = data.progress.base;
         const def = {
-            resources: { dirt: 0, stone: 0, ore: 0 },
+            resources: { dirt: 0, stone: 0, ore: 0, limestone: 0 },
             currentDepth: 0,
             clearsByDepth: { 0: 0 },
             blocks: null,
@@ -1704,10 +1766,16 @@ let initialize = {
         }
         const mine = base.mine;
         if (!mine.resources) {
-            mine.resources = { dirt: 0, stone: 0, ore: 0 };
+            mine.resources = { dirt: 0, stone: 0, ore: 0, limestone: 0 };
         }
         if (mine.resources.ore === undefined) {
             mine.resources.ore = 0;
+        }
+        if (mine.resources.limestone === undefined) {
+            mine.resources.limestone = 0;
+        }
+        if (mine.searchForLimestoneBought === undefined || mine.searchForLimestoneBought === null) {
+            mine.searchForLimestoneBought = false;
         }
         if (mine.prioritizeOre === undefined) {
             mine.prioritizeOre = false;
@@ -1727,9 +1795,25 @@ let initialize = {
                 const sp = spirits[spi];
                 if (sp.kind === "earth" && (sp.location || "hiddenSpring") === "hiddenSpring") {
                     sp.prioritizeOre = true;
+                    sp.resourcePriority = "ore";
                 }
             }
             mine.prioritizeOre = false;
+        }
+        if (base.hiddenSpring && base.hiddenSpring.spirits) {
+            const allSpirits = base.hiddenSpring.spirits;
+            for (let spi2 = 0; spi2 < allSpirits.length; spi2++) {
+                const sp2 = allSpirits[spi2];
+                if (!sp2 || sp2.kind !== "earth") {
+                    continue;
+                }
+                if (sp2.resourcePriority !== "stone" && sp2.resourcePriority !== "ore" && sp2.resourcePriority !== "limestone") {
+                    sp2.resourcePriority = sp2.prioritizeOre ? "ore" : "stone";
+                }
+                if (sp2.resourcePriority === "limestone" && !mine.searchForLimestoneBought) {
+                    sp2.resourcePriority = "stone";
+                }
+            }
         }
         if (mine.playTimerMs === undefined) {
             mine.playTimerMs = 0;

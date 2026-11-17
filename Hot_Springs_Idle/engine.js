@@ -539,6 +539,7 @@ let engine = {
         const autoChoosePackCards = prevOptions.autoChoosePackCards;
         const bonusTime = (data.currentGameState && data.currentGameState.bonusTime) || 0;
         const secondsPlayedTotal = typeof progress.secondsPlayedTotal === "number" ? progress.secondsPlayedTotal : 0;
+        const keptPaper = Math.max(0, Math.floor(progress.paper || 0));
 
         data.progress = initials.progress();
         data.battle = initials.battle();
@@ -565,6 +566,8 @@ let engine = {
         data.progress.selectedHistorySubTab = "prestige";
         data.progress.secondsThisResort = 0;
         data.progress.secondsPlayedTotal = secondsPlayedTotal;
+        data.progress.paper = keptPaper;
+        data.progress.hidePaperPrestigeNew = true;
         data.progress.prestigeRunCards = { milestone: [], bought: [] };
         data.progress.prestigeRunPacks = { milestone: 0, bought: 0 };
 
@@ -3898,6 +3901,7 @@ let engine = {
         engine.updateEarthSpirits(tickMs);
         engine.updateWaterSpirits(tickMs);
         engine.updatePebbles(tickMs);
+        engine.updateDropHammer(tickMs);
         engine.updateInnWaterCarriers(tickMs);
         engine.updateCisternWaterCarriers(tickMs);
         engine.updateDroplets(tickMs);
@@ -4047,6 +4051,15 @@ let engine = {
                 tempMinInclusive: true,
                 current: torii.water || 0,
                 capacity: engine.getToriiWaterCapacity()
+            });
+        }
+        if (engine.isCrushPaperBought() && !engine.isAtelierWaterFull()) {
+            const atelier = data.progress.base.atelier;
+            pushSink({
+                key: "atelier",
+                tempMin: 90,
+                current: (atelier && atelier.water) || 0,
+                capacity: engine.getAtelierWaterCapacity()
             });
         }
         return sinks;
@@ -5454,6 +5467,145 @@ let engine = {
         const atelier = data.progress.base && data.progress.base.atelier;
         return !!(atelier && atelier.drophammerUnlocked);
     },
+    isCrushPaperBought: function() {
+        const atelier = data.progress.base && data.progress.base.atelier;
+        return !!(atelier && atelier.crushPaperBought);
+    },
+    getAtelierWaterCapacity: function() {
+        if (!engine.isCrushPaperBought()) {
+            return 0;
+        }
+        return 4000;
+    },
+    isAtelierWaterFull: function() {
+        const cap = engine.getAtelierWaterCapacity();
+        if (cap <= 0) {
+            return true;
+        }
+        const atelier = data.progress.base && data.progress.base.atelier;
+        return !!atelier && (atelier.water || 0) >= cap;
+    },
+    getDropHammerProgressPerSecond: function() {
+        return Math.sqrt(engine.getPondForestDrainPerSecond());
+    },
+    getCheckedDropHammerTasks: function(atelier) {
+        const tasks = [];
+        if (!atelier) {
+            return tasks;
+        }
+        if (atelier.crushLimestoneChecked !== false) {
+            tasks.push("crush");
+        }
+        if (engine.isCrushPaperBought() && atelier.createPaperChecked) {
+            tasks.push("paper");
+        }
+        return tasks;
+    },
+    resolveCrushLimestone: function(atelier) {
+        if (!atelier) {
+            return;
+        }
+        let guard = 0;
+        while ((atelier.crushLimestoneProgress || 0) >= 10 && (atelier.limestone || 0) > 0 && guard < 10000) {
+            const convert = Math.min(100, atelier.limestone || 0);
+            atelier.limestone = (atelier.limestone || 0) - convert;
+            atelier.quicklime = (atelier.quicklime || 0) + convert;
+            atelier.crushLimestoneProgress -= 10;
+            guard++;
+        }
+    },
+    resolveCreatePaper: function(atelier) {
+        if (!atelier || !engine.isCrushPaperBought()) {
+            return;
+        }
+        let cost = atelier.paperPowerCost || 20;
+        if (!(cost >= 1)) {
+            cost = 20;
+        }
+        let progress = atelier.createPaperProgress || 0;
+        let guard = 0;
+        while (progress >= cost && guard < 10000) {
+            progress -= cost;
+            if (!data.progress) {
+                break;
+            }
+            data.progress.paper = (data.progress.paper || 0) + 1;
+            cost = Math.max(1, Math.round(cost * 1.05));
+            guard++;
+        }
+        atelier.createPaperProgress = progress;
+        atelier.paperPowerCost = cost;
+    },
+    distributeDropHammerPower: function(atelier, power) {
+        let remaining = power;
+        let active = engine.getCheckedDropHammerTasks(atelier);
+        let guard = 0;
+        while (remaining > 1e-9 && active.length && guard < 20) {
+            guard++;
+            const share = remaining / active.length;
+            let accepted = 0;
+            const still = [];
+            for (let i = 0; i < active.length; i++) {
+                const task = active[i];
+                let take = 0;
+                if (task === "crush") {
+                    take = share;
+                    atelier.crushLimestoneProgress = (atelier.crushLimestoneProgress || 0) + take;
+                } else if (task === "paper") {
+                    const woodCost = 50;
+                    const waterCost = 100;
+                    const limeCost = 20;
+                    const afford = Math.min(
+                        Math.floor((atelier.wood || 0) / woodCost),
+                        Math.floor((atelier.water || 0) / waterCost),
+                        Math.floor((atelier.quicklime || 0) / limeCost)
+                    );
+                    take = Math.min(Math.floor(share + 1e-9), Math.max(0, afford));
+                    if (take > 0) {
+                        atelier.wood = (atelier.wood || 0) - take * woodCost;
+                        atelier.water = (atelier.water || 0) - take * waterCost;
+                        atelier.quicklime = (atelier.quicklime || 0) - take * limeCost;
+                        atelier.createPaperProgress = (atelier.createPaperProgress || 0) + take;
+                    }
+                }
+                accepted += take;
+                if (take >= share - 1e-6) {
+                    still.push(task);
+                }
+            }
+            remaining -= accepted;
+            if (accepted <= 1e-9) {
+                break;
+            }
+            active = still;
+        }
+        engine.resolveCrushLimestone(atelier);
+        engine.resolveCreatePaper(atelier);
+    },
+    updateDropHammer: function(tickMs) {
+        if (!engine.isDrophammerUnlocked()) {
+            return;
+        }
+        const atelier = data.progress.base && data.progress.base.atelier;
+        if (!atelier) {
+            return;
+        }
+        engine.resolveCrushLimestone(atelier);
+        engine.resolveCreatePaper(atelier);
+        const gain = engine.getDropHammerProgressPerSecond() * ((tickMs || 0) / 1000);
+        const checked = engine.getCheckedDropHammerTasks(atelier);
+        if (!checked.length) {
+            atelier.hammerProgress = Math.min(100, (atelier.hammerProgress || 0) + gain);
+            return;
+        }
+        atelier.hammerProgress = (atelier.hammerProgress || 0) + gain;
+        let guard = 0;
+        while (atelier.hammerProgress >= 100 && guard < 10000) {
+            atelier.hammerProgress -= 100;
+            engine.distributeDropHammerPower(atelier, 2);
+            guard++;
+        }
+    },
     getBonfireFireSpiritSlotMax: function() {
         return 3;
     },
@@ -6146,20 +6298,42 @@ let engine = {
         }
         return engine.parseFireLauncherLocation(spirit.location || "");
     },
-    allocatePebbleLoad: function(capacity, stoneAvail, oreAvail, oreFirst) {
-        let stone = 0;
-        let ore = 0;
-        let rem = capacity;
-        if (oreFirst) {
-            ore = Math.min(rem, oreAvail);
-            rem -= ore;
-            stone = Math.min(rem, stoneAvail);
-        } else {
-            stone = Math.min(rem, stoneAvail);
-            rem -= stone;
-            ore = Math.min(rem, oreAvail);
+    getSpiritResourcePriority: function(spirit) {
+        if (!spirit || !engine.isArrangementOfPriorityUnlocked()) {
+            return "stone";
         }
-        return { stone: stone, ore: ore };
+        const priority = spirit.resourcePriority;
+        if (priority === "limestone" && engine.isSearchForLimestoneBought()) {
+            return "limestone";
+        }
+        if (priority === "ore") {
+            return "ore";
+        }
+        if (priority !== "stone" && priority !== "limestone" && spirit.prioritizeOre) {
+            return "ore";
+        }
+        return "stone";
+    },
+    allocatePebbleLoad: function(capacity, stocks, priority) {
+        const order = [];
+        const first = priority || "stone";
+        order.push(first);
+        const rest = ["stone", "ore", "limestone"];
+        for (let i = 0; i < rest.length; i++) {
+            if (rest[i] !== first) {
+                order.push(rest[i]);
+            }
+        }
+        const load = { stone: 0, ore: 0, limestone: 0 };
+        let rem = capacity;
+        const avail = stocks || {};
+        for (let i = 0; i < order.length; i++) {
+            const key = order[i];
+            const take = Math.min(rem, avail[key] || 0);
+            load[key] = take;
+            rem -= take;
+        }
+        return load;
     },
     getPebblePayloadStone: function(pebble) {
         if (!pebble) {
@@ -6176,19 +6350,34 @@ let engine = {
         }
         return pebble.payloadOre || 0;
     },
+    getPebblePayloadLimestone: function(pebble) {
+        if (!pebble) {
+            return 0;
+        }
+        return pebble.payloadLimestone || 0;
+    },
     formatPebblePayloadLabel: function(pebble) {
         const stone = engine.applyEchoedShelving(engine.getPebblePayloadStone(pebble));
         const ore = engine.getPebblePayloadOre(pebble);
-        if (stone > 0 && ore > 0) {
-            return `${intToStringRound(stone)}S | ${intToStringRound(ore)}O`;
-        }
+        const limestone = engine.getPebblePayloadLimestone(pebble);
+        const parts = [];
         if (stone > 0) {
-            return `${intToStringRound(stone)}S`;
+            parts.push(`${intToStringRound(stone)}S`);
         }
         if (ore > 0) {
-            return `${intToStringRound(ore)}O`;
+            parts.push(`${intToStringRound(ore)}O`);
         }
-        return "";
+        if (limestone > 0) {
+            parts.push(`${intToStringRound(limestone)}L`);
+        }
+        return parts.join(" | ");
+    },
+    getPebbleLoadStocks: function(resources, oreUnlocked) {
+        return {
+            stone: (resources && resources.stone) || 0,
+            ore: oreUnlocked ? ((resources && resources.ore) || 0) : 0,
+            limestone: (oreUnlocked && engine.isSearchForLimestoneBought()) ? ((resources && resources.limestone) || 0) : 0
+        };
     },
     canEarthSpiritLoadPebble: function(spirit) {
         const base = data.progress.base;
@@ -6198,14 +6387,13 @@ let engine = {
         const capacity = engine.getEarthSpiritPebbleCarryAmount(spirit);
         const stoneAvail = base.mine.resources.stone || 0;
         const oreUnlocked = engine.isBringOreToAtelierUnlocked();
-        const oreAvail = oreUnlocked ? (base.mine.resources.ore || 0) : 0;
         if (oreUnlocked) {
-            if (stoneAvail + oreAvail <= 0) {
+            const stocks = engine.getPebbleLoadStocks(base.mine.resources, true);
+            if (stocks.stone + stocks.ore + stocks.limestone <= 0) {
                 return false;
             }
-            const oreFirst = engine.isArrangementOfPriorityUnlocked() && spirit.prioritizeOre;
-            const load = engine.allocatePebbleLoad(capacity, stoneAvail, oreAvail, oreFirst);
-            return (load.stone + load.ore) > 0;
+            const load = engine.allocatePebbleLoad(capacity, stocks, engine.getSpiritResourcePriority(spirit));
+            return (load.stone + load.ore + load.limestone) > 0;
         }
         return stoneAvail > 0;
     },
@@ -6273,6 +6461,9 @@ let engine = {
     formatEarthSpiritPebbleCarry: function(spirit) {
         const raw = engine.getEarthSpiritPebbleCarryAmount(spirit);
         const stone = engine.applyEchoedShelving(raw);
+        if (engine.isSearchForLimestoneBought()) {
+            return stone + " stone / " + raw + " ore / " + raw + " limestone";
+        }
         if (stone === raw) {
             return raw + " stone/ore";
         }
@@ -7096,30 +7287,31 @@ let engine = {
             return false;
         }
         const oreUnlocked = engine.isBringOreToAtelierUnlocked();
-        const oreFirst = oreUnlocked && engine.isArrangementOfPriorityUnlocked()
-            && spirit.prioritizeOre;
         const stoneAvail = base.mine.resources.stone || 0;
-        const oreAvail = oreUnlocked ? (base.mine.resources.ore || 0) : 0;
         let loadStone = 0;
         let loadOre = 0;
+        let loadLimestone = 0;
         if (oreUnlocked) {
-            if ((stoneAvail + oreAvail) <= 0) {
+            const stocks = engine.getPebbleLoadStocks(base.mine.resources, true);
+            if (stocks.stone + stocks.ore + stocks.limestone <= 0) {
                 return false;
             }
-            const load = engine.allocatePebbleLoad(capacity, stoneAvail, oreAvail, oreFirst);
+            const load = engine.allocatePebbleLoad(capacity, stocks, engine.getSpiritResourcePriority(spirit));
             loadStone = load.stone;
             loadOre = load.ore;
+            loadLimestone = load.limestone;
         } else {
             if (stoneAvail <= 0) {
                 return false;
             }
             loadStone = Math.min(capacity, stoneAvail);
         }
-        if (loadStone + loadOre <= 0) {
+        if (loadStone + loadOre + loadLimestone <= 0) {
             return false;
         }
-        base.mine.resources.stone -= loadStone;
+        base.mine.resources.stone = (base.mine.resources.stone || 0) - loadStone;
         base.mine.resources.ore = (base.mine.resources.ore || 0) - loadOre;
+        base.mine.resources.limestone = (base.mine.resources.limestone || 0) - loadLimestone;
         if (!base.pebbles) {
             base.pebbles = [];
         }
@@ -7128,6 +7320,7 @@ let engine = {
             spiritId: spiritId,
             payloadStone: loadStone,
             payloadOre: loadOre,
+            payloadLimestone: loadLimestone,
             colorIndex: spirit ? (spirit.colorIndex || 0) : 0,
             pathProgress: 0,
             prevPathProgress: 0
@@ -7152,19 +7345,28 @@ let engine = {
             if (pebble.pathProgress >= distance) {
                 const stoneAmt = engine.applyEchoedShelving(engine.getPebblePayloadStone(pebble));
                 const oreAmt = engine.getPebblePayloadOre(pebble);
+                const limestoneAmt = engine.getPebblePayloadLimestone(pebble);
                 if (stoneAmt > 0) {
                     base.stonePile.stone = (base.stonePile.stone || 0) + stoneAmt;
                     if (typeof view !== "undefined" && view.spawnResourceFloat) {
                         view.spawnResourceFloat("baseBuilding_stonePile", "stone", stoneAmt, "#949494");
                     }
                 }
-                if (oreAmt > 0) {
+                if (oreAmt > 0 || limestoneAmt > 0) {
                     if (!base.atelier) {
-                        base.atelier = { ore: 0, bars: 0 };
+                        base.atelier = { ore: 0, bars: 0, limestone: 0, quicklime: 0 };
                     }
+                }
+                if (oreAmt > 0) {
                     base.atelier.ore = (base.atelier.ore || 0) + oreAmt;
                     if (typeof view !== "undefined" && view.spawnResourceFloat) {
                         view.spawnResourceFloat("baseBuilding_atelier", "ore", oreAmt, "#d66a40");
+                    }
+                }
+                if (limestoneAmt > 0) {
+                    base.atelier.limestone = (base.atelier.limestone || 0) + limestoneAmt;
+                    if (typeof view !== "undefined" && view.spawnResourceFloat) {
+                        view.spawnResourceFloat("baseBuilding_atelier", "limestone", limestoneAmt, "#e6d3a3");
                     }
                 }
             } else {
@@ -10270,11 +10472,47 @@ let engine = {
                     return target;
                 }
             }
+            const hold = engine.getAtelierWoodHoldSpawnTarget(allowed);
+            if (hold) {
+                return hold;
+            }
             if (allowed) {
                 return null;
             }
         }
         return engine.getFoxDenManaSpawnTarget(rh);
+    },
+    getAtelierWoodHoldSpawnTarget: function(allowed) {
+        if (allowed && !allowed.wood) {
+            return null;
+        }
+        if (!engine.isCrushPaperBought()) {
+            return null;
+        }
+        const atelier = data.progress.base && data.progress.base.atelier;
+        if (!atelier) {
+            return null;
+        }
+        const targetAmt = Math.max(0, Math.floor(atelier.woodHoldTarget || 0));
+        const held = atelier.wood || 0;
+        const inFlight = engine.getConstructionResourceInFlight("atelierHold:wood", "wood");
+        const need = targetAmt - held - inFlight;
+        if (need <= 0) {
+            return null;
+        }
+        const carry = resortData.getKitsuneWoodCarryAmount();
+        const stock = engine.getConstructionResourceAvailable("wood");
+        const amount = Math.floor(Math.min(carry, need, stock));
+        if (amount <= 0) {
+            return null;
+        }
+        return {
+            isAtelierWoodHold: true,
+            jobKey: "atelierHold:wood",
+            mapKey: "atelier",
+            resourceType: "wood",
+            amount: amount
+        };
     },
     getFoxDenManaSpawnTarget: function(rh) {
         if (!rh || !rh.manaOrdersEnabled) {
@@ -10558,6 +10796,21 @@ let engine = {
     },
     deliverFoxDenCarrierLoad: function(rh, c) {
         const jobKey = c.jobKey || (c.unlockKey ? engine.getBuildingJobKey(c.unlockKey) : "");
+        if (jobKey === "atelierHold:wood") {
+            const atelier = data.progress.base && data.progress.base.atelier;
+            if (!atelier) {
+                engine.refundConstructionResource("wood", c.amount || 0);
+                return;
+            }
+            const room = Math.max(0, Math.floor(atelier.woodHoldTarget || 0) - (atelier.wood || 0));
+            const accept = Math.min(c.amount || 0, room);
+            atelier.wood = (atelier.wood || 0) + accept;
+            const extra = (c.amount || 0) - accept;
+            if (extra > 0) {
+                engine.refundConstructionResource("wood", extra);
+            }
+            return;
+        }
         if (jobKey.indexOf("building:") === 0) {
             const unlockKey = jobKey.slice("building:".length);
             const site = rh.constructionSites[unlockKey];
@@ -10642,6 +10895,37 @@ let engine = {
             rh.constructionCarriers.push(manaCarrier);
             rh.carrierIdCounter = (rh.carrierIdCounter || 1) + 1;
             return "mana";
+        }
+        if (target.isAtelierWoodHold) {
+            const woodAmount = target.amount;
+            if (woodAmount <= 0 || engine.getConstructionResourceAvailable("wood") < woodAmount) {
+                return false;
+            }
+            const fromWood = engine.getConstructionSourcePosition("wood");
+            const toWood = engine.getFoxDenMapSlotPosition("atelier");
+            const dxW = toWood.x - fromWood.x;
+            const dyW = toWood.y - fromWood.y;
+            const distW = Math.sqrt(dxW * dxW + dyW * dyW) || 1;
+            engine.deductConstructionResource("wood", woodAmount);
+            const woodCarrier = {
+                id: rh.carrierIdCounter || 1,
+                jobKey: "atelierHold:wood",
+                unlockKey: "atelier",
+                resourceType: "wood",
+                amount: woodAmount,
+                isOkami: unit.spawnOkami,
+                progress: 0,
+                displaySlot: engine.getFreeCarrierDisplaySlot(rh),
+                fromX: fromWood.x,
+                fromY: fromWood.y,
+                toX: toWood.x,
+                toY: toWood.y,
+                totalDist: distW
+            };
+            engine.applyDirtRoadOnSpawn(woodCarrier, engine.getConstructionSourceBuildingKey("wood"), "atelier");
+            rh.constructionCarriers.push(woodCarrier);
+            rh.carrierIdCounter = (rh.carrierIdCounter || 1) + 1;
+            return "wood";
         }
         const site = target.site;
         const delivered = (site.delivered && site.delivered[resourceType]) || 0;
@@ -12274,6 +12558,14 @@ let engine = {
                 accepted = Math.min(amt, room);
                 torii.water = round1((torii.water || 0) + accepted);
             }
+        } else if (targetKey === "atelier") {
+            const atelier = data.progress.base.atelier;
+            if (atelier) {
+                const cap = engine.getAtelierWaterCapacity();
+                const room = Math.max(0, cap - (atelier.water || 0));
+                accepted = Math.min(amt, room);
+                atelier.water = round1((atelier.water || 0) + accepted);
+            }
         }
         const leftover = amt - accepted;
         if (leftover > 0) {
@@ -13020,10 +13312,40 @@ let engine = {
     getMineOreCount: function(depth) {
         return Math.min(5, Math.floor(((depth || 0) + 2) / 5));
     },
+    isSearchForLimestoneBought: function() {
+        const mine = data.progress.base && data.progress.base.mine;
+        return !!(mine && mine.searchForLimestoneBought);
+    },
+    getMineLimestoneCount: function(depth) {
+        if (!engine.isSearchForLimestoneBought()) {
+            return 0;
+        }
+        const d = depth || 0;
+        if (d >= 16) {
+            return 3;
+        }
+        if (d >= 12) {
+            return 2;
+        }
+        if (d >= 8) {
+            return 1;
+        }
+        return 0;
+    },
+    getMineBlockYield: function(depth, blockType) {
+        const d = depth || 0;
+        if (blockType === "ore") {
+            return d >= 3 ? 10 * Math.pow(2, d - 3) : 0;
+        }
+        if (blockType === "limestone") {
+            return d >= 8 ? 300 * Math.pow(2, d - 8) : 0;
+        }
+        return Math.pow(2, d);
+    },
     createMineBlocksForDepth: function(depth) {
         const d = depth || 0;
         const hpMult = Math.pow(1.9, d);
-        const hpByType = { dirt: 15, stone: 100, ore: 500 };
+        const hpByType = { dirt: 15, stone: 100, ore: 500, limestone: 250 };
         const makeBlock = function(type) {
             const maxAud = hpByType[type] * hpMult;
             return { type: type, aud: maxAud, maxAud: maxAud };
@@ -13058,8 +13380,20 @@ let engine = {
             }
         }
         const oreIdx = pickUnique(dirtIdx, engine.getMineOreCount(d));
+        const oreSet = {};
         for (let o = 0; o < oreIdx.length; o++) {
             blocks[oreIdx[o]] = makeBlock("ore");
+            oreSet[oreIdx[o]] = true;
+        }
+        const limeDirtIdx = [];
+        for (let i = 0; i < 25; i++) {
+            if (!stoneSet[i] && !oreSet[i]) {
+                limeDirtIdx.push(i);
+            }
+        }
+        const limeIdx = pickUnique(limeDirtIdx, engine.getMineLimestoneCount(d));
+        for (let li = 0; li < limeIdx.length; li++) {
+            blocks[limeIdx[li]] = makeBlock("limestone");
         }
         return blocks;
     },
@@ -13124,17 +13458,17 @@ let engine = {
     },
     grantMineBlockReward: function(mine, blockType) {
         const depth = mine.currentDepth || 0;
+        const gain = engine.getMineBlockYield(depth, blockType);
+        if (!mine.resources) {
+            mine.resources = {};
+        }
+        mine.resources[blockType] = (mine.resources[blockType] || 0) + gain;
         if (blockType === "ore") {
-            const oreGain = depth >= 3 ? 10 * Math.pow(2, depth - 3) : 0;
-            mine.resources.ore = (mine.resources.ore || 0) + oreGain;
             const hs = data.progress.base && data.progress.base.hiddenSpring;
             if (hs && !hs.oreMined) {
                 hs.oreMined = true;
             }
-            return;
         }
-        const gain = Math.pow(2, depth);
-        mine.resources[blockType] = (mine.resources[blockType] || 0) + gain;
     },
     damageMineBlocks: function(mine, damage) {
         let remaining = damage;
