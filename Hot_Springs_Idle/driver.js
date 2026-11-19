@@ -190,6 +190,9 @@ let driver = {
         if (typeof engine.tryAutobuyUpgrades === "function") {
             engine.tryAutobuyUpgrades();
         }
+        if (typeof automation !== "undefined" && automation.onSecond) {
+            automation.onSecond();
+        }
 
         if (typeof engine.updateManaPerSecond === "function") {
             engine.updateManaPerSecond();

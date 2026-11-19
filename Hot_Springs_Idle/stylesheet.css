@@ -1237,11 +1237,45 @@ button {
 }
 
 #tabPane_cardBonuses,
-#tabPane_prestige {
+#tabPane_prestige,
+#tabPane_automation {
     position: absolute;
     inset: 0;
     box-sizing: border-box;
     overflow-y: auto;
+}
+
+.automation-resource {
+    margin: 0 0 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.automation-resource-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.automation-paper-input {
+    width: 90px;
+}
+
+.paper-autobuy-controls {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-left: auto;
+    font-weight: 500;
+    font-size: 12px;
+}
+
+.paper-autobuy-controls--dim {
+    opacity: 0.45;
 }
 
 /* Match battlefield column height (gameData.battle.battlefieldHeightPx + 2). */
@@ -4804,6 +4838,7 @@ button {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 8px;
 }
 .upgrade-autobuy-label {

@@ -55,13 +55,13 @@
         </div>
         <div id="resourceProgressRow" class="resource-progress-row" style="display:none">
             <div id="manaProgressBar" class="game-progress-bar" style="display:none">
-                <div class="prog-track game-progress-track mana-progress-track">
+                <div id="manaProgressTrack" class="prog-track game-progress-track mana-progress-track">
                     <div id="manaFill" class="prog-fill prog-fill-mana"></div>
                     <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">-</span></div>
                 </div>
             </div>
             <div id="divinityProgressBar" class="game-progress-bar" style="display:none">
-                <div class="prog-track game-progress-track divinity-progress-track">
+                <div id="divinityProgressTrack" class="prog-track game-progress-track divinity-progress-track">
                     <div id="divinityFill" class="prog-fill prog-fill-divinity"></div>
                     <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/divinity.svg" alt="" draggable="false">Divinity: <span id="divinityAmount" class="game-progress-bold">0</span>/<span id="divinityCap" class="game-progress-bold">50000</span><span class="game-progress-sep">|</span>+<span id="divinityRate" class="game-progress-bold">0</span>/s</div>
                 </div>
@@ -86,6 +86,7 @@
             <button id="tabButton_history" class="tab-button" onclick="events.switchTab('history')">History</button>
             <button id="tabButton_cardBonuses" class="tab-button" onclick="events.switchTab('cardBonuses')" style="display:none">Cards</button>
             <button id="tabButton_prestige" class="tab-button" onclick="events.switchTab('prestige')" style="display:none">Prestige</button>
+            <button id="tabButton_automation" class="tab-button" onclick="events.switchTab('automation')" style="display:none">Automation</button>
             <button id="tabButton_options" class="tab-button" onclick="events.switchTab('options')">Options</button>
             </div>
             <button type="button" id="menuTabsScrollRight" class="menu-tabs-scroll menu-tabs-scroll--hidden" aria-label="Scroll tabs right">&gt;</button>
@@ -439,6 +440,7 @@
                 <div class="pane-title">Fade into Legend (Prestige)</div>
                 <div id="cardsPrestigeMount"></div>
             </div>
+            <div id="tabPane_automation" class="tab-pane" style="display:none"></div>
             <div id="tabPane_options" class="tab-pane">
                 <div class="pane-title">Options</div>
                 <div class="options-row"><button type="button" id="changelogButton" class="tab-button" onclick="changelog.open()">Changelog</button></div>
@@ -545,6 +547,7 @@
 <div id="debugSpeedPanel" class="debug-speed-panel" style="display:none">
     <button id="debugSpeed_x3" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(3)">x3</button>
     <button id="debugSpeed_x10" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(10)">x10</button>
+    <button id="debugSpeed_x50" class="button debug-speed-btn" type="button" onclick="events.toggleDebugGameSpeed(50)">x50</button>
     <span id="bonusSpeedLabel" class="debug-speed-label" style="display:none">Bonus Time <span id="bonusSpeedRemaining" class="muted-text"></span></span>
     <button id="bonusSpeed_x2" class="button debug-speed-btn" type="button" style="display:none" onclick="events.toggleBonusGameSpeed(2)">x2</button>
 </div>
@@ -606,6 +609,7 @@
 <script src="helpers.js"></script>
 <script src="resortData.js"></script>
 <script src="bonfire.js"></script>
+<script src="automation.js"></script>
 <script src="initialize.js"></script>
 <script src="offline.js"></script>
 <script src="viewCreate.js"></script>

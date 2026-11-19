@@ -352,6 +352,7 @@ let view = {
 
         const x3 = viewData.cached.debugSpeed_x3;
         const x10 = viewData.cached.debugSpeed_x10;
+        const x50 = viewData.cached.debugSpeed_x50;
         if (x3) {
             x3.style.display = showDebug ? "" : "none";
             x3.classList.toggle("debug-speed-active", showDebug && (gs.debugSpeedMultiplier || 0) === 3);
@@ -359,6 +360,10 @@ let view = {
         if (x10) {
             x10.style.display = showDebug ? "" : "none";
             x10.classList.toggle("debug-speed-active", showDebug && (gs.debugSpeedMultiplier || 0) === 10);
+        }
+        if (x50) {
+            x50.style.display = showDebug ? "" : "none";
+            x50.classList.toggle("debug-speed-active", showDebug && (gs.debugSpeedMultiplier || 0) === 50);
         }
 
         const bonusLabel = viewData.cached.bonusSpeedLabel || document.getElementById("bonusSpeedLabel");
@@ -417,6 +422,10 @@ let view = {
             data.battle.currentTab = tabOrder.indexOf("cardBonuses") >= 0 ? "cardBonuses" : "base";
             createView.showCurrentTab();
         }
+        if (data.battle.currentTab === "automation" && tabOrder.indexOf("automation") < 0) {
+            data.battle.currentTab = "base";
+            createView.showCurrentTab();
+        }
         const activeTab = data.battle.currentTab || "base";
         view.updateTabButtons(activeTab);
 
@@ -452,6 +461,8 @@ let view = {
             view.updateCardBonusesTab();
         } else if (activeTab === "prestige") {
             view.updatePrestigeTab();
+        } else if (activeTab === "automation") {
+            view.updateAutomationTab();
         } else if (activeTab === "options") {
             view.updateOptionsTab();
         }
@@ -1251,6 +1262,9 @@ let view = {
                         }
                     }
                 }
+                if (typeof automation !== "undefined" && automation.upgradeControlIds) {
+                    view.syncPaperAutobuyControl(automation.upgradeControlIds(buildingSegment, pk), automation.upgradeShowsControl(buildingSegment, pk), automation.getUpgradeSetting(buildingSegment, pk), automation.upgradeDimmed(buildingSegment, pk));
+                }
                 view.updateVal(extraEl, resortData.insertResourceIcons(resortData.getUpgradeExtraText(u, buildingSegment) || ""), "innerHTML");
                 if (typeof u.description === "function") {
                     view.updateVal(`base_${buildingSegment}_desc_${slug}`, u.description(), "innerHTML");
@@ -1437,6 +1451,9 @@ let view = {
                 view.updateVal(`base_foxDen_extra_${uk}`, `${resortData.getConstructionPercent(site)}% delivered`);
             } else {
                 view.updateVal(`base_foxDen_extra_${uk}`, "");
+            }
+            if (typeof automation !== "undefined" && automation.buildingControlIds) {
+                view.syncPaperAutobuyControl(automation.buildingControlIds(uk), automation.buildingShowsControl(uk), automation.getBuildingSetting(uk), automation.buildingDimmed(uk));
             }
         }
         const queueCount = engine.getFoxDenQueuedJobCount();
@@ -2180,17 +2197,7 @@ let view = {
         if (reviewPausedChk && reviewPausedChk.checked !== !!g.autoWeaveIncludePausedWeaves) {
             reviewPausedChk.checked = !!g.autoWeaveIncludePausedWeaves;
         }
-        view.updateVal("gardenManaReserve_row", g.arrangementOfManaReserveUnlocked ? "" : "none", "style.display");
-        const reserveChk = viewData.cached.gardenManaReserve_chk;
-        if (reserveChk && reserveChk.checked !== !!g.reserveCloneManaForAutobuy) {
-            reserveChk.checked = !!g.reserveCloneManaForAutobuy;
-        }
-        if (g.arrangementOfManaReserveUnlocked) {
-            const reserved = (typeof bonfire !== "undefined" && bonfire.getCreateClonePlan)
-                ? bonfire.getCreateClonePlan().manaCost
-                : 0;
-            view.updateVal("gardenManaReserve_label", `Don't count mana equal to the current clone's cost for mana autobuy (${formatNumber(reserved)} mana)`);
-        }
+        view.syncCloneManaReserveCheckbox();
         t.refreshOrderedPurchasables("garden", resortData.buildings.garden.upgradesOrder, { hideMaxed: t.hideMaxed });
     },
 
@@ -2695,6 +2702,7 @@ let view = {
         const rate = engine.getEffectiveManaRatePerSecond();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
         view.updateVal("manaFill", `${pct}%`, "style.width");
+        view.updateVal("manaProgressTrack", cap > 0 && amount >= cap ? "#33ccff" : "", "style.borderColor");
         view.updateVal("manaAmount", amount, "textContent", "floor");
         view.updateVal("manaCap", cap, "textContent", "manaCap");
         view.updateVal("manaRate", round1Fixed(rate), "textContent");
@@ -2720,6 +2728,7 @@ let view = {
         const rate = engine.getShrineDivinityRate();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
         view.updateVal("divinityFill", `${pct}%`, "style.width");
+        view.updateVal("divinityProgressTrack", cap > 0 && amount >= cap ? "#ffe14a" : "", "style.borderColor");
         view.updateVal("divinityAmount", amount, "textContent", "floor");
         view.updateVal("divinityCap", cap, "textContent", "floor");
         view.updateVal("divinityRate", round1Fixed(rate), "textContent");
@@ -6233,7 +6242,9 @@ let view = {
         view.updateVal("legendCurrentStars", stars < req, "classList.toggle", "legend-current-stars--short");
         view.updateVal("legendStarWarning", stars >= req ? "none" : "", "style.display");
         view.updateVal("legendWipWarning", hasNext ? "none" : "", "style.display");
-        view.updateVal("legendPaperKeepNew", data.progress.hidePaperPrestigeNew ? "none" : "", "style.display");
+        const showPaperKeep = engine.isCrushPaperBought();
+        view.updateVal("legendPaperKeep_row", showPaperKeep ? "" : "none", "style.display");
+        view.updateVal("legendPaperKeepNew", showPaperKeep && !data.progress.hidePaperPrestigeNew ? "" : "none", "style.display");
         const gain = (typeof engine.getCombatPrestigeMaxDivinityGain === "function")
             ? engine.getCombatPrestigeMaxDivinityGain()
             : 0;
@@ -6335,9 +6346,99 @@ let view = {
     updatePrestigeTab: function() {
         view.updateShrineClassControls();
     },
+    syncCloneManaReserveCheckbox: function() {
+        const g = data.progress.base && data.progress.base.garden;
+        const on = !!(g && g.reserveCloneManaForAutobuy);
+        const reserved = (typeof bonfire !== "undefined" && bonfire.getCreateClonePlan)
+            ? (bonfire.getCreateClonePlan().manaCost || 0)
+            : 0;
+        const label = `Don't count mana equal to the current clone's cost for mana autobuy (${formatNumber(reserved)} mana)`;
+        view.updateVal("gardenManaReserve_row", g && g.arrangementOfManaReserveUnlocked ? "" : "none", "style.display");
+        const reserveChk = viewData.cached.gardenManaReserve_chk;
+        if (reserveChk && reserveChk.checked !== on) {
+            reserveChk.checked = on;
+        }
+        if (g && g.arrangementOfManaReserveUnlocked) {
+            view.updateVal("gardenManaReserve_label", label);
+        }
+        const autoChk = viewData.cached.automationManaReserve_chk;
+        if (autoChk && autoChk.checked !== on) {
+            autoChk.checked = on;
+        }
+        if (viewData.cached.automationManaReserve_label) {
+            view.updateVal("automationManaReserve_label", label);
+        }
+    },
+    syncPaperAutobuyControl: function(ids, show, setting, dimmed) {
+        if (!ids || !viewData.cached[ids.row]) {
+            return;
+        }
+        view.updateVal(ids.row, show ? "" : "none", "style.display");
+        const chk = viewData.cached[ids.chk];
+        if (chk && chk.checked !== !!setting.on) {
+            chk.checked = !!setting.on;
+        }
+        const pct = setting.pct;
+        const r10 = viewData.cached[ids.r10];
+        const r50 = viewData.cached[ids.r50];
+        const r100 = viewData.cached[ids.r100];
+        if (r10) {
+            r10.checked = pct === 10;
+        }
+        if (r50) {
+            r50.checked = pct === 50;
+        }
+        if (r100) {
+            r100.checked = pct === 100;
+        }
+        view.updateVal(ids.row, !!dimmed, "classList.toggle", "paper-autobuy-controls--dim");
+    },
+    updateAutomationTab: function() {
+        if (typeof automation === "undefined") {
+            return;
+        }
+        const state = automation.ensure();
+        const enabledChk = viewData.cached.automationEnabled_chk;
+        if (enabledChk && enabledChk.checked !== !!state.enabled) {
+            enabledChk.checked = !!state.enabled;
+        }
+        const paperAmt = (data.progress && data.progress.paper) || 0;
+        const paperText = Math.abs(paperAmt - Math.floor(paperAmt)) < 1e-6
+            ? intToStringRound(paperAmt)
+            : intToString(paperAmt, 3);
+        view.updateVal("automationPaperText", paperText);
+        view.updateVal("automationNextText", automation.statusText());
+        view.syncCloneManaReserveCheckbox();
+        const list = resortData.automationResources || [];
+        const ownedWhole = Math.floor(paperAmt);
+        for (let i = 0; i < list.length; i++) {
+            const spec = list[i];
+            const key = spec.key;
+            const input = viewData.cached["automationInput_" + key];
+            if (input) {
+                const max = String(Math.max(0, ownedWhole));
+                if (input.max !== max) {
+                    input.max = max;
+                }
+            }
+            view.updateVal("automationInvested_" + key, automation.formatAmount(state.invested[key] || 0));
+            const level = state.level[key] || 0;
+            const btnId = "automationLevelBtn_" + key;
+            if (level >= 10) {
+                view.updateVal(btnId, "Use +10% more of current resources for autobuy", "innerHTML");
+                view.updateVal(btnId, true, "disabled");
+            } else {
+                const cost = automation.levelCost(key);
+                const costHtml = resortData.formatCostAmountHtml(cost, "paper", "paper");
+                view.updateVal(btnId, "Use +10% more of current resources for autobuy " + costHtml, "innerHTML");
+                view.updateVal(btnId, paperAmt < cost, "disabled");
+            }
+            view.updateVal("automationLimits_" + key, "Use up to " + automation.xOf(key) + "% of " + spec.name + ", at most " + automation.formatAmount(automation.yOf(key)));
+        }
+    },
     updateTabButtons: function(activeTab) {
         const tabs = events.mainMenuTabOrder();
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "automation", "options"];
         const notify = data.progress.baseContentNotify;
         for (let i = 0; i < allTabs.length; i++) {
             const tabKey = allTabs[i];

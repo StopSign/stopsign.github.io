@@ -128,6 +128,7 @@ let events = {
                     }
                 }
             }
+            events.insertAutomationTab(preTabs);
             return preTabs;
         }
         const tabs = ["base", "stats", "skills", "travel", "history", "options"];
@@ -151,7 +152,17 @@ let events = {
                 }
             }
         }
+        events.insertAutomationTab(tabs);
         return tabs;
+    },
+    insertAutomationTab: function(tabs) {
+        if (typeof engine === "undefined" || !engine.isCrushPaperBought || !engine.isCrushPaperBought()) {
+            return;
+        }
+        const optIx = tabs.indexOf("options");
+        if (optIx >= 0 && tabs.indexOf("automation") < 0) {
+            tabs.splice(optIx, 0, "automation");
+        }
     },
     switchTab: function(tabKey) {
         const validTabs = events.mainMenuTabOrder();
@@ -1932,6 +1943,63 @@ let events = {
             return;
         }
         up.setAutobuyChecked(!!checked);
+    },
+    automationSetEnabled: function(checked) {
+        const state = automation.ensure();
+        state.enabled = !!checked;
+    },
+    automationSanitizePaperInput: function(el) {
+        if (!el) {
+            return;
+        }
+        const digits = String(el.value || "").replace(/[^\d]/g, "");
+        if (el.value !== digits) {
+            el.value = digits;
+        }
+    },
+    automationAddPaper: function(key) {
+        const input = viewData.cached["automationInput_" + key];
+        automation.addPaper(key, input ? input.value : 0);
+        if (input) {
+            input.value = "";
+        }
+        if (view.updateAutomationTab) {
+            view.updateAutomationTab();
+        }
+    },
+    automationSetPaperPercent: function(key, pct) {
+        const input = viewData.cached["automationInput_" + key];
+        if (!input) {
+            return;
+        }
+        const paper = (data.progress && data.progress.paper) || 0;
+        const cap = Math.floor(paper);
+        let value = pct >= 100 ? cap : Math.ceil(paper * 0.5);
+        if (value > cap) {
+            value = cap;
+        }
+        if (value < 0) {
+            value = 0;
+        }
+        input.value = value > 0 ? String(value) : "";
+    },
+    automationBuyLevel: function(key) {
+        automation.buyLevel(key);
+        if (view.updateAutomationTab) {
+            view.updateAutomationTab();
+        }
+    },
+    automationSetUpgradeChecked: function(scopeKey, upgradeKey, checked) {
+        automation.setUpgradeSetting(scopeKey, upgradeKey, { on: !!checked });
+    },
+    automationSetUpgradeRate: function(scopeKey, upgradeKey, pct) {
+        automation.setUpgradeSetting(scopeKey, upgradeKey, { pct: pct });
+    },
+    automationSetBuildingChecked: function(unlockKey, checked) {
+        automation.setBuildingSetting(unlockKey, { on: !!checked });
+    },
+    automationSetBuildingRate: function(unlockKey, pct) {
+        automation.setBuildingSetting(unlockKey, { pct: pct });
     },
     goToOkamiAssignment: function(e) {
         if (e && typeof e.stopPropagation === "function") {

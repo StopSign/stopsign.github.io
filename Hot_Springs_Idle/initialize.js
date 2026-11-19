@@ -606,6 +606,9 @@ let initials = {
             divinityCapReduced50k: true,
             essenceMade: 0,
             paper: 0,
+            automation: (typeof automation !== "undefined" && automation.defaultState)
+                ? automation.defaultState()
+                : { enabled: true, invested: {}, level: {}, upgrades: {}, buildings: {} },
             manaCapacityBonusPerCombatStart: resortData.manaCapacityBonusPerCloneDispersal,
             stars: {
                 bronze: 0,

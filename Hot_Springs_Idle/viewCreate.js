@@ -20,6 +20,7 @@ let createView = {
         createView.createIntruderAttackGfxElements();
         createView.createWaveInfoStructure();
         createView.createBaseInfoElements();
+        createView.createAutomationPane();
         createView.createTravelElements();
         createView.createInfoButtons();
         createView.showCurrentTab();
@@ -30,11 +31,12 @@ let createView = {
      * Adds a ? info button to the top-right of the element with the given id.
      * Click opens a panel with htmlText; the next click anywhere closes it.
      * Optional x sets the CSS right offset in px (default 4).
-     * If htmlText is a function, it is called whenever the panel opens and when
-     * createView.refreshInfoButtonPanel(id) runs while open.
+     * If htmlText is a function, it is called when the panel opens. The open panel
+     * keeps that text until it is closed and opened again.
      * contentKeys is a string, an array, or a function returning those. Each key
      * currently returned is unread until the panel is open. Newly returned keys
      * flash the button again. Changing numbers inside existing text does not.
+     * Keys that appear while the panel is open stay unread until the next open.
      */
     normalizeInfoContentKeys: function(contentKeys) {
         let keys = contentKeys;
@@ -70,12 +72,14 @@ let createView = {
         }
         return null;
     },
-    acknowledgeInfoButton: function(wrap) {
+    acknowledgeInfoButton: function(wrap, keysOverride) {
         if (!wrap || !wrap.dataset.infoButtonFor) {
             return;
         }
         const id = wrap.dataset.infoButtonFor;
-        const keys = wrap._infoResolveKeys ? wrap._infoResolveKeys() : ["base"];
+        const keys = Array.isArray(keysOverride)
+            ? keysOverride
+            : (wrap._infoResolveKeys ? wrap._infoResolveKeys() : ["base"]);
         const store = createView.ensureInfoButtonSeenStore();
         if (!store[id] || typeof store[id] !== "object" || Array.isArray(store[id])) {
             store[id] = {};
@@ -190,17 +194,18 @@ let createView = {
             e.preventDefault();
             e.stopPropagation();
             if (wrap.classList.contains("info-button-open")) {
-                createView.acknowledgeInfoButton(wrap);
+                createView.acknowledgeInfoButton(wrap, wrap._infoOpenKeys);
                 closePanel();
                 createView.applyInfoButtonUnread(wrap);
                 return;
             }
             panel.innerHTML = resolveHtml();
+            wrap._infoOpenKeys = resolveKeys().slice();
             document.body.appendChild(panel);
             panel.classList.add("info-button-open");
             wrap.classList.add("info-button-open");
             createView.positionInfoButtonPanel(wrap);
-            createView.acknowledgeInfoButton(wrap);
+            createView.acknowledgeInfoButton(wrap, wrap._infoOpenKeys);
             createView.applyInfoButtonUnread(wrap);
             window.addEventListener("scroll", onScroll, true);
             window.addEventListener("resize", onScroll);
@@ -220,10 +225,8 @@ let createView = {
         if (!wrap) {
             return;
         }
-        if (wrap.classList.contains("info-button-open") && wrap._infoResolveHtml && wrap._infoPanel) {
-            wrap._infoPanel.innerHTML = wrap._infoResolveHtml();
-            createView.positionInfoButtonPanel(wrap);
-            createView.acknowledgeInfoButton(wrap);
+        if (wrap.classList.contains("info-button-open")) {
+            return;
         }
         createView.applyInfoButtonUnread(wrap);
     },
@@ -850,7 +853,10 @@ let createView = {
                 const label = bdef && bdef.label ? bdef.label : k;
                 const rowId = resortData.idRow("foxDen", k);
                 const btnId = resortData.idBtn("foxDen", k);
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="base-upgrade-name">${label}</div><div class="muted-text base-skill-short">${resortData.insertResourceIcons(desc)}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Plan to build</button></div>`;
+                const paperHtml = (typeof automation !== "undefined" && automation.buildingControlsHtml) ? automation.buildingControlsHtml(k) : "";
+                const nameClass = paperHtml ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
+                const nameInner = paperHtml ? `<span class="base-upgrade-name-label">${label}</span>${paperHtml}` : label;
+                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="${nameClass}">${nameInner}</div><div class="muted-text base-skill-short">${resortData.insertResourceIcons(desc)}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Plan to build</button></div>`;
             }
             return h;
         };
@@ -949,13 +955,16 @@ let createView = {
                 const extraId = resortData.idExtra(scopeKey, slug);
                 const descId = `base_${scopeKey}_desc_${slug}`;
                 const descText = typeof ud.description === "function" ? ud.description() : (ud.description || "");
+                const paperHtml = (typeof automation !== "undefined" && automation.upgradeControlsHtml) ? automation.upgradeControlsHtml(scopeKey, pk) : "";
                 let nameHtml = ud.name || "";
                 if (ud.autobuy) {
                     const autoRowId = `base_${scopeKey}_autobuy_${slug}_row`;
                     const autoChkId = `base_${scopeKey}_autobuy_${slug}_chk`;
-                    nameHtml = `<span class="base-upgrade-name-label">${ud.name || ""}</span><label id="${autoRowId}" class="upgrade-autobuy-label" style="display:none"><input type="checkbox" id="${autoChkId}" onchange="events.toggleUpgradeAutobuy('${scopeKey}','${pk}', this.checked)"> Autobuy</label>`;
+                    nameHtml = `<span class="base-upgrade-name-label">${ud.name || ""}</span><label id="${autoRowId}" class="upgrade-autobuy-label" style="display:none"><input type="checkbox" id="${autoChkId}" onchange="events.toggleUpgradeAutobuy('${scopeKey}','${pk}', this.checked)"> Autobuy</label>${paperHtml}`;
+                } else if (paperHtml) {
+                    nameHtml = `<span class="base-upgrade-name-label">${ud.name || ""}</span>${paperHtml}`;
                 }
-                const nameClass = ud.autobuy ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
+                const nameClass = (ud.autobuy || paperHtml) ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
                 h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="${nameClass}">${nameHtml}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
             }
             return h;
@@ -1266,7 +1275,7 @@ let createView = {
                                 <li>Keep Tips on skills</li>
                                 <li>Keep Legend progress and the Legend Penalty</li>
                                 <li>Keep card bonuses and packs</li>
-                                <li>Keep Paper (Create Paper's power cost resets) <span id="legendPaperKeepNew" class="legend-reset-new">(New!)</span></li>
+                                <li id="legendPaperKeep_row">Keep Paper (Create Paper's power cost resets) <span id="legendPaperKeepNew" class="legend-reset-new">(New!)</span></li>
                             </ul>
                         </div>
                         <div class="legend-reset-col">
@@ -1387,7 +1396,7 @@ let createView = {
             }
             return h;
         };
-        const htmlMarketHaulToggles = function() {
+        const htmlMarketHaulToggles = function(hardwoodLine) {
             const credit = resortData.resourceIconHtml("credit");
             const order = resortData.marketHaulResourceOrder || [];
             const rates = resortData.marketCreditPerResource || {};
@@ -1395,10 +1404,12 @@ let createView = {
             let h = "";
             for (let hi = 0; hi < order.length; hi++) {
                 const key = order[hi];
+                if (hardwoodLine ? key !== "hardwood" : key === "hardwood") {
+                    continue;
+                }
                 const idKey = key.charAt(0).toUpperCase() + key.slice(1);
                 const name = names[key] || key;
-                const wrapId = key === "hardwood" ? ` id="marketAllowHardwood_wrap"` : "";
-                h += `<label${wrapId}><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (<span id="marketHaulCredit_${key}">${rates[key] || 0}</span> ${credit}) <span id="marketHaulKeep_${key}_wrap" style="display:none">Keep: <input type="number" id="marketHaulKeep_${key}" class="market-trade-threshold" min="0" step="1" value="0" onchange="events.setMarketHaulKeep('${key}', this.value)"></span></label> `;
+                h += `<label><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (<span id="marketHaulCredit_${key}">${rates[key] || 0}</span> ${credit}) <span id="marketHaulKeep_${key}_wrap" style="display:none">Keep: <input type="number" id="marketHaulKeep_${key}" class="market-trade-threshold" min="0" step="1" value="0" onchange="events.setMarketHaulKeep('${key}', this.value)"></span></label> `;
             }
             return h;
         };
@@ -1415,8 +1426,9 @@ let createView = {
                     <label id="marketRepeatExchange_row" style="display:none"><input type="checkbox" id="marketRepeatExchange_chk" onchange="events.toggleMarketRepeatExchange(this.checked)"> Repeat when ready</label>
                 </div>
                 <div class="base-row">Allow resources:
-                    ${htmlMarketHaulToggles()}
+                    ${htmlMarketHaulToggles(false)}
                 </div>
+                <div class="base-row" id="marketAllowHardwood_wrap">${htmlMarketHaulToggles(true)}</div>
                 ${resortUpgradeRowsHtml("market")}
                 <div class="base-upgrade-divider"></div>
                 <div class="base-info-title">Market Resources</div>
@@ -2372,8 +2384,27 @@ let createView = {
         const innerH = gd.battlefieldHeightPx;
         battlefield.style.height = `${innerH + 2}px`;
     },
+    createAutomationPane: function() {
+        const root = document.getElementById("tabPane_automation");
+        if (!root || typeof automation === "undefined" || typeof resortData === "undefined") {
+            return;
+        }
+        const list = resortData.automationResources || [];
+        let rows = "";
+        for (let i = 0; i < list.length; i++) {
+            const spec = list[i];
+            const key = spec.key;
+            const manaReserve = key === "mana"
+                ? `<label class="automation-resource-line"><input type="checkbox" id="automationManaReserve_chk" onchange="events.toggleGardenReserveCloneMana(this.checked)"> <span id="automationManaReserve_label">Don't count mana equal to the current clone's cost for mana autobuy</span></label>`
+                : "";
+            rows += `<div class="automation-resource"><div><strong>${spec.name}</strong> <span class="muted-text">x${spec.multiplier}</span></div><div class="automation-resource-line"><input type="number" id="automationInput_${key}" class="automation-paper-input" min="1" step="1" oninput="events.automationSanitizePaperInput(this)"><button type="button" class="tab-button" onclick="events.automationAddPaper('${key}')">Add paper</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 50)">50%</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 100)">100%</button><span>Paper added: <span id="automationInvested_${key}">0</span></span></div><div class="automation-resource-line"><button type="button" class="tab-button" id="automationLevelBtn_${key}" onclick="events.automationBuyLevel('${key}')"></button></div><div id="automationLimits_${key}" class="muted-text"></div>${manaReserve}</div>`;
+            createView.queueCache("automationInput_" + key, "automationInvested_" + key, "automationLevelBtn_" + key, "automationLimits_" + key);
+        }
+        root.innerHTML = `<div class="pane-title">Automation</div><label class="options-row"><input type="checkbox" id="automationEnabled_chk" checked onchange="events.automationSetEnabled(this.checked)"> Autobuy</label><div class="base-row">${resortData.resourceIconHtml("paper")} Paper: <span id="automationPaperText">0</span></div><div id="automationNextText" class="muted-text"></div>${rows}`;
+        createView.queueCache("automationEnabled_chk", "automationPaperText", "automationNextText", "automationManaReserve_chk", "automationManaReserve_label");
+    },
     showCurrentTab: function() {
-        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "options"];
+        const allTabs = ["base", "guests", "leveling", "stats", "skills", "travel", "history", "cardBonuses", "prestige", "automation", "options"];
         const tabs = events.mainMenuTabOrder();
         const requestedTab = data.battle.currentTab || "base";
         const tab = tabs.indexOf(requestedTab) >= 0 ? requestedTab : "base";
@@ -2396,13 +2427,13 @@ let createView = {
         //uses createView.queueCache("<element ID>") for elements created in index.html
 
         createView.queueCache(
-            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "resourceProgressRow", "manaProgressBar", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
-            "divinityProgressBar", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
+            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "resourceProgressRow", "manaProgressBar", "manaProgressTrack", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
+            "divinityProgressBar", "divinityProgressTrack", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
             "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerTokenBarrierLayer", "playerTokenBarrierFill", "playerStatCloutLine", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
             "playerClassBarA", "playerClassBarALabel", "playerClassBarAFill", "playerClassBarB", "playerClassBarBLabel", "playerClassBarBFill",
             "playerLevelBar", "playerLevelBarFill", "playerLevelBarLabel",
-            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "deathAutoRetry_row", "deathAutoRetry_chk", "deathStartWithFullMana_row", "deathStartWithFullMana_chk", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
+            "playerBattleHudSecondary", "deathOverlay", "deathTitle", "deathManaBonus", "deathSummary", "deathTalentDetails", "tryAgainButton", "deathAutoRetry_row", "deathAutoRetry_chk", "deathStartWithFullMana_row", "deathStartWithFullMana_chk", "menuContent", "menuColumn", "battleColumn", "tabButton_base", "tabButton_guests", "tabButton_leveling", "tabButton_stats", "tabButton_skills", "tabButton_travel", "tabButton_history", "tabButton_cardBonuses", "tabButton_prestige", "tabButton_automation", "tabButton_options", "cardBonusesList", "cardBonusesEmpty",
             "cardsSubTab_get", "cardsSubTab_bonuses", "cardsPane_get", "cardsPane_bonuses", "shrineBuyCardBtn", "shrineBuyCardOdds", "shrineOpenPacksBtn", "shrineClassDebugBlock",
             "okamiTailLabel", "okamiLevelText", "okamiExpText", "okamiExpFill", "okamiSpiritStrands", "okamiSpiritStrandsNext", "okamiStateDisplay", "okamiInspirationBonus",
             "baseCoinsText", "baseStarBeadsText", "baseEssenceText", "basePaneTitleEssence", "basePaneTitlePaper", "basePaperText", "basePaneTitleStarBeads", "basePaneTitleCoins", "baseWorkersAssigned", "baseWorkersFound", "baseBuyableWrap", "baseBuyableCount", "baseBuyableTooltipList", "baseBuildingInfo", "baseBuildingInfoScroll", "baseBuildingInfoWorkerDock", "guestsList",
@@ -2430,7 +2461,7 @@ let createView = {
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
             "toriiVisitorsWaiting", "toriiVisitorsMax", "toriiNextVisitor", "toriiAvgVisitorArrival", "toriiNextVisitorProgressWrap", "toriiNextVisitorProgressFill", "toriiWater_row", "toriiWaterFill", "toriiWaterText", "toriiWaterRequire", "toriiAllowCarriersWater_row", "toriiAllowCarriersWater_chk", "okamiInspirationHint",
-            "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10", "bonusSpeedLabel", "bonusSpeedRemaining", "bonusSpeed_x2",
+            "debugSpeedPanel", "debugSpeed_x3", "debugSpeed_x10", "debugSpeed_x50", "bonusSpeedLabel", "bonusSpeedRemaining", "bonusSpeed_x2",
             "offlineProcessingOverlay", "offlineProcessingLabel", "offlineProcessingFill", "offlineProcessingEta", "offlineProcessingSummary", "offlineProcessingDismiss",
             "innRoomsAvailable", "innRoomsOccupied", "innRestfulnessPerSecond", "innInfoTitle", "innHotWater_row", "innHotWaterFill", "innHotWaterText", "innHotWaterRequire", "innAllowCarriersWater_row", "innAllowCarriersWater_chk", "innSoap_row", "innSoapText", "innTowels_row", "innTowelsText", "innOnsenSoak_row", "innMapLabelText", "innGuestsVisitPond_row",
             "innManaRow", "innFillMana_btn", "innManaProgressWrap", "innManaFill", "innManaAmount", "innManaCap",
@@ -2487,7 +2518,7 @@ let createView = {
             "base_bonfire_clone_btn", "base_bonfire_clone_prefix", "base_bonfire_mana_cost", "bonfireCloneSettings_row", "bonfireCloneSettings_map", "bonfireCloneSettings_density",
             "bonfireApplyLiveSettings_row", "bonfireApplyLiveSettings_chk",
             "shrineClassSelectRow", "shrineClassRow", "shrineMoveMountainRow", "shrineMoveConfirm_chk", "shrineMoveMountainBtn", "shrineClassDemoNote",
-            "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPaperKeepNew", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
+            "legendResetExplain", "legendRequirementText", "legendRequirementPrefix", "legendCurrentStars", "legendStarWarning", "legendWipWarning", "legendPaperKeep_row", "legendPaperKeepNew", "legendPenalty_row", "legendMaxDivinityGain", "legendMaxDivinityGainValue", "legendList",
             "shrineKarmaRateText", "shrineKarmaKitsuneMult", "shrineDivinityMultText", "shrineDivinityRateText",
             "prayerWorkersTotal", "prayerPerWorker",
             "shrineExpProgressWrap", "shrineExpFill", "shrineLevelText", "shrineExpText", "shrineExpToLevelText", "shrineExpEtaText",
@@ -2710,6 +2741,10 @@ let createView = {
                         `base_${rbk}_autobuy_${rslug}_chk`
                     );
                 }
+                if (typeof automation !== "undefined" && automation.upgradeHasControls && automation.upgradeHasControls(rbk, rpk)) {
+                    const paperIds = automation.upgradeControlIds(rbk, rpk);
+                    createView.queueCache(paperIds.row, paperIds.chk, paperIds.r10, paperIds.r50, paperIds.r100);
+                }
             }
         }
         for (let bi = 0; bi < 25; bi++) {
@@ -2725,6 +2760,10 @@ let createView = {
         for (let tui = 0; tui < resortData.getFoxDenUnlockOrder().length; tui++) {
             const kx = resortData.getFoxDenUnlockOrder()[tui];
             createView.queueCache(`base_foxDen_extra_${kx}`, resortData.idRow("foxDen", kx), resortData.idBtn("foxDen", kx));
+            if (typeof automation !== "undefined" && automation.buildingHasControls && automation.buildingHasControls(kx)) {
+                const buildIds = automation.buildingControlIds(kx);
+                createView.queueCache(buildIds.row, buildIds.chk, buildIds.r10, buildIds.r50, buildIds.r100);
+            }
         }
         for (let bi = 0; bi < BATTLE_BUFF_KEYS.length; bi++) {
             const bk = BATTLE_BUFF_KEYS[bi];
@@ -2911,7 +2950,7 @@ let createView = {
     ensureTabNotifyBadges: function() {
         const tabLabels = {
             base: "Resort", guests: "Guests", leveling: "Leveling", stats: "Stats",
-            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Cards", prestige: "Prestige", options: "Options"
+            skills: "Skills", travel: "Travel", history: "History", cardBonuses: "Cards", prestige: "Prestige", automation: "Automation", options: "Options"
         };
         for (const tabKey in tabLabels) {
             const btnId = "tabButton_" + tabKey;

@@ -1017,6 +1017,9 @@ let offline = {
         }
 
         isProcessingOffline = true;
+        if (typeof automation !== "undefined" && automation.resetOfflineCounter) {
+            automation.resetOfflineCounter();
+        }
         data.gameSettings.stopAll = true;
         // Process as if unpaused regardless of save pause state.
         const prevStop = !!data.gameSettings.stop;

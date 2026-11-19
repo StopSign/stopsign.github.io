@@ -551,6 +551,8 @@ let engine = {
         const bonusTime = (data.currentGameState && data.currentGameState.bonusTime) || 0;
         const secondsPlayedTotal = typeof progress.secondsPlayedTotal === "number" ? progress.secondsPlayedTotal : 0;
         const keptPaper = Math.max(0, progress.paper || 0);
+        const hidePaperPrestigeNew = !!progress.hidePaperPrestigeNew || engine.isCrushPaperBought();
+        const keptAutomation = progress.automation ? structuredClone(progress.automation) : null;
 
         data.progress = initials.progress();
         data.battle = initials.battle();
@@ -578,7 +580,10 @@ let engine = {
         data.progress.secondsThisResort = 0;
         data.progress.secondsPlayedTotal = secondsPlayedTotal;
         data.progress.paper = keptPaper;
-        data.progress.hidePaperPrestigeNew = true;
+        if (keptAutomation) {
+            data.progress.automation = keptAutomation;
+        }
+        data.progress.hidePaperPrestigeNew = hidePaperPrestigeNew;
         data.progress.prestigeRunCards = { milestone: [], bought: [] };
         data.progress.prestigeRunPacks = { milestone: 0, bought: 0 };
 
