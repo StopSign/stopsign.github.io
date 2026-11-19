@@ -1441,9 +1441,9 @@ const SKILL_DEFINITION_ROWS = [
         category: "combat",
         slotCategory: "defense",
         flavorText: "\"A crowd is just a very clingy shield.\"",
-        shortDescription: "Gain Clout from nearby intruders when taking damage.",
+        shortDescription: "Gain Clout from nearby intruders when Audacity is reduced.",
         rewardText: function(sk) {
-            return `Reward: +1.5 (+0.25 per skill level) Clout when you are damaged, per intruder closer than 200 ft.`;
+            return `Reward: +1.5 (+0.25 per skill level) Clout when your Audacity is reduced, per intruder closer than 200 ft.`;
         },
         getEffect: function(sk) {
             return { cloutPerCloseEnemy: 1.5 + (sk.level || 0) * 0.25 };

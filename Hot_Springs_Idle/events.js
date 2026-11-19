@@ -438,7 +438,7 @@ let events = {
         createView.updateLayoutMeasurements();
     },
     setSkillListSort: function(mode) {
-        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha" && mode !== "tips" && mode !== "grouping") {
+        if (mode !== "oldest" && mode !== "talent" && mode !== "alpha" && mode !== "tips" && mode !== "grouping" && mode !== "unequipped") {
             return;
         }
         data.progress.skillListSort = mode;
@@ -2055,38 +2055,23 @@ let events = {
             view.updateSpiritInfo();
             view.updateResortMapTokens();
         };
-        if (!selected) {
-            if (occupant) {
-                data.progress.selectedSpiritId = occupant.id;
-                refresh();
+        if (occupant) {
+            const alreadySelected = selected && occupant.id === selected.id
+                && (selected.location || "") === "spiritTraining" && (selected.slot || 0) === 0
+                && (data.progress.selectedResortInfoType || "") === "spirit";
+            if (alreadySelected) {
+                events.clearBaseBuildingSelection();
+                view.updateResortMapTokens();
+                return;
             }
-            return;
-        }
-        const isSameSlot = (selected.location || "") === "spiritTraining" && (selected.slot || 0) === 0;
-        if (isSameSlot && occupant && occupant.id === selected.id
-            && (data.progress.selectedResortInfoType || "") === "spirit") {
-            events.clearBaseBuildingSelection();
-            view.updateResortMapTokens();
-            return;
-        }
-        if (isSameSlot) {
+            data.progress.selectedSpiritId = occupant.id;
             refresh();
             return;
         }
-        if (!occupant) {
+        if (selected) {
             engine.moveSelectedSpiritTo("spiritTraining", 0);
             refresh();
-            return;
         }
-        if (occupant.id === selected.id) {
-            refresh();
-            return;
-        }
-        if (occupant.kind !== selected.kind) {
-            return;
-        }
-        engine.moveSelectedSpiritTo("spiritTraining", 0);
-        refresh();
     },
     clickSpiritSlot: function(kind, location, slotIndex) {
         if (events.consumeSpiritDragClickSuppress()) {
@@ -2401,6 +2386,7 @@ let events = {
             : resourceType === "wood" ? "allowWood"
             : resourceType === "hardwood" ? "allowHardwood"
             : resourceType === "bars" ? "allowBars"
+            : resourceType === "limestone" ? "allowLimestone"
             : null;
         if (!field) {
             return;
@@ -2510,6 +2496,12 @@ let events = {
             cistern.waterSpiritsUsePathSpeed = !!checked;
         }
     },
+    toggleCisternIdleWorkerNotify: function(checked) {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        if (cistern) {
+            cistern.showIdleWorkerNotify = !!checked;
+        }
+    },
     setFireLauncherTargetMode: function(mode) {
         const key = data.progress.selectedFireLauncherKey;
         if (!key) {
@@ -2554,7 +2546,7 @@ let events = {
         if (priority !== "stone" && priority !== "ore" && priority !== "limestone") {
             return;
         }
-        if (priority === "limestone" && !engine.isSearchForLimestoneBought()) {
+        if (priority === "limestone" && !engine.isTeachSpiritsToSortStoneBought()) {
             return;
         }
         spirit.resourcePriority = priority;
@@ -2742,6 +2734,12 @@ let events = {
         const shrine = data.progress.base && data.progress.base.shrine;
         if (shrine) {
             shrine.mapTourEndOnLastGold = !!checked;
+        }
+    },
+    setMapTourUseMaxDensity: function(checked) {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine) {
+            shrine.mapTourUseMaxDensity = !!checked;
         }
     },
     goToBonfire: function() {

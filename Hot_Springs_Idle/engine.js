@@ -1244,7 +1244,7 @@ let engine = {
                             engine.addOutrage(outrageAmt);
                         }
                     }
-                    if (skills.isSkillUnlocked("socialArmor")) {
+                    if (audLost > 0 && skills.isSkillUnlocked("socialArmor")) {
                         const closeCount = engine.countVisibleIntrudersCloserThan(200);
                         if (closeCount > 0) {
                             const saEff = skills.getSkillEffect("socialArmor");
@@ -1405,6 +1405,55 @@ let engine = {
     isMapTourEndOnLastGold: function() {
         return engine.isMapTourOptionOn("arrangementOfGoldenRestUnlocked", "mapTourEndOnLastGold");
     },
+    isMapTourUseMaxDensity: function() {
+        return engine.isMapTourOptionOn("arrangementOfFullPowerTourUnlocked", "mapTourUseMaxDensity");
+    },
+    prepareTourDensity: function() {
+        if (engine.isMapTourUseMaxDensity()) {
+            engine.applyTourMaxDensity();
+        } else {
+            engine.restoreTourCloneDensity();
+        }
+    },
+    applyTourMaxDensity: function() {
+        const tour = engine.ensureMapTour();
+        if (tour.densityOverrideActive) {
+            return;
+        }
+        const bf = data.progress.base.bonfire;
+        const max = bf.denseClonesUnlocked ? bonfire.getMaxCloneDensity() : 0;
+        const settings = data.battle && data.battle.cloneRunSettings;
+        tour.savedCloneDensity = bf.cloneDensity || 0;
+        tour.hadStoredCloneSettings = !!settings;
+        if (settings) {
+            tour.savedStoredDensity = settings.cloneDensity || 0;
+            tour.savedStoredManaCost = settings.manaCost !== undefined && settings.manaCost !== null
+                ? settings.manaCost
+                : bonfire.getCloneManaCostFromSnapshot(settings.cloneDensity);
+            settings.cloneDensity = max;
+            settings.manaCost = bonfire.getCloneManaCostFromSnapshot(max);
+        }
+        bf.cloneDensity = max;
+        tour.densityOverrideActive = true;
+    },
+    restoreTourCloneDensity: function() {
+        const tour = data.progress && data.progress.mapTour;
+        if (!tour || !tour.densityOverrideActive) {
+            return;
+        }
+        const bf = data.progress.base.bonfire;
+        bf.cloneDensity = tour.savedCloneDensity || 0;
+        const settings = data.battle && data.battle.cloneRunSettings;
+        if (settings) {
+            const density = tour.hadStoredCloneSettings ? (tour.savedStoredDensity || 0) : (tour.savedCloneDensity || 0);
+            const manaCost = tour.hadStoredCloneSettings && tour.savedStoredManaCost !== undefined && tour.savedStoredManaCost !== null
+                ? tour.savedStoredManaCost
+                : bonfire.getCloneManaCostFromSnapshot(density);
+            settings.cloneDensity = density;
+            settings.manaCost = manaCost;
+        }
+        tour.densityOverrideActive = false;
+    },
     mapHasGoldStar: function(mapKey) {
         const stars = data.progress.mapStars && data.progress.mapStars[mapKey];
         return !!(stars && stars.gold);
@@ -1563,6 +1612,7 @@ let engine = {
     },
     finishMapTour: function() {
         const tour = engine.ensureMapTour();
+        engine.restoreTourCloneDensity();
         const dest = engine.pickTourDestination();
         tour.active = false;
         tour.waitingForMana = false;
@@ -1599,6 +1649,7 @@ let engine = {
         tour.waitingForMana = false;
         tour.countdownSec = 0;
         tour.pendingMapKey = "";
+        engine.prepareTourDensity();
         if (data.battle && data.battle.state === "running") {
             engine.endCloneRun("dead", { skipRetry: true, tourHandoff: true });
         }
@@ -1615,6 +1666,7 @@ let engine = {
             tour.countdownSec = 0;
             tour.pendingMapKey = "";
             tour.returnMapKey = returnKey;
+            engine.restoreTourCloneDensity();
             return;
         }
         tour.active = true;
@@ -1622,6 +1674,7 @@ let engine = {
         tour.waitingForMana = false;
         tour.countdownSec = 0;
         tour.pendingMapKey = "";
+        engine.prepareTourDensity();
         if (data.battle && data.battle.state === "running") {
             engine.endCloneRun("dead", { skipRetry: true, tourHandoff: true });
         }
@@ -4249,9 +4302,10 @@ let engine = {
         const inn = data.progress.base && data.progress.base.inn;
         const base = inn ? (inn.restfulnessPerSecond || 1) : 1;
         const decoration = inn && inn.decorationBought ? inn.decorationBought : 0;
+        const statues = inn && inn.carveStatuesBought ? inn.carveStatuesBought : 0;
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().innRestfulnessPerSecFlat || 0) : 0;
-        return base + decoration * 0.5 + cardAdd;
+        return base + decoration * 0.5 + statues * 3 + cardAdd;
     },
     isInnGentleLightsUnlocked: function() {
         const inn = data.progress.base && data.progress.base.inn;
@@ -4557,7 +4611,8 @@ let engine = {
     getStoneDuplicatorIntervalMs: function() {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().stoneDupeSpeedAdd || 0) : 0;
-        return 10000 / (1 + cardAdd);
+        const baseMs = (data.progress.base.stonePile && data.progress.base.stonePile.cleanGlyphsBought) ? 5000 : 10000;
+        return baseMs / (1 + cardAdd);
     },
     updateStonePileDuplication: function(tickMs) {
         const pile = data.progress.base && data.progress.base.stonePile;
@@ -4603,6 +4658,11 @@ let engine = {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().starBeadAdd || 0) : 0;
         return 1 + cardAdd;
+    },
+    getLuckyWellStarBeadMultiplier: function() {
+        const cistern = data.progress.base && data.progress.base.cistern;
+        const n = (cistern && cistern.throwCoinsBought) || 0;
+        return Math.pow(1.1, n);
     },
     getVisitorRepetitionChance: function() {
         if (typeof shrineCards === "undefined" || !shrineCards.getAggregatedEffects) {
@@ -4661,7 +4721,7 @@ let engine = {
             }
             maxBeads *= (1 + maxSoakBonusAdd);
         }
-        const starMult = engine.getStarBeadCardMultiplier();
+        const starMult = engine.getStarBeadCardMultiplier() * engine.getLuckyWellStarBeadMultiplier();
         minBeads *= starMult;
         maxBeads *= starMult;
         return { min: minBeads, max: maxBeads };
@@ -5386,7 +5446,7 @@ let engine = {
                     } else if (guest.completedHotSoak) {
                         restfulness *= engine.getInnSoakBeadMultiplier(guest.usedSoap);
                     }
-                    restfulness *= engine.getStarBeadCardMultiplier();
+                    restfulness *= engine.getStarBeadCardMultiplier() * engine.getLuckyWellStarBeadMultiplier();
                     const beads = round2(restfulness);
                     if (beads > 0) {
                         data.progress.starBeads = round2((data.progress.starBeads || 0) + beads);
@@ -6328,7 +6388,7 @@ let engine = {
             return "stone";
         }
         const priority = spirit.resourcePriority;
-        if (priority === "limestone" && engine.isSearchForLimestoneBought()) {
+        if (priority === "limestone" && engine.isTeachSpiritsToSortStoneBought()) {
             return "limestone";
         }
         if (priority === "ore") {
@@ -6401,7 +6461,7 @@ let engine = {
         return {
             stone: (resources && resources.stone) || 0,
             ore: oreUnlocked ? ((resources && resources.ore) || 0) : 0,
-            limestone: (oreUnlocked && engine.isSearchForLimestoneBought()) ? ((resources && resources.limestone) || 0) : 0
+            limestone: (oreUnlocked && engine.isTeachSpiritsToSortStoneBought()) ? ((resources && resources.limestone) || 0) : 0
         };
     },
     canEarthSpiritLoadPebble: function(spirit) {
@@ -6486,7 +6546,7 @@ let engine = {
     formatEarthSpiritPebbleCarry: function(spirit) {
         const raw = engine.getEarthSpiritPebbleCarryAmount(spirit);
         const stone = engine.applyEchoedShelving(raw);
-        if (engine.isSearchForLimestoneBought()) {
+        if (engine.isTeachSpiritsToSortStoneBought()) {
             return stone + " stone / " + raw + " ore / " + raw + " limestone";
         }
         if (stone === raw) {
@@ -7621,7 +7681,7 @@ let engine = {
                             break;
                         }
                         atelier.ore -= toProcess;
-                        atelier.bars = (atelier.bars || 0) + toProcess;
+                        atelier.bars = (atelier.bars || 0) + engine.getForgeBarsFromOre(toProcess);
                         engine.grantSpiritExp(spirit, toProcess * 3);
                     }
                 }
@@ -9098,6 +9158,12 @@ let engine = {
         if ((c.bars || 0) > ((base.atelier && base.atelier.bars) || 0)) {
             missing.push("bars");
         }
+        if ((c.limestone || 0) > ((base.atelier && base.atelier.limestone) || 0)) {
+            missing.push("limestone");
+        }
+        if ((c.quicklime || 0) > ((base.atelier && base.atelier.quicklime) || 0)) {
+            missing.push("quicklime");
+        }
         if ((c.ore || 0) > ((base.atelier && base.atelier.ore) || 0)) {
             missing.push("ore");
         }
@@ -10274,7 +10340,7 @@ let engine = {
         if (resourceType === "stone") {
             return "stonePile";
         }
-        if (resourceType === "bars" || resourceType === "ore") {
+        if (resourceType === "bars" || resourceType === "ore" || resourceType === "limestone" || resourceType === "quicklime") {
             return "atelier";
         }
         if (resourceType === "ash") {
@@ -10385,6 +10451,12 @@ let engine = {
         if (resourceType === "bars") {
             return (base.atelier && base.atelier.bars) || 0;
         }
+        if (resourceType === "limestone") {
+            return (base.atelier && base.atelier.limestone) || 0;
+        }
+        if (resourceType === "quicklime") {
+            return (base.atelier && base.atelier.quicklime) || 0;
+        }
         if (resourceType === "ore") {
             return (base.atelier && base.atelier.ore) || 0;
         }
@@ -10418,6 +10490,14 @@ let engine = {
             base.atelier.bars = Math.max(0, (base.atelier.bars || 0) - amt);
             return null;
         }
+        if (resourceType === "limestone" && base.atelier) {
+            base.atelier.limestone = Math.max(0, (base.atelier.limestone || 0) - amt);
+            return null;
+        }
+        if (resourceType === "quicklime" && base.atelier) {
+            base.atelier.quicklime = Math.max(0, (base.atelier.quicklime || 0) - amt);
+            return null;
+        }
         if (resourceType === "ore" && base.atelier) {
             base.atelier.ore = Math.max(0, (base.atelier.ore || 0) - amt);
             return null;
@@ -10443,6 +10523,10 @@ let engine = {
             engine.refundStone(amt, stoneTaken);
         } else if (resourceType === "bars" && base.atelier) {
             base.atelier.bars = (base.atelier.bars || 0) + amt;
+        } else if (resourceType === "limestone" && base.atelier) {
+            base.atelier.limestone = (base.atelier.limestone || 0) + amt;
+        } else if (resourceType === "quicklime" && base.atelier) {
+            base.atelier.quicklime = (base.atelier.quicklime || 0) + amt;
         } else if (resourceType === "ore" && base.atelier) {
             base.atelier.ore = (base.atelier.ore || 0) + amt;
         } else if (resourceType === "ash" && base.bonfire) {
@@ -10949,7 +11033,7 @@ let engine = {
         if (resourceType === "stone") {
             return engine.getMapBuildingPosition("stonePile");
         }
-        if (resourceType === "bars") {
+        if (resourceType === "bars" || resourceType === "limestone" || resourceType === "quicklime") {
             return engine.getMapBuildingPosition("atelier");
         }
         if (resourceType === "ore") {
@@ -11225,7 +11309,7 @@ let engine = {
         engine.tryFoxDenOkamiAutoPathJobs();
         engine.updateArrangementOfReview(tickMs);
         const minGap = (resortData.foxDenCarrierSpawnMinMs !== undefined) ? resortData.foxDenCarrierSpawnMinMs : 500;
-        const soloKeys = ["stone", "bars", "ore", "ash"];
+        const soloKeys = ["stone", "bars", "limestone", "quicklime", "ore", "ash"];
         if (!rh._carrierGapMsByResource) {
             rh._carrierGapMsByResource = {};
         }
@@ -11844,7 +11928,10 @@ let engine = {
         }
         if (heat > protectedHeat) {
             const decayable = heat - protectedHeat;
-            bf.heat = protectedHeat + decayable * (1 - rate);
+            const bought = bf.containedHeatBought || 0;
+            const decayScale = Math.max(0, 1 - 0.15 * bought);
+            const decayRate = bonfireConfig.heatDecayPerTick * decayScale;
+            bf.heat = protectedHeat + decayable * (1 - decayRate);
         } else if (heat < protectedHeat) {
             const growable = protectedHeat - heat;
             bf.heat = heat + growable * (1 - rate);
@@ -11942,8 +12029,12 @@ let engine = {
                 : rt === "wood" ? "allowWood"
                 : rt === "hardwood" ? "allowHardwood"
                 : rt === "bars" ? "allowBars"
+                : rt === "limestone" ? "allowLimestone"
                 : null;
             if (rt === "hardwood" && !resortHelper.isGrowHardwoodBought()) {
+                continue;
+            }
+            if (rt === "limestone" && !engine.isTeachSpiritsToSortStoneBought()) {
                 continue;
             }
             if (field && market[field]) {
@@ -12948,11 +13039,12 @@ let engine = {
         }
         return -1;
     },
-    getBambooChopPower: function() {
+    getBambooChopPowerFactors: function() {
         const bf = data.progress.base.bambooForest;
         const kitsune = bf.assignedWorkers || 0;
         const atelier = data.progress.base && data.progress.base.atelier;
         const axeBonus = (atelier && atelier.betterAxesBought) || 0;
+        const whetstoneBonus = ((atelier && atelier.whetstoneBought) || 0) * 4;
         const sharperBonus = (atelier && atelier.sharperAxesBought) || 0;
         const okami = engine.getOkami();
         const okamiHere = okami.assignedBuildingKey === "bambooForest";
@@ -12960,8 +13052,14 @@ let engine = {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
             ? (shrineCards.getAggregatedEffects().chopPowerAdd || 0) : 0;
         const echoed = Math.pow(1.5, resortHelper.getEchoedAxeBought());
-        const raw = cutters * (1 + axeBonus) * (1 + 0.5 * sharperBonus) * (1 + cardAdd) * echoed;
-        return Math.ceil(raw - 1e-9);
+        return {
+            base: cutters * (1 + axeBonus + whetstoneBonus),
+            mult: (1 + 0.5 * sharperBonus) * (1 + cardAdd) * echoed
+        };
+    },
+    getBambooChopPower: function() {
+        const factors = engine.getBambooChopPowerFactors();
+        return Math.ceil(factors.base * factors.mult - 1e-9);
     },
     getBambooCutWorkerRate: function() {
         const bf = data.progress.base.bambooForest;
@@ -13522,16 +13620,16 @@ let engine = {
     getMineOreCount: function(depth) {
         return Math.min(5, Math.floor(((depth || 0) + 2) / 5));
     },
-    isSearchForLimestoneBought: function() {
+    isTeachSpiritsToSortStoneBought: function() {
         const mine = data.progress.base && data.progress.base.mine;
-        return !!(mine && mine.searchForLimestoneBought);
+        return !!(mine && mine.teachSpiritsToSortStoneBought);
     },
     isTempleUnlocked: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
         return !!(shrine && shrine.templeUnlocked);
     },
     getMineLimestoneCount: function(depth) {
-        if (!engine.isSearchForLimestoneBought()) {
+        if (!engine.isTeachSpiritsToSortStoneBought()) {
             return 0;
         }
         const d = depth || 0;
@@ -14156,6 +14254,12 @@ let engine = {
             return Math.floor(root);
         }
         return Math.ceil(root * (1 + 0.5 * n));
+    },
+    getForgeBarsFromOre: function(oreAmount) {
+        const atelier = data.progress.base && data.progress.base.atelier;
+        const bought = (atelier && atelier.addFluxBought) || 0;
+        const ore = Math.max(0, oreAmount || 0);
+        return Math.ceil(ore * Math.pow(1.25, bought) - 1e-9);
     },
     getMarketGoodAmount: function(tradeKey) {
         const market = data.progress.base && data.progress.base.market;
@@ -14868,6 +14972,7 @@ let engine = {
             : resourceType === "wood" ? "haulKeepWood"
             : resourceType === "hardwood" ? "haulKeepHardwood"
             : resourceType === "bars" ? "haulKeepBars"
+            : resourceType === "limestone" ? "haulKeepLimestone"
             : "";
         if (!shrine || !field) {
             return 0;
@@ -14880,6 +14985,7 @@ let engine = {
             : resourceType === "wood" ? "haulKeepWood"
             : resourceType === "hardwood" ? "haulKeepHardwood"
             : resourceType === "bars" ? "haulKeepBars"
+            : resourceType === "limestone" ? "haulKeepLimestone"
             : "";
         if (!shrine || !field) {
             return;
@@ -16341,6 +16447,10 @@ let engine = {
         }
     },
     updateScrollArchivesResearch: function(tickMs) {
+        const rh = data.progress.base.foxDen;
+        if (!rh.unlocks.scrollArchives) {
+            return;
+        }
         const lib = engine.ensureInscriptionState();
         if (!lib) {
             return;

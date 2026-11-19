@@ -1155,7 +1155,7 @@ var shrineCards = {
             apply: function() {}
         },
         {
-            text: "Add 11 upgrades to Shrine that cost Divinity.\nx1.5 Spirit exp gain",
+            text: "Add 12 upgrades to Shrine that cost Divinity.\nx1.5 Spirit exp gain",
             apply: function() {}
         }
     ],

@@ -242,6 +242,24 @@ body {
     background: #3c0295;
 }
 
+.mana-clone-reserve-mark,
+.mana-upgrade-cost-mark {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    margin-left: -1px;
+    pointer-events: none;
+}
+
+.mana-clone-reserve-mark {
+    background: #7ee0ff;
+}
+
+.mana-upgrade-cost-mark {
+    background: #3dcc6a;
+}
+
 .prog-fill-divinity {
     background: #8a6a1a;
 }
@@ -4735,6 +4753,47 @@ button {
 
 .base-row {
     margin-bottom: 6px;
+}
+
+.market-haul-line {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.market-haul-keep {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.market-haul-layout {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    margin-bottom: 6px;
+}
+
+.market-haul-break {
+    flex-basis: 100%;
+    height: 0;
+}
+
+.market-haul-layout--columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 4px;
+}
+
+.market-haul-layout--columns .market-haul-label {
+    grid-column: 1 / -1;
+}
+
+.market-haul-layout--columns .market-haul-break {
+    display: none;
 }
 
 .base-resource-strip {

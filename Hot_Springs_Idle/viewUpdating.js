@@ -128,6 +128,8 @@ let view = {
             stone: "img/foxWorker_stone.svg",
             water: "img/foxWorker_water.svg",
             bars: "img/foxWorker_bars.svg",
+            limestone: "img/foxWorker_limestone.svg",
+            quicklime: "img/foxWorker_quicklime.svg",
             coal: "img/foxWorker_coal.svg",
             ash: "img/foxWorker_ash.svg"
         };
@@ -1133,13 +1135,16 @@ let view = {
         const showSkip = !!garden.arrangementOfGoldenNavigationUnlocked;
         const showRepeat = !!garden.arrangementOfCyclicNavigationUnlocked;
         const showEndGold = !!garden.arrangementOfGoldenRestUnlocked;
-        view.updateVal("travelTourOptionsRow", (showSkip || showRepeat || showEndGold) ? "" : "none", "style.display");
+        const showMaxDensity = !!garden.arrangementOfFullPowerTourUnlocked;
+        view.updateVal("travelTourOptionsRow", (showSkip || showRepeat || showEndGold || showMaxDensity) ? "" : "none", "style.display");
         view.updateVal("travelSkipCompleted_row", showSkip ? "" : "none", "style.display");
         view.updateVal("travelRepeatCycle_row", showRepeat ? "" : "none", "style.display");
         view.updateVal("travelEndOnLastGold_row", showEndGold ? "" : "none", "style.display");
+        view.updateVal("travelUseMaxDensity_row", showMaxDensity ? "" : "none", "style.display");
         const skipChk = document.getElementById("travelSkipCompleted_chk");
         const repeatChk = document.getElementById("travelRepeatCycle_chk");
         const endChk = document.getElementById("travelEndOnLastGold_chk");
+        const maxDensityChk = document.getElementById("travelUseMaxDensity_chk");
         if (skipChk) {
             skipChk.checked = !!shrine.mapTourSkipCompleted;
         }
@@ -1148,6 +1153,9 @@ let view = {
         }
         if (endChk) {
             endChk.checked = !!shrine.mapTourEndOnLastGold;
+        }
+        if (maxDensityChk) {
+            maxDensityChk.checked = !!shrine.mapTourUseMaxDensity;
         }
         const tour = engine.ensureMapTour();
         const waiting = !!(tour.active && tour.waitingForMana);
@@ -2689,6 +2697,14 @@ let view = {
         const show = engine.isManaUnlocked() || engine.isShrineBuilt();
         view.updateVal("resourceProgressRow", show ? "grid" : "none", "style.display");
     },
+    showUpgradeManaCost: function(scopeKey, upgradeKey) {
+        viewData.manaCostHover = { scopeKey: scopeKey, upgradeKey: upgradeKey };
+        view.updateManaBar();
+    },
+    hideUpgradeManaCost: function() {
+        viewData.manaCostHover = null;
+        view.updateManaBar();
+    },
     updateManaBar: function() {
         view.updateResourceProgressRow();
         const unlocked = engine.isManaUnlocked();
@@ -2702,7 +2718,27 @@ let view = {
         const rate = engine.getEffectiveManaRatePerSecond();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
         view.updateVal("manaFill", `${pct}%`, "style.width");
-        view.updateVal("manaProgressTrack", cap > 0 && amount >= cap ? "#33ccff" : "", "style.borderColor");
+        view.updateVal("manaProgressTrack", cap > 0 && amount >= cap * 0.95 ? "#33ccff" : "", "style.borderColor");
+        const garden = data.progress.base && data.progress.base.garden;
+        const insightOn = !!(garden && garden.arrangementOfManaInsightUnlocked);
+        const reserveOn = insightOn && !!(garden && garden.reserveCloneManaForAutobuy);
+        const reserved = (reserveOn && typeof bonfire !== "undefined" && bonfire.getCreateClonePlan)
+            ? (bonfire.getCreateClonePlan().manaCost || 0)
+            : 0;
+        const reservePct = cap > 0 ? Math.max(0, Math.min(100, ((cap - reserved) / cap) * 100)) : 0;
+        view.updateVal("manaCloneReserveMark", reserveOn && cap > 0 ? "" : "none", "style.display");
+        view.updateVal("manaCloneReserveMark", `${reservePct}%`, "style.left");
+        let costMana = 0;
+        const hover = insightOn ? viewData.manaCostHover : null;
+        if (hover) {
+            const up = engine.getUpgradeDef(hover.scopeKey, hover.upgradeKey);
+            const cost = up ? resortData.resolveCost(up) : null;
+            costMana = (cost && cost.mana) || 0;
+        }
+        const costPct = cap > 0 ? Math.max(0, Math.min(100, (costMana / cap) * 100)) : 0;
+        view.updateVal("manaUpgradeCostMark", costMana > 0 && cap > 0 ? "" : "none", "style.display");
+        view.updateVal("manaUpgradeCostMark", `${costPct}%`, "style.left");
+        view.updateVal("manaUpgradeCostMark", costMana > amount ? "#e05050" : "#3dcc6a", "style.backgroundColor");
         view.updateVal("manaAmount", amount, "textContent", "floor");
         view.updateVal("manaCap", cap, "textContent", "manaCap");
         view.updateVal("manaRate", round1Fixed(rate), "textContent");
@@ -2728,7 +2764,7 @@ let view = {
         const rate = engine.getShrineDivinityRate();
         const pct = cap > 0 ? Math.max(0, Math.min(100, (amount / cap) * 100)) : 0;
         view.updateVal("divinityFill", `${pct}%`, "style.width");
-        view.updateVal("divinityProgressTrack", cap > 0 && amount >= cap ? "#ffe14a" : "", "style.borderColor");
+        view.updateVal("divinityProgressTrack", cap > 0 && amount >= cap * 0.95 ? "#ffe14a" : "", "style.borderColor");
         view.updateVal("divinityAmount", amount, "textContent", "floor");
         view.updateVal("divinityCap", cap, "textContent", "floor");
         view.updateVal("divinityRate", round1Fixed(rate), "textContent");
@@ -3459,9 +3495,15 @@ let view = {
         setChk("marketAllowWood_chk", market.allowWood);
         setChk("marketAllowHardwood_chk", market.allowHardwood);
         setChk("marketAllowBars_chk", market.allowBars);
-        view.updateVal("marketAllowHardwood_wrap", resortHelper.isGrowHardwoodBought() ? "" : "none", "style.display");
+        setChk("marketAllowLimestone_chk", market.allowLimestone);
+        const hardwoodOn = resortHelper.isGrowHardwoodBought();
+        const limestoneOn = engine.isTeachSpiritsToSortStoneBought();
+        view.updateVal("marketHaul_hardwood", hardwoodOn ? "" : "none", "style.display");
+        view.updateVal("marketHaul_limestone", limestoneOn ? "" : "none", "style.display");
         const haulOrder = resortData.marketHaulResourceOrder || [];
         const keepOn = !!(data.progress.base.garden && data.progress.base.garden.arrangementOfResourceProtectionUnlocked);
+        view.updateVal("marketHaulBreak", !keepOn && (hardwoodOn || limestoneOn) ? "" : "none", "style.display");
+        view.updateVal("marketHaulLayout", keepOn, "classList.toggle", "market-haul-layout--columns");
         for (let hi = 0; hi < haulOrder.length; hi++) {
             const haulKey = haulOrder[hi];
             view.updateVal("marketHaulCredit_" + haulKey, engine.getMarketCreditPerUnit(haulKey), "textContent", "floor");
@@ -3657,6 +3699,8 @@ let view = {
             view.updateVal("bambooForestInfoHardwood", bf.hardwood || 0, "textContent", "floor");
         }
         view.updateVal("bambooChopPower", engine.getBambooChopPower());
+        const chopFactors = engine.getBambooChopPowerFactors();
+        view.updateVal("bambooChopPowerFactors", `(${chopFactors.base} x ${round2(chopFactors.mult)})`);
         const pond = data.progress.base.pond;
         const pondBuilt = typeof engine.isPondBuiltFromFoxDen === "function" && engine.isPondBuiltFromFoxDen();
         view.updateVal("bambooForestWater_row", pondBuilt ? "" : "none", "style.display");
@@ -3779,7 +3823,7 @@ let view = {
         }
         const forgeBuilt = engine.isAtelierForgeBuilt();
         view.updateVal("spiritSlots_atelier_fire", forgeBuilt ? "" : "none", "style.display");
-        view.updateVal("spiritSlots_atelier_fire", engine.isSearchForLimestoneBought(), "classList.toggle", "limestone-map-line");
+        view.updateVal("spiritSlots_atelier_fire", engine.isTeachSpiritsToSortStoneBought(), "classList.toggle", "limestone-map-line");
         for (let afi = 0; afi < engine.getAtelierFireSpiritSlotMax(); afi++) {
             const atelierSlotId = `spiritSlot_atelier_fire_${afi}`;
             const aSpirit = engine.getSpiritAtLocation("atelier", afi, "fire");
@@ -4215,7 +4259,7 @@ let view = {
             view.updateVal("spiritInfoPrioritizeOreRow", priorityUnlocked && atHiddenSpring ? "" : "none", "style.display");
             if (priorityUnlocked && atHiddenSpring) {
                 const priority = engine.getSpiritResourcePriority(spirit);
-                const limeOn = engine.isSearchForLimestoneBought();
+                const limeOn = engine.isTeachSpiritsToSortStoneBought();
                 view.updateVal("spiritInfoPriorityLimestoneLabel", limeOn ? "" : "none", "style.display");
                 const stoneRadio = viewData.cached.spiritInfoPriority_stone;
                 const oreRadio = viewData.cached.spiritInfoPriority_ore;
@@ -4358,10 +4402,11 @@ let view = {
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "atelier" && engine.isAtelierForgeBuilt()) {
                 const batchSize = engine.getForgeSmeltBatch(spirit);
+                const barsOut = engine.getForgeBarsFromOre(batchSize);
                 const forgeExpPerSec = round2(engine.getAtelierForgeExpPerSec(spirit));
                 const pct = Math.max(0, Math.min(100, ((spirit.forgeTimerMs || 0) / 60000) * 100));
-                view.updateVal("spiritInfoFireNote", `Smelting ${batchSize} ore / 60s, +${forgeExpPerSec} exp/s`);
-                view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore / 60s, +${forgeExpPerSec} exp/s)`);
+                view.updateVal("spiritInfoFireNote", `Smelting ${batchSize} ore into ${barsOut} bars / 60s, +${forgeExpPerSec} exp/s`);
+                view.updateVal("spiritInfoTaskText", `Forging bars (${batchSize} ore into ${barsOut} bars / 60s, +${forgeExpPerSec} exp/s)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
             } else if (loc === "bonfire") {
                 const excessHeat = engine.getBonfireExcessHeatForExp();
@@ -4443,7 +4488,7 @@ let view = {
         if (oreMined) {
             view.updateVal("mineOreText", (mine.resources.ore || 0), "textContent", 2);
         }
-        const limestoneOn = engine.isSearchForLimestoneBought();
+        const limestoneOn = engine.isTeachSpiritsToSortStoneBought();
         view.updateVal("mineLimestoneRow", limestoneOn ? "" : "none", "style.display");
         if (limestoneOn) {
             view.updateVal("mineLimestoneText", (mine.resources.limestone || 0), "textContent", 2);
@@ -4835,8 +4880,13 @@ let view = {
             view.updateVal("cisternWishingWellCoins", wellCoins > 0 ? wellCoins.toFixed(1) : "");
             const waterCarryVisible = engine.cisternWorkersRevealed();
             view.updateVal("cisternWaterCarry_row", waterCarryVisible ? "" : "none", "style.display");
+            view.updateVal("cisternIdleNotify_row", waterCarryVisible ? "" : "none", "style.display");
             if (waterCarryVisible) {
                 view.updateVal("cisternWaterCarry", resortData.getCisternWaterCarryAmount());
+                const idleChk = viewData.cached.cisternIdleNotify_chk || document.getElementById("cisternIdleNotify_chk");
+                if (idleChk) {
+                    idleChk.checked = cistern.showIdleWorkerNotify !== false;
+                }
             }
             const garden = base.garden || {};
             const thirstUnlocked = !!garden.arrangementOfThirstUnlocked;
@@ -4911,12 +4961,15 @@ let view = {
         const atelier = base.atelier || {};
         const atelierOre = atelier.ore || 0;
         const atelierBars = atelier.bars || 0;
-        const limestoneSearched = engine.isSearchForLimestoneBought();
+        const sortStoneBought = engine.isTeachSpiritsToSortStoneBought();
         let atelierMapHtml = "";
         if (data.progress.base.hiddenSpring.bringOreToAtelierUnlocked) {
             atelierMapHtml = `${resortData.resourceIconHtml("ore")} ${intToStringRound(atelierOre)} | ${resortData.resourceIconHtml("bars")} ${intToStringRound(atelierBars)}`;
-            if (limestoneSearched) {
-                atelierMapHtml += `<br>${resortData.resourceIconHtml("limestone")} ${intToStringRound(atelier.limestone || 0)} | ${resortData.resourceIconHtml("quicklime")} ${intToStringRound(atelier.quicklime || 0)}`;
+            if (sortStoneBought) {
+                atelierMapHtml += `<br>${resortData.resourceIconHtml("limestone")} ${intToStringRound(atelier.limestone || 0)}`;
+                if (engine.isDrophammerUnlocked()) {
+                    atelierMapHtml += ` | ${resortData.resourceIconHtml("quicklime")} ${intToStringRound(atelier.quicklime || 0)}`;
+                }
             }
         }
         view.updateVal("atelierMapDisplay", atelierMapHtml, "innerHTML");
@@ -5269,7 +5322,10 @@ let view = {
                 need = need && engine.isMapElementRevealed("hiddenSpring");
             }
             if (k === "cistern") {
-                need = need || engine.shouldShowCisternWaterNotify();
+                const cistern = data.progress.base.cistern;
+                if (!cistern || cistern.showIdleWorkerNotify !== false) {
+                    need = need || engine.shouldShowCisternWaterNotify();
+                }
             }
             if (k === data.progress.selectedBaseBuilding) {
                 need = false;
@@ -5424,7 +5480,7 @@ let view = {
     },
     getSortedLibrarySkillKeys: function() {
         const sortMode = data.progress.skillListSort;
-        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping"
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "unequipped"
             ? sortMode
             : "oldest";
         const unlocked = (data.progress.base && data.progress.base.scrollArchives && data.progress.base.scrollArchives.unlockedSkills) || {};
@@ -5466,6 +5522,22 @@ let view = {
                 const gb = (sb && sb.grouping) || 0;
                 if (ga !== gb) {
                     return ga - gb;
+                }
+            } else if (sort === "unequipped") {
+                const ea = skills.isSkillEquipped(a) ? 1 : 0;
+                const eb = skills.isSkillEquipped(b) ? 1 : 0;
+                if (ea !== eb) {
+                    return ea - eb;
+                }
+                const ua = unlockIndex[a];
+                const ub = unlockIndex[b];
+                const aMissing = ua === undefined;
+                const bMissing = ub === undefined;
+                if (aMissing !== bMissing) {
+                    return aMissing ? 1 : -1;
+                }
+                if (!aMissing && ua !== ub) {
+                    return ua - ub;
                 }
             } else {
                 const ia = unlockIndex[a];
@@ -5856,7 +5928,7 @@ let view = {
 // Temporary patch fragment - applied by script then deleted.
     applySkillListSortRadiosOnly: function() {
         const sortMode = data.progress.skillListSort;
-        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping"
+        const sort = sortMode === "talent" || sortMode === "alpha" || sortMode === "tips" || sortMode === "grouping" || sortMode === "unequipped"
             ? sortMode
             : "oldest";
         const map = {
@@ -5864,7 +5936,8 @@ let view = {
             talent: viewData.cached.skillSortTalent,
             alpha: viewData.cached.skillSortAlpha,
             tips: viewData.cached.skillSortTips,
-            grouping: viewData.cached.skillSortGrouping
+            grouping: viewData.cached.skillSortGrouping,
+            unequipped: viewData.cached.skillSortUnequipped
         };
         const keys = Object.keys(map);
         for (let i = 0; i < keys.length; i++) {

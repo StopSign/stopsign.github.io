@@ -15,6 +15,16 @@ let saveFix = {
 
     /** Sole post-init entry from onLoad.handleLoad. */
     runAfterInitialize: function(loadedSaveVersion) {
+        saveFix.migrateSprinkleOreUpgrade();
+        saveFix.migrateBuildWaterWheelUpgradeKey();
+        saveFix.migrateMineshaftBeamsWork();
+        saveFix.migrateEchoedShelvingUpgrade();
+        saveFix.migrateFoxDenJobQueue();
+        saveFix.migrateSpareSandalsUpgrade();
+        saveFix.migrateShrineOneTimeFields();
+        saveFix.migrateDivinityCapacity();
+        saveFix.migrateMinePrioritizeOre();
+        saveFix.migrateBonfireAutoRetry();
         saveFix.renameSkillKey("fakeTearDrops", "applyTearDrops");
         saveFix.renameSkillKey("stageSob", "stagePresence");
         if (data.battle) {
@@ -650,5 +660,376 @@ let saveFix = {
         shrine.expToLevel = 10000;
         shrine.selectedClassKey = "none";
         shrine.karmaMechanicMigrated = true;
+    },
+
+    /** Sprinkle Ore moved from the Atelier to the Bamboo Forest. */
+    migrateSprinkleOreUpgrade: function() {
+        saveFix.migrateSprinkleOreCount();
+        const base = data.progress && data.progress.base;
+        const rh = base && base.foxDen;
+        const oldJob = "upgrade:atelier:sprinkleOre";
+        const newJob = "upgrade:bambooForest:sprinkleOre";
+        if (rh && rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJob]) {
+            const job = rh.upgradeGatherJobs[oldJob];
+            job.scopeKey = "bambooForest";
+            if (!rh.upgradeGatherJobs[newJob]) {
+                rh.upgradeGatherJobs[newJob] = job;
+            }
+            delete rh.upgradeGatherJobs[oldJob];
+        }
+        if (rh && rh.jobQueue) {
+            for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                if (rh.jobQueue[qi] === oldJob) {
+                    rh.jobQueue[qi] = newJob;
+                }
+            }
+        }
+        const carriers = rh && rh.constructionCarriers;
+        if (carriers) {
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci] && carriers[ci].jobKey === oldJob) {
+                    carriers[ci].jobKey = newJob;
+                    if (carriers[ci].unlockKey === "atelier") {
+                        carriers[ci].unlockKey = "bambooForest";
+                    }
+                }
+            }
+        }
+        const weaving = data.progress && data.progress.weaving;
+        if (!weaving) {
+            return;
+        }
+        if (weaving.active && weaving.active.scopeKey === "atelier" && weaving.active.upgradeKey === "sprinkleOre") {
+            weaving.active.scopeKey = "bambooForest";
+            weaving.active.buildingName = "Bamboo Forest";
+        }
+        const paused = weaving.paused;
+        if (paused && paused.scopeKey === "atelier" && paused.upgradeKey === "sprinkleOre") {
+            paused.scopeKey = "bambooForest";
+            paused.buildingName = "Bamboo Forest";
+        } else if (paused && paused["atelier:sprinkleOre"]) {
+            const entry = paused["atelier:sprinkleOre"];
+            entry.scopeKey = "bambooForest";
+            entry.buildingName = "Bamboo Forest";
+            if (!paused["bambooForest:sprinkleOre"]) {
+                paused["bambooForest:sprinkleOre"] = entry;
+            }
+            delete paused["atelier:sprinkleOre"];
+        }
+        const notify = base && base.baseContentNotify;
+        if (notify && notify.upgradeSeen && notify.upgradeSeen["atelier:sprinkleOre"]) {
+            notify.upgradeSeen["bambooForest:sprinkleOre"] = true;
+            delete notify.upgradeSeen["atelier:sprinkleOre"];
+        }
+    },
+
+    /** Build Water Wheel used to be stored as Unlock Drophammer. */
+    migrateBuildWaterWheelUpgradeKey: function() {
+        const progress = data.progress;
+        if (!progress) {
+            return;
+        }
+        const oldKeys = ["unlockDrophammer", "unlock_drophammer"];
+        const newKey = "buildWaterWheelAndDrophammer";
+        const weaving = progress.weaving;
+        if (weaving) {
+            if (weaving.active && weaving.active.scopeKey === "atelier" && oldKeys.indexOf(weaving.active.upgradeKey) >= 0) {
+                weaving.active.upgradeKey = newKey;
+            }
+            const paused = weaving.paused;
+            if (paused && typeof paused === "object" && !Array.isArray(paused)) {
+                for (let oi = 0; oi < oldKeys.length; oi++) {
+                    const oldPause = "atelier:" + oldKeys[oi];
+                    if (!paused[oldPause]) {
+                        continue;
+                    }
+                    paused[oldPause].upgradeKey = newKey;
+                    const newPause = "atelier:" + newKey;
+                    if (!paused[newPause]) {
+                        paused[newPause] = paused[oldPause];
+                    }
+                    delete paused[oldPause];
+                }
+            }
+        }
+        const rh = progress.base && progress.base.foxDen;
+        if (!rh) {
+            return;
+        }
+        for (let ji = 0; ji < oldKeys.length; ji++) {
+            const oldJob = "upgrade:atelier:" + oldKeys[ji];
+            const newJob = "upgrade:atelier:" + newKey;
+            if (rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJob]) {
+                const job = rh.upgradeGatherJobs[oldJob];
+                job.upgradeKey = newKey;
+                if (!rh.upgradeGatherJobs[newJob]) {
+                    rh.upgradeGatherJobs[newJob] = job;
+                }
+                delete rh.upgradeGatherJobs[oldJob];
+            }
+            if (rh.jobQueue) {
+                for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                    if (rh.jobQueue[qi] === oldJob) {
+                        rh.jobQueue[qi] = newJob;
+                    }
+                }
+            }
+            const carriers = rh.constructionCarriers || [];
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci].jobKey === oldJob) {
+                    carriers[ci].jobKey = newJob;
+                }
+            }
+        }
+    },
+
+    /** Mineshaft Beams moved from the Atelier to the Mine. */
+    migrateMineshaftBeamsWork: function() {
+        const base = data.progress && data.progress.base;
+        const mine = base && base.mine;
+        const atelierBeams = base && base.atelier && base.atelier.mineshaftBeamsBought;
+        if (mine && (mine.mineshaftBeamsBought || 0) === 0 && atelierBeams > 0) {
+            mine.mineshaftBeamsBought = atelierBeams;
+        }
+        const rh = base && base.foxDen;
+        const oldJobKey = "upgrade:atelier:mineshaftBeams";
+        const newJobKey = "upgrade:mine:mineshaftBeams";
+        if (rh && rh.upgradeGatherJobs && rh.upgradeGatherJobs[oldJobKey]) {
+            const job = rh.upgradeGatherJobs[oldJobKey];
+            job.scopeKey = "mine";
+            if (!rh.upgradeGatherJobs[newJobKey]) {
+                rh.upgradeGatherJobs[newJobKey] = job;
+            }
+            delete rh.upgradeGatherJobs[oldJobKey];
+            if (rh.jobQueue) {
+                for (let qi = 0; qi < rh.jobQueue.length; qi++) {
+                    if (rh.jobQueue[qi] === oldJobKey) {
+                        rh.jobQueue[qi] = newJobKey;
+                    }
+                }
+            }
+            if (rh.constructionCarriers && typeof engine.cancelCarriersForJob === "function") {
+                engine.cancelCarriersForJob(oldJobKey);
+            }
+        }
+        if (typeof engine.getWeavingState !== "function") {
+            return;
+        }
+        const weaving = engine.getWeavingState();
+        const retarget = function(entry) {
+            if (!entry || entry.scopeKey !== "atelier" || entry.upgradeKey !== "mineshaftBeams") {
+                return;
+            }
+            entry.scopeKey = "mine";
+            entry.buildingName = resortData.getScopeDisplayName("mine");
+        };
+        retarget(weaving.active);
+        if (weaving.paused && weaving.paused["atelier:mineshaftBeams"]) {
+            const paused = weaving.paused["atelier:mineshaftBeams"];
+            retarget(paused);
+            weaving.paused["mine:mineshaftBeams"] = paused;
+            delete weaving.paused["atelier:mineshaftBeams"];
+        }
+    },
+
+    /** Sprinkle Ore's purchase count moved from the Atelier to the Bamboo Forest. */
+    migrateSprinkleOreCount: function() {
+        const base = data.progress && data.progress.base;
+        const forest = base && base.bambooForest;
+        const atelier = base && base.atelier;
+        const moved = atelier && atelier.sprinkleOreBought;
+        if (forest && (forest.sprinkleOreBought || 0) === 0 && moved > 0) {
+            forest.sprinkleOreBought = moved;
+        }
+        if (atelier && atelier.sprinkleOreBought !== undefined) {
+            delete atelier.sprinkleOreBought;
+        }
+    },
+
+    /** Echoed Shelving moved from the Bamboo Forest to the Stone Pile. */
+    migrateEchoedShelvingUpgrade: function() {
+        const base = data.progress && data.progress.base;
+        if (!base) {
+            return;
+        }
+        const pile = base.stonePile;
+        const forest = base.bambooForest;
+        const moved = forest && forest.echoedShelvingBought;
+        if (pile && (pile.echoedShelvingBought || 0) === 0 && moved > 0) {
+            pile.echoedShelvingBought = moved;
+        }
+        if (forest && forest.echoedShelvingBought !== undefined) {
+            delete forest.echoedShelvingBought;
+        }
+        const oldJob = "upgrade:bambooForest:echoedShelving";
+        const newJob = "upgrade:stonePile:echoedShelving";
+        const fox = base.foxDen;
+        if (fox && fox.upgradeGatherJobs && fox.upgradeGatherJobs[oldJob]) {
+            const job = fox.upgradeGatherJobs[oldJob];
+            job.scopeKey = "stonePile";
+            fox.upgradeGatherJobs[newJob] = job;
+            delete fox.upgradeGatherJobs[oldJob];
+        }
+        if (fox && fox.jobQueue) {
+            for (let qi = 0; qi < fox.jobQueue.length; qi++) {
+                if (fox.jobQueue[qi] === oldJob) {
+                    fox.jobQueue[qi] = newJob;
+                }
+            }
+        }
+        const carriers = fox && fox.constructionCarriers;
+        if (carriers) {
+            for (let ci = 0; ci < carriers.length; ci++) {
+                if (carriers[ci] && carriers[ci].jobKey === oldJob) {
+                    carriers[ci].jobKey = newJob;
+                }
+            }
+        }
+        const weaving = data.progress.weaving;
+        if (!weaving) {
+            return;
+        }
+        if (weaving.active && weaving.active.scopeKey === "bambooForest" && weaving.active.upgradeKey === "echoedShelving") {
+            weaving.active.scopeKey = "stonePile";
+            weaving.active.buildingName = "Stone Pile";
+        }
+        const paused = weaving.paused;
+        if (paused && paused.scopeKey === "bambooForest" && paused.upgradeKey === "echoedShelving") {
+            paused.scopeKey = "stonePile";
+            paused.buildingName = "Stone Pile";
+        } else if (paused && paused["bambooForest:echoedShelving"]) {
+            const entry = paused["bambooForest:echoedShelving"];
+            entry.scopeKey = "stonePile";
+            entry.buildingName = "Stone Pile";
+            paused["stonePile:echoedShelving"] = entry;
+            delete paused["bambooForest:echoedShelving"];
+        }
+    },
+
+    /** Old Fox Den queues became one jobQueue, and carriers gained a jobKey. */
+    migrateFoxDenJobQueue: function() {
+        const rh = data.progress.base && data.progress.base.foxDen;
+        if (!rh) {
+            return;
+        }
+        if (!rh.jobQueue) {
+            rh.jobQueue = (rh.foxDenJobOrder && rh.foxDenJobOrder.slice()) || [];
+        } else if (!rh.jobQueue.length && rh.foxDenJobOrder && rh.foxDenJobOrder.length) {
+            rh.jobQueue = rh.foxDenJobOrder.slice();
+        }
+        if (!rh.jobQueue.length) {
+            const oldConstruction = rh.constructionQueue || [];
+            for (let cqi = 0; cqi < oldConstruction.length; cqi++) {
+                const cKey = oldConstruction[cqi];
+                const site = rh.constructionSites && rh.constructionSites[cKey];
+                if (site && site.status === "building") {
+                    rh.jobQueue.push(engine.getBuildingJobKey(cKey));
+                }
+            }
+            const oldUpgrade = rh.upgradeGatherQueue || [];
+            for (let uqi = 0; uqi < oldUpgrade.length; uqi++) {
+                const uKey = oldUpgrade[uqi];
+                const uJob = rh.upgradeGatherJobs && rh.upgradeGatherJobs[uKey];
+                if (uJob && uJob.status === "gathering") {
+                    rh.jobQueue.push(uKey);
+                }
+            }
+        }
+        delete rh.constructionQueue;
+        delete rh.upgradeGatherQueue;
+        delete rh.foxDenJobOrder;
+        const carriers = rh.constructionCarriers || [];
+        for (let ci = 0; ci < carriers.length; ci++) {
+            const c = carriers[ci];
+            if (c && !c.jobKey && c.unlockKey) {
+                c.jobKey = engine.getBuildingJobKey(c.unlockKey);
+            }
+        }
+    },
+
+    /** Spare Sandals moved from the Atelier to the Shrine. */
+    migrateSpareSandalsUpgrade: function() {
+        const weaving = data.progress && data.progress.weaving;
+        if (weaving && weaving.active && weaving.active.scopeKey === "atelier" && weaving.active.upgradeKey === "spareSandals") {
+            weaving.active.scopeKey = "shrine";
+        }
+        const rh = data.progress.base && data.progress.base.foxDen;
+        const jobs = rh && rh.upgradeGatherJobs;
+        if (!jobs) {
+            return;
+        }
+        const oldKey = "upgrade:atelier:spareSandals";
+        const newKey = "upgrade:shrine:spareSandals";
+        if (jobs[oldKey] && !jobs[newKey]) {
+            jobs[newKey] = jobs[oldKey];
+            jobs[newKey].scopeKey = "shrine";
+            jobs[newKey].upgradeKey = "spareSandals";
+            delete jobs[oldKey];
+        } else if (jobs[oldKey]) {
+            delete jobs[oldKey];
+        }
+    },
+
+    /** Drop removed Shrine fields and grant Prepare to Write a Legend to saves that already wrote one. */
+    migrateShrineOneTimeFields: function() {
+        const shrine = data.progress.base && data.progress.base.shrine;
+        if (shrine && shrine.allowClasslessWithoutDivinity !== undefined) {
+            delete shrine.allowClasslessWithoutDivinity;
+        }
+        if (shrine && !shrine.prepareToWriteLegendBought && engine.getLegendsWritten() >= 1) {
+            shrine.prepareToWriteLegendBought = true;
+        }
+        const lib = data.progress.base && data.progress.base.scrollArchives;
+        if (!lib) {
+            return;
+        }
+        delete lib.researchTaskRequired;
+        delete lib.researchTaskProgress;
+        delete lib.researchCoinCosts;
+        delete lib.freeResearchCostCredit;
+    },
+
+    /** Divinity capacity was 10000, then every existing cap dropped by 50000 once. */
+    migrateDivinityCapacity: function() {
+        const progress = data.progress;
+        if (!progress || !progress.divinity) {
+            return;
+        }
+        if (progress.divinity.capacity === 10000) {
+            progress.divinity.capacity = 100000;
+        }
+        if (!progress.divinityCapReduced50k) {
+            progress.divinity.capacity = Math.max(0, (progress.divinity.capacity || 0) - 50000);
+            progress.divinityCapReduced50k = true;
+        }
+        if ((progress.divinity.amount || 0) > progress.divinity.capacity) {
+            progress.divinity.amount = progress.divinity.capacity;
+        }
+    },
+
+    /** The mine-wide Prioritize Ore toggle became each earth spirit's resource priority. */
+    migrateMinePrioritizeOre: function() {
+        const base = data.progress && data.progress.base;
+        const mine = base && base.mine;
+        if (!mine || !mine.prioritizeOre || !base.hiddenSpring || !base.hiddenSpring.spirits) {
+            return;
+        }
+        const spirits = base.hiddenSpring.spirits;
+        for (let spi = 0; spi < spirits.length; spi++) {
+            const sp = spirits[spi];
+            if (sp.kind === "earth" && (sp.location || "hiddenSpring") === "hiddenSpring") {
+                sp.prioritizeOre = true;
+                sp.resourcePriority = "ore";
+            }
+        }
+        mine.prioritizeOre = false;
+    },
+
+    /** Auto-retry existed before its unlock. Saves that already had it on keep it. */
+    migrateBonfireAutoRetry: function() {
+        const bonfire = data.progress.base && data.progress.base.bonfire;
+        if (bonfire && bonfire.autoRetryEnabled && !bonfire.autoRetryUnlocked) {
+            bonfire.autoRetryUnlocked = true;
+        }
     }
 };

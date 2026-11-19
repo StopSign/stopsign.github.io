@@ -57,6 +57,8 @@
             <div id="manaProgressBar" class="game-progress-bar" style="display:none">
                 <div id="manaProgressTrack" class="prog-track game-progress-track mana-progress-track">
                     <div id="manaFill" class="prog-fill prog-fill-mana"></div>
+                    <div id="manaCloneReserveMark" class="mana-clone-reserve-mark" style="display:none"></div>
+                    <div id="manaUpgradeCostMark" class="mana-upgrade-cost-mark" style="display:none"></div>
                     <div class="game-progress-bar-label"><img class="inline-res-icon" src="img/mana.svg" alt="" draggable="false">Mana: <span id="manaAmount" class="game-progress-bold">0</span>/<span id="manaCap" class="game-progress-bold">1000</span><span class="game-progress-sep">|</span>+<span id="manaRate" class="game-progress-bold">0</span>/s<span id="manaRateArchiveDrain"></span><span class="game-progress-sep">|</span>ETA: <span id="manaEtaText">-</span></div>
                 </div>
             </div>
@@ -386,6 +388,7 @@
                     <label id="travelSkipCompleted_row" style="display:none"><input type="checkbox" id="travelSkipCompleted_chk" onchange="events.setMapTourSkipCompleted(this.checked)"> Skip Completed Maps</label>
                     <label id="travelRepeatCycle_row" style="display:none"><input type="checkbox" id="travelRepeatCycle_chk" onchange="events.setMapTourRepeat(this.checked)"> Repeat Cycle</label>
                     <label id="travelEndOnLastGold_row" style="display:none"><input type="checkbox" id="travelEndOnLastGold_chk" onchange="events.setMapTourEndOnLastGold(this.checked)"> End on Last Gold</label>
+                    <label id="travelUseMaxDensity_row" style="display:none"><input type="checkbox" id="travelUseMaxDensity_chk" onchange="events.setMapTourUseMaxDensity(this.checked)"> Use Max Clone Density</label>
                 </div>
                 <div id="travelTourStatusRow" class="base-row" style="display:none">
                     <span id="travelTourStatusText"></span>

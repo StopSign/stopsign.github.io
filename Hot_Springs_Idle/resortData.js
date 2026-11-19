@@ -156,8 +156,8 @@ var resortData = {
     workerDockSiteKeys: ["torii", "laundry", "bambooForest", "foxDen", "bonfire", "cistern", "scrollArchives",  "mage_tower", "market"],
 
     /** Credit paid per unit of each haulable resource delivered to the Market. */
-    marketCreditPerResource: { stone: 5, wood: 3, hardwood: 20, bars: 10 },
-    marketHaulResourceOrder: ["stone", "wood", "hardwood", "bars"],
+    marketCreditPerResource: { stone: 5, wood: 3, hardwood: 20, bars: 10, limestone: 15 },
+    marketHaulResourceOrder: ["stone", "wood", "hardwood", "bars", "limestone"],
 
     /** Market Resources trades bought by assigned Traders. Order drives round-robin. */
     marketTradesOrder: ["fertilizer", "coal", "soap", "towels", "driedNoodles"],
@@ -330,7 +330,7 @@ var resortData = {
         const remaining = Math.max(0, required - delivered);
         const owned = resortData.ownedAmountForCostKey(key);
         const cls = owned >= remaining ? " cost-amt-affordable" : "";
-        const icon = (key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "ash")
+        const icon = (key === "wood" || key === "hardwood" || key === "stone" || key === "ore" || key === "bars" || key === "limestone" || key === "quicklime" || key === "ash")
             ? " " + resortData.resourceIconHtml(key)
             : "";
         return `${intToStringRound(delivered)}/<span class="cost-amt${cls}">${intToStringRound(required)}</span>${icon} ${label}`;
@@ -429,7 +429,7 @@ var resortData = {
         return `Buy for [${parts.join(", ")}]`;
     },
 
-    gatherResourceKeys: ["wood", "hardwood", "stone", "bars", "ore", "ash"],
+    gatherResourceKeys: ["wood", "hardwood", "stone", "bars", "limestone", "quicklime", "ore", "ash"],
 
     emptyGatherDelivered: function() {
         const out = {};
@@ -456,8 +456,6 @@ var resortData = {
                 credit: c.credit || 0,
                 divinity: c.divinity || 0,
                 essence: c.essence || 0,
-                limestone: c.limestone || 0,
-                quicklime: c.quicklime || 0,
                 paper: c.paper || 0
             }
         };
@@ -467,7 +465,7 @@ var resortData = {
         const w = weaveCost || {};
         return (w.coins || 0) > 0 || (w.starBeads || 0) > 0 || (w.mana || 0) > 0
             || (w.credit || 0) > 0 || (w.divinity || 0) > 0 || (w.essence || 0) > 0
-            || (w.limestone || 0) > 0 || (w.quicklime || 0) > 0 || (w.paper || 0) > 0;
+            || (w.paper || 0) > 0;
     },
 
     hasGatherCost: function(gatherCost) {
@@ -519,6 +517,16 @@ var resortData = {
         const barsReq = (required && required.bars) || 0;
         if (barsReq > 0) {
             parts.push(resortData.formatCollectedPartHtml(barsDel, barsReq, "bars", "bars"));
+        }
+        const limestoneDel = (delivered && delivered.limestone) || 0;
+        const limestoneReq = (required && required.limestone) || 0;
+        if (limestoneReq > 0) {
+            parts.push(resortData.formatCollectedPartHtml(limestoneDel, limestoneReq, "limestone", "limestone"));
+        }
+        const quicklimeDel = (delivered && delivered.quicklime) || 0;
+        const quicklimeReq = (required && required.quicklime) || 0;
+        if (quicklimeReq > 0) {
+            parts.push(resortData.formatCollectedPartHtml(quicklimeDel, quicklimeReq, "quicklime", "quicklime"));
         }
         const oreDel = (delivered && delivered.ore) || 0;
         const oreReq = (required && required.ore) || 0;
@@ -1311,7 +1319,10 @@ var resortData = {
                     weavingTime: 120,
                     canBuy: function() {
                         const torii = data.progress.base.torii;
-                        return engine.isCisternBuiltFromFoxDen() && !(torii && torii.drinkingBowlUnlocked);
+                        const hs = data.progress.base.hiddenSpring;
+                        return engine.isCisternBuiltFromFoxDen()
+                            && !!(hs && (hs.waterSpiritsBought || 0) >= 1)
+                            && !(torii && torii.drinkingBowlUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.torii.drinkingBowlUnlocked = true;
@@ -1378,9 +1389,10 @@ var resortData = {
                 kilnSubTab: "clone",
                 charcoalPitProgressMs: 0,
                 buildUponCloneFoundationBought: 0,
-                contemplateSturdinessBought: 0
+                contemplateSturdinessBought: 0,
+                containedHeatBought: 0
             },
-            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "igniteSparks", "buildUponCloneFoundation", "contemplateSturdiness", "fillMana"],
+            upgradesOrder: ["tendTheFlame", "containedHeat", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "igniteSparks", "buildUponCloneFoundation", "contemplateSturdiness", "fillMana"],
             upgrades: {
                 tendTheFlame: {
                     key: "tend_the_flame",
@@ -1398,6 +1410,33 @@ var resortData = {
                         return !!data.progress.base.bonfire.tendTheFlameUnlocked;
                     },
                     soldOutButtonLabel: "Tended"
+                },
+                containedHeat: {
+                    key: "contained_heat",
+                    name: "Contained Heat",
+                    description: "Each purchase reduces bonfire heat decay by 15%. Heat still falls only from the amount above the assigned fire spirits.",
+                    getCost: function() {
+                        const n = data.progress.base.bonfire.containedHeatBought || 0;
+                        return { limestone: Math.round(1500 * Math.pow(3, n)) };
+                    },
+                    weavingTime: 1000,
+                    weavingTimeIncrease: 1.5,
+                    roundWeavingTime: true,
+                    maxPurchases: 3,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.bonfire.containedHeatBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isTeachSpiritsToSortStoneBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.bonfire.containedHeatBought = (data.progress.base.bonfire.containedHeatBought || 0) + 1;
+                    },
+                    soldOutButtonLabel: "Max heat",
+                    extraInfo: function() {
+                        const n = data.progress.base.bonfire.containedHeatBought || 0;
+                        return `Heat decay: -${n * 15}%`;
+                    },
                 },
                 buildKiln: {
                     key: "build_kiln",
@@ -1564,7 +1603,7 @@ var resortData = {
                     key: "ignite_sparks",
                     name: "Ignite Sparks in Oven",
                     description: "Summon a fire spirit.",
-                    weavingTime: 2000,
+                    weavingTime: 3000,
                     weavingTimeIncrease: 2,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.bonfire.igniteSparksBought || 0;
@@ -1572,8 +1611,8 @@ var resortData = {
                     getCost: function() {
                         const bought = data.progress.base.bonfire.igniteSparksBought || 0;
                         return {
-                            limestone: 2000 * Math.pow(5, bought),
-                            hardwood: 4000 * Math.pow(5, bought)
+                            limestone: 3000 * Math.pow(4, bought),
+                            hardwood: 3000 * Math.pow(4, bought)
                         };
                     },
                     maxPurchases: 2,
@@ -1590,7 +1629,7 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Ignited",
                     rowVisible: function() {
-                        return resortHelper.isContainedSparkBought() && engine.isSearchForLimestoneBought();
+                        return resortHelper.isContainedSparkBought() && engine.isTeachSpiritsToSortStoneBought();
                     }
                 },
                 startWithFullMana: {
@@ -1719,7 +1758,7 @@ var resortData = {
                 sprinkleOreBought: 0,
                 sprinkleAshBought: 0
             },
-            upgradesOrder: ["infuseSoil", "sprinkleOre", "sprinkleAsh", "echoedAxe", "growHardwood"],
+            upgradesOrder: ["infuseSoil", "sprinkleOre", "sprinkleAsh", "growHardwood", "echoedAxe"],
             upgrades: {
                 infuseSoil: {
                     key: "infuse_soil",
@@ -1869,17 +1908,19 @@ var resortData = {
                 replaceWithHotterWater: false,
                 refuseIncomingWater: false,
                 waterSpiritsUsePathSpeed: true,
+                showIdleWorkerNotify: true,
                 assignedWorkers: 0,
                 waterCarriers: [],
                 carrierIdCounter: 1,
                 wishingWellBought: 0,
+                throwCoinsBought: 0,
                 growPlantSpiritBought: 0,
                 condenseWaterSpiritBought: 0,
                 raiseEarthSpiritBought: 0,
                 spinFireSpiritBought: 0,
                 energeticDropletsBought: 0
             },
-            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell", "growPlantSpirit", "condenseWaterSpirit", "raiseEarthSpirit", "spinFireSpirit", "energeticDroplets"],
+            upgradesOrder: ["increaseCapacity", "reinforceToriiCapacity", "reinforceOnsenCapacity", "reinforceNoodleCapacity", "buildWishingWell", "throwCoinsDownTheWell", "growPlantSpirit", "condenseWaterSpirit", "raiseEarthSpirit", "spinFireSpirit", "energeticDroplets"],
             upgrades: {
                 increaseCapacity: {
                     key: "increase_capacity",
@@ -2038,6 +2079,32 @@ var resortData = {
                         const rate = engine.getWishingWellCoinRate();
                         const nextAdd = bought <= 0 ? 0.1 : 1;
                         return `Coins: +${rate.toFixed(1)}/s. Next: +${nextAdd}/s`;
+                    }
+                },
+                throwCoinsDownTheWell: {
+                    key: "throw_coins_down_the_well",
+                    name: "Throw Coins Down the Well",
+                    description: "Each purchase multiplies Star Beads guests leave by x1.05.",
+                    getCost: function() {
+                        const n = (data.progress.base.cistern.throwCoinsBought || 0);
+                        return { coins: Math.round(20000 * Math.pow(1.15, n)) };
+                    },
+                    weavingTime: 200,
+                    weavingTimeIncrease: 1.1,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return (data.progress.base.cistern.throwCoinsBought || 0);
+                    },
+                    canBuy: function() {
+                        return resortHelper.isLuckyWellBought();
+                    },
+                    onBuy: function() {
+                        const cistern = data.progress.base.cistern;
+                        cistern.throwCoinsBought = (cistern.throwCoinsBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = (data.progress.base.cistern && data.progress.base.cistern.throwCoinsBought) || 0;
+                        return `Star Beads: x${round2(Math.pow(1.05, n))}`;
                     }
                 },
                 growPlantSpirit: {
@@ -2457,7 +2524,7 @@ var resortData = {
 
         mine: {
             label: "Mine",
-            upgradesOrder: ["pebblePay", "mineshaftBeams", "formPlayPit", "searchForLimestone"],
+            upgradesOrder: ["pebblePay", "mineshaftBeams", "formPlayPit", "teachSpiritsToSortStone"],
             upgrades: {
                 pebblePay: {
                     key: "pebble_pay",
@@ -2547,25 +2614,25 @@ var resortData = {
                         return `Dirt per play: +${pct}% (x${round2(resortHelper.getPlayPitDirtMultiplier())}). Next: +${nextAdd}%`;
                     },
                 },
-                searchForLimestone: {
-                    key: "search_for_limestone",
-                    name: "Search for Limestone",
+                teachSpiritsToSortStone: {
+                    key: "teach_spirits_to_sort_stone",
+                    name: "Teach Spirits to Sort Stone",
                     description: "On the next mine grid, replace dirt with limestone. One block at depth 8, two at 12, and three at 16. A limestone block has half an ore block's health. Depth 8 grants 300 limestone, doubling each depth after that.",
-                    cost: { starBeads: 100000, bars: 1500, hardwood: 1000 },
+                    cost: { coins: 200000, stone: 10000 },
                     weavingTime: 4000,
                     rowVisible: function() {
                         return engine.isBringOreToAtelierUnlocked() && resortHelper.isLimestoneCarvingBought();
                     },
                     canBuy: function() {
-                        return engine.isBringOreToAtelierUnlocked() && !engine.isSearchForLimestoneBought();
+                        return engine.isBringOreToAtelierUnlocked() && !engine.isTeachSpiritsToSortStoneBought();
                     },
                     onBuy: function() {
-                        data.progress.base.mine.searchForLimestoneBought = true;
+                        data.progress.base.mine.teachSpiritsToSortStoneBought = true;
                     },
                     upgradeSoldOut: function() {
-                        return engine.isSearchForLimestoneBought();
+                        return engine.isTeachSpiritsToSortStoneBought();
                     },
-                    soldOutButtonLabel: "Searched"
+                    soldOutButtonLabel: "Taught"
                 }
             }
         },
@@ -2581,6 +2648,7 @@ var resortData = {
                 guestIdCounter: 1,
                 furnitureBought: 0,
                 decorationBought: 0,
+                carveStatuesBought: 0,
                 addRoomBought: 0,
                 secondFloorRoomsBought: 0,
                 reinforceJointsBought: 0,
@@ -2598,7 +2666,7 @@ var resortData = {
                 gentleLightsUnlocked: false,
                 shapedLampsBought: 0
             },
-            upgradesOrder: ["addFurniture", "addDecoration", "addRoom", "buildPathToPond", "convertToOnsen", "reinforceJoints", "secondFloorRooms", "createGentleLights", "shapedLamps", "fillMana"],
+            upgradesOrder: ["addFurniture", "addDecoration", "carveStatues", "addRoom", "buildPathToPond", "convertToOnsen", "reinforceJoints", "secondFloorRooms", "createGentleLights", "shapedLamps", "fillMana"],
             upgrades: {
                 addFurniture: {
                     key: "add_furniture",
@@ -2639,6 +2707,32 @@ var resortData = {
                     },
                     maxPurchases: 4,
                     soldOutButtonLabel: "Max decoration",
+                },
+                carveStatues: {
+                    key: "carve_statues",
+                    name: "Carve Statues",
+                    description: "Carved figures help guests gain restfulness faster (+3/s per upgrade).",
+                    getCost: function() {
+                        const n = data.progress.base.inn.carveStatuesBought || 0;
+                        return { limestone: Math.round(500 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 900,
+                    weavingTimeIncreaseAdd: 900,
+                    maxPurchases: 4,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.inn.carveStatuesBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isTeachSpiritsToSortStoneBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.inn.carveStatuesBought = (data.progress.base.inn.carveStatuesBought || 0) + 1;
+                    },
+                    soldOutButtonLabel: "Max statues",
+                    extraInfo: function() {
+                        const n = data.progress.base.inn.carveStatuesBought || 0;
+                        return `Restfulness: +${n * 3}/s`;
+                    },
                 },
                 addRoom: {
                     key: "add_room",
@@ -3022,6 +3116,8 @@ var resortData = {
                 manaStorageCharmsBought: 0,
                 betterAxesBought: 0,
                 sharperAxesBought: 0,
+                whetstoneBought: 0,
+                addFluxBought: 0,
                 magicLoomsBought: 0,
                 sprinkleOreOnRoadsBought: 0,
                 improveDirtRoadsBought: 0,
@@ -3046,7 +3142,7 @@ var resortData = {
                 paperPowerCost: 20,
                 crushPaperBought: false
             },
-            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "buildWaterWheelAndDrophammer", "crushPaper"],
+            upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "whetstone", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "buildWaterWheelAndDrophammer", "addFlux", "crushPaper"],
             upgrades: {
                 magicLooms: {
                     key: "magic_looms",
@@ -3310,6 +3406,7 @@ var resortData = {
                     },
                     weavingTime: 120,
                     weavingTimeIncreaseAdd: 120,
+                    maxPurchases: 6,
                     getWeavingPurchaseIndex: function() {
                         return data.progress.base.atelier.sharperAxesBought || 0;
                     },
@@ -3319,9 +3416,37 @@ var resortData = {
                     onBuy: function() {
                         data.progress.base.atelier.sharperAxesBought = (data.progress.base.atelier.sharperAxesBought || 0) + 1;
                     },
+                    soldOutButtonLabel: "Max axes",
                     extraInfo: function() {
                         const n = data.progress.base.atelier.sharperAxesBought || 0;
                         return `+${n * 50}% chop power per kitsune`;
+                    },
+                },
+                whetstone: {
+                    key: "whetstone",
+                    name: "Whetstone",
+                    description: "Each kitsune chopping bamboo gains +4 chop power per upgrade.",
+                    getCost: function() {
+                        const n = data.progress.base.atelier.whetstoneBought || 0;
+                        return { limestone: Math.round(4000 * Math.pow(2, n)) };
+                    },
+                    weavingTime: 2000,
+                    weavingTimeIncrease: 1.5,
+                    roundWeavingTime: true,
+                    maxPurchases: 4,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.atelier.whetstoneBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isTeachSpiritsToSortStoneBought();
+                    },
+                    onBuy: function() {
+                        data.progress.base.atelier.whetstoneBought = (data.progress.base.atelier.whetstoneBought || 0) + 1;
+                    },
+                    soldOutButtonLabel: "Max whetstones",
+                    extraInfo: function() {
+                        const n = data.progress.base.atelier.whetstoneBought || 0;
+                        return `+${n * 4} chop power per kitsune`;
                     },
                 },
                 sprinkleOreOnRoads: {
@@ -3377,7 +3502,7 @@ var resortData = {
                 buildWaterWheelAndDrophammer: {
                     key: "build_water_wheel_and_drophammer",
                     name: "Build Water Wheel and Drophammer",
-                    description: "Build a water wheel and drop hammer beside the Atelier. The stream to the Bamboo Forest turns the wheel.",
+                    description: "Build a water wheel and drop hammer beside the Atelier, turning faster with the steam's strength. Starts by turning Limestone into Quicklime.",
                     cost: { wood: 20000, hardwood: 2000, stone: 40000 },
                     weavingTime: 6000,
                     rowVisible: function() {
@@ -3394,6 +3519,32 @@ var resortData = {
                         return !!(data.progress.base.atelier && data.progress.base.atelier.drophammerUnlocked);
                     },
                     soldOutButtonLabel: "Built"
+                },
+                addFlux: {
+                    key: "add_flux",
+                    name: "Add Flux",
+                    description: "Each purchase multiplies bars gained from a forge cycle by x1.25. Ore used and spirit exp stay on the ore amount. Bars are rounded up.",
+                    getCost: function() {
+                        const n = data.progress.base.atelier.addFluxBought || 0;
+                        return { quicklime: Math.round(1000 * Math.pow(1.5, n)) };
+                    },
+                    weavingTime: 1500,
+                    weavingTimeIncreaseAdd: 750,
+                    maxPurchases: 6,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.atelier.addFluxBought || 0;
+                    },
+                    canBuy: function() {
+                        return engine.isDrophammerUnlocked();
+                    },
+                    onBuy: function() {
+                        data.progress.base.atelier.addFluxBought = (data.progress.base.atelier.addFluxBought || 0) + 1;
+                    },
+                    soldOutButtonLabel: "Max flux",
+                    extraInfo: function() {
+                        const n = data.progress.base.atelier.addFluxBought || 0;
+                        return `Bars per ore: x${round2(Math.pow(1.25, n))}`;
+                    },
                 },
                 crushPaper: {
                     key: "crush_paper",
@@ -3455,9 +3606,11 @@ var resortData = {
                 arrangementOfOrbGrowthUnlocked: false,
                 arrangementOfManaCurrentsUnlocked: false,
                 arrangementOfManaReserveUnlocked: false,
+                arrangementOfManaInsightUnlocked: false,
                 arrangementOfResourceProtectionUnlocked: false,
                 arrangementOfNavigationUnlocked: false,
                 arrangementOfGoldenNavigationUnlocked: false,
+                arrangementOfFullPowerTourUnlocked: false,
                 arrangementOfCyclicNavigationUnlocked: false,
                 arrangementOfGoldenRestUnlocked: false,
                 reserveCloneManaForAutobuy: false,
@@ -3473,8 +3626,8 @@ var resortData = {
                 "arrangementOfStepBuilding", "arrangementOfLanternPlacing",
                 "arrangementOfFireTending", "arrangementOfPriority", "arrangementOfThirst", "arrangementOfTraderResponsibility",
                 "arrangementOfPaperMoney", "arrangementOfHeatTargeting",
-                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents", "arrangementOfManaReserve",
-                "arrangementOfResourceProtection", "arrangementOfNavigation", "arrangementOfGoldenNavigation",
+                "arrangementOfSpelunking", "arrangementOfSelfSufficiency", "arrangementOfOrbGrowth", "arrangementOfManaCurrents", "arrangementOfManaReserve", "arrangementOfManaInsight",
+                "arrangementOfResourceProtection", "arrangementOfNavigation", "arrangementOfGoldenNavigation", "arrangementOfFullPowerTour",
                 "arrangementOfCyclicNavigation", "arrangementOfGoldenRest"],
             upgrades: {
                 arrangementOfRotation: {
@@ -4083,7 +4236,7 @@ var resortData = {
                     weavingTime: 90,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return resortHelper.getArtAppreciationBought() >= 1;
+                        return resortHelper.getArtAppreciationBought() >= 1 && engine.isManaUnlocked();
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfOrbGrowthUnlocked = true;
@@ -4106,7 +4259,7 @@ var resortData = {
                     weavingTime: 90,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return resortHelper.getArtAppreciationBought() >= 2;
+                        return resortHelper.getArtAppreciationBought() >= 2 && engine.isManaUnlocked();
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfManaCurrentsUnlocked = true;
@@ -4143,6 +4296,25 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Arranged"
                 },
+                arrangementOfManaInsight: {
+                    key: "arrangement_of_mana_insight",
+                    name: "Arrangement of Mana Insight",
+                    description: "The mana bar marks mana set aside for the current clone, and the mana cost of the upgrade under your pointer.",
+                    cost: { stone: 1000 },
+                    weavingTime: 1000,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfManaReserveUnlocked && !g.arrangementOfManaInsightUnlocked);
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfManaInsightUnlocked = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfManaInsightUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
                 arrangementOfResourceProtection: {
                     key: "arrangement_of_resource_protection",
                     name: "Arrangement of Resource Protection",
@@ -4172,7 +4344,9 @@ var resortData = {
                     weavingTime: 400,
                     canBuy: function() {
                         const g = data.progress.base.garden;
-                        return resortHelper.isSkyAppreciationBought() && !(g && g.arrangementOfNavigationUnlocked);
+                        return engine.isBonfireBuiltFromFoxDen()
+                            && resortHelper.isSkyAppreciationBought()
+                            && !(g && g.arrangementOfNavigationUnlocked);
                     },
                     onBuy: function() {
                         data.progress.base.garden.arrangementOfNavigationUnlocked = true;
@@ -4187,8 +4361,8 @@ var resortData = {
                     key: "arrangement_of_golden_navigation",
                     name: "Arrangement of Golden Navigation", 
                     description: "Reveal Skip Completed Maps on the Travel tab.",
-                    cost: { stone: 1500 },
-                    weavingTime: 1000,
+                    cost: { stone: 3000 },
+                    weavingTime: 2000,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfNavigationUnlocked) && !g.arrangementOfGoldenNavigationUnlocked;
@@ -4202,12 +4376,32 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Arranged"
                 },
+                arrangementOfFullPowerTour: {
+                    key: "arrangement_of_full_power_tour",
+                    name: "Arrangement of Full Power Tour",
+                    description: "Reveal a Use Max Clone Density checkbox on Try Every Map Once. When checked, the tour uses your maximum clone density, then restores the previous density.",
+                    cost: { stone: 8000 },
+                    weavingTime: 2500,
+                    canBuy: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfGoldenNavigationUnlocked) && !g.arrangementOfFullPowerTourUnlocked;
+                    },
+                    onBuy: function() {
+                        data.progress.base.garden.arrangementOfFullPowerTourUnlocked = true;
+                        data.progress.base.shrine.mapTourUseMaxDensity = true;
+                    },
+                    upgradeSoldOut: function() {
+                        const g = data.progress.base.garden;
+                        return !!(g && g.arrangementOfFullPowerTourUnlocked);
+                    },
+                    soldOutButtonLabel: "Arranged"
+                },
                 arrangementOfCyclicNavigation: {
                     key: "arrangement_of_cyclic_navigation",
                     name: "Arrangement of Cyclic Navigation",
                     description: "Reveal Repeat Cycle on the Travel tab.",
-                    cost: { stone: 2500 },
-                    weavingTime: 1500,
+                    cost: { stone: 4000 },
+                    weavingTime: 2500,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfGoldenNavigationUnlocked) && !g.arrangementOfCyclicNavigationUnlocked;
@@ -4225,8 +4419,8 @@ var resortData = {
                     key: "arrangement_of_golden_rest",
                     name: "Arrangement of Golden Rest",
                     description: "Reveal End on Last Gold on the Travel tab.",
-                    cost: { stone: 2500 },
-                    weavingTime: 1500,
+                    cost: { stone: 4000 },
+                    weavingTime: 2500,
                     canBuy: function() {
                         const g = data.progress.base.garden;
                         return !!(g && g.arrangementOfGoldenNavigationUnlocked) && !g.arrangementOfGoldenRestUnlocked;
@@ -4248,7 +4442,7 @@ var resortData = {
         stonePile: {
             label: "Stone Pile",
             description: "Holds stone.",
-            upgradesOrder: ["createStoneDuplicator", "echoedShelving", "fillMana"],
+            upgradesOrder: ["createStoneDuplicator", "cleanGlyphs", "echoedShelving", "fillMana"],
             upgrades: {
                 createStoneDuplicator: {
                     key: "create_stone_duplicator",
@@ -4270,6 +4464,29 @@ var resortData = {
                         return !!(data.progress.base.stonePile && data.progress.base.stonePile.stoneDuplicatorUnlocked);
                     },
                     soldOutButtonLabel: "Built"
+                },
+                cleanGlyphs: {
+                    key: "clean_glyphs",
+                    name: "Clean Glyphs",
+                    description: "The stone duplicator ticks twice as fast: 5 seconds before card speed.",
+                    cost: { limestone: 4000 },
+                    weavingTime: 3000,
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        const pile = data.progress.base.stonePile;
+                        return engine.isTeachSpiritsToSortStoneBought()
+                            && !!(pile && pile.stoneDuplicatorUnlocked && !pile.cleanGlyphsBought);
+                    },
+                    onBuy: function() {
+                        data.progress.base.stonePile.cleanGlyphsBought = true;
+                    },
+                    upgradeSoldOut: function() {
+                        return !!(data.progress.base.stonePile && data.progress.base.stonePile.cleanGlyphsBought);
+                    },
+                    soldOutButtonLabel: "Cleaned",
+                    extraInfo: function() {
+                        return "Duplicator tick: 5s before card speed";
+                    },
                 },
                 echoedShelving: {
                     key: "echoed_shelving",
@@ -4476,6 +4693,7 @@ var resortData = {
                 allowWood: false,
                 allowHardwood: false,
                 allowBars: false,
+                allowLimestone: false,
                 nextHaulResourceIndex: 0,
                 creditOnlyPurchases: false,
                 fertilizer: 0,
@@ -5548,6 +5766,7 @@ var resortData = {
                 spiritAncestorGuidanceBought: 0,
                 containedSparkBought: 0,
                 essenceGatheringBought: 0,
+                luckyWellBought: 0,
                 keepRecordsBought: 0,
                 kitsuneBalanceBought: 0,
                 callTheGoddessBought: 0,
@@ -5563,9 +5782,11 @@ var resortData = {
                 haulKeepWood: 0,
                 haulKeepHardwood: 0,
                 haulKeepBars: 0,
+                haulKeepLimestone: 0,
                 mapTourSkipCompleted: false,
                 mapTourRepeat: false,
                 mapTourEndOnLastGold: false,
+                mapTourUseMaxDensity: false,
                 prepareToWriteLegendBought: false,
                 templeUnlocked: false,
                 okamiIconographyBought: 0,
@@ -5581,7 +5802,7 @@ var resortData = {
                 "plantAffinity", "earthAffinity", "hardenBamboo", "scribingInfusions", "shardsFound",
                 "tradingContracts", "resourceProtection", "dealMaking", "orbHeight", "skyAppreciation",
                 "limestoneCarving", "waterfallTraining", "spiritAncestors", "spiritAncestorGuidance",
-                "containedSpark", "essenceGathering", "keepRecords", "kitsuneBalance",
+                "containedSpark", "essenceGathering", "luckyWell", "keepRecords", "kitsuneBalance",
                 "callTheGoddess", "donationDrive", "waterPower",
                 "upgradeToTemple", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"],
             upgrades: {
@@ -6142,7 +6363,7 @@ var resortData = {
                 limestoneCarving: {
                     key: "limestone_carving",
                     name: "Limestone Carving",
-                    description: "Reveals Search for Limestone in the Mine - a new resource to mine and bring to Atelier.",
+                    description: "Reveals Teach Spirits to Sort Stone in the Mine - a new resource to mine and bring to Atelier.",
                     weavingTime: 800,
                     getCost: function() {
                         return { divinity: 20000 };
@@ -6185,7 +6406,7 @@ var resortData = {
                 spiritAncestors: {
                     key: "spirit_ancestors",
                     name: "Spirit Knowledge",
-                    description: "Spirit exp is multiplied by 1 + spirit training / spirit power.",
+                    description: "Spirit exp per spirit is multiplied by 1 + spirit training / spirit power.",
                     weavingTime: 3500,
                     getCost: function() {
                         return { divinity: 80000 };
@@ -6226,7 +6447,7 @@ var resortData = {
                     key: "contained_spark",
                     name: "Contained Spark",
                     description: "Reveals Ignite Sparks in Oven in the Bonfire for two more Fire Spirits that cost Limestone.",
-                    weavingTime: 2000,
+                    weavingTime: 4000,
                     getCost: function() {
                         return { divinity: 50000 };
                     },
@@ -6268,11 +6489,31 @@ var resortData = {
                         return engine.getLegendsWritten() >= 3;
                     }
                 },
+                luckyWell: {
+                    key: "lucky_well",
+                    name: "Lucky Well",
+                    description: "Reveals Throw Coins Down the Well in the Cistern, an upgrade to exchange coins for Spirit Beads gain.",
+                    weavingTime: 600,
+                    getCost: function() {
+                        return { divinity: 40000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.luckyWellBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isLuckyWellBought();
+                    },
+                    soldOutButtonLabel: "Lucky",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
                 keepRecords: {
                     key: "keep_records",
                     name: "Keep Records",
-                    description: "Reveals Crush Paper in the Atelier, a resource that keeps between prestiges and is used for auto-building.",
-                    weavingTime: 2000,
+                    description: "Reveals Crush Paper in the Drophammer, to get paper: a resource that keeps between prestiges and is used for auto-building.",
+                    weavingTime: 4000,
                     getCost: function() {
                         return { divinity: 75000 };
                     },
@@ -6314,7 +6555,7 @@ var resortData = {
                 callTheGoddess: {
                     key: "call_the_goddess",
                     name: "Call the Goddess",
-                    description: "Reveals Upgrade to Temple.",
+                    description: "Reveals a shrine upgrade to build a Temple, a place that uses Limestone and Kitsune and more for various upgrades.",
                     weavingTime: 3000,
                     getCost: function() {
                         return { divinity: 50000 };

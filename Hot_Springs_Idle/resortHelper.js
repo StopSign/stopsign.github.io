@@ -259,6 +259,9 @@ let resortHelper = {
     getEssenceGatheringBought: function() {
         return resortHelper.getShrineUpgradeBought("essenceGatheringBought");
     },
+    isLuckyWellBought: function() {
+        return resortHelper.getShrineUpgradeBought("luckyWellBought") > 0;
+    },
     isKeepRecordsBought: function() {
         return resortHelper.getShrineUpgradeBought("keepRecordsBought") > 0;
     },

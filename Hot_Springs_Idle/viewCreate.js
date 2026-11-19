@@ -623,7 +623,7 @@ let createView = {
                 }
                 if (engine.cisternWorkersRevealed()) {
                     html += "<p>Assigned kitsune, and the Okami while she is here, carry water to a building that still has room and is allowing carriers. They leave only when the Cistern is hot enough for that stop: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. A trip takes up to the Water carry amount. They prefer a stop that can hold a full load. Water that does not fit on delivery is returned to the Cistern.</p>";
-                    html += "<p>The ! appears when kitsune or the Okami are assigned, at least one stop still has room and is accepting carriers, and the Cistern is too cold for every one of those stops: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. It does not appear when every available stop is already full, including water already on the way, or while you are looking at the Cistern.</p>";
+                    html += "<p>The ! appears while Show ! when workers are idle is checked, kitsune or the Okami are assigned, at least one stop still has room and is accepting carriers, and the Cistern is too cold for every one of those stops: above 40C for the Onsen, above 65C for the Noodle Bar, and at least 26C for the Torii. It does not appear when every available stop is already full, including water already on the way, or while you are looking at the Cistern. A new Cistern upgrade still marks the building when that box is off.</p>";
                 }
                 return html;
             },
@@ -651,7 +651,7 @@ let createView = {
                 html += "<p>Earth spirits dig with their effective spirit power. Mineshaft Beams add 20% dig power each, which is the bonus on the Spirit power line.</p>";
                 html += "<p>A grid is 25 blocks. Depth 0 has 1 stone, and each 2 depth adds 1 stone, up to 5. Ore starts at depth 3, and each 5 depth adds 1 ore, up to 5. The rest is dirt.</p>";
                 if (engine.isBringOreToAtelierUnlocked()) {
-                    html += "<p>After Search for Limestone, the next grid adds 1 limestone at depth 8, 2 at 12, and 3 at 16, replacing dirt only. A limestone block has half an ore block's health, and depth 8 grants 300 limestone, doubling each depth after that.</p>";
+                    html += "<p>After Teach Spirits to Sort Stone, the next grid adds 1 limestone at depth 8, 2 at 12, and 3 at 16, replacing dirt only. A limestone block has half an ore block's health, and depth 8 grants 300 limestone, doubling each depth after that.</p>";
                 }
                 html += "<p>Digging does not grant exp. When the grid is clear, assigned earth spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and split among them as exp. The play line shows that amount.</p>";
                 if (resortHelper.getPlayPitBought() > 0) {
@@ -678,8 +678,8 @@ let createView = {
                 const kind = spirit ? (spirit.kind || "earth") : "";
                 let html = "<p>Exp to the next level is multiplied by 1.8.</p>";
                 if (kind === "earth") {
-                    const minedResources = engine.isSearchForLimestoneBought() ? "dirt, stone, ore, or limestone" : "dirt, stone, or ore";
-                    const carriedResources = engine.isSearchForLimestoneBought() ? "stone, ore, or limestone" : "stone or ore";
+                    const minedResources = engine.isTeachSpiritsToSortStoneBought() ? "dirt, stone, ore, or limestone" : "dirt, stone, or ore";
+                    const carriedResources = engine.isTeachSpiritsToSortStoneBought() ? "stone, ore, or limestone" : "stone or ore";
                     html += "<p>At the Mine, an earth spirit digs with effective spirit power: Spirit Power plus Spirit Training, up to as much training as power. Mineshaft Beams add 20% dig power each. Clearing a block grants " + minedResources + ". Digging does not grant exp. After the grid is clear, the spirits play in the dirt. Every 5 seconds, dirt equal to their total level is removed and that amount is split as exp among the earth spirits assigned there.</p>";
                     let pebbleInfo = "<p>At the Hidden Spring, an earth spirit sends pebbles down the path. Each pebble carries floor(√effective spirit power) " + carriedResources + ", plus 20% per Pebble Pay, rounded up.";
                     if (resortHelper.getEchoedShelvingBought() > 0) {
@@ -713,7 +713,7 @@ let createView = {
                 if (resortHelper.isSpiritTrainingSpotBought()) {
                     keys.push("training");
                 }
-                if (engine.isSearchForLimestoneBought()) {
+                if (engine.isTeachSpiritsToSortStoneBought()) {
                     keys.push("limestone");
                 }
                 return keys;
@@ -870,7 +870,7 @@ let createView = {
                 const paperHtml = (typeof automation !== "undefined" && automation.buildingControlsHtml) ? automation.buildingControlsHtml(k) : "";
                 const nameClass = paperHtml ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
                 const nameInner = paperHtml ? `<span class="base-upgrade-name-label">${label}</span>${paperHtml}` : label;
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="${nameClass}">${nameInner}</div><div class="muted-text base-skill-short">${resortData.insertResourceIcons(desc)}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Plan to build</button></div>`;
+                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row" onmouseenter="view.showUpgradeManaCost('foxDenUnlock','${k}')" onmouseleave="view.hideUpgradeManaCost()"><div class="base-upgrade-text"><div class="${nameClass}">${nameInner}</div><div class="muted-text base-skill-short">${resortData.insertResourceIcons(desc)}</div><div id="base_foxDen_extra_${k}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('foxDenUnlock','${k}')">Plan to build</button></div>`;
             }
             return h;
         };
@@ -979,7 +979,7 @@ let createView = {
                     nameHtml = `<span class="base-upgrade-name-label">${ud.name || ""}</span>${paperHtml}`;
                 }
                 const nameClass = (ud.autobuy || paperHtml) ? "base-upgrade-name base-upgrade-name--autobuy" : "base-upgrade-name";
-                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row"><div class="base-upgrade-text"><div class="${nameClass}">${nameHtml}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
+                h += `<div id="${rowId}" class="base-scrollArchives-row base-upgrade-row" onmouseenter="view.showUpgradeManaCost('${scopeKey}','${pk}')" onmouseleave="view.hideUpgradeManaCost()"><div class="base-upgrade-text"><div class="${nameClass}">${nameHtml}</div><div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div><div id="${extraId}" class="muted-text"></div></div><button id="${btnId}" class="tab-button" onclick="events.buyUpgrade('${scopeKey}','${pk}')">Buy for</button></div>`;
             }
             return h;
         };
@@ -1145,7 +1145,7 @@ let createView = {
             const descText = ud.description || "";
             return `
                 <div id="prayerStatue_${spec.id}" class="prayer-statue-cell">
-                    <div id="${rowId}" class="base-scrollArchives-row base-upgrade-row">
+                    <div id="${rowId}" class="base-scrollArchives-row base-upgrade-row" onmouseenter="view.showUpgradeManaCost('shrine','${spec.upgradeKey}')" onmouseleave="view.hideUpgradeManaCost()">
                         <div class="base-upgrade-text">
                             <div class="base-upgrade-name">${ud.name || ""}</div>
                             <div id="${descId}" class="muted-text base-skill-short">${resortData.insertResourceIcons(descText)}</div>
@@ -1410,22 +1410,13 @@ let createView = {
             }
             return h;
         };
-        const htmlMarketHaulToggles = function(hardwoodLine) {
+        const htmlMarketHaulItem = function(key) {
             const credit = resortData.resourceIconHtml("credit");
-            const order = resortData.marketHaulResourceOrder || [];
             const rates = resortData.marketCreditPerResource || {};
-            const names = { stone: "Stone", wood: "Wood", hardwood: "Hardwood", bars: "Bars" };
-            let h = "";
-            for (let hi = 0; hi < order.length; hi++) {
-                const key = order[hi];
-                if (hardwoodLine ? key !== "hardwood" : key === "hardwood") {
-                    continue;
-                }
-                const idKey = key.charAt(0).toUpperCase() + key.slice(1);
-                const name = names[key] || key;
-                h += `<label><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"> ${name} (<span id="marketHaulCredit_${key}">${rates[key] || 0}</span> ${credit}) <span id="marketHaulKeep_${key}_wrap" style="display:none">Keep: <input type="number" id="marketHaulKeep_${key}" class="market-trade-threshold" min="0" step="1" value="0" onchange="events.setMarketHaulKeep('${key}', this.value)"></span></label> `;
-            }
-            return h;
+            const names = { stone: "Stone", wood: "Wood", hardwood: "Hardwood", bars: "Bars", limestone: "Limestone" };
+            const idKey = key.charAt(0).toUpperCase() + key.slice(1);
+            const name = names[key] || key;
+            return `<div id="marketHaul_${key}" class="market-haul-item"><label class="market-haul-line"><input type="checkbox" id="marketAllow${idKey}_chk" onchange="events.toggleMarketHaulResource('${key}', this.checked)"><span id="marketHaulKeep_${key}_wrap" class="market-haul-keep" style="display:none">Keep <input type="number" id="marketHaulKeep_${key}" class="market-trade-threshold" min="0" step="1" value="0" onchange="events.setMarketHaulKeep('${key}', this.value)"></span><span class="market-haul-name">${name}</span><span class="market-haul-credit"><span id="marketHaulCredit_${key}">${rates[key] || 0}</span> ${credit}</span></label></div>`;
         };
         const htmlMarketPanel = function() {
             const credit = resortData.resourceIconHtml("credit");
@@ -1439,10 +1430,15 @@ let createView = {
                     <button type="button" id="marketExchangeCredit_btn" class="tab-button" onclick="events.startExchangeCredit()">Exchange 1000 coins for 1000 credits</button>
                     <label id="marketRepeatExchange_row" style="display:none"><input type="checkbox" id="marketRepeatExchange_chk" onchange="events.toggleMarketRepeatExchange(this.checked)"> Repeat when ready</label>
                 </div>
-                <div class="base-row">Allow resources:
-                    ${htmlMarketHaulToggles(false)}
+                <div id="marketHaulLayout" class="market-haul-layout">
+                    <div id="marketAllowResourcesLabel" class="market-haul-label">Trade Resources for Credit</div>
+                    ${htmlMarketHaulItem("stone")}
+                    ${htmlMarketHaulItem("wood")}
+                    ${htmlMarketHaulItem("bars")}
+                    <div id="marketHaulBreak" class="market-haul-break"></div>
+                    ${htmlMarketHaulItem("hardwood")}
+                    ${htmlMarketHaulItem("limestone")}
                 </div>
-                <div class="base-row" id="marketAllowHardwood_wrap">${htmlMarketHaulToggles(true)}</div>
                 ${resortUpgradeRowsHtml("market")}
                 <div class="base-upgrade-divider"></div>
                 <div class="base-info-title">Market Resources</div>
@@ -1727,7 +1723,7 @@ let createView = {
                     <div id="bambooForestInfoTitle" class="base-info-title">Bamboo Forest</div>
                     <div class="base-row">Bamboo Chips: <span id="bambooForestInfoChips"></span> <span class="muted-text"> -> 10 -> </span> ${resortData.resourceIconHtml("wood")} Wood: <span id="bambooForestInfoWood"></span></div>
                     <div id="bambooForestHardwood_row" class="base-row" style="display:none">Hardwood Chips: <span id="bambooForestInfoHardwoodChips"></span> <span class="muted-text"> -> 50 -> </span> ${resortData.resourceIconHtml("hardwood")} Hardwood: <span id="bambooForestInfoHardwood"></span></div>
-                    <div class="base-row">Chop Power: <span id="bambooChopPower"></span></div>
+                    <div class="base-row">Chop Power: <span id="bambooChopPower"></span> <span id="bambooChopPowerFactors" class="muted-text"></span></div>
                     <div id="bambooForestWater_row" class="base-row" style="display:none">Water: <span id="bambooForestWaterText"></span></div>
                     <div id="bambooForestFertilizer_row" class="base-row" style="display:none">Fertilizer: <span id="bambooForestFertilizerText"></span></div>
                     <div class="base-row muted-text">Select which stalk to cut.</div>
@@ -1759,6 +1755,7 @@ let createView = {
                     <div class="base-row">Capacity: <span id="cisternInfoCapacity"></span></div>
                     <div id="cisternWishingWell_row" class="base-row" style="display:none">Wishing well: +<span id="cisternWishingWellCoins"></span> coins/s</div>
                     <div id="cisternWaterCarry_row" class="base-row" style="display:none">Water carry: <span id="cisternWaterCarry"></span>L per trip</div>
+                    <div id="cisternIdleNotify_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternIdleNotify_chk" checked onchange="events.toggleCisternIdleWorkerNotify(this.checked)"> Show ! when workers are idle</label></div>
                     <div id="cisternReplaceHotWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternReplaceHotWater_chk" onchange="events.toggleCisternReplaceWithHotterWater(this.checked)"> Replace with hotter water</label></div>
                     <div id="cisternRefuseWater_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternRefuseWater_chk" onchange="events.toggleCisternRefuseIncomingWater(this.checked)"> Dump incoming water to the Pond</label></div>
                     <div id="cisternViscosity_row" class="base-row" style="display:none"><label><input type="checkbox" id="cisternViscosity_chk" checked onchange="events.toggleCisternWaterSpiritsUsePathSpeed(this.checked)"> Water spirits use path speed bonuses</label></div>
@@ -2189,6 +2186,7 @@ let createView = {
                     <label><input type="radio" name="skillListSort" id="skillSortAlpha" value="alpha" onchange="events.setSkillListSort('alpha')"> Alphabetically</label>
                     <label><input type="radio" name="skillListSort" id="skillSortTips" value="tips" onchange="events.setSkillListSort('tips')"> Tips</label>
                     <label><input type="radio" name="skillListSort" id="skillSortGrouping" value="grouping" onchange="events.setSkillListSort('grouping')"> Grouping</label>
+                    <label><input type="radio" name="skillListSort" id="skillSortUnequipped" value="unequipped" onchange="events.setSkillListSort('unequipped')"> Unequipped</label>
                 </div>
             </div>`;
 
@@ -2225,7 +2223,7 @@ let createView = {
             "skillsSlots_equipped", "skillsSlots_library", "skillsLibraryResearchedTitle",
             "skillsLibraryListArea", "skillsLibraryTwoCol", "skillsLibraryColsScroll", "skillsLibraryColLeft", "skillsLibraryColRight",
             "skillsLibraryRowsHost", "skillsListSearchRow", "skillsListSearch", "skillsListEmpty",
-            "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping",
+            "skillSortRadios", "skillSortOldest", "skillSortTalent", "skillSortAlpha", "skillSortTips", "skillSortGrouping", "skillSortUnequipped",
             "skillInfoPanel", "skillInfo_title", "skillInfo_grouping", "skillInfo_current_wrap", "skillInfo_current",
             "skillInfo_reward", "skillInfo_trigger", "skillInfo_base_exp", "skillInfo_exp_on_trigger",
             "skillInfo_exp_text", "skillInfo_exp_mults", "skillInfo_exp_fill",
@@ -2442,7 +2440,7 @@ let createView = {
         //uses createView.queueCache("<element ID>") for elements created in index.html
 
         createView.queueCache(
-            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "resourceProgressRow", "manaProgressBar", "manaProgressTrack", "manaFill", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
+            "mainLayout", "gameColumnsRow", "gameProgressBars", "okamiProgressBar", "resourceProgressRow", "manaProgressBar", "manaProgressTrack", "manaFill", "manaCloneReserveMark", "manaUpgradeCostMark", "manaAmount", "manaCap", "manaRate", "manaRateArchiveDrain", "manaEtaText",
             "divinityProgressBar", "divinityProgressTrack", "divinityFill", "divinityAmount", "divinityCap", "divinityRate",
             "battlefieldWrap", "battlefield", "battleHud", "battleEndRunBtn", "waveInfo", "waveInfoTimeRow", "waveInfoStar", "waveInfoTimeLabel", "waveInfoTransition", "waveInfoZoneShards", "waveInfoZones", "rangeMarkers", "attackLines", "slapFxLayer", "slapHandOuter", "slapHandSide", "slapHandInner", "playerBuffRow", "playerStack", "playerToken", "playerTokenAudLayer", "playerTokenAudFill", "playerTokenBarrierLayer", "playerTokenBarrierFill", "playerStatCloutLine", "playerStatAudLine", "playerStatDmgLine", "playerMovePulse",
             "playerAttackBarFill", "playerAttackBarLabel", "playerSandalBarTrack", "playerSandalBarFill", "playerSandalBarLabel",
@@ -2471,7 +2469,7 @@ let createView = {
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
             "spiritInfoTaskText", "spiritInfoTaskProgressWrap", "spiritInfoTaskFill",
             "cisternInfoWater", "cisternInfoTemperature", "cisternInfoCapacity", "cisternWaterCarry_row", "cisternWaterCarry", "cisternWishingWell_row", "cisternWishingWellCoins",
-            "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternEmptyHalf_btn",
+            "cisternReplaceHotWater_row", "cisternReplaceHotWater_chk", "cisternRefuseWater_row", "cisternRefuseWater_chk", "cisternViscosity_row", "cisternViscosity_chk", "cisternIdleNotify_row", "cisternIdleNotify_chk", "cisternEmptyHalf_btn",
             "pondInfoWater", "pondWishingWellRate", "pondWaterSpiritExp_row", "pondWaterSpiritExp", "pondSendWater_row",
             "bambooForestWater_row", "bambooForestWaterText", "bambooForestFertilizer_row", "bambooForestFertilizerText",
             "base_bambooForest_infuse_soil_row", "base_bambooForest_infuse_soil_btn", "base_bambooForest_infuse_soil_extra",
@@ -2511,9 +2509,9 @@ let createView = {
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
             "marketExpProgressWrap", "marketExpFill", "marketLevelText", "marketExpText", "marketExpToLevelText", "marketCreditText", "marketTradeStatus_row", "marketDemandTax_row",
-            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowHardwood_chk", "marketAllowHardwood_wrap", "marketAllowBars_chk", "marketExchangeCredit_btn",
-            "marketHaulCredit_stone", "marketHaulCredit_wood", "marketHaulCredit_hardwood", "marketHaulCredit_bars",
-            "marketHaulKeep_stone_wrap", "marketHaulKeep_wood_wrap", "marketHaulKeep_hardwood_wrap", "marketHaulKeep_bars_wrap",
+            "marketAllowStone_chk", "marketAllowWood_chk", "marketAllowHardwood_chk", "marketHaul_hardwood", "marketAllowBars_chk", "marketAllowLimestone_chk", "marketHaul_limestone", "marketHaulLayout", "marketHaulBreak", "marketExchangeCredit_btn",
+            "marketHaulCredit_stone", "marketHaulCredit_wood", "marketHaulCredit_hardwood", "marketHaulCredit_bars", "marketHaulCredit_limestone",
+            "marketHaulKeep_stone_wrap", "marketHaulKeep_wood_wrap", "marketHaulKeep_hardwood_wrap", "marketHaulKeep_bars_wrap", "marketHaulKeep_limestone_wrap",
             "marketRepeatExchange_row", "marketRepeatExchange_chk",
             "base_market_traders_assign_one_btn", "base_market_traders_assign_ten_btn", "base_market_traders_assign_all_btn", "base_market_traders_unassign_one_btn", "base_market_traders_unassign_ten_btn", "base_market_traders_unassign_all_btn", "base_market_traders_workers_label",
             "base_mage_tower_assign_one_btn", "base_mage_tower_assign_ten_btn", "base_mage_tower_assign_all_btn", "base_mage_tower_unassign_one_btn", "base_mage_tower_unassign_ten_btn", "base_mage_tower_unassign_all_btn", "base_mage_tower_workers_label", "base_mage_tower_worker_prod_text", "base_mage_tower_worker_prod_wrap", "base_mage_tower_worker_prog_fill", "base_mage_tower_assign_okami_btn",
@@ -2578,7 +2576,7 @@ let createView = {
             "baseBuilding_foxDen", "baseBuilding_bonfire", "baseBuilding_market", "baseBuilding_garden", "baseBuilding_atelier", "baseBuilding_mage_tower", "baseBuilding_scrollArchives",
             "levelText", "levelExpText", "levelTabExpFill", "attributePointsText", "strText", "conText", "spdText", "chaStatTip", "soulText", "soulStatTip", "strStatTip", "conStatTip", "currentClassText", "classPerLevelText", "attributePlanList", "levelingPointsWrap", "levelingAssignButtons", "attributePlanTitle", "attributePlanHighest", "attributePlanPending", "statsAudText", "statsAudTip", "statsHealingCard", "statsHealingText", "statsHealingTip", "statsFlatBlockCard", "statsFlatBlockText", "statsFlatBlockTip", "statsCloutCard", "statsCloutText", "statsCloutTip", "statsAttackText", "statsAttackTip", "statsArmorCard", "statsArmorText", "statsArmorTip", "statsSlapText", "statsSlapTip", "statsSandalText", "statsSandalTip", "statsExtraCoinsCard", "statsExtraCoinsText", "statsExtraCoinsTip",
             "travelPane_maps", "travelPane_challenges", "travelSubTab_maps", "travelSubTab_challenges", "travelBonfireLaunchBtn", "travelGoBonfireBtn", "travelBonfireManaCost",
-            "travelTryEveryMapBtn", "travelTourOptionsRow", "travelSkipCompleted_row", "travelSkipCompleted_chk", "travelRepeatCycle_row", "travelRepeatCycle_chk", "travelEndOnLastGold_row", "travelEndOnLastGold_chk", "travelTourStatusRow", "travelTourStatusText", "travelStopTourBtn",
+            "travelTryEveryMapBtn", "travelTourOptionsRow", "travelSkipCompleted_row", "travelSkipCompleted_chk", "travelRepeatCycle_row", "travelRepeatCycle_chk", "travelEndOnLastGold_row", "travelEndOnLastGold_chk", "travelUseMaxDensity_row", "travelUseMaxDensity_chk", "travelTourStatusRow", "travelTourStatusText", "travelStopTourBtn",
             "skillsList", "historyList",
             "historySubTabs", "historySubTab_combat", "historySubTab_prestige", "historyPane_combat", "historyPane_prestige", "prestigeHistoryList",
             "sandalAttackToggle", "sandalAttackWrap", "sandalAttackLockText", "manualSaveButton", "saveToFileRow", "saveToFileButton", "importFromFileButton", "hideMaxedUpgradesToggle", "disableCompactLayoutToggle", "numberTypeSuffix", "numberTypeScientific", "numberTypeEngineering", "offlineModeCatchUp", "offlineModePauseBonus", "statsSandalCard", "playTimeClock", "playTimeThisLabel", "playTimeTotalRow", "playTimeTotalClock", "levelingPlayStats",             "skillSubTab_equipped", "skillSubTab_library", "skillLoadoutBtn_0", "skillLoadoutBtn_1", "skillLoadoutBtn_2", "skillLoadoutBtn_3", "skillLoadoutBtn_4", "skillLoadoutSave", "skillLoadoutLoad", "skillLoadoutClear",
@@ -2655,7 +2653,7 @@ let createView = {
         const bfcfg = resortData.bambooForestConfig;
         const bStalks = bfcfg.stalkCount || 4;
         const bRows = bfcfg.rowCount || 3;
-        createView.queueCache("bambooChopPower", "bambooAutoRotate_row", "bambooTagline_row");
+        createView.queueCache("bambooChopPower", "bambooChopPowerFactors", "bambooAutoRotate_row", "bambooTagline_row");
         for (let bsi = 0; bsi < bStalks; bsi++) {
             createView.queueCache(`bambooCutBtn_${bsi}`, `bambooSwitchBtn_${bsi}`, `bambooType_${bsi}`, `bambooStatus_${bsi}`, `bambooBaseWood_${bsi}`);
             for (let bri = 0; bri < bRows; bri++) {
