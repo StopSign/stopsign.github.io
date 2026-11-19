@@ -544,15 +544,15 @@ var SHRINE_CARD_DEFINITION_ROWS = [
         category: "buff",
         rarity: { rare: 4 },
         getEffect: function(rarity) {
-            if (rarity === "rare") return { okamiPathSpeedAdd: 0.50 };
+            if (rarity === "rare") return { okamiPathSpeedAdd: 0.25 };
             return {};
         },
         effectText: function(rarity) {
             const e = this.getEffect(rarity);
-            return "Okami Path Speed: +" + Math.round((e.okamiPathSpeedAdd || 0) * 100) + "%";
+            return "Okami Path Speed: +" + Math.round((e.okamiPathSpeedAdd || 0) * 25) + "%";
         },
         totalBonusText: function(totalEffect) {
-            return "Okami Path Speed: +" + Math.round((totalEffect.okamiPathSpeedAdd || 0) * 100) + "%";
+            return "Okami Path Speed: +" + Math.round((totalEffect.okamiPathSpeedAdd || 0) * 25) + "%";
         }
     },
     {

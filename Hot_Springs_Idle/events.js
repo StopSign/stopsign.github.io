@@ -156,7 +156,13 @@ let events = {
         return tabs;
     },
     insertAutomationTab: function(tabs) {
-        if (typeof engine === "undefined" || !engine.isCrushPaperBought || !engine.isCrushPaperBought()) {
+        if (!data.progress) {
+            return;
+        }
+        if ((data.progress.paper || 0) > 0) {
+            data.progress.paperEverOwned = true;
+        }
+        if (!data.progress.paperEverOwned) {
             return;
         }
         const optIx = tabs.indexOf("options");
@@ -1989,17 +1995,59 @@ let events = {
             view.updateAutomationTab();
         }
     },
+    automationMoveResource: function(key, dir) {
+        automation.moveResource(key, dir);
+        if (view.applyAutomationResourceOrder) {
+            view.applyAutomationResourceOrder();
+        }
+    },
+    automationResourceDragEnd: function() {
+        events._automationDragKey = null;
+    },
+    automationResourceDragStart: function(event, key) {
+        events._automationDragKey = key;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = "move";
+            event.dataTransfer.setData("text/plain", key);
+        }
+    },
+    automationResourceDragOver: function(event) {
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = "move";
+        }
+    },
+    automationResourceDrop: function(event, targetKey) {
+        event.preventDefault();
+        const fromKey = events._automationDragKey || (event.dataTransfer && event.dataTransfer.getData("text/plain"));
+        events._automationDragKey = null;
+        if (!fromKey || fromKey === targetKey) {
+            return;
+        }
+        automation.placeResource(fromKey, targetKey);
+        if (view.applyAutomationResourceOrder) {
+            view.applyAutomationResourceOrder();
+        }
+    },
     automationSetUpgradeChecked: function(scopeKey, upgradeKey, checked) {
         automation.setUpgradeSetting(scopeKey, upgradeKey, { on: !!checked });
     },
     automationSetUpgradeRate: function(scopeKey, upgradeKey, pct) {
         automation.setUpgradeSetting(scopeKey, upgradeKey, { pct: pct });
     },
+    automationStepUpgradeRate: function(scopeKey, upgradeKey, dir) {
+        const current = automation.getUpgradeSetting(scopeKey, upgradeKey);
+        automation.setUpgradeSetting(scopeKey, upgradeKey, { pct: automation.stepRate(current.pct, dir) });
+    },
     automationSetBuildingChecked: function(unlockKey, checked) {
         automation.setBuildingSetting(unlockKey, { on: !!checked });
     },
     automationSetBuildingRate: function(unlockKey, pct) {
         automation.setBuildingSetting(unlockKey, { pct: pct });
+    },
+    automationStepBuildingRate: function(unlockKey, dir) {
+        const current = automation.getBuildingSetting(unlockKey);
+        automation.setBuildingSetting(unlockKey, { pct: automation.stepRate(current.pct, dir) });
     },
     goToOkamiAssignment: function(e) {
         if (e && typeof e.stopPropagation === "function") {

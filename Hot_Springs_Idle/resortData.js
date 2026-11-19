@@ -339,21 +339,21 @@ var resortData = {
     costToParts: function(cost) {
         const c = cost || {};
         const parts = [];
+        if ((c.paper || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.paper, "paper", "paper"));
         if ((c.bars || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.bars, "bars", "bars"));
         if ((c.ore || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ore, "ore", "ore"));
         if ((c.ash || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.ash, "ash", "ash"));
-        if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
-        if ((c.hardwood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.hardwood, "hardwood", "hardwood"));
-        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
-        if ((c.coins || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.coins, "coins", "coins"));
-        if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
-        if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
-        if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
-        if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
-        if ((c.essence || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.essence, "essence", "essence"));
         if ((c.limestone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.limestone, "limestone", "limestone"));
         if ((c.quicklime || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.quicklime, "quicklime", "quicklime"));
-        if ((c.paper || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.paper, "paper", "paper"));
+        if ((c.hardwood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.hardwood, "hardwood", "hardwood"));
+        if ((c.stone || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.stone, "stone", "stone"));
+        if ((c.wood || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.wood, "wood", "wood"));
+        if ((c.coins || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.coins, "coins", "coins"));
+        if ((c.essence || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.essence, "essence", "essence"));
+        if ((c.starBeads || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.starBeads, "starBeads", "Star Beads"));
+        if ((c.credit || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.credit, "credit", "Credit"));
+        if ((c.divinity || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.divinity, "divinity", "divinity"));
+        if ((c.mana || 0) > 0) parts.push(resortData.formatCostAmountHtml(c.mana, "mana", "mana"));
         return parts;
     },
 
@@ -1826,10 +1826,10 @@ var resortData = {
                     weavingTime: 300,
                     maxPurchases: 1,
                     canBuy: function() {
-                        return resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
+                        return engine.isBringOreToAtelierUnlocked() && resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
                     },
                     rowVisible: function() {
-                        return resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
+                        return engine.isBringOreToAtelierUnlocked() && resortHelper.isHardenBambooBought() && !resortHelper.isGrowHardwoodBought();
                     },
                     onBuy: function() {
                         data.progress.base.bambooForest.growHardwoodBought = 1;
@@ -3139,7 +3139,8 @@ var resortData = {
                 crushLimestoneProgress: 0,
                 createPaperChecked: false,
                 createPaperProgress: 0,
-                paperPowerCost: 20,
+                paperCreated: 0,
+                paperPowerCost: 6,
                 crushPaperBought: false
             },
             upgradesOrder: ["organizeOrders", "betterAxes", "sharperAxes", "whetstone", "makeBaskets", "makeBuckets", "magicLooms", "createMetalFireLauncher", "formDirtRoads", "manaStorageCharms", "addForge", "largerForge", "sprinkleOreOnRoads", "improveDirtRoads", "buildWaterWheelAndDrophammer", "addFlux", "crushPaper"],
@@ -3503,7 +3504,7 @@ var resortData = {
                     key: "build_water_wheel_and_drophammer",
                     name: "Build Water Wheel and Drophammer",
                     description: "Build a water wheel and drop hammer beside the Atelier, turning faster with the steam's strength. Starts by turning Limestone into Quicklime.",
-                    cost: { wood: 20000, hardwood: 2000, stone: 40000 },
+                    cost: { wood: 20000, hardwood: 2000, stone: 30000 },
                     weavingTime: 6000,
                     rowVisible: function() {
                         return resortHelper.isWaterPowerBought();
@@ -3551,7 +3552,7 @@ var resortData = {
                     name: "Crush Paper",
                     description: "Prepare the drop hammer to make paper. Reveals the Atelier water tank, wood hold, and the Create Paper task.",
                     cost: { stone: 20000, essence: 1000 },
-                    weavingTime: 3000,
+                    weavingTime: 6000,
                     rowVisible: function() {
                         return engine.isDrophammerUnlocked() && resortHelper.isKeepRecordsBought();
                     },
@@ -4442,7 +4443,7 @@ var resortData = {
         stonePile: {
             label: "Stone Pile",
             description: "Holds stone.",
-            upgradesOrder: ["createStoneDuplicator", "cleanGlyphs", "echoedShelving", "fillMana"],
+            upgradesOrder: ["createStoneDuplicator", "cleanGlyphs", "smoothWiring", "echoedShelving", "fillMana"],
             upgrades: {
                 createStoneDuplicator: {
                     key: "create_stone_duplicator",
@@ -4468,8 +4469,8 @@ var resortData = {
                 cleanGlyphs: {
                     key: "clean_glyphs",
                     name: "Clean Glyphs",
-                    description: "The stone duplicator ticks twice as fast: 5 seconds before card speed.",
-                    cost: { limestone: 4000 },
+                    description: "The stone duplicator ticks twice as fast.",
+                    cost: { limestone: 2000, bars: 2000 },
                     weavingTime: 3000,
                     maxPurchases: 1,
                     canBuy: function() {
@@ -4486,6 +4487,29 @@ var resortData = {
                     soldOutButtonLabel: "Cleaned",
                     extraInfo: function() {
                         return "Duplicator tick: 5s before card speed";
+                    },
+                },
+                smoothWiring: {
+                    key: "smooth_wiring",
+                    name: "Smooth Wiring",
+                    description: "The stone duplicator's mana cost is halved.",
+                    cost: { limestone: 2000, bars: 2000 },
+                    weavingTime: 3000,
+                    maxPurchases: 1,
+                    canBuy: function() {
+                        const pile = data.progress.base.stonePile;
+                        return engine.isTeachSpiritsToSortStoneBought()
+                            && !!(pile && pile.stoneDuplicatorUnlocked && !pile.smoothWiringBought);
+                    },
+                    onBuy: function() {
+                        data.progress.base.stonePile.smoothWiringBought = true;
+                    },
+                    upgradeSoldOut: function() {
+                        return !!(data.progress.base.stonePile && data.progress.base.stonePile.smoothWiringBought);
+                    },
+                    soldOutButtonLabel: "Smoothed",
+                    extraInfo: function() {
+                        return "Duplicator mana: /2";
                     },
                 },
                 echoedShelving: {
@@ -5789,6 +5813,7 @@ var resortData = {
                 mapTourUseMaxDensity: false,
                 prepareToWriteLegendBought: false,
                 templeUnlocked: false,
+                earlyPowerIconographyBought: 0,
                 okamiIconographyBought: 0,
                 elementalResonanceBought: 0,
                 divineGiftsBought: 0,
@@ -5796,7 +5821,7 @@ var resortData = {
                 prayerStatues: {},
                 prayerDonations: {}
             },
-            upgradesOrder: ["spareSandals", "prepareToWriteLegend", "axeEchoes", "shelvingEchoes", "richerNeighbors", "artAppreciation",
+            upgradesOrder: ["upgradeToTemple", "spareSandals", "prepareToWriteLegend", "axeEchoes", "shelvingEchoes", "richerNeighbors", "artAppreciation",
                 "powerfulChops", "spiritWeavingEchoes",  "shardEchoes", "languageEchoes", 
                 "skillEchoes", "karmaStacking",
                 "plantAffinity", "earthAffinity", "hardenBamboo", "scribingInfusions", "shardsFound",
@@ -5804,7 +5829,7 @@ var resortData = {
                 "limestoneCarving", "waterfallTraining", "spiritAncestors", "spiritAncestorGuidance",
                 "containedSpark", "essenceGathering", "luckyWell", "keepRecords", "kitsuneBalance",
                 "callTheGoddess", "donationDrive", "waterPower",
-                "upgradeToTemple", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"],
+                "earlyPowerIconography", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"],
             upgrades: {
                 prepareToWriteLegend: {
                     key: "prepare_to_write_legend",
@@ -6615,10 +6640,10 @@ var resortData = {
                 upgradeToTemple: {
                     key: "upgrade_to_temple",
                     name: "Upgrade to Temple",
-                    description: "Build a temple beside the Shrine.",
+                    description: "Build a temple beside the Shrine. Keeps upon prestige.",
                     weavingTime: 8000,
                     getCost: function() {
-                        return { limestone: 3000, coins: 500000, starBeads: 500000, essence: 10000 };
+                        return { limestone: 5000, starBeads: 5000000, essence: 1000 };
                     },
                     canBuy: function() {
                         const shrine = data.progress.base && data.progress.base.shrine;
@@ -6636,6 +6661,33 @@ var resortData = {
                         return resortHelper.isCallTheGoddessBought();
                     }
                 },
+                earlyPowerIconography: {
+                    key: "early_power_iconography",
+                    name: "Iconography of Early Power",
+                    description: "Each purchase adds spirit power equal to 200 times its new level. The first adds +200, the second +400, and each later purchase adds 200 more than the last.",
+                    weavingTime: 2000,
+                    weavingTimeIncrease: 1.2,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getShrineUpgradeBought("earlyPowerIconographyBought");
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getShrineUpgradeBought("earlyPowerIconographyBought");
+                        return { limestone: Math.round(2000 * Math.pow(1.5, bought)), divinity: 30000 };
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.earlyPowerIconographyBought = (shrine.earlyPowerIconographyBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getShrineUpgradeBought("earlyPowerIconographyBought");
+                        const total = 200 * n * (n + 1) / 2;
+                        return `Spirit power: +${total}`;
+                    },
+                    rowVisible: function() {
+                        return engine.isTempleUnlocked();
+                    }
+                },
                 okamiIconography: {
                     key: "okami_iconography",
                     name: "Okami Iconography",
@@ -6648,7 +6700,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getShrineUpgradeBought("okamiIconographyBought");
-                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)), divinity: 30000 };
                     },
                     maxPurchases: 5,
                     onBuy: function() {
@@ -6676,7 +6728,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getShrineUpgradeBought("elementalResonanceBought");
-                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)), divinity: 30000 };
                     },
                     maxPurchases: 5,
                     onBuy: function() {
@@ -6705,7 +6757,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getShrineUpgradeBought("divineGiftsBought");
-                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)), divinity: 30000 };
                     },
                     maxPurchases: 5,
                     onBuy: function() {
@@ -6733,7 +6785,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getShrineUpgradeBought("goddessIconographyBought");
-                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)) };
+                        return { limestone: Math.round(6000 * Math.pow(1.5, bought)), divinity: 30000 };
                     },
                     maxPurchases: 5,
                     onBuy: function() {
@@ -6758,14 +6810,14 @@ var resortData = {
      * Clone Exp spends star beads: that is the only bead stock.
      */
     prayerStatueCatalog: [
-        { id: "maxMana", upgradeKey: "maxManaStatue", key: "max_mana_statue", name: "Max Mana Statue", effectName: "Max Mana", column: "left", weavingTime: 10000, cost: { mana: 500000, wood: 50000 }, ignoreManaCapacityGate: true, prayerBase: 20000, prayerGrowth: 1.2, effectMult: 1.05 },
-        { id: "audacity", upgradeKey: "audacityStatue", key: "audacity_statue", name: "Audacity Statue", effectName: "Audacity", column: "left", weavingTime: 15000, cost: { limestone: 10000, bars: 10000 }, prayerBase: 40000, prayerGrowth: 1.3, effectMult: 1.05 },
-        { id: "cloneExp", upgradeKey: "cloneExpStatue", key: "clone_exp_statue", name: "Clone Exp Statue", effectName: "Clone Exp", column: "left", weavingTime: 15000, cost: { mana: 1000000, starBeads: 2000000 }, ignoreManaCapacityGate: true, prayerBase: 40000, prayerGrowth: 1.3, effectMult: 1.1 },
-        { id: "talent", upgradeKey: "talentStatue", key: "talent_statue", name: "Talent Statue", effectName: "Talent Exp", column: "left", weavingTime: 20000, cost: { essence: 500000, stone: 100000 }, prayerBase: 60000, prayerGrowth: 1.2, effectMult: 1.05 },
-        { id: "manaGain", upgradeKey: "manaGainStatue", key: "mana_gain_statue", name: "Mana Gain Statue", effectName: "Mana Gain", column: "right", weavingTime: 10000, cost: { mana: 800000, bars: 10000 }, ignoreManaCapacityGate: true, prayerBase: 30000, prayerGrowth: 1.2, effectMult: 1.05 },
-        { id: "ego", upgradeKey: "egoStatue", key: "ego_statue", name: "Ego Statue", effectName: "Ego", column: "right", weavingTime: 15000, cost: { quicklime: 10000, ore: 10000 }, prayerBase: 40000, prayerGrowth: 1.2, effectMult: 1.05 },
-        { id: "paper", upgradeKey: "paperStatue", key: "paper_statue", name: "Paper Statue", effectName: "Paper", column: "right", weavingTime: 20000, cost: { paper: 1000, essence: 300000 }, prayerBase: 50000, prayerGrowth: 1.3, effectMult: 1.05 },
-        { id: "starPower", upgradeKey: "starPowerStatue", key: "star_power_statue", name: "Star Power Statue", effectName: "Star Power", column: "right", weavingTime: 25000, cost: { coins: 30000000, hardwood: 10000 }, prayerBase: 100000, prayerGrowth: 2, additive: 0.1 }
+        { id: "maxMana", upgradeKey: "maxManaStatue", key: "max_mana_statue", name: "Max Mana Statue", effectName: "Max Mana", column: "left", weavingTime: 10000, cost: { mana: 500000, wood: 150000 }, ignoreManaCapacityGate: true, prayerBase: 40000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "audacity", upgradeKey: "audacityStatue", key: "audacity_statue", name: "Audacity Statue", effectName: "Audacity", column: "left", weavingTime: 15000, cost: { limestone: 10000, bars: 20000 }, prayerBase: 80000, prayerGrowth: 1.3, effectMult: 1.05 },
+        { id: "cloneExp", upgradeKey: "cloneExpStatue", key: "clone_exp_statue", name: "Clone Exp Statue", effectName: "Clone Exp", column: "left", weavingTime: 15000, cost: { mana: 1000000, starBeads: 2000000 }, ignoreManaCapacityGate: true, prayerBase: 80000, prayerGrowth: 1.3, effectMult: 1.1 },
+        { id: "talent", upgradeKey: "talentStatue", key: "talent_statue", name: "Talent Statue", effectName: "Talent Exp", column: "left", weavingTime: 20000, cost: { essence: 500000, stone: 1000000 }, prayerBase: 120000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "manaGain", upgradeKey: "manaGainStatue", key: "mana_gain_statue", name: "Mana Gain Statue", effectName: "Mana Gain", column: "right", weavingTime: 10000, cost: { mana: 800000, bars: 10000 }, ignoreManaCapacityGate: true, prayerBase: 60000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "ego", upgradeKey: "egoStatue", key: "ego_statue", name: "Ego Statue", effectName: "Ego", column: "right", weavingTime: 15000, cost: { quicklime: 10000, ore: 20000 }, prayerBase: 80000, prayerGrowth: 1.2, effectMult: 1.05 },
+        { id: "paper", upgradeKey: "paperStatue", key: "paper_statue", name: "Paper Statue", effectName: "Paper", column: "right", weavingTime: 20000, cost: { paper: 1000, essence: 300000 }, prayerBase: 100000, prayerGrowth: 1.3, effectMult: 1.05 },
+        { id: "starPower", upgradeKey: "starPowerStatue", key: "star_power_statue", name: "Star Power Statue", effectName: "Star Power", column: "right", weavingTime: 25000, cost: { coins: 50000000, hardwood: 30000 }, prayerBase: 200000, prayerGrowth: 2, additive: 0.1 }
     ],
     prayerDonationCatalog: [
         { id: "mana", upgradeKey: "donateMana", key: "donate_mana", name: "Donate Mana", cost: { mana: 200000 }, ignoreManaCapacityGate: true },
@@ -6773,9 +6825,9 @@ var resortData = {
         { id: "wood", upgradeKey: "donateWood", key: "donate_wood", name: "Donate Wood", cost: { wood: 10000 } },
         { id: "hardwood", upgradeKey: "donateHardwood", key: "donate_hardwood", name: "Donate Hardwood", cost: { hardwood: 5000 } },
         { id: "ore", upgradeKey: "donateOre", key: "donate_ore", name: "Donate Ore", cost: { ore: 10000 } },
-        { id: "bars", upgradeKey: "donateBars", key: "donate_bars", name: "Donate Bars", cost: { bars: 5000 } },
-        { id: "coins", upgradeKey: "donateCoins", key: "donate_coins", name: "Donate Coins", cost: { coins: 500000 } },
-        { id: "starBeads", upgradeKey: "donateStarBeads", key: "donate_star_beads", name: "Donate Star Beads", cost: { starBeads: 300000 } },
+        { id: "bars", upgradeKey: "donateBars", key: "donate_bars", name: "Donate Bars", cost: { bars: 10000 } },
+        { id: "coins", upgradeKey: "donateCoins", key: "donate_coins", name: "Donate Coins", cost: { coins: 2000000 } },
+        { id: "starBeads", upgradeKey: "donateStarBeads", key: "donate_star_beads", name: "Donate Star Beads", cost: { starBeads: 1000000 } },
         { id: "limestone", upgradeKey: "donateLimestone", key: "donate_limestone", name: "Donate Limestone", cost: { limestone: 10000 } },
         { id: "quicklime", upgradeKey: "donateQuicklime", key: "donate_quicklime", name: "Donate Quicklime", cost: { quicklime: 10000 } },
         { id: "essence", upgradeKey: "donateEssence", key: "donate_essence", name: "Donate Essence", cost: { essence: 10000 } }

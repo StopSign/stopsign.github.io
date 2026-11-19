@@ -59,6 +59,22 @@ const changelog = {
 };
 
 
+
+
+changelog.addSection("Legend 3! Automation!", "0.4", 
+    `Multiple new resources, multiple new systems that carry over prestige, including a system for auto-building!
+
+Other Changes:
+* Some UI tweaks
+* The first 3 skill choices being all offense, defense, and then untility are no longer affected by any locked skills of those categories
+* Sturdy Shelves all output x1.3 -> x1.2
+* Scroll Archives doesn't start until you buy it
+* Some shrine upgrades made slightly more expensive
+* Fixed Social Armor to do as it describes
+* Capped Sharper Axes at 6 since there is another late game chop upgrade now
+* Added Arrangement of Mana Insight to see the mana costs and clone reserve amount on the mana bar
+* Okami Path Speed shrine card effect/2 (on account of new path upgrades and more use of it)`);
+
 changelog.addSection("Legend 2; prestige resets all again", "0.3", 
     `
 Changes:

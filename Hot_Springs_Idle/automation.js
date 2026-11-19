@@ -48,6 +48,24 @@ let automation = {
             state.buildings = {};
         }
         const list = resortData.automationResources || [];
+        const known = {};
+        for (let n = 0; n < list.length; n++) {
+            known[list[n].key] = true;
+        }
+        const order = [];
+        const savedOrder = Array.isArray(state.order) ? state.order : [];
+        for (let o = 0; o < savedOrder.length; o++) {
+            const savedKey = savedOrder[o];
+            if (known[savedKey] && order.indexOf(savedKey) < 0) {
+                order.push(savedKey);
+            }
+        }
+        for (let n = 0; n < list.length; n++) {
+            if (order.indexOf(list[n].key) < 0) {
+                order.push(list[n].key);
+            }
+        }
+        state.order = order;
         for (let i = 0; i < list.length; i++) {
             const key = list[i].key;
             const invested = Math.floor(Number(state.invested[key]));
@@ -72,6 +90,49 @@ let automation = {
             }
         }
         return null;
+    },
+
+    orderedSpecs: function() {
+        const list = resortData.automationResources || [];
+        if (!data || !data.progress) {
+            return list.slice();
+        }
+        const state = automation.ensure();
+        const byKey = {};
+        for (let i = 0; i < list.length; i++) {
+            byKey[list[i].key] = list[i];
+        }
+        const out = [];
+        const order = state.order || [];
+        for (let i = 0; i < order.length; i++) {
+            if (byKey[order[i]]) {
+                out.push(byKey[order[i]]);
+            }
+        }
+        return out.length ? out : list.slice();
+    },
+
+    moveResource: function(key, dir) {
+        const order = automation.ensure().order;
+        const index = order.indexOf(key);
+        const next = index + dir;
+        if (index < 0 || next < 0 || next >= order.length) {
+            return;
+        }
+        const swap = order[index];
+        order[index] = order[next];
+        order[next] = swap;
+    },
+
+    placeResource: function(fromKey, toKey) {
+        const order = automation.ensure().order;
+        const from = order.indexOf(fromKey);
+        const to = order.indexOf(toKey);
+        if (from < 0 || to < 0 || from === to) {
+            return;
+        }
+        const row = order.splice(from, 1)[0];
+        order.splice(to, 0, row);
     },
 
     resourceName: function(key) {
@@ -107,7 +168,7 @@ let automation = {
         if (!cost) {
             return out;
         }
-        const list = resortData.automationResources || [];
+        const list = automation.orderedSpecs();
         const seen = {};
         for (let i = 0; i < list.length; i++) {
             const key = list[i].key;
@@ -396,9 +457,7 @@ let automation = {
         return {
             row: prefix + "_row",
             chk: prefix + "_chk",
-            r10: prefix + "_r10",
-            r50: prefix + "_r50",
-            r100: prefix + "_r100"
+            pct: prefix + "_pct"
         };
     },
 
@@ -407,14 +466,25 @@ let automation = {
         return {
             row: prefix + "_row",
             chk: prefix + "_chk",
-            r10: prefix + "_r10",
-            r50: prefix + "_r50",
-            r100: prefix + "_r100"
+            pct: prefix + "_pct"
         };
     },
 
-    controlsHtml: function(ids, rateName, checkHandler, ratePrefix) {
-        return `<span id="${ids.row}" class="paper-autobuy-controls" style="display:none"><label><input type="checkbox" id="${ids.chk}" onchange="${checkHandler}"> Autobuy</label><label><input type="radio" name="${rateName}" id="${ids.r10}" value="10" onchange="${ratePrefix}10)"> 10%</label><label><input type="radio" name="${rateName}" id="${ids.r50}" value="50" onchange="${ratePrefix}50)"> 50%</label><label><input type="radio" name="${rateName}" id="${ids.r100}" value="100" onchange="${ratePrefix}100)"> 100%</label></span>`;
+    stepRate: function(pct, dir) {
+        const order = [10, 50, 100];
+        let index = order.indexOf(automation.normalizePct(pct));
+        if (index < 0) {
+            index = order.length - 1;
+        }
+        const next = index + (dir < 0 ? -1 : 1);
+        if (next < 0 || next >= order.length) {
+            return order[index];
+        }
+        return order[next];
+    },
+
+    controlsHtml: function(ids, checkHandler, stepHandler) {
+        return `<span id="${ids.row}" class="paper-autobuy-controls" style="display:none"><label><input type="checkbox" id="${ids.chk}" onchange="${checkHandler}"> Autobuy</label><button type="button" class="tab-button paper-autobuy-step" onclick="${stepHandler}-1)">&lt;</button><span id="${ids.pct}">100%</span><button type="button" class="tab-button paper-autobuy-step" onclick="${stepHandler}1)">&gt;</button></span>`;
     },
 
     upgradeControlsHtml: function(scope, upgradeKey) {
@@ -424,9 +494,8 @@ let automation = {
         const ids = automation.upgradeControlIds(scope, upgradeKey);
         return automation.controlsHtml(
             ids,
-            "paperAutoRate_" + scope + "_" + upgradeKey,
             "events.automationSetUpgradeChecked('" + scope + "','" + upgradeKey + "', this.checked)",
-            "events.automationSetUpgradeRate('" + scope + "','" + upgradeKey + "', "
+            "events.automationStepUpgradeRate('" + scope + "','" + upgradeKey + "', "
         );
     },
 
@@ -437,9 +506,8 @@ let automation = {
         const ids = automation.buildingControlIds(unlockKey);
         return automation.controlsHtml(
             ids,
-            "paperAutoBuildRate_" + unlockKey,
             "events.automationSetBuildingChecked('" + unlockKey + "', this.checked)",
-            "events.automationSetBuildingRate('" + unlockKey + "', "
+            "events.automationStepBuildingRate('" + unlockKey + "', "
         );
     },
 

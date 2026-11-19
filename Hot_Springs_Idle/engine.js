@@ -551,6 +551,7 @@ let engine = {
         const bonusTime = (data.currentGameState && data.currentGameState.bonusTime) || 0;
         const secondsPlayedTotal = typeof progress.secondsPlayedTotal === "number" ? progress.secondsPlayedTotal : 0;
         const keptPaper = Math.max(0, progress.paper || 0);
+        const paperEverOwned = !!progress.paperEverOwned || keptPaper > 0;
         const hidePaperPrestigeNew = !!progress.hidePaperPrestigeNew || engine.isCrushPaperBought();
         const keptAutomation = progress.automation ? structuredClone(progress.automation) : null;
         if (shrine && resortHelper.isSpiritAncestorGuidanceBought()) {
@@ -583,6 +584,7 @@ let engine = {
         data.progress.secondsThisResort = 0;
         data.progress.secondsPlayedTotal = secondsPlayedTotal;
         data.progress.paper = keptPaper;
+        data.progress.paperEverOwned = paperEverOwned;
         if (keptAutomation) {
             data.progress.automation = keptAutomation;
         }
@@ -4603,10 +4605,13 @@ let engine = {
     },
     getStoneDuplicatorBatch: function() {
         const market = data.progress.base && data.progress.base.market;
-        if (market && market.improveStoneDuplicatorBought) {
-            return { stone: 10, mana: 500 };
+        const pile = data.progress.base && data.progress.base.stonePile;
+        const improved = !!(market && market.improveStoneDuplicatorBought);
+        let mana = improved ? 500 : 100;
+        if (pile && pile.smoothWiringBought) {
+            mana = mana / 2;
         }
-        return { stone: 1, mana: 100 };
+        return { stone: improved ? 10 : 1, mana: mana };
     },
     getStoneDuplicatorIntervalMs: function() {
         const cardAdd = (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects)
@@ -5571,7 +5576,7 @@ let engine = {
         return !!atelier && (atelier.water || 0) >= cap;
     },
     getDropHammerProgressPerSecond: function() {
-        return Math.sqrt(engine.getPondForestDrainPerSecond());
+        return Math.sqrt(engine.getPondForestDrainPerSecond()) / 10;
     },
     getCheckedDropHammerTasks: function(atelier) {
         const tasks = [];
@@ -5585,6 +5590,39 @@ let engine = {
             tasks.push("paper");
         }
         return tasks;
+    },
+    dropHammerTaskNeedsPower: function(atelier, task) {
+        if (!atelier) {
+            return false;
+        }
+        if (task === "crush") {
+            return (atelier.limestone || 0) > 0;
+        }
+        if (task === "paper") {
+            const cost = engine.getCreatePaperResourceCost();
+            return (atelier.wood || 0) >= cost.wood
+                && (atelier.water || 0) >= cost.water
+                && (atelier.quicklime || 0) >= cost.quicklime;
+        }
+        return false;
+    },
+    checkedDropHammerNeedsPower: function(atelier) {
+        const tasks = engine.getCheckedDropHammerTasks(atelier);
+        for (let i = 0; i < tasks.length; i++) {
+            if (engine.dropHammerTaskNeedsPower(atelier, tasks[i])) {
+                return true;
+            }
+        }
+        return false;
+    },
+    getPaperCostIncreaseAfter: function() {
+        return 500;
+    },
+    getPaperPowerCostStart: function() {
+        return 6;
+    },
+    getCreatePaperResourceCost: function() {
+        return { wood: 300, water: 500, quicklime: 50 };
     },
     resolveCrushLimestone: function(atelier) {
         if (!atelier) {
@@ -5603,11 +5641,12 @@ let engine = {
         if (!atelier || !engine.isCrushPaperBought()) {
             return;
         }
-        let cost = atelier.paperPowerCost || 20;
+        let cost = atelier.paperPowerCost || engine.getPaperPowerCostStart();
         if (!(cost >= 1)) {
-            cost = 20;
+            cost = engine.getPaperPowerCostStart();
         }
         let progress = atelier.createPaperProgress || 0;
+        let created = atelier.paperCreated || 0;
         let guard = 0;
         while (progress >= cost && guard < 10000) {
             progress -= cost;
@@ -5615,9 +5654,16 @@ let engine = {
                 break;
             }
             data.progress.paper = (data.progress.paper || 0) + engine.getPrayerEffect("paper");
-            cost = Math.max(1, Math.round(cost * 1.05));
+            if ((data.progress.paper || 0) > 0) {
+                data.progress.paperEverOwned = true;
+            }
+            created += 1;
+            if (created > engine.getPaperCostIncreaseAfter()) {
+                cost = Math.max(1, Math.round(cost * 1.05));
+            }
             guard++;
         }
+        atelier.paperCreated = created;
         atelier.createPaperProgress = progress;
         atelier.paperPowerCost = cost;
     },
@@ -5634,12 +5680,15 @@ let engine = {
                 const task = active[i];
                 let take = 0;
                 if (task === "crush") {
-                    take = share;
-                    atelier.crushLimestoneProgress = (atelier.crushLimestoneProgress || 0) + take;
+                    if ((atelier.limestone || 0) > 0) {
+                        take = share;
+                        atelier.crushLimestoneProgress = (atelier.crushLimestoneProgress || 0) + take;
+                    }
                 } else if (task === "paper") {
-                    const woodCost = 50;
-                    const waterCost = 100;
-                    const limeCost = 20;
+                    const resCost = engine.getCreatePaperResourceCost();
+                    const woodCost = resCost.wood;
+                    const waterCost = resCost.water;
+                    const limeCost = resCost.quicklime;
                     const afford = Math.min(
                         Math.floor((atelier.wood || 0) / woodCost),
                         Math.floor((atelier.water || 0) / waterCost),
@@ -5678,17 +5727,19 @@ let engine = {
         engine.resolveCrushLimestone(atelier);
         engine.resolveCreatePaper(atelier);
         const gain = engine.getDropHammerProgressPerSecond() * ((tickMs || 0) / 1000);
-        const checked = engine.getCheckedDropHammerTasks(atelier);
-        if (!checked.length) {
+        if (!engine.checkedDropHammerNeedsPower(atelier)) {
             atelier.hammerProgress = Math.min(100, (atelier.hammerProgress || 0) + gain);
             return;
         }
         atelier.hammerProgress = (atelier.hammerProgress || 0) + gain;
         let guard = 0;
-        while (atelier.hammerProgress >= 100 && guard < 10000) {
+        while (atelier.hammerProgress >= 100 && engine.checkedDropHammerNeedsPower(atelier) && guard < 10000) {
             atelier.hammerProgress -= 100;
             engine.distributeDropHammerPower(atelier, 2);
             guard++;
+        }
+        if (!engine.checkedDropHammerNeedsPower(atelier)) {
+            atelier.hammerProgress = Math.min(100, atelier.hammerProgress || 0);
         }
     },
     getBonfireFireSpiritSlotMax: function() {
@@ -6884,11 +6935,20 @@ let engine = {
         resortData.deductCost(cost);
         return true;
     },
+    getEarlyPowerBonus: function() {
+        const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)
+            ? resortHelper.getShrineUpgradeBought("earlyPowerIconographyBought") : 0;
+        const n = Math.max(0, Math.floor(bought || 0));
+        return 200 * n * (n + 1) / 2;
+    },
+    getSpiritPower: function(spirit) {
+        return ((spirit && spirit.spiritPower) || 0) + engine.getEarlyPowerBonus();
+    },
     getEffectiveSpiritPower: function(spirit) {
         if (!spirit) {
             return 0;
         }
-        const power = spirit.spiritPower || 0;
+        const power = engine.getSpiritPower(spirit);
         return power + Math.min(spirit.training || 0, power);
     },
     /** Assumed continuous forge exp/s when always smelting (batch x 3 / 60s). */
@@ -10792,7 +10852,7 @@ let engine = {
         if (need <= 0) {
             return null;
         }
-        const carry = resortData.getKitsuneWoodCarryAmount();
+        const carry = resortData.getKitsuneCarryCapacity();
         const stock = engine.getConstructionResourceAvailable("wood");
         const amount = Math.floor(Math.min(carry, need, stock));
         if (amount <= 0) {
@@ -13753,7 +13813,8 @@ let engine = {
             total += spirits[i].level || 1;
         }
         return total;
-    },    getMinePlayDirtPerCycle: function() {
+    },
+    getMinePlayDirtPerCycle: function() {
         return engine.getMineSpiritLevelTotal() * resortHelper.getPlayPitDirtMultiplier();
     },
     getMineFirstActiveBlock: function() {
@@ -14207,7 +14268,8 @@ let engine = {
             ? (shrineCards.getAggregatedEffects().marketExpAdd || 0) : 0;
         market.exp = (market.exp || 0) + amount * (1 + cardAdd);
         engine.applyMarketLevelUps();
-    },    /** Three to start, three more per Market level, hard capped at 12. */
+    },
+    /** Three to start, three more per Market level, hard capped at 12. */
     canStartExchangeCredit: function() {
         if (!engine.isMarketBuilt()) {
             return false;

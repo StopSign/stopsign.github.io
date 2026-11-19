@@ -1264,9 +1264,30 @@ button {
 }
 
 .automation-resource {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
     margin: 0 0 12px;
     padding-bottom: 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.automation-resource-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.automation-resource-reorder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 0 0 auto;
+}
+
+.automation-limits .muted-text {
+    margin-top: 0;
 }
 
 .automation-resource-line {
@@ -1283,13 +1304,19 @@ button {
 
 .paper-autobuy-controls {
     display: inline-flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 4px;
     margin-left: auto;
     font-weight: 500;
     font-size: 12px;
+}
+
+.paper-autobuy-step {
+    min-width: 22px;
+    padding: 0 4px;
+    line-height: 1.2;
 }
 
 .paper-autobuy-controls--dim {
@@ -1690,6 +1717,10 @@ button {
 
 .labeled-progress-sep {
     white-space: pre;
+}
+
+.labeled-progress-text .muted-text {
+    margin-top: 0;
 }
 
 .skill-equip-slot {
@@ -2899,7 +2930,7 @@ button {
 .resort-building-shrine.has-temple {
     display: flex;
     width: 80px;
-    left: 22px;
+    left: 2px;
     transform: none;
 }
 
@@ -3759,7 +3790,7 @@ button {
 }
 
 .spirit-slot-grid-atelier-fire.limestone-map-line {
-    bottom: 144px;
+    bottom: 142px;
 }
 
 .spirit-slot-grid-bonfire-fire {
@@ -4362,8 +4393,8 @@ button {
 }
 
 .resort-map-progress-atelier-water {
-    left: 490px;
-    bottom: 176px;
+    left: 484px;
+    bottom: 132px;
 }
 
 .resort-map-progress-hidden-spring-mana {
@@ -4853,6 +4884,22 @@ button {
     border-radius: 4px;
     padding: 6px;
     background: rgba(0, 0, 0, 0.15);
+}
+
+.prayer-statue-cell .base-scrollArchives-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.prayer-statue-cell .base-upgrade-text {
+    width: 100%;
+}
+
+.prayer-statue-cell .base-scrollArchives-row > .tab-button {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
 }
 
 .prayer-statue-track {

@@ -2034,6 +2034,15 @@ let view = {
         view.updateVal("atelierSubTab_dropHammer", tabsOn && sub === "dropHammer" ? "#2d4e7a" : "#1f2b3e", "style.backgroundColor");
         view.updateVal("atelierPane_atelier", !tabsOn || sub === "atelier" ? "" : "none", "style.display");
         view.updateVal("atelierPane_dropHammer", tabsOn && sub === "dropHammer" ? "" : "none", "style.display");
+        if (typeof createView !== "undefined" && createView.getInfoButtonWrap) {
+            const atelierInfo = createView.getInfoButtonWrap(viewData.cached.resortInfo_atelier);
+            if (atelierInfo) {
+                atelierInfo.style.display = tabsOn ? "" : "none";
+            }
+            if (tabsOn && createView.refreshInfoButtonPanel) {
+                createView.refreshInfoButtonPanel("resortInfo_atelier");
+            }
+        }
         if (viewData.cached.base_atelier_sandal_row) {
             view.updateVal("base_atelier_sandal_row", "none", "style.display");
         }
@@ -2068,10 +2077,12 @@ let view = {
         if (!paperOn) {
             return;
         }
-        const cost = atelier.paperPowerCost || 20;
+        const cost = atelier.paperPowerCost || engine.getPaperPowerCostStart();
         const paperProg = atelier.createPaperProgress || 0;
         view.updateVal("dropHammerPaperProg", round2(paperProg));
         view.updateVal("dropHammerPaperNeed", String(cost));
+        view.updateVal("dropHammerPaperCreated", String(Math.floor(atelier.paperCreated || 0)));
+        view.updateVal("dropHammerPaperCostRamp", String(engine.getPaperCostIncreaseAfter()));
         view.updateVal("dropHammerPaperFill", `${Math.max(0, Math.min(100, cost > 0 ? (paperProg / cost) * 100 : 0))}%`, "style.width");
         const paperChk = viewData.cached.dropHammerPaper_chk;
         if (paperChk && paperChk.checked !== !!atelier.createPaperChecked) {
@@ -2085,7 +2096,8 @@ let view = {
             }
         }
         view.updateVal("atelierWoodHeld", intToStringRound(atelier.wood || 0));
-        view.updateVal("dropHammerPaperCost", `50 wood, 100L water, 20 quicklime per power. Needs ${intToStringRound(cost)} power.`);
+        const resCost = engine.getCreatePaperResourceCost();
+        view.updateVal("dropHammerPaperCost", `${resCost.wood} wood, ${resCost.water}L water, ${resCost.quicklime} quicklime per power. Needs ${intToStringRound(cost)} power.`);
     },
     updateAtelierWheel: function() {
         const unlocked = engine.isDrophammerUnlocked();
@@ -4211,14 +4223,14 @@ let view = {
         view.updateVal("spiritInfoTitle", engine.getSpiritDisplayName(spirit));
         view.syncSpiritNameEditor(spirit);
         view.updateVal("spiritInfoLevel", spirit.level || 1);
-        view.updateVal("spiritInfoPower", round2(spirit.spiritPower || 1));
+        view.updateVal("spiritInfoPower", round2(engine.getSpiritPower(spirit)));
         const nextPowerInc = engine.getSpiritPowerNextIncrease(spirit.level || 1);
         view.updateVal("spiritInfoPowerNote", kind === "earth" || kind === "water" || kind === "fire" || kind === "plant" ? `(+${nextPowerInc} on lvl)` : "", "textContent");
         const trainingBought = resortHelper.isSpiritTrainingSpotBought();
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
-        const power = spirit.spiritPower || 0;
+        const power = engine.getSpiritPower(spirit);
         const training = spirit.training || 0;
         view.updateVal("spiritInfoTrainingCap", trainingBought && training > power ? ` uses ${round1Fixed(power)} (capped at spirit power)` : "");
         const hasHighest = spirit.highestTraining !== undefined && spirit.highestTraining !== null;
@@ -6467,18 +6479,7 @@ let view = {
             chk.checked = !!setting.on;
         }
         const pct = setting.pct;
-        const r10 = viewData.cached[ids.r10];
-        const r50 = viewData.cached[ids.r50];
-        const r100 = viewData.cached[ids.r100];
-        if (r10) {
-            r10.checked = pct === 10;
-        }
-        if (r50) {
-            r50.checked = pct === 50;
-        }
-        if (r100) {
-            r100.checked = pct === 100;
-        }
+        view.updateVal(ids.pct, pct + "%");
         view.updateVal(ids.row, !!dimmed, "classList.toggle", "paper-autobuy-controls--dim");
     },
     updateAutomationTab: function() {
@@ -6497,7 +6498,7 @@ let view = {
         view.updateVal("automationPaperText", paperText);
         view.updateVal("automationNextText", automation.statusText());
         view.syncCloneManaReserveCheckbox();
-        const list = resortData.automationResources || [];
+        const list = automation.orderedSpecs();
         const ownedWhole = Math.floor(paperAmt);
         for (let i = 0; i < list.length; i++) {
             const spec = list[i];
@@ -6521,7 +6522,20 @@ let view = {
                 view.updateVal(btnId, "Use +10% more of current resources for autobuy " + costHtml, "innerHTML");
                 view.updateVal(btnId, paperAmt < cost, "disabled");
             }
-            view.updateVal("automationLimits_" + key, "Use up to " + automation.xOf(key) + "% of " + spec.name + ", at most " + automation.formatAmount(automation.yOf(key)));
+            view.updateVal("automationLimits_" + key, "Use up to " + automation.xOf(key) + "% of " + spec.name + ", at most " + automation.formatAmount(automation.yOf(key)) + ' <span class="muted-text">(invested paper multiplied by ' + spec.multiplier + ")</span>", "innerHTML");
+        }
+    },
+    applyAutomationResourceOrder: function() {
+        const list = document.getElementById("automationResourceList");
+        if (!list || typeof automation === "undefined" || !automation.orderedSpecs) {
+            return;
+        }
+        const specs = automation.orderedSpecs();
+        for (let i = 0; i < specs.length; i++) {
+            const row = document.getElementById("automationResource_" + specs[i].key);
+            if (row) {
+                list.appendChild(row);
+            }
         }
     },
     updateTabButtons: function(activeTab) {

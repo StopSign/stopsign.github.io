@@ -24,8 +24,8 @@ let loadStaticSaveFile = false; //SET FOR COMMIT
 let isSteam = false; //SET FOR COMMIT
 // let isSteam = true; //SET FOR STEAM BUILD
 
-// let isDebug = false; //SET FOR COMMIT
-let isDebug = true;
+let isDebug = false; //SET FOR COMMIT
+// let isDebug = true;
 let showPathDebug = false;
 let debugPondStreamMaxWidth = false;
 let debugLevel = 0; //To start at different parts of the game
@@ -466,7 +466,8 @@ let initials = {
                 dupeTimerMs: 10000,
                 stoneDuplicatorUnlocked: false,
                 echoedShelvingBought: 0,
-                cleanGlyphsBought: false
+                cleanGlyphsBought: false,
+                smoothWiringBought: false
             },
             fireLaunchers: {
                 builtCount: 0,
@@ -959,6 +960,9 @@ let initialize = {
             if (pile.cleanGlyphsBought === undefined || pile.cleanGlyphsBought === null) {
                 pile.cleanGlyphsBought = false;
             }
+            if (pile.smoothWiringBought === undefined || pile.smoothWiringBought === null) {
+                pile.smoothWiringBought = false;
+            }
         }
         const garden = base.garden;
         const manaOrderOn = !!(garden && garden.arrangementOfManaOrdersUnlocked);
@@ -1248,6 +1252,9 @@ let initialize = {
         }
         if (!base.dirtRoads) {
             base.dirtRoads = [];
+        }
+        if ((atelier.paperCreated || 0) <= engine.getPaperCostIncreaseAfter()) {
+            atelier.paperPowerCost = engine.getPaperPowerCostStart();
         }
     },
     initializeGarden: function() {

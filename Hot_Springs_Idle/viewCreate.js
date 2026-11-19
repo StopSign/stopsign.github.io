@@ -232,6 +232,21 @@ let createView = {
     },
     createInfoButtons: function() {
         createView.createInfoButton(
+            "tabPane_automation",
+            function() {
+                return "<p>Enable all paper autobuyers turns buying on or off. Each upgrade and building still has its own Autobuy box.</p>"
+                    + "<p>Use +10% more spends paper. Each purchase lets autobuy spend another 10% of the resource you currently have, up to 100%.</p>"
+                    + "<p>Adding paper raises that resource's ceiling. The ceiling is the paper you added, multiplied by the number shown on the row. An autobuy will not pay more than that ceiling.</p>"
+                    + "<p>A purchase shows its Autobuy box once the ceiling covers its starting cost. Its 10%, 50%, and 100% choices shrink the share of your current stock it may use.</p>"
+                    + "<p>About once a second, while the Fox Den queue is empty and the Okami is not weaving, autobuy takes the first checked purchase that fits both limits. It follows building order and skips a checked purchase that does not fit yet. If a gather is already ready and that purchase is still checked, it weaves that instead.</p>"
+                    + "<p>The mana row can leave aside enough mana for the current clone.</p>";
+            },
+            8,
+            function() {
+                return ["base"];
+            }
+        );
+        createView.createInfoButton(
             "resortInfo_scrollArchives",
             function() {
                 const stars = engine.countAchievedMapStarsByType();
@@ -570,9 +585,13 @@ let createView = {
         createView.createInfoButton(
             "resortInfo_shrine",
             function() {
-                let html = "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second. Temple iconography multiplies Okami exp and divinity gain, raises the level new spirits start at, and adds a chance that cards bought with divinity are rare.</p>";
+                let html = "<p>Karma per second is (total talent levels × star score × total spirit levels × Okami level × Okami tails) / 10,000,000. Star score is bronze + 2× silver + 4× gold. The Okami gains a tail every 10 levels. Karma fills this level bar. Each shrine level grants +0.1 divinity per second. Temple iconography adds spirit power, multiplies Okami exp and divinity gain, raises the level new spirits start at, and adds a chance that cards bought with divinity are rare.</p>";
                 if (typeof engine !== "undefined" && engine.isTempleUnlocked && engine.isTempleUnlocked()) {
-                    html += "<p>Prayer Statues take assigned kitsune. Each kitsune adds prayer each second equal to the shrine level, multiplied by donations. A finished prayer applies half of its increase now and banks the full increase. Prestige moves that bank into the carried bonus, resets the prayer and the next requirement, and keeps the statue. Donations reset, including one that is still weaving, and each one multiplies prayer per worker by x1.1. Each kitsune assigned to any statue adds +20% karma, added together.</p>";
+                    html += "<p>Prayer Statues must be built first, but their building state keeps through prestige. After being built, they take assigned kitsune that add prayer to that shrine equal to shrine level x bonuses.</p>";
+                    html += "<p>A finished prayer applies half of its increase now and banks the full increase. Prestige moves that bank into the carried bonus and resets the prayer and the next requirement. Each kitsune assigned to any statue adds +20% karma gain.</p>";
+                    if (typeof resortHelper !== "undefined" && resortHelper.isDonationDriveBought()) {
+                        html += "<p>Donations and their bonuses reset on prestige. Each donation multiplies prayer by x1.1.</p>";
+                    }
                 }
                 return html;
             },
@@ -585,6 +604,23 @@ let createView = {
                 return keys;
             }
         );
+        createView.createInfoButton(
+            "resortInfo_atelier",
+            function() {
+                let html = "<p>The Drop Hammer fills from pond water drained toward the forest. Each second adds the square root of that drain, divided by 10. At 100 progress the bar is spent and grants 2 power, split across the checked tasks. If none of those tasks can use power, the bar stays full and the power is not spent.</p>";
+                html += "<p>Crush Limestone needs limestone. Its share of power fills that task's bar. Every 10 power turns up to 100 limestone into quicklime.</p>";
+                html += "<p>Create Paper needs 300 wood, 500 water, and 50 quicklime for each power it takes. That power fills the paper bar. Each time the bar reaches its power cost, paper is created. The cost starts at 6 and stays there until more than 500 creations, then each creation multiplies the cost by x1.05.</p>";
+                return html;
+            },
+            56,
+            function() {
+                return ["drophammer"];
+            }
+        );
+        const atelierInfo = createView.getInfoButtonWrap(document.getElementById("resortInfo_atelier"));
+        if (atelierInfo && !(typeof engine !== "undefined" && engine.isDrophammerUnlocked && engine.isDrophammerUnlocked())) {
+            atelierInfo.style.display = "none";
+        }
         createView.createInfoButton(
             "resortInfo_hiddenSpring",
             function() {
@@ -1158,9 +1194,8 @@ let createView = {
                         ${htmlPrayerWorkerRow(spec.id)}
                         <div class="skills-shard-slot-progress-track labeled-progress-track prayer-statue-track">
                             <div id="prayerFill_${spec.id}" class="skills-shard-slot-progress-fill"></div>
-                            <div class="labeled-progress-text labeled-progress-text--small"><span id="prayerProg_${spec.id}"></span><span class="labeled-progress-sep"> / </span><span id="prayerNeed_${spec.id}"></span></div>
+                            <div class="labeled-progress-text labeled-progress-text--small"><span id="prayerProg_${spec.id}"></span><span class="labeled-progress-sep"> / </span><span id="prayerNeed_${spec.id}"></span><span class="labeled-progress-sep"> | ETA: </span><span id="prayerEta_${spec.id}">-</span></div>
                         </div>
-                        <div class="muted-text">ETA: <span id="prayerEta_${spec.id}">-</span></div>
                         <div id="prayerBonus_${spec.id}" class="prayer-statue-bonus"></div>
                     </div>
                 </div>`;
@@ -1189,7 +1224,7 @@ let createView = {
                 </div>`;
         };
         const htmlShrinePanel = function() {
-            const templeKeys = ["okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"];
+            const templeKeys = ["earlyPowerIconography", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"];
             const prayerKeys = resortData.getPrayerUiUpgradeKeys();
             const shrineExclude = templeKeys.concat(prayerKeys);
             const shrineOnly = (resortData.buildings.shrine.upgradesOrder || []).filter(function(k) {
@@ -1197,7 +1232,7 @@ let createView = {
             });
             const donationKeys = (resortData.prayerDonationCatalog || []).map(function(d) { return d.upgradeKey; });
             return `
-                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span id="shrineKarmaKitsuneMult" class="muted-text"></span><span class="game-progress-sep">|</span>Divinity, mult: x<span id="shrineDivinityMultText">1</span>: <span id="shrineDivinityRateText">0</span>/s</div>
+                <div class="base-row">Karma: <span id="shrineKarmaRateText">0</span>/s<span id="shrineKarmaKitsuneMult" class="muted-text"></span><span class="game-progress-sep">|</span>Divinity: <span id="shrineDivinityRateText">0</span>/s <span class="muted-text">(x<span id="shrineDivinityMultText">1</span>)</span></div>
                 <div id="shrineExpProgressWrap" class="prog-track orb-exp-prog-track">
                     <div id="shrineExpFill" class="prog-fill prog-fill-karma"></div>
                     <div class="game-progress-bar-label">Level <span id="shrineLevelText" class="game-progress-bold">0</span><span class="game-progress-sep">|</span>Karma <span id="shrineExpText" class="game-progress-bold">0</span> / <span id="shrineExpToLevelText" class="game-progress-bold">10000</span><span class="game-progress-sep">|</span>ETA: <span id="shrineExpEtaText">-</span></div>
@@ -1211,9 +1246,13 @@ let createView = {
                 </div>
                 <div id="shrinePane_temple" style="display:none">
                     ${htmlPrayerStatues()}
+                    <div class="base-upgrade-divider"></div>
+                    <div class="prayer-donations-title">Carvings</div>
+                    <div class="muted-text">Iconographies do not reset on prestige.</div>
                     ${resortUpgradeRowsHtml("shrine", shrineOnly, { skipDivider: true })}
                     <div class="base-upgrade-divider"></div>
                     <div class="prayer-donations-title">Donations</div>
+                    <div class="muted-text">Donations reset upon prestige.</div>
                     ${resortUpgradeRowsHtml("shrine", [], { skipDivider: true, onlyKeys: donationKeys })}
                 </div>
             `;
@@ -1297,6 +1336,7 @@ let createView = {
                             <ul class="legend-reset-list">
                                 <li>Reset the Resort's non-shrine buildings, upgrades, and resources</li>
                                 <li>Reset Skills, Maps, Stars, and Kitsune</li>
+                                <li>Reset Temple Donations</li>
                             </ul>
                         </div>
                     </div>
@@ -1668,7 +1708,7 @@ let createView = {
                             <div id="dropHammerProgressFill" class="skills-shard-slot-progress-fill"></div>
                             <div id="dropHammerProgressLabel" class="labeled-progress-text"></div>
                         </div>
-                        <div class="base-row muted-text">Drop Hammer progress is √(pond water drained)/s</div>
+                        <div class="base-row muted-text">Drop Hammer progress is √(pond water drained)/10/s</div>
                         <div class="base-upgrade-divider"></div>
                         <div class="base-row">Drop Hammer Tasks</div>
                         <div id="dropHammerTask_crush" class="drop-hammer-task">
@@ -1686,7 +1726,7 @@ let createView = {
                                 <div class="drop-hammer-task-progress">
                                     <div class="skills-shard-slot-progress-track labeled-progress-track">
                                         <div id="dropHammerPaperFill" class="skills-shard-slot-progress-fill"></div>
-                                        <div class="labeled-progress-text labeled-progress-text--small"><span id="dropHammerPaperProg"></span><span class="labeled-progress-sep"> / </span><span id="dropHammerPaperNeed"></span></div>
+                                        <div class="labeled-progress-text labeled-progress-text--small"><span id="dropHammerPaperProg"></span><span class="labeled-progress-sep"> / </span><span id="dropHammerPaperNeed"></span><span class="labeled-progress-sep"> | </span><span class="labeled-progress-sep">Created: </span><span id="dropHammerPaperCreated">0</span><span class="labeled-progress-sep"> | </span><span class="muted-text labeled-progress-sep">Cost starts increasing at </span><span id="dropHammerPaperCostRamp" class="muted-text">500</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -2402,7 +2442,9 @@ let createView = {
         if (!root || typeof automation === "undefined" || typeof resortData === "undefined") {
             return;
         }
-        const list = resortData.automationResources || [];
+        const list = (typeof automation !== "undefined" && automation.orderedSpecs)
+            ? automation.orderedSpecs()
+            : (resortData.automationResources || []);
         let rows = "";
         for (let i = 0; i < list.length; i++) {
             const spec = list[i];
@@ -2410,10 +2452,10 @@ let createView = {
             const manaReserve = key === "mana"
                 ? `<label class="automation-resource-line"><input type="checkbox" id="automationManaReserve_chk" onchange="events.toggleGardenReserveCloneMana(this.checked)"> <span id="automationManaReserve_label">Don't count mana equal to the current clone's cost for mana autobuy</span></label>`
                 : "";
-            rows += `<div class="automation-resource"><div><strong>${spec.name}</strong> <span class="muted-text">x${spec.multiplier}</span></div><div class="automation-resource-line"><input type="number" id="automationInput_${key}" class="automation-paper-input" min="1" step="1" oninput="events.automationSanitizePaperInput(this)"><button type="button" class="tab-button" onclick="events.automationAddPaper('${key}')">Add paper</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 50)">50%</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 100)">100%</button><span>Paper added: <span id="automationInvested_${key}">0</span></span></div><div class="automation-resource-line"><button type="button" class="tab-button" id="automationLevelBtn_${key}" onclick="events.automationBuyLevel('${key}')"></button></div><div id="automationLimits_${key}" class="muted-text"></div>${manaReserve}</div>`;
+            rows += `<div id="automationResource_${key}" class="automation-resource" data-automation-key="${key}" ondragover="events.automationResourceDragOver(event)" ondrop="events.automationResourceDrop(event, '${key}')"><div class="automation-resource-main"><div><strong>${spec.name}</strong></div><div class="automation-resource-line"><button type="button" class="tab-button" id="automationLevelBtn_${key}" onclick="events.automationBuyLevel('${key}')"></button></div><div class="automation-resource-line"><input type="number" id="automationInput_${key}" class="automation-paper-input" min="1" step="1" oninput="events.automationSanitizePaperInput(this)"><button type="button" class="tab-button" onclick="events.automationAddPaper('${key}')">Add paper</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 50)">50%</button><button type="button" class="tab-button" onclick="events.automationSetPaperPercent('${key}', 100)">100%</button><span>Paper added: <span id="automationInvested_${key}">0</span></span></div><div id="automationLimits_${key}" class="automation-limits"></div>${manaReserve}</div><div class="automation-resource-reorder"><button type="button" class="tab-button kiln-priority-move" onclick="events.automationMoveResource('${key}', -1)">^</button><span class="kiln-priority-handle" draggable="true" ondragstart="events.automationResourceDragStart(event, '${key}')" ondragend="events.automationResourceDragEnd()" title="Drag to reorder">=</span><button type="button" class="tab-button kiln-priority-move" onclick="events.automationMoveResource('${key}', 1)">v</button></div></div>`;
             createView.queueCache("automationInput_" + key, "automationInvested_" + key, "automationLevelBtn_" + key, "automationLimits_" + key);
         }
-        root.innerHTML = `<div class="pane-title">Automation</div><label class="options-row"><input type="checkbox" id="automationEnabled_chk" checked onchange="events.automationSetEnabled(this.checked)"> Autobuy</label><div class="base-row">${resortData.resourceIconHtml("paper")} Paper: <span id="automationPaperText">0</span></div><div id="automationNextText" class="muted-text"></div>${rows}`;
+        root.innerHTML = `<div class="pane-title">Automation</div><label class="options-row"><input type="checkbox" id="automationEnabled_chk" checked onchange="events.automationSetEnabled(this.checked)"> Enable all paper autobuyers</label><div class="base-row">${resortData.resourceIconHtml("paper")} Paper: <span id="automationPaperText">0</span></div><div id="automationNextText" class="muted-text"></div><div id="automationResourceList">${rows}</div>`;
         createView.queueCache("automationEnabled_chk", "automationPaperText", "automationNextText", "automationManaReserve_chk", "automationManaReserve_label");
     },
     showCurrentTab: function() {
@@ -2504,7 +2546,7 @@ let createView = {
             "mapHiddenSpringManaProgressWrap", "mapHiddenSpringManaProgressFill",
             "guestStarBeadsRange", "guestStarBeadsMin", "guestStarBeadsMax", "guestStarBeadsRangeNote",
             "kitsuneAssignTooltip", "kitsuneAssignTooltipList",
-            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "dropHammerRes_row", "dropHammerLimestoneText", "dropHammerQuicklimeText", "dropHammerProgressTrack", "dropHammerProgressFill", "dropHammerProgressLabel", "dropHammerTask_crush", "dropHammerCrush_chk", "dropHammerCrushFill", "dropHammerCrushProg", "dropHammerCrushNeed", "dropHammerTask_paper", "dropHammerPaper_chk", "dropHammerPaperFill", "dropHammerPaperProg", "dropHammerPaperNeed", "dropHammerPaperCost", "atelierWoodHold_row", "atelierWoodHoldInput", "atelierWoodHeld", "atelierWater_row", "atelierWaterFill", "atelierWaterText", "atelierWaterRequire", "atelierAllowCarriersWater_row", "atelierAllowCarriersWater_chk", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay", "shrineMapTemple", "shrineSubTabs", "shrineSubTab_shrine", "shrineSubTab_temple", "shrinePane_shrine", "shrinePane_temple",
+            "stonePileInfoValue", "stonePileMapValue", "atelierMapDisplay", "atelierMapWheel", "atelierOreBars_row", "atelierInfoOre", "atelierInfoBars", "atelierSubTabs", "atelierSubTab_atelier", "atelierSubTab_dropHammer", "atelierPane_atelier", "atelierPane_dropHammer", "dropHammerRes_row", "dropHammerLimestoneText", "dropHammerQuicklimeText", "dropHammerProgressTrack", "dropHammerProgressFill", "dropHammerProgressLabel", "dropHammerTask_crush", "dropHammerCrush_chk", "dropHammerCrushFill", "dropHammerCrushProg", "dropHammerCrushNeed", "dropHammerTask_paper", "dropHammerPaper_chk", "dropHammerPaperFill", "dropHammerPaperProg", "dropHammerPaperNeed", "dropHammerPaperCreated", "dropHammerPaperCostRamp", "dropHammerPaperCost", "atelierWoodHold_row", "atelierWoodHoldInput", "atelierWoodHeld", "atelierWater_row", "atelierWaterFill", "atelierWaterText", "atelierWaterRequire", "atelierAllowCarriersWater_row", "atelierAllowCarriersWater_chk", "toriiMapDisplay", "innMapDisplay", "cisternMapValue", "mageTowerMapDisplay", "shrineMapDisplay", "shrineMapTemple", "shrineSubTabs", "shrineSubTab_shrine", "shrineSubTab_temple", "shrinePane_shrine", "shrinePane_temple",
             "mapToriiProgressWrap", "mapToriiProgressFill", "mapLaundryProgressWrap", "mapLaundryProgressFill", "mapOrbProgressWrap", "mapOrbProgressFill", "mapShrineProgressWrap", "mapShrineProgressFill",
             "orbExpProgressWrap", "orbExpFill", "orbLevelText", "orbExpText", "orbExpToLevelText", "orbManaRateText", "orbBaseManaText", "orbBaseManaCloneBonusText", "orbExpRateText", "orbExpEtaText",
             "marketMapDisplay", "mapMarketProgressWrap", "mapMarketProgressFill",
@@ -2756,7 +2798,7 @@ let createView = {
                 }
                 if (typeof automation !== "undefined" && automation.upgradeHasControls && automation.upgradeHasControls(rbk, rpk)) {
                     const paperIds = automation.upgradeControlIds(rbk, rpk);
-                    createView.queueCache(paperIds.row, paperIds.chk, paperIds.r10, paperIds.r50, paperIds.r100);
+                    createView.queueCache(paperIds.row, paperIds.chk, paperIds.pct);
                 }
             }
         }
@@ -2775,7 +2817,7 @@ let createView = {
             createView.queueCache(`base_foxDen_extra_${kx}`, resortData.idRow("foxDen", kx), resortData.idBtn("foxDen", kx));
             if (typeof automation !== "undefined" && automation.buildingHasControls && automation.buildingHasControls(kx)) {
                 const buildIds = automation.buildingControlIds(kx);
-                createView.queueCache(buildIds.row, buildIds.chk, buildIds.r10, buildIds.r50, buildIds.r100);
+                createView.queueCache(buildIds.row, buildIds.chk, buildIds.pct);
             }
         }
         for (let bi = 0; bi < BATTLE_BUFF_KEYS.length; bi++) {
