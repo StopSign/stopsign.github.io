@@ -9,7 +9,7 @@ var resortData = {
 
     /** All map building keys (resort buttons; order does not affect gameplay). */
     baseBuildingOrder: [
-        "foxDen", "stonePile", "bambooForest", "garden", "torii", "inn", "atelier", "mage_tower", "bonfire", "scrollArchives",
+        "foxDen", "stonePile", "bambooForest", "torii", "inn", "garden", "atelier", "mage_tower", "bonfire", "scrollArchives",
         "mine", "hiddenSpring", 
          "cistern", "pond",  "market", "shrine", "noodleBar", "laundry"
     ],
@@ -60,7 +60,11 @@ var resortData = {
 
     getKitsuneCarryCapacity: function() {
         const bought = (data.progress.base && data.progress.base.atelier && data.progress.base.atelier.basketsBought) || 0;
-        return fibonacci(bought + 1);
+        let cap = fibonacci(bought + 1);
+        if (resortHelper.isKitsuneBalanceBought()) {
+            cap *= 2;
+        }
+        return cap;
     },
 
     getManaCarryAmount: function() {
@@ -1352,6 +1356,7 @@ var resortData = {
                 fireTendingEnabled: true,
                 fireTendingHeatCap: 55,
                 stokeFireSpiritBought: 0,
+                igniteSparksBought: 0,
                 denseClonesUnlocked: false,
                 cloneDensity: 0,
                 lingeringDensityUnlocked: false,
@@ -1375,7 +1380,7 @@ var resortData = {
                 buildUponCloneFoundationBought: 0,
                 contemplateSturdinessBought: 0
             },
-            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "buildUponCloneFoundation", "contemplateSturdiness", "fillMana"],
+            upgradesOrder: ["tendTheFlame", "buildKiln", "autoRetry", "denseClones", "lingeringDensity", "bondGrowth", "growthBlessing", "startWithFullMana", "plannedGrowthBlessing", "stokeFireSpirit", "igniteSparks", "buildUponCloneFoundation", "contemplateSturdiness", "fillMana"],
             upgrades: {
                 tendTheFlame: {
                     key: "tend_the_flame",
@@ -1554,6 +1559,39 @@ var resortData = {
                     },
                     maxPurchases: 2,
                     soldOutButtonLabel: "Max stoked",
+                },
+                igniteSparks: {
+                    key: "ignite_sparks",
+                    name: "Ignite Sparks in Oven",
+                    description: "Summon a fire spirit.",
+                    weavingTime: 2000,
+                    weavingTimeIncrease: 2,
+                    getWeavingPurchaseIndex: function() {
+                        return data.progress.base.bonfire.igniteSparksBought || 0;
+                    },
+                    getCost: function() {
+                        const bought = data.progress.base.bonfire.igniteSparksBought || 0;
+                        return {
+                            limestone: 2000 * Math.pow(5, bought),
+                            hardwood: 4000 * Math.pow(5, bought)
+                        };
+                    },
+                    maxPurchases: 2,
+                    canBuy: function() {
+                        const bought = data.progress.base.bonfire.igniteSparksBought || 0;
+                        return bought < 2 && !!engine.findExtraSpiritPlacementSlot("fire");
+                    },
+                    onBuy: function() {
+                        data.progress.base.bonfire.igniteSparksBought = (data.progress.base.bonfire.igniteSparksBought || 0) + 1;
+                        engine.assembleExtraSpirit("fire");
+                    },
+                    upgradeSoldOut: function() {
+                        return (data.progress.base.bonfire.igniteSparksBought || 0) >= 2;
+                    },
+                    soldOutButtonLabel: "Ignited",
+                    rowVisible: function() {
+                        return resortHelper.isContainedSparkBought() && engine.isSearchForLimestoneBought();
+                    }
                 },
                 startWithFullMana: {
                     key: "start_with_full_mana",
@@ -2516,7 +2554,7 @@ var resortData = {
                     cost: { starBeads: 100000, bars: 1500, hardwood: 1000 },
                     weavingTime: 4000,
                     rowVisible: function() {
-                        return engine.isBringOreToAtelierUnlocked();
+                        return engine.isBringOreToAtelierUnlocked() && resortHelper.isLimestoneCarvingBought();
                     },
                     canBuy: function() {
                         return engine.isBringOreToAtelierUnlocked() && !engine.isSearchForLimestoneBought();
@@ -3343,7 +3381,7 @@ var resortData = {
                     cost: { wood: 20000, hardwood: 2000, stone: 40000 },
                     weavingTime: 6000,
                     rowVisible: function() {
-                        return true;
+                        return resortHelper.isWaterPowerBought();
                     },
                     canBuy: function() {
                         const atelier = data.progress.base.atelier;
@@ -3364,7 +3402,7 @@ var resortData = {
                     cost: { stone: 20000, essence: 1000 },
                     weavingTime: 3000,
                     rowVisible: function() {
-                        return engine.isDrophammerUnlocked();
+                        return engine.isDrophammerUnlocked() && resortHelper.isKeepRecordsBought();
                     },
                     canBuy: function() {
                         const atelier = data.progress.base.atelier;
@@ -5504,6 +5542,23 @@ var resortData = {
                 dealMakingBought: 0,
                 orbHeightBought: 0,
                 skyAppreciationBought: 0,
+                limestoneCarvingBought: 0,
+                waterfallTrainingBought: 0,
+                spiritAncestorsBought: 0,
+                spiritAncestorGuidanceBought: 0,
+                containedSparkBought: 0,
+                essenceGatheringBought: 0,
+                keepRecordsBought: 0,
+                kitsuneBalanceBought: 0,
+                callTheGoddessBought: 0,
+                donationDriveBought: 0,
+                waterPowerBought: 0,
+                spiritAncestorRecords: {
+                    earth: { entries: [], nextIndex: 0 },
+                    water: { entries: [], nextIndex: 0 },
+                    fire: { entries: [], nextIndex: 0 },
+                    plant: { entries: [], nextIndex: 0 }
+                },
                 haulKeepStone: 0,
                 haulKeepWood: 0,
                 haulKeepHardwood: 0,
@@ -5525,6 +5580,9 @@ var resortData = {
                 "skillEchoes", "karmaStacking",
                 "plantAffinity", "earthAffinity", "hardenBamboo", "scribingInfusions", "shardsFound",
                 "tradingContracts", "resourceProtection", "dealMaking", "orbHeight", "skyAppreciation",
+                "limestoneCarving", "waterfallTraining", "spiritAncestors", "spiritAncestorGuidance",
+                "containedSpark", "essenceGathering", "keepRecords", "kitsuneBalance",
+                "callTheGoddess", "donationDrive", "waterPower",
                 "upgradeToTemple", "okamiIconography", "elementalResonance", "divineGifts", "goddessIconography"],
             upgrades: {
                 prepareToWriteLegend: {
@@ -5597,7 +5655,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getShardEchoesBought();
-                        return { divinity: 20000 + 10000 * bought };
+                        return { divinity: 20000 + 15000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
@@ -5677,7 +5735,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getLanguageEchoesBought();
-                        return { divinity: 20000 + 10000 * bought };
+                        return { divinity: 20000 * Math.pow(2, bought) };
                     },
                     getMaxPurchases: function() {
                         return Math.min(10, engine.getLegendsWritten());
@@ -5708,7 +5766,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getSkillEchoesBought();
-                        return { divinity: 20000 + 10000 * bought };
+                        return { divinity: 20000 + 20000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
@@ -5739,7 +5797,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getSpiritWeavingEchoesBought();
-                        return { divinity: 16000 + 8000 * bought };
+                        return { divinity: 15000 + 15000 * bought };
                     },
                     getMaxPurchases: function() {
                         return engine.getLegendsWritten();
@@ -6038,7 +6096,7 @@ var resortData = {
                     },
                     getCost: function() {
                         const bought = resortHelper.getOrbHeightBought();
-                        return { divinity: 10000 + 8000 * bought };
+                        return { divinity: 10000 + 15000 * bought };
                     },
                     getMaxPurchases: function() {
                         return Math.max(0, engine.getLegendsWritten() - 1);
@@ -6081,6 +6139,238 @@ var resortData = {
                         return engine.getLegendsWritten() >= 2;
                     }
                 },
+                limestoneCarving: {
+                    key: "limestone_carving",
+                    name: "Limestone Carving",
+                    description: "Reveals Search for Limestone in the Mine - a new resource to mine and bring to Atelier.",
+                    weavingTime: 800,
+                    getCost: function() {
+                        return { divinity: 20000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.limestoneCarvingBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isLimestoneCarvingBought();
+                    },
+                    soldOutButtonLabel: "Carved",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                waterfallTraining: {
+                    key: "waterfall_training",
+                    name: "Waterfall Training",
+                    description: "Hidden Spring training grants spirit level / 10 training instead of 0.1, and the finish costs x(1 + spirit level / 20) mana. Hidden Spring mana capacity is x4.",
+                    weavingTime: 2000,
+                    getCost: function() {
+                        return { divinity: 70000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.waterfallTrainingBought = 1;
+                    },
+                    extraInfo: function() {
+                        return resortHelper.isWaterfallTrainingBought() ? "Training: level/10. Mana capacity: x4" : "";
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isWaterfallTrainingBought();
+                    },
+                    soldOutButtonLabel: "Training",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                spiritAncestors: {
+                    key: "spirit_ancestors",
+                    name: "Spirit Knowledge",
+                    description: "Spirit exp is multiplied by 1 + spirit training / spirit power.",
+                    weavingTime: 3500,
+                    getCost: function() {
+                        return { divinity: 80000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.spiritAncestorsBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isSpiritAncestorsBought();
+                    },
+                    soldOutButtonLabel: "Remembered",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                spiritAncestorGuidance: {
+                    key: "spirit_ancestor_guidance",
+                    name: "Spirit Ancestral Guidance",
+                    description: "Each spirit's name and spirit training is saved upon prestige. New spirits of that kind inherit them from highest training to lowest, and gain x2 spirit training until they reach that training.",
+                    weavingTime: 8000,
+                    getCost: function() {
+                        return { divinity: 90000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.spiritAncestorGuidanceBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isSpiritAncestorGuidanceBought();
+                    },
+                    soldOutButtonLabel: "Guided",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                containedSpark: {
+                    key: "contained_spark",
+                    name: "Contained Spark",
+                    description: "Reveals Ignite Sparks in Oven in the Bonfire for two more Fire Spirits that cost Limestone.",
+                    weavingTime: 2000,
+                    getCost: function() {
+                        return { divinity: 50000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.containedSparkBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isContainedSparkBought();
+                    },
+                    soldOutButtonLabel: "Contained",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3 && resortHelper.isLimestoneCarvingBought();
+                    }
+                },
+                essenceGathering: {
+                    key: "essence_gathering",
+                    name: "Essence Gathering",
+                    description: "Each purchase multiplies essence gained by x1.3.",
+                    weavingTime: 3000,
+                    weavingTimeIncrease: 1.2,
+                    roundWeavingTime: true,
+                    getWeavingPurchaseIndex: function() {
+                        return resortHelper.getEssenceGatheringBought();
+                    },
+                    getCost: function() {
+                        const bought = resortHelper.getEssenceGatheringBought();
+                        return { divinity: Math.round(50000 * Math.pow(1.4, bought)) };
+                    },
+                    onBuy: function() {
+                        const shrine = data.progress.base.shrine;
+                        shrine.essenceGatheringBought = (shrine.essenceGatheringBought || 0) + 1;
+                    },
+                    extraInfo: function() {
+                        const n = resortHelper.getEssenceGatheringBought();
+                        return `Essence: x${round2(Math.pow(1.3, n))}`;
+                    },
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                keepRecords: {
+                    key: "keep_records",
+                    name: "Keep Records",
+                    description: "Reveals Crush Paper in the Atelier, a resource that keeps between prestiges and is used for auto-building.",
+                    weavingTime: 2000,
+                    getCost: function() {
+                        return { divinity: 75000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.keepRecordsBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isKeepRecordsBought();
+                    },
+                    soldOutButtonLabel: "Recording",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3 && resortHelper.isWaterPowerBought();
+                    }
+                },
+                kitsuneBalance: {
+                    key: "kitsune_balance",
+                    name: "Kitsune Balance",
+                    description: "Kitsune carry twice as many resources per trip.",
+                    weavingTime: 1000,
+                    getCost: function() {
+                        return { divinity: 80000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.kitsuneBalanceBought = 1;
+                    },
+                    extraInfo: function() {
+                        return resortHelper.isKitsuneBalanceBought() ? "Resource carry: x2" : "";
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isKitsuneBalanceBought();
+                    },
+                    soldOutButtonLabel: "Balanced",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3;
+                    }
+                },
+                callTheGoddess: {
+                    key: "call_the_goddess",
+                    name: "Call the Goddess",
+                    description: "Reveals Upgrade to Temple.",
+                    weavingTime: 3000,
+                    getCost: function() {
+                        return { divinity: 50000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.callTheGoddessBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isCallTheGoddessBought();
+                    },
+                    soldOutButtonLabel: "Called",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3 && resortHelper.isLimestoneCarvingBought();
+                    }
+                },
+                donationDrive: {
+                    key: "donation_drive",
+                    name: "Donation Drive",
+                    description: "Reveals the Temple's donation upgrades.",
+                    weavingTime: 4000,
+                    getCost: function() {
+                        return { divinity: 100000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.donationDriveBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isDonationDriveBought();
+                    },
+                    soldOutButtonLabel: "Driving",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3 && resortHelper.isCallTheGoddessBought();
+                    }
+                },
+                waterPower: {
+                    key: "water_power",
+                    name: "Water Power",
+                    description: "Reveals Build Water Wheel and Drophammer in the Atelier.",
+                    weavingTime: 1500,
+                    getCost: function() {
+                        return { divinity: 20000 };
+                    },
+                    maxPurchases: 1,
+                    onBuy: function() {
+                        data.progress.base.shrine.waterPowerBought = 1;
+                    },
+                    upgradeSoldOut: function() {
+                        return resortHelper.isWaterPowerBought();
+                    },
+                    soldOutButtonLabel: "Powered",
+                    rowVisible: function() {
+                        return engine.getLegendsWritten() >= 3 && resortHelper.isLimestoneCarvingBought();
+                    }
+                },
                 upgradeToTemple: {
                     key: "upgrade_to_temple",
                     name: "Upgrade to Temple",
@@ -6102,7 +6392,7 @@ var resortData = {
                     },
                     soldOutButtonLabel: "Built",
                     rowVisible: function() {
-                        return engine.isSearchForLimestoneBought();
+                        return resortHelper.isCallTheGoddessBought();
                     }
                 },
                 okamiIconography: {
@@ -6515,7 +6805,7 @@ resortData.installPrayerUpgrades = function() {
                 return `Prayer power from this: x${round2(Math.pow(1.1, n))}`;
             },
             rowVisible: function() {
-                return engine.isTempleUnlocked();
+                return resortHelper.isDonationDriveBought();
             }
         };
         shrine.upgradesOrder.push(spec.upgradeKey);

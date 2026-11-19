@@ -370,19 +370,17 @@ var SHRINE_CARD_DEFINITION_ROWS = [
             if (rarity === "rare") {
                 return {
                     hiddenSpringPowerExpFlat: 10,
-                    hiddenSpringPowerTrainingFlat: 0.1,
-                    hiddenSpringPowerCostFlat: 100
+                    hiddenSpringPowerTrainingFlat: 0.1
                 };
             }
             return {};
         },
         effectText: function(rarity) {
-            return "Hidden Spring Training: +10 exp, +0.1 training, +100 mana cost";
+            return "Hidden Spring Training: +10 exp, +0.1 training";
         },
         totalBonusText: function(totalEffect) {
             return "Hidden Spring Training: +" + (totalEffect.hiddenSpringPowerExpFlat || 0) + " exp, +" +
-                roundNearestDecimals(totalEffect.hiddenSpringPowerTrainingFlat || 0, 1) + " training, +" +
-                (totalEffect.hiddenSpringPowerCostFlat || 0) + " mana cost";
+                roundNearestDecimals(totalEffect.hiddenSpringPowerTrainingFlat || 0, 1) + " training";
         }
     },
     {
@@ -1154,6 +1152,10 @@ var shrineCards = {
         },
         {
             text: "Add 10 upgrades to Shrine that cost Divinity.\nx1.5 Okami exp gain",
+            apply: function() {}
+        },
+        {
+            text: "Add 11 upgrades to Shrine that cost Divinity.\nx1.5 Spirit exp gain",
             apply: function() {}
         }
     ],

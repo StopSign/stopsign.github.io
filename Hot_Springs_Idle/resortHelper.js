@@ -241,6 +241,39 @@ let resortHelper = {
     isSkyAppreciationBought: function() {
         return resortHelper.getShrineUpgradeBought("skyAppreciationBought") > 0;
     },
+    isLimestoneCarvingBought: function() {
+        return resortHelper.getShrineUpgradeBought("limestoneCarvingBought") > 0;
+    },
+    isWaterfallTrainingBought: function() {
+        return resortHelper.getShrineUpgradeBought("waterfallTrainingBought") > 0;
+    },
+    isSpiritAncestorsBought: function() {
+        return resortHelper.getShrineUpgradeBought("spiritAncestorsBought") > 0;
+    },
+    isSpiritAncestorGuidanceBought: function() {
+        return resortHelper.getShrineUpgradeBought("spiritAncestorGuidanceBought") > 0;
+    },
+    isContainedSparkBought: function() {
+        return resortHelper.getShrineUpgradeBought("containedSparkBought") > 0;
+    },
+    getEssenceGatheringBought: function() {
+        return resortHelper.getShrineUpgradeBought("essenceGatheringBought");
+    },
+    isKeepRecordsBought: function() {
+        return resortHelper.getShrineUpgradeBought("keepRecordsBought") > 0;
+    },
+    isKitsuneBalanceBought: function() {
+        return resortHelper.getShrineUpgradeBought("kitsuneBalanceBought") > 0;
+    },
+    isCallTheGoddessBought: function() {
+        return resortHelper.getShrineUpgradeBought("callTheGoddessBought") > 0;
+    },
+    isDonationDriveBought: function() {
+        return resortHelper.getShrineUpgradeBought("donationDriveBought") > 0;
+    },
+    isWaterPowerBought: function() {
+        return resortHelper.getShrineUpgradeBought("waterPowerBought") > 0;
+    },
     isPrepareToWriteLegendBought: function() {
         const shrine = data.progress.base && data.progress.base.shrine;
         return !!(shrine && shrine.prepareToWriteLegendBought);

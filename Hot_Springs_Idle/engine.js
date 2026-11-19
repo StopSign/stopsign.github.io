@@ -553,6 +553,9 @@ let engine = {
         const keptPaper = Math.max(0, progress.paper || 0);
         const hidePaperPrestigeNew = !!progress.hidePaperPrestigeNew || engine.isCrushPaperBought();
         const keptAutomation = progress.automation ? structuredClone(progress.automation) : null;
+        if (shrine && resortHelper.isSpiritAncestorGuidanceBought()) {
+            engine.snapshotSpiritAncestors(shrine);
+        }
 
         data.progress = initials.progress();
         data.battle = initials.battle();
@@ -4239,6 +4242,7 @@ let engine = {
         };
         engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
+        engine.applySpiritAncestorRecord(spirit);
         return true;
     },
     getInnRestfulnessPerSecond: function() {
@@ -6558,6 +6562,7 @@ let engine = {
         }
         engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
+        engine.applySpiritAncestorRecord(spirit);
         return true;
     },
     findSpiritPlacementSlot: function(kind) {
@@ -6662,6 +6667,7 @@ let engine = {
         }
         engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
+        engine.applySpiritAncestorRecord(spirit);
         return true;
     },
     assembleEarthSpiritFromPurchase: function() {
@@ -6752,6 +6758,7 @@ let engine = {
         }
         engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
+        engine.applySpiritAncestorRecord(spirit);
         return true;
     },
     assemblePlantSpiritFromPurchase: function() {
@@ -6794,6 +6801,7 @@ let engine = {
         };
         engine.stampDefaultSpiritLevel(spirit);
         hs.spirits.push(spirit);
+        engine.applySpiritAncestorRecord(spirit);
         return true;
     },
     buyAssembleEarthSpirit: function() {
@@ -6853,14 +6861,19 @@ let engine = {
         }
         return volume / travelSec;
     },
-    /** Assumed continuous training-spot exp/s from card effects. */
-    getSpiritTrainingExpPerSec: function() {
-        const trainFx = engine.getSpiritTrainingCardEffects();
+    /** Assumed continuous training-spot exp/s, including legend, teach, and ancestor multipliers. */
+    getSpiritTrainingExpPerSec: function(spirit) {
+        const trainFx = engine.getSpiritTrainingCardEffects(spirit);
         const durationMs = trainFx.durationMs || 0;
         if (durationMs <= 0) {
             return 0;
         }
-        return (trainFx.exp || 0) / (durationMs / 1000);
+        let exp = trainFx.exp * engine.getLegendSpiritExpMultiplier();
+        if (spirit) {
+            exp *= engine.getTeachFromExperienceExpMult(spirit);
+            exp *= engine.getSpiritAncestorExpMultiplier(spirit);
+        }
+        return exp / (durationMs / 1000);
     },
     isSpiritAtTrainingSpot: function(spirit) {
         return !!(spirit && spirit.location === "spiritTraining");
@@ -6873,27 +6886,49 @@ let engine = {
             spirit.trainingTimerMs = 0;
         }
     },
-    getSpiritTrainingCardEffects: function() {
-        if (typeof shrineCards === "undefined" || !shrineCards.getAggregatedEffects) {
-            return {
-                cost: 500,
-                durationMs: 60000,
-                exp: 60,
-                training: 0.1
-            };
+    getSpiritTrainingCardEffects: function(spirit) {
+        let cardTraining = 0;
+        let cardExp = 0;
+        let reduction = 0;
+        let durationReduce = 0;
+        if (typeof shrineCards !== "undefined" && shrineCards.getAggregatedEffects) {
+            const card = shrineCards.getAggregatedEffects();
+            cardTraining = card.hiddenSpringPowerTrainingFlat || 0;
+            cardExp = card.hiddenSpringPowerExpFlat || 0;
+            reduction = card.hiddenSpringManaCostReductionAdd || 0;
+            durationReduce = card.hiddenSpringDurationReduceMs || 0;
         }
-        const card = shrineCards.getAggregatedEffects();
-        const baseCost = 500 + (card.hiddenSpringPowerCostFlat || 0);
-        const reduction = card.hiddenSpringManaCostReductionAdd || 0;
+        const level = spirit ? (spirit.level || 1) : 1;
+        let training = (resortHelper.isWaterfallTrainingBought() ? (level / 10) : 0.1) + cardTraining;
+        training = engine.getAncestorAdjustedTrainingGain(spirit, training);
+        let cost = 500 * (1 - reduction);
+        if (spirit && resortHelper.isWaterfallTrainingBought()) {
+            cost *= (1 + level / 20);
+        }
         return {
-            cost: baseCost * (1 - reduction),
-            durationMs: 60000 - (card.hiddenSpringDurationReduceMs || 0),
-            exp: 60 + (card.hiddenSpringPowerExpFlat || 0),
-            training: 0.1 + (card.hiddenSpringPowerTrainingFlat || 0)
+            cost: cost,
+            durationMs: 60000 - durationReduce,
+            exp: 60 + cardExp,
+            training: training
         };
     },
-    getSpiritTrainingManaCost: function() {
-        return engine.getSpiritTrainingCardEffects().cost;
+    getAncestorAdjustedTrainingGain: function(spirit, baseGain) {
+        if (!spirit || spirit.highestTraining === undefined || spirit.highestTraining === null) {
+            return baseGain;
+        }
+        const current = spirit.training || 0;
+        const highest = spirit.highestTraining;
+        if (current >= highest) {
+            return baseGain;
+        }
+        const room = highest - current;
+        if (baseGain * 2 <= room) {
+            return baseGain * 2;
+        }
+        return baseGain + (room / 2);
+    },
+    getSpiritTrainingManaCost: function(spirit) {
+        return engine.getSpiritTrainingCardEffects(spirit).cost;
     },
     getSpiritTrainingDurationMs: function() {
         return engine.getSpiritTrainingCardEffects().durationMs;
@@ -6903,7 +6938,7 @@ let engine = {
             return false;
         }
         const hs = data.progress.base.hiddenSpring;
-        const need = engine.getSpiritTrainingManaCost();
+        const need = engine.getSpiritTrainingManaCost(spirit);
         if (!hs || (hs.mana || 0) < need) {
             return false;
         }
@@ -6920,7 +6955,7 @@ let engine = {
         if (!engine.canSpiritTrain(spirit)) {
             return;
         }
-        const trainFx = engine.getSpiritTrainingCardEffects();
+        const trainFx = engine.getSpiritTrainingCardEffects(spirit);
         spirit.trainingTimerMs = (spirit.trainingTimerMs || 0) + tickMs;
         const durationMs = trainFx.durationMs;
         if (spirit.trainingTimerMs < durationMs) {
@@ -7192,17 +7227,118 @@ let engine = {
             return;
         }
         amount *= engine.getTeachFromExperienceExpMult(spirit);
+        amount *= engine.getLegendSpiritExpMultiplier();
         if (amount <= 0) {
             return;
         }
-        spirit.exp = (spirit.exp || 0) + amount;
+        spirit.exp = spirit.exp || 0;
         spirit.expToLevel = spirit.expToLevel || 15;
-        while (spirit.exp >= spirit.expToLevel) {
+        while (amount > 0) {
+            if (spirit.exp >= spirit.expToLevel) {
+                spirit.exp -= spirit.expToLevel;
+                spirit.level = (spirit.level || 1) + 1;
+                spirit.expToLevel = Math.round(spirit.expToLevel * 1.8);
+                spirit.spiritPower = engine.getSpiritPowerForLevel(spirit.level);
+                continue;
+            }
+            const mult = engine.getSpiritAncestorExpMultiplier(spirit);
+            const room = spirit.expToLevel - spirit.exp;
+            const gained = amount * mult;
+            if (gained < room) {
+                spirit.exp += gained;
+                return;
+            }
+            spirit.exp += room;
+            amount -= room / mult;
             spirit.exp -= spirit.expToLevel;
             spirit.level = (spirit.level || 1) + 1;
             spirit.expToLevel = Math.round(spirit.expToLevel * 1.8);
             spirit.spiritPower = engine.getSpiritPowerForLevel(spirit.level);
         }
+    },
+    getSpiritAncestorExpMultiplier: function(spirit) {
+        if (!resortHelper.isSpiritAncestorsBought() || !spirit) {
+            return 1;
+        }
+        const power = spirit.spiritPower || 1;
+        return 1 + ((spirit.training || 0) / power);
+    },
+    freshSpiritAncestorRecords: function() {
+        return {
+            earth: { entries: [], nextIndex: 0 },
+            water: { entries: [], nextIndex: 0 },
+            fire: { entries: [], nextIndex: 0 },
+            plant: { entries: [], nextIndex: 0 }
+        };
+    },
+    snapshotSpiritAncestors: function(shrine) {
+        const spirits = data.progress.base.hiddenSpring.spirits;
+        if (!shrine.spiritAncestorRecords || shrine.spiritAncestorRecords === resortData.buildings.shrine.progressDefaults.spiritAncestorRecords) {
+            shrine.spiritAncestorRecords = engine.freshSpiritAncestorRecords();
+        }
+        const records = shrine.spiritAncestorRecords;
+        const kinds = ["earth", "water", "fire", "plant"];
+        for (let k = 0; k < kinds.length; k++) {
+            const kind = kinds[k];
+            const snapshot = [];
+            for (let i = 0; i < spirits.length; i++) {
+                const spirit = spirits[i];
+                if (spirit.kind !== kind) {
+                    continue;
+                }
+                snapshot.push({
+                    name: engine.sanitizeSpiritName(spirit.name),
+                    training: spirit.training || 0,
+                    id: spirit.id || 0
+                });
+            }
+            snapshot.sort(function(a, b) {
+                if (b.training !== a.training) {
+                    return b.training - a.training;
+                }
+                return a.id - b.id;
+            });
+            const entries = [];
+            for (let i = 0; i < snapshot.length; i++) {
+                entries.push({ name: snapshot[i].name, training: snapshot[i].training });
+            }
+            let savedBest = 0;
+            const saved = records[kind];
+            if (saved && saved.entries) {
+                for (let i = 0; i < saved.entries.length; i++) {
+                    if ((saved.entries[i].training || 0) > savedBest) {
+                        savedBest = saved.entries[i].training || 0;
+                    }
+                }
+            }
+            let newBest = 0;
+            for (let i = 0; i < entries.length; i++) {
+                if (entries[i].training > newBest) {
+                    newBest = entries[i].training;
+                }
+            }
+            if (!saved || !saved.entries || saved.entries.length === 0 || newBest > savedBest) {
+                records[kind] = { entries: entries, nextIndex: 0 };
+            } else {
+                saved.nextIndex = 0;
+            }
+        }
+    },
+    applySpiritAncestorRecord: function(spirit) {
+        if (!resortHelper.isSpiritAncestorGuidanceBought()) {
+            return;
+        }
+        const bucket = data.progress.base.shrine.spiritAncestorRecords[spirit.kind];
+        const index = bucket.nextIndex || 0;
+        const entry = bucket.entries[index];
+        if (!entry) {
+            return;
+        }
+        bucket.nextIndex = index + 1;
+        if (entry.name) {
+            spirit.name = entry.name;
+        }
+        spirit.highestTraining = entry.training || 0;
     },
     getTeachFromExperienceExpMult: function(spirit) {
         const orb = data.progress.base && data.progress.base.mage_tower;
@@ -7538,7 +7674,7 @@ let engine = {
             const room = engine.isCisternRefusingWater() ? 0 : Math.max(0, engine.getCisternMaxCapacity() - volBeforeAdd);
             const waterGain = Math.min(dropletVol, room);
             engine.addWaterToCistern(dropletVol, deliveredHeat);
-            const essenceGain = Math.max(0, dropletHeat - 100) + (d.essence || 0);
+            const essenceGain = (Math.max(0, dropletHeat - 100) + (d.essence || 0)) * engine.getEssenceGatheringMultiplier();
             cistern.essence = (cistern.essence || 0) + essenceGain;
             if (essenceGain > 0) {
                 data.progress.essenceMade = (data.progress.essenceMade || 0) + essenceGain;
@@ -10797,7 +10933,9 @@ let engine = {
             return !!(data.progress && data.progress.battleUnlocked) && !!unlocks.bonfire;
         }
         if (unlockKey === "cistern") {
-            return engine.hasFirstEarthSpirit();
+            const torii = data.progress.base && data.progress.base.torii;
+            return engine.hasFirstEarthSpirit()
+                && !!(torii && (torii.plantSpiritsBought || 0) > 0);
         }
         if (unlockKey === "pond") {
             return !!unlocks.cistern;
@@ -13688,6 +13826,9 @@ let engine = {
             }
             cap *= (1 + add);
         }
+        if (buildingKey === "hiddenSpring" && resortHelper.isWaterfallTrainingBought()) {
+            cap *= 4;
+        }
         return cap;
     },
     hasManaCapacityForCost: function(cost) {
@@ -14709,6 +14850,12 @@ let engine = {
     },
     getLegendOkamiExpMultiplier: function() {
         return engine.getLegendsWritten() >= 2 ? 1.5 : 1;
+    },
+    getLegendSpiritExpMultiplier: function() {
+        return engine.getLegendsWritten() >= 3 ? 1.5 : 1;
+    },
+    getEssenceGatheringMultiplier: function() {
+        return Math.pow(1.3, resortHelper.getEssenceGatheringBought());
     },
     getTempleOkamiExpMultiplier: function() {
         const bought = (typeof resortHelper !== "undefined" && resortHelper.getShrineUpgradeBought)

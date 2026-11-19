@@ -1535,6 +1535,19 @@ let initialize = {
         if (typeof engine !== "undefined" && engine.ensurePrayerState) {
             engine.ensurePrayerState(shrine);
         }
+        if (!shrine.spiritAncestorRecords || shrine.spiritAncestorRecords === def.spiritAncestorRecords) {
+            shrine.spiritAncestorRecords = engine.freshSpiritAncestorRecords();
+        }
+        const ancestorKinds = ["earth", "water", "fire", "plant"];
+        for (let ai = 0; ai < ancestorKinds.length; ai++) {
+            const kind = ancestorKinds[ai];
+            const bucket = shrine.spiritAncestorRecords[kind];
+            if (!bucket || !bucket.entries) {
+                shrine.spiritAncestorRecords[kind] = { entries: [], nextIndex: 0 };
+            } else if (typeof bucket.nextIndex !== "number") {
+                bucket.nextIndex = 0;
+            }
+        }
         if (!shrine.cards || typeof shrine.cards !== "object") {
             shrine.cards = (typeof shrineCards !== "undefined" && shrineCards.createFreshCardsState)
                 ? shrineCards.createFreshCardsState()

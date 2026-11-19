@@ -4174,9 +4174,21 @@ let view = {
         const atTraining = engine.isSpiritAtTrainingSpot(spirit);
         view.updateVal("spiritInfoTrainingRow", trainingBought ? "" : "none", "style.display");
         view.updateVal("spiritInfoTraining", round1Fixed(spirit.training || 0));
+        const power = spirit.spiritPower || 0;
+        const training = spirit.training || 0;
+        view.updateVal("spiritInfoTrainingCap", trainingBought && training > power ? ` uses ${round1Fixed(power)} (capped at spirit power)` : "");
+        const hasHighest = spirit.highestTraining !== undefined && spirit.highestTraining !== null;
+        view.updateVal("spiritInfoHighestTrainingRow", hasHighest ? "" : "none", "style.display");
+        if (hasHighest) {
+            view.updateVal("spiritInfoHighestTraining", round1Fixed(spirit.highestTraining));
+        }
         if (atTraining) {
-            const trainGain = engine.getSpiritTrainingCardEffects().training;
-            view.updateVal("spiritInfoTrainingGain", ` (+${round1Fixed(trainGain)})`);
+            const trainFx = engine.getSpiritTrainingCardEffects(spirit);
+            let gainText = ` (+${round1Fixed(trainFx.training)}, ${roundNearestDecimals(trainFx.cost, 2)} mana)`;
+            if (hasHighest && training < spirit.highestTraining) {
+                gainText += ` x2 until ${round1Fixed(spirit.highestTraining)}`;
+            }
+            view.updateVal("spiritInfoTrainingGain", gainText);
         } else {
             view.updateVal("spiritInfoTrainingGain", "");
         }
@@ -4184,6 +4196,8 @@ let view = {
         view.updateVal("spiritInfoExpReq", round2(spirit.expToLevel || 15));
         const expBonusPct = Math.round((engine.getTeachFromExperienceExpMult(spirit) - 1) * 100);
         view.updateVal("spiritInfoExpBonus", expBonusPct > 0 ? `(+${expBonusPct}%)` : "");
+        const ancestorShown = round2(engine.getSpiritAncestorExpMultiplier(spirit));
+        view.updateVal("spiritInfoAncestorExp", ancestorShown > 1 ? `x${ancestorShown} from Spirit Ancestors` : "");
         view.updateVal("spiritInfoEarthExtras", kind === "earth" ? "" : "none", "style.display");
         view.updateVal("spiritInfoWaterExtras", kind === "water" ? "" : "none", "style.display");
         view.updateVal("spiritInfoFireExtras", kind === "fire" ? "" : "none", "style.display");
@@ -4368,21 +4382,22 @@ let view = {
         if (atTraining) {
             view.updateVal("spiritInfoTaskWrap", "", "style.display");
             view.updateVal("spiritInfoFireNote", "");
-            const trainExpPerSec = round2(engine.getSpiritTrainingExpPerSec());
+            const trainExpPerSec = round2(engine.getSpiritTrainingExpPerSec(spirit));
+            const trainCost = roundNearestDecimals(engine.getSpiritTrainingManaCost(spirit), 2);
             const taskEl = viewData.cached.spiritInfoTaskText;
             if (engine.canSpiritTrain(spirit)) {
                 view.updateVal("spiritInfoTaskProgressWrap", "", "style.display");
                 const ms = spirit.trainingTimerMs || 0;
                 const durationMs = Math.max(1, engine.getSpiritTrainingDurationMs());
                 const pct = Math.max(0, Math.min(100, (ms / durationMs) * 100));
-                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/${roundNearestDecimals(durationMs / 1000, 2)}s, +${trainExpPerSec} exp/s)`);
+                view.updateVal("spiritInfoTaskText", `Training (${round1Fixed(ms / 1000)}/${roundNearestDecimals(durationMs / 1000, 2)}s, +${trainExpPerSec} exp/s, ${trainCost} mana)`);
                 view.updateVal("spiritInfoTaskFill", `${pct}%`, "style.width");
                 if (taskEl) {
                     taskEl.classList.remove("muted-text");
                 }
             } else {
                 view.updateVal("spiritInfoTaskProgressWrap", "none", "style.display");
-                view.updateVal("spiritInfoTaskText", `+${trainExpPerSec} exp/s (waiting - need mana and training below spirit power)`);
+                view.updateVal("spiritInfoTaskText", `+${trainExpPerSec} exp/s (waiting - need ${trainCost} mana)`);
                 if (taskEl) {
                     taskEl.classList.add("muted-text");
                 }

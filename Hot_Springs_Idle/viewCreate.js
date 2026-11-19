@@ -321,12 +321,26 @@ let createView = {
         if (!resortHelper.isSpiritTrainingSpotBought() || !engine.getSpiritTrainingCardEffects) {
             return "";
         }
-        const trainFx = engine.getSpiritTrainingCardEffects();
+        const spirit = engine.getSpiritAtLocation("spiritTraining", 0);
+        const trainFx = engine.getSpiritTrainingCardEffects(spirit);
         const cost = roundNearestDecimals(trainFx.cost, 2);
         const duration = roundNearestDecimals(trainFx.durationMs / 1000, 2);
         const exp = roundNearestDecimals(trainFx.exp, 2);
         const training = roundNearestDecimals(trainFx.training, 2);
-        return `<p>At the Spirit Training Spot, a spirit trains when the Hidden Spring has at least ${cost} mana. Training lasts ${duration}s, then spends ${cost} Hidden Spring mana to grant ${exp} exp and +${training} training. Training can rise above Spirit Power. Effects use Spirit Power plus Spirit Training, up to an equal amount of Spirit Training.</p>`;
+        let trainingClause = `+${training} training`;
+        let costClause = `${cost} Hidden Spring mana`;
+        if (resortHelper.isWaterfallTrainingBought()) {
+            trainingClause = spirit
+                ? `+${training} training (spirit level / 10, plus card bonuses)`
+                : "spirit level / 10 training, plus card bonuses";
+            costClause = spirit
+                ? `${cost} Hidden Spring mana (x(1 + spirit level / 20))`
+                : "Hidden Spring mana multiplied by (1 + spirit level / 20)";
+        }
+        if (spirit && spirit.highestTraining !== undefined && spirit.highestTraining !== null && (spirit.training || 0) < spirit.highestTraining) {
+            trainingClause += `, x2 until ${round1Fixed(spirit.highestTraining)}`;
+        }
+        return `<p>At the Spirit Training Spot, a spirit trains when the Hidden Spring has at least ${cost} mana. Training lasts ${duration}s, then spends ${costClause} to grant ${exp} exp and ${trainingClause}. Effects use Spirit Power plus Spirit Training, up to an equal amount of Spirit Training. Training stored above Spirit Power does nothing until Spirit Power catches up.</p>`;
     },
     createBuildingInfoButtons: function() {
         createView.createInfoButton(
@@ -1500,8 +1514,9 @@ let createView = {
                     </div>
                     <div class="base-row">Level: <span id="spiritInfoLevel"></span></div>
                     <div class="base-row">Spirit power: <span id="spiritInfoPower"></span> <span id="spiritInfoPowerNote" class="muted-text"></span></div>
-                    <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span><span id="spiritInfoTrainingGain" class="muted-text"></span></div>
-                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpBonus" class="muted-text"></span></div>
+                    <div id="spiritInfoTrainingRow" class="base-row" style="display:none">Spirit Training: <span id="spiritInfoTraining"></span><span id="spiritInfoTrainingGain" class="muted-text"></span><span id="spiritInfoTrainingCap" class="muted-text"></span></div>
+                    <div id="spiritInfoHighestTrainingRow" class="base-row" style="display:none">Highest Spirit Training: <span id="spiritInfoHighestTraining"></span></div>
+                    <div class="base-row">Exp: <span id="spiritInfoExp"></span>/<span id="spiritInfoExpReq"></span> <span id="spiritInfoExpBonus" class="muted-text"></span> <span id="spiritInfoAncestorExp" class="muted-text"></span></div>
                     <div id="spiritInfoEarthExtras">
                         <div class="base-row">Pebbles active: <span id="spiritInfoPebbles"></span>/<span id="spiritInfoPebblesMax"></span></div>
                         <div class="base-row">Pebble carry: <span id="spiritInfoPebbleCarry"></span></div>
@@ -2450,7 +2465,7 @@ let createView = {
             "base_hiddenSpring_earthSpirit_row", "base_hiddenSpring_earthSpirit_btn", "base_hiddenSpring_earthSpirit_extra",
             "base_hiddenSpring_waterSpirit_row", "base_hiddenSpring_waterSpirit_btn", "base_hiddenSpring_waterSpirit_extra",
             "base_hiddenSpring_fireSpirit_row", "base_hiddenSpring_fireSpirit_btn", "base_hiddenSpring_fireSpirit_extra",
-            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpBonus",
+            "spiritInfoTitle", "spiritInfoRenameBtn", "spiritInfoNameInput", "spiritInfoLevel", "spiritInfoPower", "spiritInfoPowerNote", "spiritInfoTrainingRow", "spiritInfoTraining", "spiritInfoTrainingGain", "spiritInfoTrainingCap", "spiritInfoHighestTrainingRow", "spiritInfoHighestTraining", "spiritInfoExp", "spiritInfoExpReq", "spiritInfoExpBonus", "spiritInfoAncestorExp",
             "spiritInfoEarthExtras", "spiritInfoWaterExtras", "spiritInfoFireExtras", "spiritInfoFireLauncherExtras", "spiritInfoPlantExtras", "spiritInfoTaskWrap",
             "spiritInfoPebbles", "spiritInfoPebblesMax", "spiritInfoPebbleCarry", "spiritInfoPebbleEtas", "spiritInfoPrioritizeOreRow", "spiritInfoPriority_stone", "spiritInfoPriority_ore", "spiritInfoPriority_limestone", "spiritInfoPriorityLimestoneLabel", "spiritInfoAutoReturnMineRow", "spiritInfoAutoReturnMine_chk", "spiritInfoWaterVolume", "spiritInfoHeat", "spiritInfoEssence", "spiritInfoEqualSpacingRow", "spiritInfoEqualSpacing_chk", "spiritInfoDropletEtas", "spiritInfoFireNote",
             "spiritInfoFireLauncherName", "spiritInfoFireLauncherEmbers", "spiritInfoFireLauncherEmbersCap", "spiritInfoFireLauncherStats", "spiritInfoSelectLauncher_btn", "spiritInfoPlantColumn", "spiritInfoPlantChipsBonus",
